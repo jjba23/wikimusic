@@ -1,0 +1,13 @@
+#+title: Wikimusic
+
+Work in progress 🚧
+
+This is a Lisp (Guile Scheme) version of the Wikimusic system.
+
+It will replace the Haskell REST API and SSR frontend with a GNU Artanis monolith.
+
+https://codeberg.org/jjba23/wikimusic-api
+
+https://codeberg.org/jjba23/wikimusic-ssr
+
+The productivity gains have been fantastic.
