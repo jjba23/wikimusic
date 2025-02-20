@@ -33,7 +33,11 @@
                                         "font-black text-stone-800 text-md"))
                                    ,(G_ "viewing songs"))
                                (div
-                                ,(song-list G_ songs)
+                                (div
+                                 ,(map (lambda(x)
+                                         `(div
+                                           ,(item-tile G_ "songs" x))) songs)
+                                 )
                                 )))))
 
 (define-public (songs-detail-page G_ song)
@@ -43,19 +47,12 @@
                                         "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref song "display_name"))
                                (div
-                                ,(song-detail G_ song)
+                                (div
+                                 ,(format #f "~a" song)
+                                 )
                                 )
                                ))))
 
-(define (song-list G_ songs)
-  `(div
-    ,(map (lambda(x)
-            `(div
-              ,(item-tile G_ "songs" x))) songs)
-    ))
 
 
-(define (song-detail G_ song)
-  `(div
-    ,(format #f "~a" song)
-    ))
+

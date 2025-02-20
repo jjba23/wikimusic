@@ -33,7 +33,11 @@
                                         "font-black text-stone-800 text-md"))
                                    ,(G_ "viewing artists"))
                                (div
-                                ,(artist-list G_ artists)
+                                (div
+                                 ,(map (lambda(x)
+                                         `(div
+                                           ,(item-tile G_ "artists" x))) artists)
+                                 )
                                 )))))
 
 (define-public (artists-detail-page G_ artist)
@@ -43,19 +47,13 @@
                                         "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref artist "display_name"))
                                (div
-                                ,(artist-detail G_ artist)
+                                (div
+                                 ,(format #f "~a" artist)
+                                 )                                
                                 )
                                ))))
 
-(define (artist-list G_ artists)
-  `(div
-    ,(map (lambda(x)
-            `(div
-              ,(item-tile G_ "artists" x))) artists)
-    ))
 
 
-(define (artist-detail G_ artist)
-  `(div
-    ,(format #f "~a" artist)
-    ))
+
+

@@ -33,7 +33,11 @@
                                         "font-black text-stone-800 text-md"))
                                    ,(G_ "viewing genres"))
                                (div
-                                ,(genre-list G_ genres)
+                                (div
+                                 ,(map (lambda(x)
+                                         `(div
+                                           ,(item-tile G_ "genres" x))) genres)
+                                 )
                                 )))))
 
 (define-public (genres-detail-page G_ genre)
@@ -43,19 +47,13 @@
                                         "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref genre "display_name"))
                                (div
-                                ,(genre-detail G_ genre)
+                                (div
+                                 ,(format #f "~a" genre)
+                                 )
                                 )
                                ))))
 
-(define (genre-list G_ genres)
-  `(div
-    ,(map (lambda(x)
-            `(div
-              ,(item-tile G_ "genres" x))) genres)
-    ))
 
 
-(define (genre-detail G_ genre)
-  `(div
-    ,(format #f "~a" genre)
-    ))
+
+
