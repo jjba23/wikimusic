@@ -1,13 +1,31 @@
 #+title: Wikimusic
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: toc:nil num:nil
+
+[[https://jointhefreeworld.org/static-assets/badges/GNU-Guix-c48702.png]] [[https://jointhefreeworld.org/static-assets/badges/Scheme-Guile-d0730f.png]]
 
 Work in progress 🚧
+
+This is 100% free software, licensed under the GNU General Public License v3 or later.
+[[https://www.gnu.org/licenses/gpl-3.0.en.html][Refer to the full license, on GNU's website]]
+
+The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education.
+
+[[https://www.buymeacoffee.com/jjbigorra][Please donate by clicking here]]. This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong.
+
+-----
 
 This is a Lisp (Guile Scheme) version of the Wikimusic system.
 
 It will replace the Haskell REST API and SSR frontend with a GNU Artanis monolith.
 
+The productivity gains have been fantastic.
+
 https://codeberg.org/jjba23/wikimusic-api
 
 https://codeberg.org/jjba23/wikimusic-ssr
 
-The productivity gains have been fantastic.
+
+-----
