@@ -105,3 +105,13 @@
         )
   )
 
+(define-public (entity-details G_ entity x)
+  `((div
+     (dl
+      (dt ,(G_ "views"))
+      (dd
+       ,(format #f "~a" (assoc-ref x "views")))
+      (dt ,(G_ "uuid"))
+      (dd
+       ,(assoc-ref x "identifier"))
+      ))))

@@ -48,7 +48,7 @@
                                    ,(assoc-ref song "display_name"))
                                (div
                                 (div
-                                 ,(format #f "~a" song)
+                                 ,(entity-details G_ "songs" song)
                                  )
                                 )
                                ))))

@@ -48,7 +48,7 @@
                                    ,(assoc-ref genre "display_name"))
                                (div
                                 (div
-                                 ,(format #f "~a" genre)
+                                 ,(entity-details G_ "genres" genre)
                                  )
                                 )
                                ))))

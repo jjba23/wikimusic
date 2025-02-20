@@ -30,19 +30,20 @@
      (lambda (rc)
        (let ((artists ($artists 'get #:order-by '(created_at desc))))
          (response-emit (:mime rc
-                         (artists-list-page (:i18n rc) artists)))
-         
-         )))
+                         (artists-list-page (:i18n rc) artists))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let ((artist ($artists 'get
-                               #:ret 'top
-                               #:condition (where #:identifier (params rc "uuid")))))
+       (let* ((artist ($artists 'get
+                                #:ret 'top
+                                #:condition (where #:identifier (params rc "uuid"))))
+              (inc-v (+ 1 (assoc-ref (car artist) "views"))))
+         ;; do views update
+         (DB-query (DB-open rc)
+                   (->sql update 'artists set `((views ,inc-v))
+                          (where #:identifier (params rc "uuid"))))
          (response-emit (:mime rc
-                         (artists-detail-page (:i18n rc) (car artist))))
-         
-         )))
+                         (artists-detail-page (:i18n rc) (car artist)))))))
 

@@ -30,19 +30,20 @@
      (lambda (rc)
        (let ((songs ($songs 'get #:order-by '(created_at desc))))
          (response-emit (:mime rc
-                         (songs-list-page (:i18n rc) songs)))
-         
-         )))
+                         (songs-list-page (:i18n rc) songs))))))
 
 (get "/songs/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let ((song ($songs 'get
-                           #:ret 'top
-                           #:condition (where #:identifier (params rc "uuid")))))
+       (let* ((song ($songs 'get
+                            #:ret 'top
+                            #:condition (where #:identifier (params rc "uuid"))))
+              (inc-v (+ 1 (assoc-ref (car song) "views"))))
+         ;; do views update
+         (DB-query (DB-open rc)
+                   (->sql update 'songs set `((views ,inc-v))
+                          (where #:identifier (params rc "uuid"))))
          (response-emit (:mime rc
-                         (songs-detail-page (:i18n rc) (car song))))
-         
-         )))
+                         (songs-detail-page (:i18n rc) (car song)))))))
 

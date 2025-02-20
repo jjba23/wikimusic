@@ -30,19 +30,20 @@
      (lambda (rc)
        (let ((genres ($genres 'get #:order-by '(created_at desc))))
          (response-emit (:mime rc
-                         (genres-list-page (:i18n rc) genres)))
-         
-         )))
+                         (genres-list-page (:i18n rc) genres))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let ((genre ($genres 'get
-                             #:ret 'top
-                             #:condition (where #:identifier (params rc "uuid")))))
+       (let* ((genre ($genres 'get
+                              #:ret 'top
+                              #:condition (where #:identifier (params rc "uuid"))))
+              (inc-v (+ 1 (assoc-ref (car genre) "views"))))
+         ;; do views update
+         (DB-query (DB-open rc)
+                   (->sql update 'genres set `((views ,inc-v))
+                          (where #:identifier (params rc "uuid"))))
          (response-emit (:mime rc
-                         (genres-detail-page (:i18n rc) (car genre))))
-         
-         )))
+                         (genres-detail-page (:i18n rc) (car genre)))))))
 
