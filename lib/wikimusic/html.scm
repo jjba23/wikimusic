@@ -35,6 +35,16 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route))
 
+(begin
+  (define-syntax-rule (cond-render item render-func)
+    "Render HTML conditionally if item exists"
+    (cond
+      ((or (nil? item)
+           (equal? item #f))
+       '())
+      (else (render-func item))))
+  (export cond-render))
+
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
          (div (@ (class
@@ -98,25 +108,29 @@
                       (footer ,(page-footer G_))))))
   (export html-template))
 
-(define-public (item-tile G_ entity x)
-  `(div (@ (class "flex flex-col py-3"))
-        (a (@ (class "text-blue-800")
-              (href ,(format #f "/~a/uuid/~a" entity
-                             (assoc-ref x "identifier"))))
-           (span ,(assoc-ref x "display_name")))
-        (span ,(G_ "views")
-              ,(format #f "~a"
-                       (assoc-ref x "views")))))
-
-(begin
-  (define-syntax-rule (cond-render item render-func)
-    "Render HTML conditionally if item exists"
-    (cond
-      ((or (nil? item)
-           (equal? item #f))
-       '())
-      (else (render-func item))))
-  (export cond-render))
+(define-public (item-tile G_ entity x artworks)
+  (let ((item-link (format #f "/~a/uuid/~a" entity
+                           (assoc-ref x "identifier"))))
+    `(div (@ (class "flex flex-col py-3"))
+          ,(cond-render (cond
+                          ((equal? 0
+                                   (length artworks))
+                           '())
+                          (else (car artworks)))
+                        (lambda (art)
+                          `(figure (@ (class "py-3 sm:w-48"))
+                                   (a (@ (href ,item-link))
+                                      (img (@ (loading "lazy")
+                                              (class "rounded-xl")
+                                              (src ,(assoc-ref art
+                                                               "content_url"))))))))
+          (a (@ (class "text-blue-800 text-xl font-medium")
+                (href ,item-link))
+             (span ,(assoc-ref x "display_name")))
+          (div (@ (class "flex flex-row gap-2"))
+               (span ,(G_ "views"))
+               (span ,(format #f "~a"
+                              (assoc-ref x "views")))))))
 
 (define-public (render-visibility-status status)
   (cond
@@ -125,12 +139,13 @@
     (else `(span "unkown status"))))
 
 (define-public (entity-details G_ entity x artworks)
-  `((div (@(class "py-4")) ,(cond-render (assoc-ref x "description")
-                                         (lambda (description)
-                                           `(div (span (@ (class "text-stone-700 font-bold"))
-                                                       ,(G_ "description"))
-                                                 (span (@ (class "pl-3 text-stone-800"))
-                                                       ,(description)))))
+  `((div (@ (class "py-4"))
+         ,(cond-render (assoc-ref x "description")
+                       (lambda (description)
+                         `(div (p (@ (class "text-stone-700 font-bold"))
+                                  ,(G_ "description"))
+                               (p (@ (class "pl-3 text-stone-800"))
+                                  ,description))))
          (dl (dt (@ (class "text-stone-700 font-bold"))
                  ,(G_ "views"))
              (dd (@ (class "pl-3 text-stone-800"))
@@ -158,7 +173,8 @@
                            (lambda (approved-by)
                              `((dt (@ (class "text-stone-700 font-bold"))
                                    ,(G_ "approved by"))
-                               (dd (@(class "pl-3 text-stone-800")) ,approved-by))))
+                               (dd (@ (class "pl-3 text-stone-800"))
+                                   ,approved-by))))
              (dt (@ (class "text-stone-700 font-bold"))
                  ,(G_ "uuid"))
              (dd (@ (class "pl-3 text-stone-800"))
@@ -169,3 +185,4 @@
                                   (class "rounded-xl")
                                   (src ,(assoc-ref art "content_url"))))))
                artworks))))
+

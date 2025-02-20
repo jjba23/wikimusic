@@ -26,15 +26,21 @@
   #:use-module (ice-9 string-fun))
 
 (define-public (genres-list-page G_ genres artworks)
-  (html-template G_
-                 #:body `(div (@ (class "container mx-auto"))
-                              ((h2 (@ (class
-                                       "font-black text-stone-800 text-md"))
-                                   ,(G_ "viewing genres"))
-                               (div (div ,(map (lambda (x)
-                                                 `(div ,(item-tile G_ "genres"
-                                                                   x))) genres)
-                                         ,(format #f "~a" artworks)))))))
+  (let ((arts (lambda(x)(filter (lambda (art)
+                             (equal? (assoc-ref x "identifier")
+                                     (assoc-ref art "genre_identifier"))) artworks))))
+    (html-template G_
+                   #:body `(div (@ (class "container mx-auto"))
+                                ((h2 (@ (class
+                                          "font-black text-stone-800 text-md"))
+                                     ,(G_ "viewing genres"))
+                                 (div (div (@ (class
+                                                "flex flex-row flex-wrap gap-3 items-center"))
+                                           ,(map (lambda (x)
+                                                   `(div ,(item-tile G_
+                                                                     "genres"
+                                                                     x (arts x))))
+                                                 genres))))))))
 
 (define-public (genres-detail-page G_ genre artworks)
   (html-template G_
