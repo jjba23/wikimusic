@@ -67,23 +67,23 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                 "flex flex-row flex-wrap gap-3 p-3 bg-transparent items-center justify-left w-full shadow-md"))
+                "flex flex-row flex-wrap gap-3 p-3 bg-transparent items-center justify-left w-full shadow-md"))
             (a (@ (class "text-md text-stone-800 font-sans font-black px-4")
                   (href "/")) "Wikimusic")
             (a (@ (class
-                    "text-sm lowercase text-blue-800 font-sans font-medium px-2")
+                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
                   (href "/songs"))
                ,(G_ "Songs"))
             (a (@ (class
-                    "text-sm lowercase text-blue-800 font-sans font-medium px-2")
+                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
                   (href "/genres"))
                ,(G_ "Genres"))
             (a (@ (class
-                    "text-sm lowercase text-blue-800 font-sans font-medium px-2")
+                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
                   (href "/artists"))
                ,(G_ "Artists"))
             (a (@ (class
-                    "text-sm lowercase text-blue-800 font-sans font-medium px-2")
+                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
                   (href "/login"))
                ,(G_ "Login"))))
     `(html (head (title "Wikimusic")

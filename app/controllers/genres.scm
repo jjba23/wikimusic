@@ -30,14 +30,12 @@
      (lambda (rc)
        (let* ((genres ($genres 'get
                                #:order-by '(created_at desc)))
+              (genre-ids (map (lambda (s)
+                                (assoc-ref s "identifier")) genres))
               (artworks ($genre_artworks 'get
                                          #:ret 'all
                                          #:condition (where #:genre_identifier
-                                                            (map (lambda (s)
-                                                                   (assoc-ref
-                                                                    s
-                                                                    "identifier"))
-                                                                 genres)))))
+                                                            genre-id))))
          (response-emit (:mime rc
                                (genres-list-page (:i18n rc) genres artworks))))))
 

@@ -26,17 +26,18 @@
   #:use-module (ice-9 string-fun))
 
 (define-public (songs-list-page G_ songs artworks)
-  (let ((arts (lambda(x) (filter (lambda (art)
-                              (equal? (assoc-ref x "identifier")
+  (let ((arts (lambda (x)
+                (filter (lambda (art)
+                          (equal? (assoc-ref x "identifier")
 
-                                      (assoc-ref art "song_identifier"))) artworks))))
+                                  (assoc-ref art "song_identifier"))) artworks))))
     (html-template G_
                    #:body `(div (@ (class "container mx-auto"))
                                 ((h2 (@ (class
-                                          "font-black text-stone-800 text-md"))
+                                         "font-black text-stone-800 text-md"))
                                      ,(G_ "viewing songs"))
                                  (div (div (@ (class
-                                                "flex flex-row flex-wrap gap-3 items-center"))
+                                               "flex flex-row flex-wrap gap-3 items-center"))
                                            ,(map (lambda (x)
                                                    `(div ,(item-tile G_
                                                                      "songs" x

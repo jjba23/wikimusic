@@ -30,16 +30,13 @@
      (lambda (rc)
        (let* ((songs ($songs 'get
                              #:order-by '(created_at desc)))
+              (song-ids (map (lambda (s)
+                               
+                               (assoc-ref s "identifier")) songs))
               (artworks ($song_artworks 'get
                                         #:ret 'all
-                                        #:condition (where #:song_identifier (map (lambda 
-                                                                                          (s)
-                                                                                    
-                                                                                    
-                                                                                    (assoc-ref
-                                                                                     s
-                                                                                     "identifier"))
-                                                                              songs)))))
+                                        #:condition (where #:song_identifier
+                                                           song-ids))))
          (response-emit (:mime rc
                                (songs-list-page (:i18n rc) songs artworks))))))
 

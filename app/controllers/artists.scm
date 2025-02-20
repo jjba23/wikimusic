@@ -30,15 +30,13 @@
      (lambda (rc)
        (let* ((artists ($artists 'get
                                  #:order-by '(created_at desc)))
+              (artist-ids (map (lambda (s)
+                                 (assoc-ref s "identifier")) artists))
               (artworks ($artist_artworks 'get
                                           #:ret 'all
                                           #:condition (where
                                                              #:artist_identifier
-                                                             (map (lambda (s)
-                                                                    (assoc-ref
-                                                                     s
-                                                                     "identifier"))
-                                                                  artists)))))
+                                                             artist-ids))))
          (response-emit (:mime rc
                                (artists-list-page (:i18n rc) artists artworks))))))
 
