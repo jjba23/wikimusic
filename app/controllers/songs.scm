@@ -35,6 +35,7 @@
                                         #:condition (where #:song_identifier (map (lambda 
                                                                                           (s)
                                                                                     
+                                                                                    
                                                                                     (assoc-ref
                                                                                      s
                                                                                      "identifier"))
