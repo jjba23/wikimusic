@@ -35,14 +35,13 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route))
 
-
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
          (div (@ (class
-                   "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
+                  "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
               (p (@ (class "text-sm text-stone-600"))
                  ,(G_ "find the source code here"))
-              (a (@ (class "text-stone-800 font-bold cursor-pointer text-sm")
+              (a (@ (class "text-blue-800 font-bold cursor-pointer text-sm")
                     (href "https://codeberg.org/jjba23/wikimusic"))
                  "https://codeberg.org/jjba23/wikimusic"))
          (p (@ (class "py-3"))
@@ -58,19 +57,23 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                 "flex flex-row flex-wrap gap-3 p-3 bg-transparent items-center justify-left w-full shadow-md"))
+                "flex flex-row flex-wrap gap-3 p-3 bg-transparent items-center justify-left w-full shadow-md"))
             (a (@ (class "text-md text-stone-800 font-sans font-black px-4")
                   (href "/")) "Wikimusic")
-            (a (@ (class "text-sm lowercase text-stone-800 font-sans font-medium px-2")
+            (a (@ (class
+                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
                   (href "/login"))
                ,(G_ "Login"))
-            (a (@ (class "text-sm lowercase text-stone-800 font-sans font-medium px-2")
+            (a (@ (class
+                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
                   (href "/songs"))
                ,(G_ "Songs"))
-            (a (@ (class "text-sm lowercase text-stone-800 font-sans font-medium px-2")
+            (a (@ (class
+                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
                   (href "/genres"))
                ,(G_ "Genres"))
-            (a (@ (class "text-sm lowercase text-stone-800 font-sans font-medium px-2")
+            (a (@ (class
+                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
                   (href "/artists"))
                ,(G_ "Artists"))))
     `(html (head (title "Wikimusic")
@@ -90,32 +93,53 @@
            (body (@ (class "bg-stone-200/50"))
                  (div (@ (class "flex flex-col h-screen justify-between"))
                       (div ,nav
-                           (div (@(class "py-8")) ,body))
+                           (div (@ (class "py-8"))
+                                ,body))
                       (footer ,(page-footer G_))))))
   (export html-template))
 
 (define-public (item-tile G_ entity x)
-  `(div (@(class "flex flex-col p-2"))
-        (a (@(class "text-blue-800")
-            (href ,(format #f "/~a/uuid/~a" entity (assoc-ref x "identifier"))))
+  `(div (@ (class "flex flex-col py-3"))
+        (a (@ (class "text-blue-800")
+              (href ,(format #f "/~a/uuid/~a" entity
+                             (assoc-ref x "identifier"))))
            (span ,(assoc-ref x "display_name")))
-        (span
-         ,(G_ "views")
-         ,(format #f "~a" (assoc-ref x "views")))
-        )
-  )
+        (span ,(G_ "views")
+              ,(format #f "~a"
+                       (assoc-ref x "views")))))
+
+(begin
+  (define-syntax-rule (cond-render item render-func)
+    "Render HTML conditionally if item exists"
+    (cond
+      ((or (nil? item)
+           (equal? item #f))
+       '())
+      (else (render-func item))))
+  (export cond-render))
 
 (define-public (entity-details G_ entity x artworks)
-  `((div
-     (dl
-      (dt ,(G_ "views"))
-      (dd
-       ,(format #f "~a" (assoc-ref x "views")))
-      (dt ,(G_ "uuid"))
-      (dd
-       ,(assoc-ref x "identifier")))
-     ,(map (lambda(art)
-             `(figure (@(class "py-3 sm:w-48"))
-                      (img (@(class "rounded-xl")(src ,(assoc-ref art "content_url")))))
-             ) artworks)
-     )))
+  `((div ,(cond-render (assoc-ref x "description")
+                       (lambda (description)
+                         `(div (span ,(G_ "description"))
+                               (span ,(description)))))
+         (dl (dt ,(G_ "views"))
+             (dd ,(format #f "~a"
+                          (assoc-ref x "views")))
+             (dt ,(G_ "created"))
+             (dl ,(assoc-ref x "created_at"))
+             (dt ,(G_ "last edited"))
+             (dl ,(assoc-ref x "last_edited_at"))
+             (dt ,(G_ "contributor"))
+             (dl ,(assoc-ref x "created_by"))
+             (dt ,(G_ "visibility"))
+             (dl ,(assoc-ref x "visibility_status"))
+             (dt ,(G_ "approved by"))
+             (dl ,(assoc-ref x "approved_by"))
+             (dt ,(G_ "uuid"))
+             (dd ,(assoc-ref x "identifier")))
+         ,(map (lambda (art)
+                 `(figure (@ (class "py-3 sm:w-48"))
+                          (img (@ (class "rounded-xl")
+                                  (src ,(assoc-ref art "content_url"))))))
+               artworks))))

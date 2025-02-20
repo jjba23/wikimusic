@@ -15,7 +15,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
 
-
 (define-module (app views login)
   #:use-module (wikimusic html)
   #:use-module (artanis artanis)
@@ -30,11 +29,11 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-bold text-stone-800 text-md"))
+                                       "font-bold text-stone-800 text-md"))
                                    ,(G_ "login to wikimusic"))
                                (div (form (@ (action "/login")
                                              (class
-                                               "w-full rounded-xl bg-stone-200/75 p-4 flex flex-row flex-wrap items-center gap-4 align-center")
+                                              "w-full rounded-xl bg-stone-200/75 p-4 flex flex-row flex-wrap items-center gap-4 align-center")
                                              (method "POST"))
                                           (label ,(G_ "username"))
                                           (input (@ (type "text")
@@ -46,6 +45,6 @@
                                                     (name "password")) "")
                                           (button (@ (type "submit")
                                                      (class
-                                                       "p-2 rounded-xl w-min bg-green-700/75 text-white"))
+                                                      "p-2 rounded-xl w-min bg-green-700/75 text-white"))
                                                   "login")))))))
 

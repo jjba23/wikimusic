@@ -15,7 +15,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
 
-
 (define-module (app views artists)
   #:use-module (wikimusic html)
   #:use-module (artanis artanis)
@@ -30,31 +29,20 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-black text-stone-800 text-md"))
+                                       "font-black text-stone-800 text-md"))
                                    ,(G_ "viewing artists"))
-                               (div
-                                (div
-                                 ,(map (lambda(x)
-                                         `(div
-                                           ,(item-tile G_ "artists" x))) artists)
-                                 ,(format #f "~a" artworks)
-                                 )
-                                )))))
+                               (div (div ,(map (lambda (x)
+                                                 `(div ,(item-tile G_
+                                                                   "artists" x)))
+                                               artists)
+                                         ,(format #f "~a" artworks)))))))
 
 (define-public (artists-detail-page G_ artist artworks)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-black text-stone-800 text-xl"))
+                                       "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref artist "display_name"))
-                               (div
-                                (div
-                                 ,(entity-details G_ "artists" artist artworks)
-                                 )                                
-                                )
-                               ))))
-
-
-
-
+                               (div (div ,(entity-details G_ "artists" artist
+                                                          artworks)))))))
 

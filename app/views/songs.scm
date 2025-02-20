@@ -15,7 +15,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
 
-
 (define-module (app views songs)
   #:use-module (wikimusic html)
   #:use-module (artanis artanis)
@@ -30,30 +29,19 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-black text-stone-800 text-md"))
+                                       "font-black text-stone-800 text-md"))
                                    ,(G_ "viewing songs"))
-                               (div
-                                (div
-                                 ,(map (lambda(x)
-                                         `(div
-                                           ,(item-tile G_ "songs" x))) songs)
-                                 ,(format #f "~a" artworks)
-                                 )
-                                )))))
+                               (div (div ,(map (lambda (x)
+                                                 `(div ,(item-tile G_ "songs"
+                                                                   x))) songs)
+                                         ,(format #f "~a" artworks)))))))
 
 (define-public (songs-detail-page G_ song artworks)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-black text-stone-800 text-xl"))
+                                       "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref song "display_name"))
-                               (div
-                                (div
-                                 ,(entity-details G_ "songs" song artworks)
-                                 )
-                                )
-                               ))))
-
-
-
+                               (div (div ,(entity-details G_ "songs" song
+                                                          artworks)))))))
 

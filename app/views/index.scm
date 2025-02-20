@@ -15,7 +15,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
 
-
 (define-module (app views index)
   #:use-module (wikimusic html)
   #:use-module (artanis artanis)
@@ -29,12 +28,9 @@
 (define-public (welcome-page G_)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
-                              (div
-                               (h2 (@ (class
-                                        "font-black text-stone-800 text-md"))
-                                   ,(G_ "welcome to wikimusic"))
-                               (p ,(G_ "wikimusic - the free music knowledge encyclopaedia")))
-                              )))
-
-
+                              (div (h2 (@ (class
+                                           "font-black text-stone-800 text-md"))
+                                       ,(G_ "welcome to wikimusic"))
+                                   (p ,(G_
+                                        "wikimusic - the free music knowledge encyclopaedia"))))))
 

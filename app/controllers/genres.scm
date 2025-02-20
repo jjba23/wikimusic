@@ -15,7 +15,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
 
-
 (define-artanis-controller genres)
 
 (import (wikimusic html)
@@ -29,13 +28,18 @@
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((genres ($genres 'get #:order-by '(created_at desc)))
+       (let* ((genres ($genres 'get
+                               #:order-by '(created_at desc)))
               (artworks ($genre_artworks 'get
                                          #:ret 'all
                                          #:condition (where #:genre_identifier
-                                                            (map (lambda(s) (assoc-ref s "identifier")) genres)))))
+                                                            (map (lambda (s)
+                                                                   (assoc-ref
+                                                                    s
+                                                                    "identifier"))
+                                                                 genres)))))
          (response-emit (:mime rc
-                         (genres-list-page (:i18n rc) genres artworks))))))
+                               (genres-list-page (:i18n rc) genres artworks))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
@@ -43,15 +47,21 @@
      (lambda (rc)
        (let* ((genre ($genres 'get
                               #:ret 'top
-                              #:condition (where #:identifier (params rc "uuid"))))
-              (inc-v (+ 1 (assoc-ref (car genre) "views")))
+                              #:condition (where #:identifier (params rc
+                                                                      "uuid"))))
+              (inc-v (+ 1
+                        (assoc-ref (car genre) "views")))
               (artworks ($genre_artworks 'get
                                          #:ret 'all
-                                         #:condition (where #:genre_identifier (params rc "uuid")))))
+                                         #:condition (where #:genre_identifier
+                                                            (params rc "uuid")))))
          ;; do views update
          (DB-query (DB-open rc)
-                   (->sql update 'genres set `((views ,inc-v))
+                   (->sql update
+                          'genres set
+                          `((views ,inc-v))
                           (where #:identifier (params rc "uuid"))))
          (response-emit (:mime rc
-                         (genres-detail-page (:i18n rc) (car genre) artworks))))))
+                               (genres-detail-page (:i18n rc)
+                                                   (car genre) artworks))))))
 

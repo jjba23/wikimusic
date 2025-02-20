@@ -15,7 +15,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
 
-
 (define-artanis-controller login)
 
 (import (wikimusic html)
@@ -28,5 +27,5 @@
      #:i18n '(cookie "lang")
      (lambda (rc)
        (response-emit (:mime rc
-                       (login-page (:i18n rc))))))
+                             (login-page (:i18n rc))))))
 

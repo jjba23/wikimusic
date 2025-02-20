@@ -15,7 +15,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
 
-
 (define-artanis-controller artists)
 
 (import (wikimusic html)
@@ -29,13 +28,19 @@
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((artists ($artists 'get #:order-by '(created_at desc)))
+       (let* ((artists ($artists 'get
+                                 #:order-by '(created_at desc)))
               (artworks ($artist_artworks 'get
                                           #:ret 'all
-                                          #:condition (where #:artist_identifier
-                                                             (map (lambda(s) (assoc-ref s "identifier")) artists)))))
+                                          #:condition (where
+                                                             #:artist_identifier
+                                                             (map (lambda (s)
+                                                                    (assoc-ref
+                                                                     s
+                                                                     "identifier"))
+                                                                  artists)))))
          (response-emit (:mime rc
-                         (artists-list-page (:i18n rc) artists artworks))))))
+                               (artists-list-page (:i18n rc) artists artworks))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
@@ -43,15 +48,22 @@
      (lambda (rc)
        (let* ((artist ($artists 'get
                                 #:ret 'top
-                                #:condition (where #:identifier (params rc "uuid"))))
-              (inc-v (+ 1 (assoc-ref (car artist) "views")))
+                                #:condition (where #:identifier (params rc
+                                                                 "uuid"))))
+              (inc-v (+ 1
+                        (assoc-ref (car artist) "views")))
               (artworks ($artist_artworks 'get
                                           #:ret 'all
-                                          #:condition (where #:artist_identifier (params rc "uuid")))))
+                                          #:condition (where
+                                                             #:artist_identifier
+                                                             (params rc "uuid")))))
          ;; do views update
          (DB-query (DB-open rc)
-                   (->sql update 'artists set `((views ,inc-v))
+                   (->sql update
+                          'artists set
+                          `((views ,inc-v))
                           (where #:identifier (params rc "uuid"))))
          (response-emit (:mime rc
-                         (artists-detail-page (:i18n rc) (car artist) artworks))))))
+                               (artists-detail-page (:i18n rc)
+                                                    (car artist) artworks))))))
 
