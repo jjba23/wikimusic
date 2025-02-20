@@ -25,7 +25,7 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define-public (songs-list-page G_ songs artworks)
+(define-public (songs-list-page G_ songs artworks song-version-count-alist)
   (let ((arts (lambda (x)
                 (filter (lambda (art)
                           (equal? (assoc-ref x "identifier")
@@ -44,12 +44,64 @@
                                                                      (arts x))))
                                                  songs))))))))
 
-(define-public (songs-detail-page G_ song artworks)
+(define-public (songs-detail-page G_ song artworks song-contents)
   (html-template G_
-                 #:body `(div (@ (class "container mx-auto"))
-                              ((h2 (@ (class
-                                       "font-black text-stone-800 text-xl"))
-                                   ,(assoc-ref song "display_name"))
-                               (div (div ,(entity-details G_ "songs" song
-                                                          artworks)))))))
+                 #:body `((div (@ (class "container mx-auto"))
+                               ((h2 (@ (class
+                                        "font-black text-stone-800 text-xl"))
+                                    ,(assoc-ref song "display_name"))
+                                (div (div ,(entity-details G_ "songs" song
+                                                           artworks)))))
+                          (div ,(render-song-contents G_ song song-contents)))))
 
+(define-public (render-song-contents G_ song song-contents)
+  `(div (@ (class "flex flex-col gap-6"))
+        ,(map (lambda (version)
+                `((hr)
+                  (details (@ (open "true")
+                              (class "cursor-pointer"))
+                           (summary (@ (class "p-6"))
+                                    ,(cond-render (assoc-ref version
+                                                             "version_name")
+                                                  (lambda (version-name)
+                                                    `(div (@ (class
+                                                              "flex flex-row flex-wrap gap-4"))
+                                                          (span (@ (class
+                                                                    "text-xl font-bold text-stone-700"))
+                                                                ,(G_ "version"))
+                                                          (span (@ (class
+                                                                    "text-xl font-bold text-stone-700"))
+                                                                ,version-name)
+                                                          ,(cond-render (assoc-ref
+                                                                         version
+                                                                         "instrument_type")
+                                                                        (lambda 
+                                                                                (instrument-type)
+                                                                          `(span
+                                                                            (@
+                                                                             (class
+                                                                              "text-xl font-bold text-stone-700"))
+                                                                            ,instrument-type)))))))
+                           (div (@ (class "p-4"))
+
+                                ,(cond-render (assoc-ref version
+                                                         "ascii_legend")
+                                              (lambda (ascii-legend)
+                                                `(div (span (@ (class
+                                                                "text-xl font-bold text-stone-700"))
+                                                            ,(G_
+                                                              "ascii legend"))
+                                                      (pre (@ (class
+                                                               "p-6 m-4 bg-stone-200/75 text-black rounded-xl white-space-pre overflow-x-scroll text-sm"))
+                                                           ,ascii-legend))))
+                                ,(cond-render (assoc-ref version
+                                                         "ascii_contents")
+                                              (lambda (ascii-contents)
+                                                `(div (span (@ (class
+                                                                "text-xl font-bold text-stone-700"))
+                                                            ,(G_
+                                                              "ascii contents"))
+                                                      (pre (@ (class
+                                                               "p-6 m-4 bg-stone-200/75 text-black rounded-xl white-space-pre overflow-x-scroll text-sm"))
+                                                           ,ascii-contents))))))))
+              song-contents)))

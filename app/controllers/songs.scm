@@ -17,11 +17,13 @@
 
 (define-artanis-controller songs)
 
+(import (app views songs))
 (import (wikimusic html)
         (web uri)
         (ice-9 string-fun)
         (app models songs)
         (app models song_artworks)
+        (app models song_contents)
         (app views songs))
 
 (get "/songs"
@@ -31,36 +33,57 @@
        (let* ((songs ($songs 'get
                              #:order-by '(created_at desc)))
               (song-ids (map (lambda (s)
-                               
                                (assoc-ref s "identifier")) songs))
-              (artworks ($song_artworks 'get
-                                        #:ret 'all
-                                        #:condition (where #:song_identifier
-                                                           song-ids))))
+              (artworks (cond
+                          ((nil? song-ids)
+                           '())
+                          (else ($song_artworks 'get
+                                                #:ret 'all
+                                                #:condition (where
+                                                                   #:song_identifier
+                                                                   song-ids)))))
+              (song_contents (cond
+                               ((nil? song-ids)
+                                '())
+                               (else ($song_contents 'get
+                                                     #:ret 'all
+                                                     #:condition (where
+                                                                  #:song_identifier
+                                                                  song-ids)))))
+              (song-version-count-alist '()))
          (response-emit (:mime rc
-                               (songs-list-page (:i18n rc) songs artworks))))))
+                               (songs-list-page (:i18n rc) songs artworks
+                                                song-version-count-alist))))))
 
 (get "/songs/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((song ($songs 'get
-                            #:ret 'top
-                            #:condition (where #:identifier (params rc "uuid"))))
+       (let* ((uuid (params rc "uuid"))
+              (song (car ($songs 'get
+                                 #:ret 'top
+                                 #:condition (where #:identifier uuid))))
               (inc-v (+ 1
-                        (assoc-ref (car song) "views")))
+                        (assoc-ref song "views")))
               (artworks ($song_artworks 'get
                                         #:ret 'all
-                                        #:condition (where #:song_identifier (params
-                                                                              rc
-                                                                              "uuid")))))
+                                        #:condition (where #:song_identifier
+                                                           uuid)))
+              (song-contents ($song_contents 'get
+                                             #:ret 'all
+                                             #:condition (where
+                                                                #:song_identifier
+                                                                uuid))))
+         
          ;; do views update
          (DB-query (DB-open rc)
                    (->sql update
                           'songs set
                           `((views ,inc-v))
-                          (where #:identifier (params rc "uuid"))))
+                          (where #:identifier uuid)))
+
+         ;; return rendered view
          (response-emit (:mime rc
-                               (songs-detail-page (:i18n rc)
-                                                  (car song) artworks))))))
+                               (songs-detail-page (:i18n rc) song artworks
+                                                  song-contents))))))
 

@@ -37,7 +37,7 @@
                                          #:condition (where #:genre_identifier
                                                             genre-ids))))
          (response-emit (:mime rc
-                         (genres-list-page (:i18n rc) genres artworks))))))
+                               (genres-list-page (:i18n rc) genres artworks))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
