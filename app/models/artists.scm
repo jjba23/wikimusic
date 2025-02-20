@@ -22,8 +22,8 @@
                       (identifier char-field
                                   (#:primary-key #:maxlen 36))
                       (display_name char-field (#:maxlen 256))
-                      (created_by char-field (#:maxlen 36))
-                      (visibility_status small-int (#:not-null))
+                      (created_by char-field (#:not-null #:maxlen 36))
+                      (visibility_status smallint (#:not-null))
                       (approved_by char-field (#:maxlen 36))
                       (views bigint (#:not-null))
                       (description char-field (#:maxlen 2048))

@@ -22,15 +22,20 @@
         (web uri)
         (ice-9 string-fun)
         (app models artists)
+        (app models artist_artworks)
         (app views artists))
 
 (get "/artists"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let ((artists ($artists 'get #:order-by '(created_at desc))))
+       (let* ((artists ($artists 'get #:order-by '(created_at desc)))
+              (artworks ($artist_artworks 'get
+                                          #:ret 'all
+                                          #:condition (where #:artist_identifier
+                                                             (map (lambda(s) (assoc-ref s "identifier")) artists)))))
          (response-emit (:mime rc
-                         (artists-list-page (:i18n rc) artists))))))
+                         (artists-list-page (:i18n rc) artists artworks))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
@@ -39,11 +44,14 @@
        (let* ((artist ($artists 'get
                                 #:ret 'top
                                 #:condition (where #:identifier (params rc "uuid"))))
-              (inc-v (+ 1 (assoc-ref (car artist) "views"))))
+              (inc-v (+ 1 (assoc-ref (car artist) "views")))
+              (artworks ($artist_artworks 'get
+                                          #:ret 'all
+                                          #:condition (where #:artist_identifier (params rc "uuid")))))
          ;; do views update
          (DB-query (DB-open rc)
                    (->sql update 'artists set `((views ,inc-v))
                           (where #:identifier (params rc "uuid"))))
          (response-emit (:mime rc
-                         (artists-detail-page (:i18n rc) (car artist)))))))
+                         (artists-detail-page (:i18n rc) (car artist) artworks))))))
 

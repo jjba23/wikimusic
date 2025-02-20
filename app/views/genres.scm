@@ -26,7 +26,7 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define-public (genres-list-page G_ genres)
+(define-public (genres-list-page G_ genres artworks)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
@@ -37,10 +37,11 @@
                                  ,(map (lambda(x)
                                          `(div
                                            ,(item-tile G_ "genres" x))) genres)
+                                 ,(format #f "~a" artworks)
                                  )
                                 )))))
 
-(define-public (genres-detail-page G_ genre)
+(define-public (genres-detail-page G_ genre artworks)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
@@ -48,7 +49,7 @@
                                    ,(assoc-ref genre "display_name"))
                                (div
                                 (div
-                                 ,(entity-details G_ "genres" genre)
+                                 ,(entity-details G_ "genres" genre artworks)
                                  )
                                 )
                                ))))

@@ -105,7 +105,7 @@
         )
   )
 
-(define-public (entity-details G_ entity x)
+(define-public (entity-details G_ entity x artworks)
   `((div
      (dl
       (dt ,(G_ "views"))
@@ -113,5 +113,9 @@
        ,(format #f "~a" (assoc-ref x "views")))
       (dt ,(G_ "uuid"))
       (dd
-       ,(assoc-ref x "identifier"))
-      ))))
+       ,(assoc-ref x "identifier")))
+     ,(map (lambda(art)
+             `(figure (@(class "py-3 sm:w-48"))
+                      (img (@(class "rounded-xl")(src ,(assoc-ref art "content_url")))))
+             ) artworks)
+     )))

@@ -26,7 +26,7 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define-public (songs-list-page G_ songs)
+(define-public (songs-list-page G_ songs artworks)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
@@ -37,10 +37,11 @@
                                  ,(map (lambda(x)
                                          `(div
                                            ,(item-tile G_ "songs" x))) songs)
+                                 ,(format #f "~a" artworks)
                                  )
                                 )))))
 
-(define-public (songs-detail-page G_ song)
+(define-public (songs-detail-page G_ song artworks)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
@@ -48,7 +49,7 @@
                                    ,(assoc-ref song "display_name"))
                                (div
                                 (div
-                                 ,(entity-details G_ "songs" song)
+                                 ,(entity-details G_ "songs" song artworks)
                                  )
                                 )
                                ))))
