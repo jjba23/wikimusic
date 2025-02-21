@@ -30,7 +30,7 @@
                        (login-page (:i18n rc))))))
 
 (post "/login"
-      #:auth '(table users "email_address" "password_hash")
+      #:auth '(table users "username" "password_hash")
       #:session #t
       (lambda (rc)
         (cond

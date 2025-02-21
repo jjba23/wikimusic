@@ -42,7 +42,7 @@
                                           (label ,(G_ "password"))
                                           (input (@ (type "password")
                                                     (class "p-3 rounded-xl")
-                                                    (name "password")) "")
+                                                    (name "password_hash")) "")
                                           (button (@ (type "submit")
                                                      (class
                                                       "p-2 rounded-xl w-min bg-green-700/75 text-white"))

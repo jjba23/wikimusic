@@ -23,6 +23,8 @@
                                   (#:primary-key #:maxlen 36))
                       (display_name char-field
                                     (#:not-null #:maxlen 256))
+                      (username char-field
+                                (#:not-null #:maxlen 256))
                       (email_address char-field
                                      (#:not-null #:unique #:maxlen 512))
                       (password_hash char-field
