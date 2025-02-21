@@ -33,43 +33,44 @@
                                  #:order-by '(created_at desc)))
               (artist-ids (map (lambda (s)
                                  (assoc-ref s "identifier")) artists))
-              (artworks ($artist_artworks 'get
-                                          #:ret 'all
-                                          #:condition (where
-                                                             #:artist_identifier
-                                                             artist-ids)))
+              (artworks (cond ((nil? artist-ids) '())
+                              (else ($artist_artworks 'get
+                                                      #:ret 'all
+                                                      #:condition (where
+                                                                   #:artist_identifier
+                                                                   artist-ids)))))
               (opinions (cond
-                          ((nil? artist-ids)
-                           '())
-                          (else ($artist_opinions 'get
-                                                  #:ret 'all
-                                                  #:condition (where
-                                                               #:artist_identifier
-                                                               artist-ids))))))
+                         ((nil? artist-ids)
+                          '())
+                         (else ($artist_opinions 'get
+                                                 #:ret 'all
+                                                 #:condition (where
+                                                              #:artist_identifier
+                                                              artist-ids))))))
          (response-emit (:mime rc
-                               (artists-list-page (:i18n rc) artists artworks
-                                                  opinions))))))
+                         (artists-list-page (:i18n rc) artists artworks
+                                            opinions))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
        (let* ((uuid (params rc "uuid"))
-              (artist ($artists 'get
-                                #:ret 'top
-                                #:condition (where #:identifier uuid)))
+              (artist (car ($artists 'get
+                                     #:ret 'top
+                                     #:condition (where #:identifier uuid))))
               (inc-v (+ 1
-                        (assoc-ref (car artist) "views")))
+                        (assoc-ref artist "views")))
               (artworks ($artist_artworks 'get
                                           #:ret 'all
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))
+                                                       #:artist_identifier
+                                                       uuid)))
               (opinions ($artist_opinions 'get
                                           #:ret 'all
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid))))
+                                                       #:artist_identifier
+                                                       uuid))))
          ;; do views update
          (DB-query (DB-open rc)
                    (->sql update
@@ -77,7 +78,7 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                               (artists-detail-page (:i18n rc)
-                                                    (car artist) artworks
-                                                    opinions))))))
+                         (artists-detail-page (:i18n rc)
+                                              artist artworks
+                                              opinions))))))
 

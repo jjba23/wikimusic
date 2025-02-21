@@ -33,32 +33,33 @@
                                #:order-by '(created_at desc)))
               (genre-ids (map (lambda (s)
                                 (assoc-ref s "identifier")) genres))
-              (artworks ($genre_artworks 'get
-                                         #:ret 'all
-                                         #:condition (where #:genre_identifier
-                                                            genre-ids)))
+              (artworks (cond ((nil? genre-ids) '())
+                              (else ($genre_artworks 'get
+                                                     #:ret 'all
+                                                     #:condition (where #:genre_identifier
+                                                                        genre-ids)))))
               (opinions (cond
-                          ((nil? genre-ids)
-                           '())
-                          (else ($genre_opinions 'get
-                                                 #:ret 'all
-                                                 #:condition (where
-                                                                    #:genre_identifier
-                                                                    genre-ids))))))
+                         ((nil? genre-ids)
+                          '())
+                         (else ($genre_opinions 'get
+                                                #:ret 'all
+                                                #:condition (where
+                                                             #:genre_identifier
+                                                             genre-ids))))))
          (response-emit (:mime rc
-                               (genres-list-page (:i18n rc) genres artworks
-                                                 opinions))))))
+                         (genres-list-page (:i18n rc) genres artworks
+                                           opinions))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
        (let* ((uuid (params rc "uuid"))
-              (genre ($genres 'get
-                              #:ret 'top
-                              #:condition (where #:identifier uuid)))
+              (genre (car ($genres 'get
+                                   #:ret 'top
+                                   #:condition (where #:identifier uuid))))
               (inc-v (+ 1
-                        (assoc-ref (car genre) "views")))
+                        (assoc-ref genre "views")))
               (artworks ($genre_artworks 'get
                                          #:ret 'all
                                          #:condition (where #:genre_identifier
@@ -74,7 +75,7 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                               (genres-detail-page (:i18n rc)
-                                                   (car genre) artworks
-                                                   opinions))))))
+                         (genres-detail-page (:i18n rc)
+                                             genre artworks
+                                             opinions))))))
 
