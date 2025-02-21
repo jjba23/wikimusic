@@ -29,8 +29,8 @@
                                      (#:maxlen 2048))
                       (password_reset_token char-field
                                             (#:maxlen 2048))
-                      (auth_token char-field
-                                  (#:maxlen 2048))
+                      (salt char-field
+                            (#:maxlen 2048))
                       (latest_login_at date-field)
                       (latest_login_device char-field
                                            (#:maxlen 2048))
