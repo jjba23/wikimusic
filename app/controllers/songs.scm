@@ -24,6 +24,7 @@
         (app models songs)
         (app models song_artworks)
         (app models song_contents)
+        (app models song_comments)
         (app models song_opinions)
         (app views songs))
 
@@ -51,6 +52,14 @@
                                                 #:condition (where
                                                                    #:song_identifier
                                                                    song-ids)))))
+              (comments (cond
+                          ((nil? song-ids)
+                           '())
+                          (else ($song_comments 'get
+                                                #:ret 'all
+                                                #:condition (where
+                                                                   #:song_identifier
+                                                                   song-ids)))))
               (song-contents (cond
                                ((nil? song-ids)
                                 '())
@@ -73,9 +82,12 @@
                                                           song-contents))))
                                              songs)))
          (response-emit (:mime rc
-                               (songs-list-page (:i18n rc) songs artworks
+                               (songs-list-page (:i18n rc)
+                                                songs
+                                                artworks
                                                 song-version-count-alist
-                                                opinions))))))
+                                                opinions
+                                                comments))))))
 
 (get "/songs/uuid/:uuid"
      #:mime 'xml
@@ -95,6 +107,10 @@
                                         #:ret 'all
                                         #:condition (where #:song_identifier
                                                            uuid)))
+              (comments ($song_comments 'get
+                                        #:ret 'all
+                                        #:condition (where #:song_identifier
+                                                           uuid)))
               (created-by-alist '())
               (song-contents ($song_contents 'get
                                              #:ret 'all
@@ -111,6 +127,10 @@
 
          ;; return rendered view
          (response-emit (:mime rc
-                               (songs-detail-page (:i18n rc) song artworks
-                                                  song-contents opinions))))))
+                               (songs-detail-page (:i18n rc)
+                                                  song
+                                                  artworks
+                                                  song-contents
+                                                  opinions
+                                                  comments))))))
 

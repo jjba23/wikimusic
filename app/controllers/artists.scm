@@ -23,6 +23,7 @@
         (app models artists)
         (app models artist_artworks)
         (app models artist_opinions)
+        (app models artist_comments)
         (app views artists))
 
 (get "/artists"
@@ -33,23 +34,33 @@
                                  #:order-by '(created_at desc)))
               (artist-ids (map (lambda (s)
                                  (assoc-ref s "identifier")) artists))
-              (artworks (cond ((nil? artist-ids) '())
-                              (else ($artist_artworks 'get
-                                                      #:ret 'all
-                                                      #:condition (where
-                                                                   #:artist_identifier
-                                                                   artist-ids)))))
+              (artworks (cond
+                          ((nil? artist-ids)
+                           '())
+                          (else ($artist_artworks 'get
+                                                  #:ret 'all
+                                                  #:condition (where
+                                                               #:artist_identifier
+                                                               artist-ids)))))
               (opinions (cond
-                         ((nil? artist-ids)
-                          '())
-                         (else ($artist_opinions 'get
-                                                 #:ret 'all
-                                                 #:condition (where
-                                                              #:artist_identifier
-                                                              artist-ids))))))
+                          ((nil? artist-ids)
+                           '())
+                          (else ($artist_opinions 'get
+                                                  #:ret 'all
+                                                  #:condition (where
+                                                               #:artist_identifier
+                                                               artist-ids)))))
+              (comments (cond
+                          ((nil? artist-ids)
+                           '())
+                          (else ($artist_comments 'get
+                                                  #:ret 'all
+                                                  #:condition (where
+                                                               #:artist_identifier
+                                                               artist-ids))))))
          (response-emit (:mime rc
-                         (artists-list-page (:i18n rc) artists artworks
-                                            opinions))))))
+                               (artists-list-page (:i18n rc) artists artworks
+                                                  opinions comments))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
@@ -64,13 +75,18 @@
               (artworks ($artist_artworks 'get
                                           #:ret 'all
                                           #:condition (where
-                                                       #:artist_identifier
-                                                       uuid)))
+                                                             #:artist_identifier
+                                                             uuid)))
               (opinions ($artist_opinions 'get
                                           #:ret 'all
                                           #:condition (where
-                                                       #:artist_identifier
-                                                       uuid))))
+                                                             #:artist_identifier
+                                                             uuid)))
+              (comments ($artist_comments 'get
+                                          #:ret 'all
+                                          #:condition (where
+                                                             #:artist_identifier
+                                                             uuid))))
          ;; do views update
          (DB-query (DB-open rc)
                    (->sql update
@@ -78,7 +94,6 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                         (artists-detail-page (:i18n rc)
-                                              artist artworks
-                                              opinions))))))
+                               (artists-detail-page (:i18n rc) artist artworks
+                                                    opinions comments))))))
 

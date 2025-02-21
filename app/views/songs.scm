@@ -26,27 +26,36 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define (render-song-tile G_ artworks song-version-count-alist opinions x)
+(define (render-song-tile G_
+                          artworks
+                          song-version-count-alist
+                          opinions
+                          comments
+                          x)
   (let ((extra-info (cond-render (assoc-ref song-version-count-alist
                                             (assoc-ref x "identifier"))
                                  (lambda (vc)
                                    `(div (@ (class
-                                             "flex flex-row gap-2 text-sm"))
-
-                                         (span ,(G_ "versions"))
+                                             "flex flex-row gap-2 text-xs"))
 
                                          (span ,(format #f "~a"
 
-                                                        (car vc))))))))
+                                                        (car vc)))
+                                         (span ,(G_ "versions")))))))
     `((div ,(item-tile G_
                        'song
                        x
                        (relevant-entities 'song artworks x)
                        (relevant-entities 'song opinions x)
+                       (relevant-entities 'song comments x)
                        #:extra-info extra-info)))))
 
-(define-public (songs-list-page G_ songs artworks song-version-count-alist
-                                opinions)
+(define-public (songs-list-page G_
+                                songs
+                                artworks
+                                song-version-count-alist
+                                opinions
+                                comments)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
@@ -55,19 +64,30 @@
                                (div (div (@ (class
                                              "flex flex-row flex-wrap gap-3 items-center"))
                                          ,(map (lambda (x)
-                                                 (render-song-tile G_ artworks
+                                                 (render-song-tile G_
+                                                  artworks
                                                   song-version-count-alist
-                                                  opinions x)) songs)))))))
+                                                  opinions
+                                                  comments
+                                                  x)) songs)))))))
 
-(define-public (songs-detail-page G_ song artworks song-contents opinions)
+(define-public (songs-detail-page G_
+                                  song
+                                  artworks
+                                  song-contents
+                                  opinions
+                                  comments)
   (html-template G_
                  #:body `((div (@ (class "container mx-auto"))
                                ((h2 (@ (class
                                         "font-black text-stone-800 text-xl"))
                                     ,(assoc-ref song "display_name"))
                                 (div (div ,(entity-details G_
-                                                           'song song artworks
-                                                           opinions)))))
+                                                           'song
+                                                           song
+                                                           artworks
+                                                           opinions
+                                                           comments)))))
                           (div ,(render-song-contents G_ song song-contents)))))
 
 (define-public (render-song-contents G_ song song-contents)

@@ -26,7 +26,7 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define-public (artists-list-page G_ artists artworks opinions)
+(define-public (artists-list-page G_ artists artworks opinions comments)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
@@ -36,20 +36,26 @@
                                              "flex flex-row flex-wrap gap-3 items-center"))
                                          ,(map (lambda (x)
                                                  `(div ,(item-tile G_
-                                                                   'artist x
+                                                                   'artist
+                                                                   x
                                                                    (relevant-entities 'artist
                                                                     artworks x)
                                                                    (relevant-entities 'artist
-                                                                    opinions x))))
+                                                                    opinions x)
+                                                                   (relevant-entities 'artist
+                                                                    comments x))))
                                                artists)))))))
 
-(define-public (artists-detail-page G_ artist artworks opinions)
+(define-public (artists-detail-page G_ artist artworks opinions comments)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
                                        "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref artist "display_name"))
                                (div (div ,(entity-details G_
-                                                          'artist artist
-                                                          artworks opinions)))))))
+                                                          'artist
+                                                          artist
+                                                          artworks
+                                                          opinions
+                                                          comments)))))))
 

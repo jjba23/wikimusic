@@ -26,7 +26,7 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define-public (genres-list-page G_ genres artworks opinions)
+(define-public (genres-list-page G_ genres artworks opinions comments)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
@@ -36,20 +36,26 @@
                                              "flex flex-row flex-wrap gap-3 items-center"))
                                          ,(map (lambda (x)
                                                  `(div ,(item-tile G_
-                                                                   'genre x
+                                                                   'genre
+                                                                   x
                                                                    (relevant-entities 'genre
                                                                     artworks x)
                                                                    (relevant-entities 'genre
-                                                                    opinions x))))
+                                                                    opinions x)
+                                                                   (relevant-entities 'genre
+                                                                    comments x))))
                                                genres)))))))
 
-(define-public (genres-detail-page G_ genre artworks opinions)
+(define-public (genres-detail-page G_ genre artworks opinions comments)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
                                        "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref genre "display_name"))
                                (div (div ,(entity-details G_
-                                                          'genre genre
-                                                          artworks opinions)))))))
+                                                          'genre
+                                                          genre
+                                                          artworks
+                                                          opinions
+                                                          comments)))))))
 

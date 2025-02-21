@@ -22,6 +22,7 @@
         (ice-9 string-fun)
         (app models genres)
         (app models genre_artworks)
+        (app models genre_comments)
         (app models genre_opinions)
         (app views genres))
 
@@ -33,22 +34,33 @@
                                #:order-by '(created_at desc)))
               (genre-ids (map (lambda (s)
                                 (assoc-ref s "identifier")) genres))
-              (artworks (cond ((nil? genre-ids) '())
-                              (else ($genre_artworks 'get
-                                                     #:ret 'all
-                                                     #:condition (where #:genre_identifier
-                                                                        genre-ids)))))
+              (artworks (cond
+                          ((nil? genre-ids)
+                           '())
+                          (else ($genre_artworks 'get
+                                                 #:ret 'all
+                                                 #:condition (where
+                                                                    #:genre_identifier
+                                                                    genre-ids)))))
               (opinions (cond
-                         ((nil? genre-ids)
-                          '())
-                         (else ($genre_opinions 'get
-                                                #:ret 'all
-                                                #:condition (where
-                                                             #:genre_identifier
-                                                             genre-ids))))))
+                          ((nil? genre-ids)
+                           '())
+                          (else ($genre_opinions 'get
+                                                 #:ret 'all
+                                                 #:condition (where
+                                                                    #:genre_identifier
+                                                                    genre-ids)))))
+              (comments (cond
+                          ((nil? genre-ids)
+                           '())
+                          (else ($genre_comments 'get
+                                                 #:ret 'all
+                                                 #:condition (where
+                                                                    #:genre_identifier
+                                                                    genre-ids))))))
          (response-emit (:mime rc
-                         (genres-list-page (:i18n rc) genres artworks
-                                           opinions))))))
+                               (genres-list-page (:i18n rc) genres artworks
+                                                 opinions comments))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
@@ -67,6 +79,10 @@
               (opinions ($genre_opinions 'get
                                          #:ret 'all
                                          #:condition (where #:genre_identifier
+                                                            uuid)))
+              (comments ($genre_comments 'get
+                                         #:ret 'all
+                                         #:condition (where #:genre_identifier
                                                             uuid))))
          ;; do views update
          (DB-query (DB-open rc)
@@ -75,7 +91,6 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                         (genres-detail-page (:i18n rc)
-                                             genre artworks
-                                             opinions))))))
+                               (genres-detail-page (:i18n rc) genre artworks
+                                                   opinions comments))))))
 

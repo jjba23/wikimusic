@@ -114,6 +114,7 @@
                       x
                       artworks
                       opinions
+                      comments
                       #:key (extra-info '()))
     (let ((item-link (format #f "/~as/uuid/~a" entity
                              (assoc-ref x "identifier")))
@@ -145,10 +146,16 @@
                  (span ,(format #f "~a"
                                 (assoc-ref x "views"))))
             (div (@ (class "flex flex-row gap-2"))
-                 (span (@ (class "font-black text-green-800 text-sm"))
+                 (span (@ (class "font-black text-green-800 text-xs"))
                        ,(format #f "~a" likes))
-                 (span (@ (class "font-black text-red-800 text-sm"))
+                 (span (@ (class "font-black text-red-800 text-xs"))
                        ,(format #f "~a" dislikes)))
+            (div (@ (class "flex flex-row gap-2"))
+                 (span (@ (class "text-xs"))
+                       ,(format #f "~a"
+                                (length comments)))
+                 (span (@ (class "text-xs"))
+                       ,(G_ "comments")))
             ,extra-info)))
   (export item-tile))
 
@@ -158,7 +165,12 @@
      `(span "published"))
     (else `(span "unkown status"))))
 
-(define-public (entity-details G_ entity x artworks opinions)
+(define-public (entity-details G_
+                               entity
+                               x
+                               artworks
+                               opinions
+                               comments)
   (let* ((rendered-artworks (map (lambda (art)
                                    `(figure (@ (class "py-3 sm:w-48"))
                                             (img (@ (loading "lazy")
