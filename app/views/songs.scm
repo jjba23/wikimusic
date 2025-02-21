@@ -25,38 +25,47 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define-public (songs-list-page G_ songs artworks song-version-count-alist)
-  (let ((arts (lambda (x)
-                (filter (lambda (art)
-                          (equal? (assoc-ref x "identifier")
+(define (relevant-artworks artworks x)
+  (filter (lambda (art)
+            (equal? (assoc-ref x "identifier")
+                    (assoc-ref art "song_identifier"))) artworks))
 
-                                  (assoc-ref art "song_identifier"))) artworks))))
-    (html-template G_
-                   #:body `(div (@ (class "container mx-auto"))
-                                ((h2 (@ (class
-                                          "font-black text-stone-800 text-md"))
-                                     ,(G_ "viewing songs"))
-                                 (div (div (@ (class
-                                                "flex flex-row flex-wrap gap-3 items-center"))
-                                           ,(map (lambda (x)
-                                                   `((div ,(item-tile G_
-                                                                      "songs" x
-                                                                      (arts x)
-                                                                      #:extra-info (cond-render (assoc-ref song-version-count-alist
-                                                                                                           (assoc-ref x "identifier"))
-                                                                                                (lambda(vc)
-                                                                                                  `(div (@(class "flex flex-row gap-2 text-sm"))
-                                                                                                        (span ,(G_ "versions"))
-                                                                                                        (span ,(format #f "~a" (car vc)))))
-                                                                                                )))
-                                                     ))
-                                                 songs))))))))
+(define (render-song-tile G_ artworks song-version-count-alist x)
+  (let ((extra-info (cond-render (assoc-ref song-version-count-alist
+                                            (assoc-ref x "identifier"))
+                                 (lambda (vc)
+                                   `(div (@ (class
+                                             "flex flex-row gap-2 text-sm"))
+
+                                         (span ,(G_ "versions"))
+
+                                         (span ,(format #f "~a"
+
+                                                        (car vc))))))))
+    `((div ,(item-tile G_
+                       "songs"
+                       x
+                       (relevant-artworks artworks x)
+                       #:extra-info extra-info)))))
+
+(define-public (songs-list-page G_ songs artworks song-version-count-alist)
+  (html-template G_
+                 #:body `(div (@ (class "container mx-auto"))
+                              ((h2 (@ (class
+                                       "font-black text-stone-800 text-md"))
+                                   ,(G_ "viewing songs"))
+                               (div (div (@ (class
+                                             "flex flex-row flex-wrap gap-3 items-center"))
+                                         ,(map (lambda (x)
+                                                 (render-song-tile G_ artworks
+                                                  song-version-count-alist x))
+                                               songs)))))))
 
 (define-public (songs-detail-page G_ song artworks song-contents)
   (html-template G_
                  #:body `((div (@ (class "container mx-auto"))
                                ((h2 (@ (class
-                                         "font-black text-stone-800 text-xl"))
+                                        "font-black text-stone-800 text-xl"))
                                     ,(assoc-ref song "display_name"))
                                 (div (div ,(entity-details G_ "songs" song
                                                            artworks)))))
