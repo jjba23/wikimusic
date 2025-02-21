@@ -34,21 +34,29 @@
     (html-template G_
                    #:body `(div (@ (class "container mx-auto"))
                                 ((h2 (@ (class
-                                         "font-black text-stone-800 text-md"))
+                                          "font-black text-stone-800 text-md"))
                                      ,(G_ "viewing songs"))
                                  (div (div (@ (class
-                                               "flex flex-row flex-wrap gap-3 items-center"))
+                                                "flex flex-row flex-wrap gap-3 items-center"))
                                            ,(map (lambda (x)
-                                                   `(div ,(item-tile G_
-                                                                     "songs" x
-                                                                     (arts x))))
+                                                   `((div ,(item-tile G_
+                                                                      "songs" x
+                                                                      (arts x)
+                                                                      #:extra-info (cond-render (assoc-ref song-version-count-alist
+                                                                                                           (assoc-ref x "identifier"))
+                                                                                                (lambda(vc)
+                                                                                                  `(div (@(class "flex flex-row gap-2 text-sm"))
+                                                                                                        (span ,(G_ "versions"))
+                                                                                                        (span ,(format #f "~a" (car vc)))))
+                                                                                                )))
+                                                     ))
                                                  songs))))))))
 
 (define-public (songs-detail-page G_ song artworks song-contents)
   (html-template G_
                  #:body `((div (@ (class "container mx-auto"))
                                ((h2 (@ (class
-                                        "font-black text-stone-800 text-xl"))
+                                         "font-black text-stone-800 text-xl"))
                                     ,(assoc-ref song "display_name"))
                                 (div (div ,(entity-details G_ "songs" song
                                                            artworks)))))

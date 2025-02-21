@@ -35,25 +35,29 @@
               (song-ids (map (lambda (s)
                                (assoc-ref s "identifier")) songs))
               (artworks (cond
-                          ((nil? song-ids)
-                           '())
-                          (else ($song_artworks 'get
-                                                #:ret 'all
-                                                #:condition (where
-                                                                   #:song_identifier
-                                                                   song-ids)))))
-              (song_contents (cond
-                               ((nil? song-ids)
-                                '())
-                               (else ($song_contents 'get
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
-              (song-version-count-alist '()))
+                         ((nil? song-ids)
+                          '())
+                         (else ($song_artworks 'get
+                                               #:ret 'all
+                                               #:condition (where
+                                                            #:song_identifier
+                                                            song-ids)))))
+              (song-contents (cond
+                              ((nil? song-ids)
+                               '())
+                              (else ($song_contents 'get
+                                                    #:columns '(identifier song_identifier)
+                                                    #:ret 'all
+                                                    #:condition (where
+                                                                 #:song_identifier
+                                                                 song-ids)))))              
+              (song-version-count-alist (map (lambda(song)
+                                               `(,(assoc-ref song "identifier") ,(length (filter (lambda(sc) (equal? (assoc-ref sc "song_identifier")
+                                                                                                                (assoc-ref song "identifier"))) song-contents)))
+                                               ) songs)))
          (response-emit (:mime rc
-                               (songs-list-page (:i18n rc) songs artworks
-                                                song-version-count-alist))))))
+                         (songs-list-page (:i18n rc) songs artworks
+                                          song-version-count-alist))))))
 
 (get "/songs/uuid/:uuid"
      #:mime 'xml
@@ -69,11 +73,12 @@
                                         #:ret 'all
                                         #:condition (where #:song_identifier
                                                            uuid)))
+              (created-by-alist '())
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                                #:song_identifier
-                                                                uuid))))
+                                                          #:song_identifier
+                                                          uuid))))
          
          ;; do views update
          (DB-query (DB-open rc)
@@ -84,6 +89,6 @@
 
          ;; return rendered view
          (response-emit (:mime rc
-                               (songs-detail-page (:i18n rc) song artworks
-                                                  song-contents))))))
+                         (songs-detail-page (:i18n rc) song artworks
+                                            song-contents))))))
 
