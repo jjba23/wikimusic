@@ -18,7 +18,8 @@
     (DB-query (get-conn-from-pool!)
               (->sql update
                      'users set
-                     `((salt ,salt)(password_hash ,real-pass))
+                     `((salt ,salt)
+                       (password_hash ,real-pass))
                      (where #:email_address email_address)))))
 
 ;; (migrate-up (display "Adding user...")

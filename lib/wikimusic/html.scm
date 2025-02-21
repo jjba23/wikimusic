@@ -171,8 +171,9 @@
                                       (assoc-ref comment "created_by")))
                       (lambda (u)
                         `(p (@ (class "text-xs text-stone-600"))
-                            ,(format #f "~a &lt;~a&gt;"
+                            ,(format #f "~a (~a) &lt;~a&gt;"
                                      (assoc-ref u "display_name")
+                                     (assoc-ref u "username")
                                      (assoc-ref u "email_address")))))
         (p (@ (class "text-sm text-stone-900"))
            ,(assoc-ref comment "contents"))
@@ -254,11 +255,13 @@
                                       (lambda (u)
                                         `(div (@ (class
                                                   "flex flex-wrap flex-row gap-2"))
-                                              (span ,(assoc-ref u
-                                                      "display_name"))
-                                              (span ,(format #f "&lt;~a&gt;"
-                                                             (assoc-ref u
-                                                              "email_address")))))))
+                                              (span ,(format #f
+                                                      "~a (~a) &lt;~a&gt;"
+                                                      (assoc-ref u
+                                                       "display_name")
+                                                      (assoc-ref u "username")
+                                                      (assoc-ref u
+                                                       "email_address")))))))
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "visibility"))
                     (dd (@ (class "pl-3 text-stone-800"))

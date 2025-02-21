@@ -92,7 +92,7 @@
                              #:ret 'all
                              #:order-by '(display_name asc)
                              #:columns '(identifier display_name email_address
-                                                    avatar_url)))
+                                                    username avatar_url)))
               (user-alist (map (lambda (u)
                                  `(,(assoc-ref u "identifier") ,u)) users)))
          ;; do views update

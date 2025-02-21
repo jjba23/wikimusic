@@ -27,28 +27,28 @@
      #:i18n '(cookie "lang")
      (lambda (rc)
        (response-emit (:mime rc
-                       (login-page (:i18n rc))))))
+                             (login-page (:i18n rc))))))
 
 (post "/login"
       #:auth '(table users "username" "password_hash")
       #:session #t
       (lambda (rc)
         (cond
-         ((:session rc
-           'check)
-          (redirect-to rc
-                       (string->uri (format #f "~a/songs"
-                                            (current-myhost)))
-                       #:status 302))
-         ((:auth rc)
-          (:session rc
-           'spawn)
-          (redirect-to rc
-                       (string->uri (format #f "~a/songs"
-                                            (current-myhost)))
-                       #:status 302))
-         (else (redirect-to rc
-                            (string->uri (format #f
-                                                 "~a/login?login_failed=true"
-                                                 (current-myhost)))
-                            #:status 302)))))
+          ((:session rc
+                     'check)
+           (redirect-to rc
+                        (string->uri (format #f "~a/songs"
+                                             (current-myhost)))
+                        #:status 302))
+          ((:auth rc)
+           (:session rc
+                     'spawn)
+           (redirect-to rc
+                        (string->uri (format #f "~a/songs"
+                                             (current-myhost)))
+                        #:status 302))
+          (else (redirect-to rc
+                             (string->uri (format #f
+                                           "~a/login?login_failed=true"
+                                           (current-myhost)))
+                             #:status 302)))))
