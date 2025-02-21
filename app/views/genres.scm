@@ -30,24 +30,26 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-black text-stone-800 text-md"))
+                                       "font-black text-stone-800 text-md"))
                                    ,(G_ "viewing genres"))
                                (div (div (@ (class
-                                              "flex flex-row flex-wrap gap-3 items-center"))
+                                             "flex flex-row flex-wrap gap-3 items-center"))
                                          ,(map (lambda (x)
-                                                 `(div ,(item-tile G_ "genres"
-                                                                   x
+                                                 `(div ,(item-tile G_
+                                                                   'genre x
                                                                    (relevant-entities 'genre
-                                                                                      artworks x)
-                                                                   (relevant-entities 'genre opinions x))))
+                                                                    artworks x)
+                                                                   (relevant-entities 'genre
+                                                                    opinions x))))
                                                genres)))))))
 
-(define-public (genres-detail-page G_ genre artworks)
+(define-public (genres-detail-page G_ genre artworks opinions)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
                                        "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref genre "display_name"))
-                               (div (div ,(entity-details G_ "genres" genre
-                                                          artworks)))))))
+                               (div (div ,(entity-details G_
+                                                          'genre genre
+                                                          artworks opinions)))))))
 

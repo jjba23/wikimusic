@@ -38,42 +38,43 @@
                                          #:condition (where #:genre_identifier
                                                             genre-ids)))
               (opinions (cond
-                         ((nil? genre-ids)
-                          '())
-                         (else ($genre_opinions 'get
-                                                #:ret 'all
-                                                #:condition (where
-                                                             #:genre_identifier
-                                                             genre-ids))))))
+                          ((nil? genre-ids)
+                           '())
+                          (else ($genre_opinions 'get
+                                                 #:ret 'all
+                                                 #:condition (where
+                                                                    #:genre_identifier
+                                                                    genre-ids))))))
          (response-emit (:mime rc
-                         (genres-list-page (:i18n rc) genres artworks opinions))))))
+                               (genres-list-page (:i18n rc) genres artworks
+                                                 opinions))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((genre ($genres 'get
+       (let* ((uuid (params rc "uuid"))
+              (genre ($genres 'get
                               #:ret 'top
-                              #:condition (where #:identifier (params rc
-                                                                      "uuid"))))
+                              #:condition (where #:identifier uuid)))
               (inc-v (+ 1
                         (assoc-ref (car genre) "views")))
               (artworks ($genre_artworks 'get
                                          #:ret 'all
                                          #:condition (where #:genre_identifier
-                                                            (params rc "uuid"))))
+                                                            uuid)))
               (opinions ($genre_opinions 'get
                                          #:ret 'all
-                                         #:condition (where
-                                                      #:genre_identifier
-                                                      uuid))))
+                                         #:condition (where #:genre_identifier
+                                                            uuid))))
          ;; do views update
          (DB-query (DB-open rc)
                    (->sql update
                           'genres set
                           `((views ,inc-v))
-                          (where #:identifier (params rc "uuid"))))
+                          (where #:identifier uuid)))
          (response-emit (:mime rc
-                         (genres-detail-page (:i18n rc)
-                                             (car genre) artworks))))))
+                               (genres-detail-page (:i18n rc)
+                                                   (car genre) artworks
+                                                   opinions))))))
 

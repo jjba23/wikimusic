@@ -30,24 +30,26 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-black text-stone-800 text-md"))
+                                       "font-black text-stone-800 text-md"))
                                    ,(G_ "viewing artists"))
                                (div (div (@ (class
-                                              "flex flex-row flex-wrap gap-3 items-center"))
+                                             "flex flex-row flex-wrap gap-3 items-center"))
                                          ,(map (lambda (x)
                                                  `(div ,(item-tile G_
-                                                                   "artists" x
+                                                                   'artist x
                                                                    (relevant-entities 'artist
-                                                                                      artworks x)
-                                                                   (relevant-entities 'genre opinions x))))
+                                                                    artworks x)
+                                                                   (relevant-entities 'artist
+                                                                    opinions x))))
                                                artists)))))))
 
-(define-public (artists-detail-page G_ artist artworks)
+(define-public (artists-detail-page G_ artist artworks opinions)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
                                        "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref artist "display_name"))
-                               (div (div ,(entity-details G_ "artists" artist
-                                                          artworks)))))))
+                               (div (div ,(entity-details G_
+                                                          'artist artist
+                                                          artworks opinions)))))))
 
