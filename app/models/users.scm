@@ -24,7 +24,7 @@
                       (display_name char-field
                                     (#:not-null #:maxlen 256))
                       (email_address char-field
-                                     (#:not-null #:maxlen 512))
+                                     (#:not-null #:unique #:maxlen 512))
                       (password_hash char-field
                                      (#:maxlen 2048))
                       (password_reset_token char-field
