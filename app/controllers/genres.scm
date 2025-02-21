@@ -24,6 +24,7 @@
         (app models genre_artworks)
         (app models genre_comments)
         (app models genre_opinions)
+        (app models users)
         (app views genres))
 
 (get "/genres"
@@ -86,7 +87,12 @@
                                          #:ret 'all
                                          #:order-by '(created_at asc)
                                          #:condition (where #:genre_identifier
-                                                            uuid))))
+                                                            uuid)))
+              (users ($users 'get
+                             #:ret 'all
+                             #:order-by '(display_name asc)
+                             #:columns '(identifier display_name email_address avatar_url)))
+              (user-alist (map (lambda(u) `(,(assoc-ref u "identifier") ,u)) users)))
          ;; do views update
          (DB-query (DB-open rc)
                    (->sql update
@@ -94,6 +100,6 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                               (genres-detail-page (:i18n rc) genre artworks
-                                                   opinions comments))))))
+                         (genres-detail-page (:i18n rc) genre artworks
+                                             opinions comments user-alist))))))
 

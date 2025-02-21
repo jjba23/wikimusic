@@ -76,18 +76,20 @@
                                   artworks
                                   song-contents
                                   opinions
-                                  comments)
+                                  comments
+                                  user-alist)
   (html-template G_
                  #:body `((div (@ (class "container mx-auto"))
                                ((h2 (@ (class
-                                        "font-black text-stone-800 text-xl"))
+                                         "font-black text-stone-800 text-xl"))
                                     ,(assoc-ref song "display_name"))
                                 (div (div ,(entity-details G_
                                                            'song
                                                            song
                                                            artworks
                                                            opinions
-                                                           comments)))))
+                                                           comments
+                                                           user-alist)))))
                           (div ,(render-song-contents G_ song song-contents)))))
 
 (define-public (render-song-contents G_ song song-contents)

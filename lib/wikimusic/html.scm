@@ -189,7 +189,8 @@
                                x
                                artworks
                                opinions
-                               comments)
+                               comments
+                               user-alist)
   (let* ((rendered-artworks (map (lambda (art)
                                    `(figure (@ (class "py-3 sm:w-48"))
                                             (img (@ (loading "lazy")
@@ -222,6 +223,7 @@
                                              (dd (@ (class
                                                       "pl-3 text-stone-800"))
                                                  ,approved-by))))))
+
     `((div (@ (class "py-4 flex flex-row flex-wrap gap-6"))
            (div ,rendered-artworks)
            (div ,maybe-description
@@ -238,7 +240,11 @@
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "contributor"))
                     (dd (@ (class "pl-3 text-stone-800"))
-                        ,(assoc-ref x "created_by"))
+                        ,(cond-render (car (assoc-ref user-alist (assoc-ref x "created_by")))
+                                      (lambda(u)
+                                        `(div (@(class "flex flex-wrap flex-row gap-2"))
+                                              (span ,(assoc-ref u "display_name"))
+                                              (span ,(format #f "&lt;~a&gt;" (assoc-ref u "email_address")))))))
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "visibility"))
                     (dd (@ (class "pl-3 text-stone-800"))
@@ -247,7 +253,7 @@
                     ,maybe-approved-by
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "uuid"))
-                    (dd (@ (class "pl-3 text-stone-800"))
+                    (dd (@ (class "pl-3 text-sm text-stone-500"))
                         ,(assoc-ref x "identifier")))))
       (details 
        (summary (@ (class "cursor-pointer")) ,(format #f "~a ~a" (length comments) (G_ "comments")))

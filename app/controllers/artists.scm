@@ -24,6 +24,7 @@
         (app models artist_artworks)
         (app models artist_opinions)
         (app models artist_comments)
+        (app models users)
         (app views artists))
 
 (get "/artists"
@@ -77,19 +78,24 @@
                                           #:ret 'all
                                           #:order-by '(order_value asc)
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))
+                                                       #:artist_identifier
+                                                       uuid)))
               (opinions ($artist_opinions 'get
                                           #:ret 'all
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))
+                                                       #:artist_identifier
+                                                       uuid)))
               (comments ($artist_comments 'get
                                           #:ret 'all
                                           #:order-by '(created_at asc)
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid))))
+                                                       #:artist_identifier
+                                                       uuid)))
+              (users ($users 'get
+                             #:ret 'all
+                             #:order-by '(display_name asc)
+                             #:columns '(identifier display_name email_address avatar_url)))
+              (user-alist (map (lambda(u) `(,(assoc-ref u "identifier") ,u)) users)))
          ;; do views update
          (DB-query (DB-open rc)
                    (->sql update
@@ -97,6 +103,6 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                               (artists-detail-page (:i18n rc) artist artworks
-                                                    opinions comments))))))
+                         (artists-detail-page (:i18n rc) artist artworks
+                                              opinions comments user-alist))))))
 
