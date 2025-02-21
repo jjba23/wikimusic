@@ -161,21 +161,27 @@
 
 (define-public (render-visibility-status status)
   (cond
-    ((eq? status 0)
-     `(span "published"))
-    (else `(span "unkown status"))))
+   ((eq? status 0)
+    `(span "published"))
+   (else `(span "unkown status"))))
+
+(define-public (render-comment G_ comment)
+  `(div (@(class "py-3"))
+        (p (@(class "text-xs text-stone-600")) ,(assoc-ref comment "created_by"))
+        (p (@(class "text-sm text-stone-900")) ,(assoc-ref comment "contents"))
+        (p (@(class "text-xs text-stone-400")) ,(assoc-ref comment "created_at"))))
 
 (define-public (render-comments G_ parent-identifier comments)
   (let* ((top-nodes (filter (lambda (c)
                               (equal? parent-identifier
                                       (assoc-ref c "parent_identifier")))
                             comments)))
-    (map (lambda (com)
+    (map (lambda (comment)
            `((div (@ (class "max-w-prose"))
-                  ,(assoc-ref com "contents"))
-             (div (@ (class "max-w-prose ml-2"))
+                  ,(render-comment G_ comment))
+             (div (@ (class "max-w-prose pl-3"))
                   ,(render-comments G_
-                                    (assoc-ref com "identifier") comments))))
+                                    (assoc-ref comment "identifier") comments))))
          top-nodes)))
 
 (define-public (entity-details G_
@@ -189,32 +195,32 @@
                                             (img (@ (loading "lazy")
                                                     (class "rounded-xl")
                                                     (src ,(assoc-ref art
-                                                           "content_url"))))))
+                                                                     "content_url"))))))
                                  artworks))
          (rendered-comments (render-comments G_ #f comments))
          (maybe-description (cond-render (assoc-ref x "description")
                                          (lambda (description)
                                            `(div (p (@ (class
-                                                        "text-stone-700 font-bold"))
+                                                         "text-stone-700 font-bold"))
                                                     ,(G_ "description"))
                                                  (p (@ (class
-                                                        "pl-3 text-stone-800 max-w-prose"))
+                                                         "pl-3 text-stone-800 max-w-prose"))
                                                     ,description)))))
          (maybe-last-edited-at (cond-render (assoc-ref x "last_edited_at")
                                             (lambda (last-edited-at)
                                               `((dt (@ (class
-                                                        "text-stone-700 font-bold"))
+                                                         "text-stone-700 font-bold"))
                                                     ,(G_ "last edited"))
                                                 (dd (@ (class
-                                                        "pl-3 text-stone-800"))
+                                                         "pl-3 text-stone-800"))
                                                     ,last-edited-at)))))
          (maybe-approved-by (cond-render (assoc-ref x "approved_by")
                                          (lambda (approved-by)
                                            `((dt (@ (class
-                                                     "text-stone-700 font-bold"))
+                                                      "text-stone-700 font-bold"))
                                                  ,(G_ "approved by"))
                                              (dd (@ (class
-                                                     "pl-3 text-stone-800"))
+                                                      "pl-3 text-stone-800"))
                                                  ,approved-by))))))
     `((div (@ (class "py-4 flex flex-row flex-wrap gap-6"))
            (div ,rendered-artworks)
@@ -237,13 +243,13 @@
                         ,(G_ "visibility"))
                     (dd (@ (class "pl-3 text-stone-800"))
                         ,(render-visibility-status (assoc-ref x
-                                                    "visibility_status")))
+                                                              "visibility_status")))
                     ,maybe-approved-by
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "uuid"))
                     (dd (@ (class "pl-3 text-stone-800"))
                         ,(assoc-ref x "identifier")))))
-      (details (@ (class "cursor-pointer"))
-               (summary ,(G_ "comments"))
-               ,rendered-comments))))
+      (details 
+       (summary (@ (class "cursor-pointer")) ,(format #f "~a ~a" (length comments) (G_ "comments")))
+       ,rendered-comments))))
 
