@@ -41,6 +41,7 @@
                            '())
                           (else ($song_artworks 'get
                                                 #:ret 'all
+                                                #:order-by '(order_value asc)
                                                 #:condition (where
                                                                    #:song_identifier
                                                                    song-ids)))))
@@ -101,6 +102,7 @@
                         (assoc-ref song "views")))
               (artworks ($song_artworks 'get
                                         #:ret 'all
+                                        #:order-by '(order_value asc)
                                         #:condition (where #:song_identifier
                                                            uuid)))
               (opinions ($song_opinions 'get
@@ -109,6 +111,7 @@
                                                            uuid)))
               (comments ($song_comments 'get
                                         #:ret 'all
+                                        #:order-by '(created_at asc)
                                         #:condition (where #:song_identifier
                                                            uuid)))
               (created-by-alist '())

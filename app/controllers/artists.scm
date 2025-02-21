@@ -39,6 +39,7 @@
                            '())
                           (else ($artist_artworks 'get
                                                   #:ret 'all
+                                                  #:order-by '(order_value asc)
                                                   #:condition (where
                                                                #:artist_identifier
                                                                artist-ids)))))
@@ -74,6 +75,7 @@
                         (assoc-ref artist "views")))
               (artworks ($artist_artworks 'get
                                           #:ret 'all
+                                          #:order-by '(order_value asc)
                                           #:condition (where
                                                              #:artist_identifier
                                                              uuid)))
@@ -84,6 +86,7 @@
                                                              uuid)))
               (comments ($artist_comments 'get
                                           #:ret 'all
+                                          #:order-by '(created_at asc)
                                           #:condition (where
                                                              #:artist_identifier
                                                              uuid))))

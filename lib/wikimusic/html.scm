@@ -165,6 +165,19 @@
      `(span "published"))
     (else `(span "unkown status"))))
 
+(define-public (render-comments G_ parent-identifier comments)
+  (let* ((top-nodes (filter (lambda (c)
+                              (equal? parent-identifier
+                                      (assoc-ref c "parent_identifier")))
+                            comments)))
+    (map (lambda (com)
+           `((div (@ (class "max-w-prose"))
+                  ,(assoc-ref com "contents"))
+             (div (@ (class "max-w-prose ml-2"))
+                  ,(render-comments G_
+                                    (assoc-ref com "identifier") comments))))
+         top-nodes)))
+
 (define-public (entity-details G_
                                entity
                                x
@@ -178,6 +191,7 @@
                                                     (src ,(assoc-ref art
                                                            "content_url"))))))
                                  artworks))
+         (rendered-comments (render-comments G_ #f comments))
          (maybe-description (cond-render (assoc-ref x "description")
                                          (lambda (description)
                                            `(div (p (@ (class
@@ -228,5 +242,8 @@
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "uuid"))
                     (dd (@ (class "pl-3 text-stone-800"))
-                        ,(assoc-ref x "identifier"))))))))
+                        ,(assoc-ref x "identifier")))))
+      (details (@ (class "cursor-pointer"))
+               (summary ,(G_ "comments"))
+               ,rendered-comments))))
 

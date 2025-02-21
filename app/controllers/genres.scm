@@ -39,6 +39,7 @@
                            '())
                           (else ($genre_artworks 'get
                                                  #:ret 'all
+                                                 #:order-by '(order_value asc)
                                                  #:condition (where
                                                                     #:genre_identifier
                                                                     genre-ids)))))
@@ -74,6 +75,7 @@
                         (assoc-ref genre "views")))
               (artworks ($genre_artworks 'get
                                          #:ret 'all
+                                         #:order-by '(order_value asc)
                                          #:condition (where #:genre_identifier
                                                             uuid)))
               (opinions ($genre_opinions 'get
@@ -82,6 +84,7 @@
                                                             uuid)))
               (comments ($genre_comments 'get
                                          #:ret 'all
+                                         #:order-by '(created_at asc)
                                          #:condition (where #:genre_identifier
                                                             uuid))))
          ;; do views update
