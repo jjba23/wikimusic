@@ -22,6 +22,7 @@
         (ice-9 string-fun)
         (app models genres)
         (app models genre_artworks)
+        (app models genre_opinions)
         (app views genres))
 
 (get "/genres"
@@ -35,9 +36,17 @@
               (artworks ($genre_artworks 'get
                                          #:ret 'all
                                          #:condition (where #:genre_identifier
-                                                            genre-ids))))
+                                                            genre-ids)))
+              (opinions (cond
+                         ((nil? genre-ids)
+                          '())
+                         (else ($genre_opinions 'get
+                                                #:ret 'all
+                                                #:condition (where
+                                                             #:genre_identifier
+                                                             genre-ids))))))
          (response-emit (:mime rc
-                               (genres-list-page (:i18n rc) genres artworks))))))
+                         (genres-list-page (:i18n rc) genres artworks opinions))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
@@ -52,7 +61,12 @@
               (artworks ($genre_artworks 'get
                                          #:ret 'all
                                          #:condition (where #:genre_identifier
-                                                            (params rc "uuid")))))
+                                                            (params rc "uuid"))))
+              (opinions ($genre_opinions 'get
+                                         #:ret 'all
+                                         #:condition (where
+                                                      #:genre_identifier
+                                                      uuid))))
          ;; do views update
          (DB-query (DB-open rc)
                    (->sql update
@@ -60,6 +74,6 @@
                           `((views ,inc-v))
                           (where #:identifier (params rc "uuid"))))
          (response-emit (:mime rc
-                               (genres-detail-page (:i18n rc)
-                                                   (car genre) artworks))))))
+                         (genres-detail-page (:i18n rc)
+                                             (car genre) artworks))))))
 

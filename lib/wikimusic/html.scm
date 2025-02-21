@@ -113,22 +113,25 @@
                       entity
                       x
                       artworks
+                      opinions
                       #:key (extra-info '()))
     (let ((item-link (format #f "/~a/uuid/~a" entity
-                             (assoc-ref x "identifier"))))
+                             (assoc-ref x "identifier")))
+          (likes (length (filter (lambda(o) (equal? 1 (assoc-ref o "is_like"))) opinions)))
+          (dislikes (length (filter (lambda(o) (equal? 1 (assoc-ref o "is_dislike"))) opinions))))
       `(div (@ (class "flex flex-col py-3"))
             ,(cond-render (cond
-                            ((equal? 0
-                                     (length artworks))
-                             '())
-                            (else (car artworks)))
+                           ((equal? 0
+                                    (length artworks))
+                            '())
+                           (else (car artworks)))
                           (lambda (art)
                             `(figure (@ (class "py-3 sm:w-48"))
                                      (a (@ (href ,item-link))
                                         (img (@ (loading "lazy")
                                                 (class "rounded-xl")
                                                 (src ,(assoc-ref art
-                                                       "content_url"))))))))
+                                                                 "content_url"))))))))
             (a (@ (class "text-blue-800 text-xl font-medium")
                   (href ,item-link))
                (span ,(assoc-ref x "display_name")))
@@ -136,6 +139,9 @@
                  (span ,(G_ "views"))
                  (span ,(format #f "~a"
                                 (assoc-ref x "views"))))
+            (div (@(class "flex flex-row gap-2"))
+                 (span (@(class "font-black text-green-800 text-sm")) ,(format #f "~a" likes))
+                 (span (@(class "font-black text-red-800 text-sm")) ,(format #f "~a" dislikes)))
             ,extra-info)))
   (export item-tile))
 

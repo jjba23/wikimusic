@@ -26,12 +26,12 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define (render-song-tile G_ artworks song-version-count-alist x)
+(define (render-song-tile G_ artworks song-version-count-alist opinions x)
   (let ((extra-info (cond-render (assoc-ref song-version-count-alist
                                             (assoc-ref x "identifier"))
                                  (lambda (vc)
                                    `(div (@ (class
-                                             "flex flex-row gap-2 text-sm"))
+                                              "flex flex-row gap-2 text-sm"))
 
                                          (span ,(G_ "versions"))
 
@@ -42,19 +42,20 @@
                        "songs"
                        x
                        (relevant-entities 'song artworks x)
+                       (relevant-entities 'song opinions x)
                        #:extra-info extra-info)))))
 
-(define-public (songs-list-page G_ songs artworks song-version-count-alist)
+(define-public (songs-list-page G_ songs artworks song-version-count-alist opinions)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                       "font-black text-stone-800 text-md"))
+                                        "font-black text-stone-800 text-md"))
                                    ,(G_ "viewing songs"))
                                (div (div (@ (class
-                                             "flex flex-row flex-wrap gap-3 items-center"))
+                                              "flex flex-row flex-wrap gap-3 items-center"))
                                          ,(map (lambda (x)
                                                  (render-song-tile G_ artworks
-                                                  song-version-count-alist x))
+                                                                   song-version-count-alist opinions x))
                                                songs)))))))
 
 (define-public (songs-detail-page G_ song artworks song-contents)

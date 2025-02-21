@@ -22,6 +22,7 @@
         (ice-9 string-fun)
         (app models artists)
         (app models artist_artworks)
+        (app models artist_opinions)
         (app views artists))
 
 (get "/artists"
@@ -35,10 +36,18 @@
               (artworks ($artist_artworks 'get
                                           #:ret 'all
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             artist-ids))))
+                                                       #:artist_identifier
+                                                       artist-ids)))
+              (opinions (cond
+                         ((nil? artist-ids)
+                          '())
+                         (else ($artist_opinions 'get
+                                                 #:ret 'all
+                                                 #:condition (where
+                                                              #:artist_identifier
+                                                              artist-ids))))))
          (response-emit (:mime rc
-                               (artists-list-page (:i18n rc) artists artworks))))))
+                         (artists-list-page (:i18n rc) artists artworks opinions))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
@@ -47,14 +56,19 @@
        (let* ((artist ($artists 'get
                                 #:ret 'top
                                 #:condition (where #:identifier (params rc
-                                                                 "uuid"))))
+                                                                        "uuid"))))
               (inc-v (+ 1
                         (assoc-ref (car artist) "views")))
               (artworks ($artist_artworks 'get
                                           #:ret 'all
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             (params rc "uuid")))))
+                                                       #:artist_identifier
+                                                       (params rc "uuid"))))
+              (opinions ($artist_opinions 'get
+                                          #:ret 'all
+                                          #:condition (where
+                                                       #:artist_identifier
+                                                       uuid))))
          ;; do views update
          (DB-query (DB-open rc)
                    (->sql update
@@ -62,6 +76,6 @@
                           `((views ,inc-v))
                           (where #:identifier (params rc "uuid"))))
          (response-emit (:mime rc
-                               (artists-detail-page (:i18n rc)
-                                                    (car artist) artworks))))))
+                         (artists-detail-page (:i18n rc)
+                                              (car artist) artworks))))))
 
