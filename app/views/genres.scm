@@ -46,11 +46,16 @@
                                                                     comments x))))
                                                genres)))))))
 
-(define-public (genres-detail-page G_ genre artworks opinions comments user-alist)
+(define-public (genres-detail-page G_
+                                   genre
+                                   artworks
+                                   opinions
+                                   comments
+                                   user-alist)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-black text-stone-800 text-xl"))
+                                       "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref genre "display_name"))
                                (div (div ,(entity-details G_
                                                           'genre

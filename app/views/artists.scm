@@ -46,11 +46,16 @@
                                                                     comments x))))
                                                artists)))))))
 
-(define-public (artists-detail-page G_ artist artworks opinions comments user-alist)
+(define-public (artists-detail-page G_
+                                    artist
+                                    artworks
+                                    opinions
+                                    comments
+                                    user-alist)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-black text-stone-800 text-xl"))
+                                       "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref artist "display_name"))
                                (div (div ,(entity-details G_
                                                           'artist

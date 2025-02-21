@@ -118,13 +118,15 @@
               (users ($users 'get
                              #:ret 'all
                              #:order-by '(display_name asc)
-                             #:columns '(identifier display_name email_address avatar_url)))
-              (user-alist (map (lambda(u) `(,(assoc-ref u "identifier") ,u)) users))
+                             #:columns '(identifier display_name email_address
+                                                    avatar_url)))
+              (user-alist (map (lambda (u)
+                                 `(,(assoc-ref u "identifier") ,u)) users))
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                          #:song_identifier
-                                                          uuid))))
+                                                                #:song_identifier
+                                                                uuid))))
          
          ;; do views update
          (DB-query (DB-open rc)
@@ -135,11 +137,11 @@
 
          ;; return rendered view
          (response-emit (:mime rc
-                         (songs-detail-page (:i18n rc)
-                                            song
-                                            artworks
-                                            song-contents
-                                            opinions
-                                            comments
-                                            user-alist))))))
+                               (songs-detail-page (:i18n rc)
+                                                  song
+                                                  artworks
+                                                  song-contents
+                                                  opinions
+                                                  comments
+                                                  user-alist))))))
 

@@ -32,8 +32,10 @@
                       (auth_token char-field
                                   (#:maxlen 2048))
                       (latest_login_at date-field)
-                      (latest_login_device char-field (#:maxlen 2048))
-                      (avatar_url char-field (#:maxlen 4096))
+                      (latest_login_device char-field
+                                           (#:maxlen 2048))
+                      (avatar_url char-field
+                                  (#:maxlen 4096))
                       (description char-field
                                    (#:maxlen 2048))
                       (created_at date-field
