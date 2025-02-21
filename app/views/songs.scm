@@ -17,6 +17,7 @@
 
 (define-module (app views songs)
   #:use-module (wikimusic html)
+  #:use-module (wikimusic abstraction)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -24,11 +25,6 @@
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
-
-(define (relevant-artworks artworks x)
-  (filter (lambda (art)
-            (equal? (assoc-ref x "identifier")
-                    (assoc-ref art "song_identifier"))) artworks))
 
 (define (render-song-tile G_ artworks song-version-count-alist x)
   (let ((extra-info (cond-render (assoc-ref song-version-count-alist
@@ -45,7 +41,7 @@
     `((div ,(item-tile G_
                        "songs"
                        x
-                       (relevant-artworks artworks x)
+                       (relevant-entities 'song artworks x)
                        #:extra-info extra-info)))))
 
 (define-public (songs-list-page G_ songs artworks song-version-count-alist)

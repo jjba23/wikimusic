@@ -17,6 +17,7 @@
 
 (define-module (app views artists)
   #:use-module (wikimusic html)
+  #:use-module (wikimusic abstraction)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -26,22 +27,19 @@
   #:use-module (ice-9 string-fun))
 
 (define-public (artists-list-page G_ artists artworks)
-  (let ((arts (lambda (x)
-                (filter (lambda (art)
-                          (equal? (assoc-ref x "identifier")
-                                  (assoc-ref art "artist_identifier")))
-                        artworks))))
-    (html-template G_
-                   #:body `(div (@ (class "container mx-auto"))
-                                ((h2 (@ (class
-                                         "font-black text-stone-800 text-md"))
-                                     ,(G_ "viewing artists"))
-                                 (div (div (@ (class
-                                               "flex flex-row flex-wrap gap-3 items-center"))
-                                           ,(map (lambda (x)
-                                                   `(div ,(item-tile G_
-                                                           "artists" x
-                                                           (arts x)))) artists))))))))
+  (html-template G_
+                 #:body `(div (@ (class "container mx-auto"))
+                              ((h2 (@ (class
+                                       "font-black text-stone-800 text-md"))
+                                   ,(G_ "viewing artists"))
+                               (div (div (@ (class
+                                             "flex flex-row flex-wrap gap-3 items-center"))
+                                         ,(map (lambda (x)
+                                                 `(div ,(item-tile G_
+                                                                   "artists" x
+                                                                   (relevant-entities 'artist
+                                                                    artworks x))))
+                                               artists)))))))
 
 (define-public (artists-detail-page G_ artist artworks)
   (html-template G_
