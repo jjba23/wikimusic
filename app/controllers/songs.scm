@@ -145,3 +145,26 @@
                                                   comments
                                                   user-alist))))))
 
+(get "/songs/uuid/:uuid/edit"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     (lambda (rc)
+       (let* ((uuid (params rc "uuid"))
+              (song (car ($songs 'get
+                                 #:ret 'top
+                                 #:condition (where #:identifier uuid))))
+              (artworks ($song_artworks 'get
+                                        #:ret 'all
+                                        #:order-by '(order_value asc)
+                                        #:condition (where #:song_identifier
+                                                           uuid)))
+              (song-contents ($song_contents 'get
+                                             #:ret 'all
+                                             #:condition (where
+                                                                #:song_identifier
+                                                                uuid))))
+         
+         (response-emit (:mime rc
+                               (song-edit-page (:i18n rc) song song-contents
+                                               artworks))))))
+

@@ -22,6 +22,9 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
+  #:use-module (hygguile abstraction)
+  #:use-module (hygguile components input)
+  #:use-module (hygguile components button)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
@@ -143,3 +146,55 @@
                                                                "p-6 m-4 bg-stone-200/75 text-black rounded-xl white-space-pre overflow-x-scroll text-sm"))
                                                            ,ascii-contents))))))))
               song-contents)))
+
+(begin
+  (define* (song-edit-page G_ song song-contents artworks)
+    (html-template G_
+                   #:body `(div (@ (class "container mx-auto"))
+                                (h2 (@ (class
+                                         "font-black text-stone-800 text-md"))
+                                    ,(G_ "editing song"))
+                                ,(song-form G_
+                                            #:display-name (assoc-ref song
+                                                                      "display_name")
+                                            #:music-key (assoc-ref-or-empty-str song
+                                                                                "music_key")
+                                            #:music-tuning (assoc-ref-or-empty-str song "music_tuning")
+                                            #:music-creation-date (assoc-ref-or-empty-str song "music_creation_date")
+                                            #:album-name (assoc-ref-or-empty-str song "album_name")
+                                            #:album-info-link (assoc-ref-or-empty-str song "album_info_link")
+                                            #:description (assoc-ref-or-empty-str song "description")))))
+  (export song-edit-page))
+
+(begin
+  (define* (song-form G_
+                      #:key (display-name "")
+                      (music-key "")
+                      (music-tuning "")
+                      (music-creation-date "")
+                      (album-name "")
+                      (album-info-link "")
+                      (description ""))
+    `((div ,(mk-input #:label (G_ "display name")
+                      #:name "display-name"
+                      #:value display-name
+                      #:required #t)
+           ,(mk-input #:label (G_ "music key")
+                      #:name "music-key"
+                      #:value music-key)
+           ,(mk-input #:label (G_ "music tuning")
+                      #:name "music-tuning"
+                      #:value music-tuning)
+           ,(mk-input #:label (G_ "music creation date")
+                      #:name "music-creation-date"
+                      #:value music-creation-date)
+           ,(mk-input #:label (G_ "album name")
+                      #:name "album-name"
+                      #:value album-name)
+           ,(mk-input #:label (G_ "album info url")
+                      #:name "album-info-link"
+                      #:value album-info-link)
+           ,(mk-input #:label (G_ "description")
+                      #:name "description"
+                      #:value description))))
+  (export song-form))

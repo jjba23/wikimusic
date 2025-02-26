@@ -32,6 +32,9 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
+  #:use-module (hygguile abstraction)
+  #:use-module (hygguile components input)
+  #:use-module (hygguile components button)
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route))
 
@@ -213,19 +216,15 @@
                                                            entity
                                                            (assoc-ref x
                                                             "identifier"))))
-                                       (button (@ (type "submit")
-                                                  (class
-                                                   "text-white bg-green-900 p-2 rounded-xl"))
-                                               ,(G_ "like")))
+                                       ,(success-submit-button #:content (G_
+                                                                          "like")))
                                  (form (@ (action ,(format #f
                                                            "/~as/dislike/~a"
                                                            entity
                                                            (assoc-ref x
                                                             "identifier"))))
-                                       (button (@ (type "submit")
-                                                  (class
-                                                   "text-white bg-red-900 p-2 rounded-xl"))
-                                               ,(G_ "dislike"))))))
+                                       ,(danger-submit-button #:content (G_
+                                                                         "dislike"))))))
          (maybe-description (cond-render (assoc-ref x "description")
                                          (lambda (description)
                                            `(div (p (@ (class
@@ -253,7 +252,10 @@
     
     `((div (@ (class "py-4 flex flex-row flex-wrap gap-6"))
            (div ,rendered-artworks)
-           (div ,opinion-buttons
+           (div (div ,opinion-buttons
+                     (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity
+                                          (assoc-ref x "identifier"))))
+                        ,(action-button #:content (G_ "edit"))))
                 ,maybe-description
                 (dl (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "views"))
