@@ -151,19 +151,35 @@
   (define* (song-edit-page G_ song song-contents artworks)
     (html-template G_
                    #:body `(div (@ (class "container mx-auto"))
-                                (h2 (@ (class
-                                         "font-black text-stone-800 text-md"))
-                                    ,(G_ "editing song"))
-                                ,(song-form G_
-                                            #:display-name (assoc-ref song
-                                                                      "display_name")
-                                            #:music-key (assoc-ref-or-empty-str song
-                                                                                "music_key")
-                                            #:music-tuning (assoc-ref-or-empty-str song "music_tuning")
-                                            #:music-creation-date (assoc-ref-or-empty-str song "music_creation_date")
-                                            #:album-name (assoc-ref-or-empty-str song "album_name")
-                                            #:album-info-link (assoc-ref-or-empty-str song "album_info_link")
-                                            #:description (assoc-ref-or-empty-str song "description")))))
+                                (details (@(class "cursor-pointer"))
+                                         (summary (@ (class
+                                                       "font-black text-stone-800 text-md"))
+                                                  ,(G_ "new artwork"))
+                                         ,(song-artwork-form G_
+                                                             #:song-identifier (assoc-ref song "identifier")))
+                                (hr (@(class "my-6")))
+                                (details (@(class "cursor-pointer"))
+                                         (summary (@ (class
+                                                       "font-black text-stone-800 text-md"))
+                                                  ,(G_ "editing song"))
+                                         ,(song-form G_
+                                                     #:display-name (assoc-ref song
+                                                                               "display_name")
+                                                     #:music-key (assoc-ref-or-empty-str
+                                                                  song "music_key")
+                                                     #:music-tuning (assoc-ref-or-empty-str
+                                                                     song
+                                                                     "music_tuning")
+                                                     #:music-creation-date (assoc-ref-or-empty-str
+                                                                            song
+                                                                            "music_creation_date")
+                                                     #:album-name (assoc-ref-or-empty-str
+                                                                   song "album_name")
+                                                     #:album-info-link (assoc-ref-or-empty-str
+                                                                        song
+                                                                        "album_info_link")
+                                                     #:description (assoc-ref-or-empty-str
+                                                                    song "description"))))))
   (export song-edit-page))
 
 (begin
@@ -175,26 +191,53 @@
                       (album-name "")
                       (album-info-link "")
                       (description ""))
-    `((div ,(mk-input #:label (G_ "display name")
-                      #:name "display-name"
-                      #:value display-name
-                      #:required #t)
-           ,(mk-input #:label (G_ "music key")
-                      #:name "music-key"
-                      #:value music-key)
-           ,(mk-input #:label (G_ "music tuning")
-                      #:name "music-tuning"
-                      #:value music-tuning)
-           ,(mk-input #:label (G_ "music creation date")
-                      #:name "music-creation-date"
-                      #:value music-creation-date)
-           ,(mk-input #:label (G_ "album name")
-                      #:name "album-name"
-                      #:value album-name)
-           ,(mk-input #:label (G_ "album info url")
-                      #:name "album-info-link"
-                      #:value album-info-link)
-           ,(mk-textarea #:label (G_ "description")
-                         #:name "description"
-                         #:value description))))
+    `((form (@(method POST)(content-type application/x-www-url-encoded))
+            (div ,(mk-input #:label (G_ "display name")
+                            #:name "display-name"
+                            #:value display-name
+                            #:required #t)
+                 ,(mk-input #:label (G_ "music key")
+                            #:name "music-key"
+                            #:value music-key)
+                 ,(mk-input #:label (G_ "music tuning")
+                            #:name "music-tuning"
+                            #:value music-tuning)
+                 ,(mk-input #:label (G_ "music creation date")
+                            #:name "music-creation-date"
+                            #:value music-creation-date)
+                 ,(mk-input #:label (G_ "album name")
+                            #:name "album-name"
+                            #:value album-name)
+                 ,(mk-input #:label (G_ "album info url")
+                            #:name "album-info-link"
+                            #:value album-info-link)
+                 ,(mk-textarea #:label (G_ "description")
+                               #:name "description"
+                               #:value description)))))
+  (export song-form))
+
+(begin
+  (define* (song-artwork-form G_ 
+                              #:key
+                              song-identifier
+                              (artwork-identifier #f)
+                              (content-url "")
+                              (content-caption "")
+                              (order-value 0))
+    (let* ((form-action (if (equal? #f artwork-identifier )
+                            (format #f "/songs/uuid/~a/artworks/new" song-identifier)
+                            (format #f "/songs/uuid/~a/artworks/edit/~a" song-identifier artwork-identifier))))
+      `((form (@(method POST)(content-type application/x-www-url-encoded)(action ,form-action))
+              (div
+               ,(mk-input #:label (G_ "content url")
+                          #:name "content-url"
+                          #:value content-url
+                          #:required #t)
+               ,(mk-input #:label (G_ "content caption")
+                          #:name "content-captio"
+                          #:value content-caption)
+               ,(mk-input #:label (G_ "order value")
+                          #:type 'number
+                          #:name "order-value"
+                          #:value order-value))))))
   (export song-form))

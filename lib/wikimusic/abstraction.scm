@@ -37,22 +37,20 @@
 
 (define-public (relevant-entities entity related-entities x)
   (let* ((k (cond
-             ((eq? entity
-                   'artist)
-              "artist_identifier")
-             ((eq? entity
-                   'genre)
-              "genre_identifier")
-             ((eq? entity
-                   'song)
-              "song_identifier")
-             (else "song_identifier"))))
+              ((eq? entity
+                    'artist)
+               "artist_identifier")
+              ((eq? entity
+                    'genre)
+               "genre_identifier")
+              ((eq? entity
+                    'song)
+               "song_identifier")
+              (else "song_identifier"))))
     (filter (lambda (related-entity)
               (equal? (assoc-ref x "identifier")
                       (assoc-ref related-entity k))) related-entities)))
 
 (define-public (assoc-ref-or-empty-str alist field)
   (let ((sut (assoc-ref alist field)))
-    (if (equal? #f sut)
-        ""
-        sut)))
+    (if (equal? #f sut) "" sut)))
