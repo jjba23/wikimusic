@@ -194,7 +194,7 @@
            ,(mk-input #:label (G_ "album info url")
                       #:name "album-info-link"
                       #:value album-info-link)
-           ,(mk-input #:label (G_ "description")
-                      #:name "description"
-                      #:value description))))
+           ,(mk-textarea #:label (G_ "description")
+                         #:name "description"
+                         #:value description))))
   (export song-form))
