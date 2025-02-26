@@ -205,37 +205,50 @@
                                             (img (@ (loading "lazy")
                                                     (class "rounded-xl")
                                                     (src ,(assoc-ref art
-                                                                     "content_url"))))))
+                                                           "content_url"))))))
                                  artworks))
          (rendered-comments (render-comments G_ user-alist #f comments))
-         (opinion-buttons `((div (@(class "flex flex-row flex-wrap gap-3"))
-                                 (form (@(action ,(format #f "/~as/like/~a" entity (assoc-ref x "identifier"))))
-                                       (button (@(type "submit")(class "text-white bg-green-900 p-2 rounded-xl")) ,(G_ "like")))
-                                 (form (@(action ,(format #f "/~as/dislike/~a" entity (assoc-ref x "identifier"))))
-                                       (button (@(type "submit")(class "text-white bg-red-900 p-2 rounded-xl")) ,(G_ "dislike"))))))
+         (opinion-buttons `((div (@ (class "flex flex-row flex-wrap gap-3"))
+                                 (form (@ (action ,(format #f "/~as/like/~a"
+                                                           entity
+                                                           (assoc-ref x
+                                                            "identifier"))))
+                                       (button (@ (type "submit")
+                                                  (class
+                                                   "text-white bg-green-900 p-2 rounded-xl"))
+                                               ,(G_ "like")))
+                                 (form (@ (action ,(format #f
+                                                           "/~as/dislike/~a"
+                                                           entity
+                                                           (assoc-ref x
+                                                            "identifier"))))
+                                       (button (@ (type "submit")
+                                                  (class
+                                                   "text-white bg-red-900 p-2 rounded-xl"))
+                                               ,(G_ "dislike"))))))
          (maybe-description (cond-render (assoc-ref x "description")
                                          (lambda (description)
                                            `(div (p (@ (class
-                                                         "text-stone-700 font-bold"))
+                                                        "text-stone-700 font-bold"))
                                                     ,(G_ "description"))
                                                  (p (@ (class
-                                                         "pl-3 text-stone-800 max-w-prose"))
+                                                        "pl-3 text-stone-800 max-w-prose"))
                                                     ,description)))))
          (maybe-last-edited-at (cond-render (assoc-ref x "last_edited_at")
                                             (lambda (last-edited-at)
                                               `((dt (@ (class
-                                                         "text-stone-700 font-bold"))
+                                                        "text-stone-700 font-bold"))
                                                     ,(G_ "last edited"))
                                                 (dd (@ (class
-                                                         "pl-3 text-stone-800"))
+                                                        "pl-3 text-stone-800"))
                                                     ,last-edited-at)))))
          (maybe-approved-by (cond-render (assoc-ref x "approved_by")
                                          (lambda (approved-by)
                                            `((dt (@ (class
-                                                      "text-stone-700 font-bold"))
+                                                     "text-stone-700 font-bold"))
                                                  ,(G_ "approved by"))
                                              (dd (@ (class
-                                                      "pl-3 text-stone-800"))
+                                                     "pl-3 text-stone-800"))
                                                  ,approved-by))))))
     
     `((div (@ (class "py-4 flex flex-row flex-wrap gap-6"))
@@ -260,19 +273,19 @@
                                                                  "created_by")))
                                       (lambda (u)
                                         `(div (@ (class
-                                                   "flex flex-wrap flex-row gap-2"))
+                                                  "flex flex-wrap flex-row gap-2"))
                                               (span ,(format #f
-                                                             "~a (~a) &lt;~a&gt;"
-                                                             (assoc-ref u
-                                                                        "display_name")
-                                                             (assoc-ref u "username")
-                                                             (assoc-ref u
-                                                                        "email_address")))))))
+                                                      "~a (~a) &lt;~a&gt;"
+                                                      (assoc-ref u
+                                                       "display_name")
+                                                      (assoc-ref u "username")
+                                                      (assoc-ref u
+                                                       "email_address")))))))
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "visibility"))
                     (dd (@ (class "pl-3 text-stone-800"))
                         ,(render-visibility-status (assoc-ref x
-                                                              "visibility_status")))
+                                                    "visibility_status")))
                     ,maybe-approved-by
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "uuid"))
