@@ -38,20 +38,11 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route))
 
-(begin
-  (define-syntax-rule (cond-render render-func item)
-    "Render HTML conditionally if item exists"
-    (cond
-      ((or (nil? item)
-           (equal? item #f))
-       '())
-      (else (render-func item))))
-  (export cond-render))
 
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
          (div (@ (class
-                  "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
+                   "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
               (p (@ (class "text-sm text-stone-600"))
                  ,(G_ "find the source code here"))
               (a (@ (class "text-blue-800 font-bold cursor-pointer text-sm")
