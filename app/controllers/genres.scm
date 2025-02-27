@@ -19,12 +19,14 @@
 
 (import (wikimusic html)
         (web uri)
+        (wikimusic auth)
         (ice-9 string-fun)
         (app models genres)
         (app models genre_artworks)
         (app models genre_comments)
         (app models genre_opinions)
         (app models users)
+        (uuid generate)
         (app views genres))
 
 (get "/genres"
@@ -102,10 +104,42 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                               (genres-detail-page (:i18n rc)
-                                                   genre
-                                                   artworks
-                                                   opinions
-                                                   comments
-                                                   user-alist))))))
+                         (genres-detail-page (:i18n rc)
+                                             genre
+                                             artworks
+                                             opinions
+                                             comments
+                                             user-alist))))))
 
+
+(define (do-opinion rc is-like is-dislike)
+  (let* ((uuid (params rc "uuid"))
+         (user-identifier (:cookies-value rc "wikimusic-user-identifier"))
+         (rec (car($genres 'get #:condition (where #:identifier uuid))))
+         (new-uuid (generate-string-uuid))
+         (ex-op (filter (lambda(o) (equal? user-identifier (assoc-ref o "created_by")))
+                        ($genre_opinions 'get #:condition (where #:genre_identifier uuid)))))
+    (write rec)
+    (if (not (nil? ex-op))
+        ($genre_opinions 'mod 'row-delete
+                         (where #:identifier (assoc-ref (car ex-op) "identifier"))))
+    ($genre_opinions 'set
+                     #:identifier new-uuid
+                     #:genre_identifier uuid
+                     #:created_by user-identifier
+                     #:is_like is-like
+                     #:is_dislike is-dislike
+                     #:created_at (current-time))
+    (redirect-to rc (string->uri (format #f "~a/genres/uuid/~a" (current-myhost) uuid)) #:status 302)))
+
+(post "/genres/uuid/:uuid/like"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda(rc)
+        (protected-endpoint rc (lambda() (do-opinion rc 1 0)))))
+
+(post "/genres/uuid/:uuid/dislike"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda(rc)
+        (protected-endpoint rc (lambda() (do-opinion rc 0 1)))))
