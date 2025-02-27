@@ -22,6 +22,9 @@
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
+  #:use-module (hygguile abstraction)
+  #:use-module (hygguile components input)
+  #:use-module (hygguile components button)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
@@ -34,17 +37,18 @@
                                (div (form (@ (action "/login")
                                              (class
                                               "w-full rounded-xl bg-stone-200/75 p-4 flex flex-row flex-wrap items-center gap-4 align-center")
-                                             (method "POST"))
-                                          (label ,(G_ "username"))
-                                          (input (@ (type "text")
-                                                    (class "p-3 rounded-xl")
-                                                    (name "username")) "")
-                                          (label ,(G_ "password"))
-                                          (input (@ (type "password")
-                                                    (class "p-3 rounded-xl")
-                                                    (name "password_hash")) "")
-                                          (button (@ (type "submit")
-                                                     (class
-                                                      "p-2 rounded-xl w-min bg-green-700/75 text-white"))
-                                                  "login")))))))
+                                             (method POST))
+                                          ,(mk-input #:label (G_ "username")
+                                                     #:name "username"
+                                                     #:value ""
+                                                     #:required #t)
+                                          ,(mk-input #:label (G_ "password")
+                                                     #:name "password_hash"
+                                                     #:value ""
+                                                     #:type 'password
+                                                     #:required #t)
+                                          (div ,(success-submit-button
+                                                                       #:content
+                                                                       (G_
+                                                                        "login")))))))))
 

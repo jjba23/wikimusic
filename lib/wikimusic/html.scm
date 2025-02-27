@@ -32,23 +32,17 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
+  #:use-module (hygguile abstraction)
+  #:use-module (hygguile components input)
+  #:use-module (hygguile components button)
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route))
 
-(begin
-  (define-syntax-rule (cond-render item render-func)
-    "Render HTML conditionally if item exists"
-    (cond
-      ((or (nil? item)
-           (equal? item #f))
-       '())
-      (else (render-func item))))
-  (export cond-render))
 
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
          (div (@ (class
-                  "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
+                   "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
               (p (@ (class "text-sm text-stone-600"))
                  ,(G_ "find the source code here"))
               (a (@ (class "text-blue-800 font-bold cursor-pointer text-sm")
@@ -126,18 +120,18 @@
                                               (assoc-ref o "is_dislike")))
                                     opinions))))
       `(div (@ (class "flex flex-col py-3"))
-            ,(cond-render (cond
-                            ((equal? 0
-                                     (length artworks))
-                             '())
-                            (else (car artworks)))
-                          (lambda (art)
+            ,(cond-render (lambda (art)
                             `(figure (@ (class "py-3 sm:w-48"))
                                      (a (@ (href ,item-link))
                                         (img (@ (loading "lazy")
                                                 (class "rounded-xl")
                                                 (src ,(assoc-ref art
-                                                       "content_url"))))))))
+                                                       "content_url")))))))
+                          (cond
+                            ((equal? 0
+                                     (length artworks))
+                             '())
+                            (else (car artworks))))
             (a (@ (class "text-blue-800 text-xl font-medium")
                   (href ,item-link))
                (span ,(assoc-ref x "display_name")))
@@ -167,14 +161,14 @@
 
 (define-public (render-comment G_ user-alist comment)
   `(div (@ (class "py-3"))
-        ,(cond-render (car (assoc-ref user-alist
-                                      (assoc-ref comment "created_by")))
-                      (lambda (u)
+        ,(cond-render (lambda (u)
                         `(p (@ (class "text-xs text-stone-600"))
                             ,(format #f "~a (~a) &lt;~a&gt;"
                                      (assoc-ref u "display_name")
                                      (assoc-ref u "username")
-                                     (assoc-ref u "email_address")))))
+                                     (assoc-ref u "email_address"))))
+                      (car (assoc-ref user-alist
+                                      (assoc-ref comment "created_by"))))
         (p (@ (class "text-sm text-stone-900"))
            ,(assoc-ref comment "contents"))
         (p (@ (class "text-xs text-stone-400"))
@@ -205,42 +199,58 @@
                                             (img (@ (loading "lazy")
                                                     (class "rounded-xl")
                                                     (src ,(assoc-ref art
-                                                                     "content_url"))))))
+                                                           "content_url"))))
+                                            ,(cond-render (lambda (fc)
+                                                            `(figcaption ,fc))
+                                                          (assoc-ref art
+                                                           "content_caption"))))
                                  artworks))
          (rendered-comments (render-comments G_ user-alist #f comments))
-         (opinion-buttons `((div (@(class "flex flex-row flex-wrap gap-3"))
-                                 (form (@(action ,(format #f "/~as/like/~a" entity (assoc-ref x "identifier"))))
-                                       (button (@(type "submit")(class "text-white bg-green-900 p-2 rounded-xl")) ,(G_ "like")))
-                                 (form (@(action ,(format #f "/~as/dislike/~a" entity (assoc-ref x "identifier"))))
-                                       (button (@(type "submit")(class "text-white bg-red-900 p-2 rounded-xl")) ,(G_ "dislike"))))))
-         (maybe-description (cond-render (assoc-ref x "description")
-                                         (lambda (description)
+         (opinion-buttons `((div (@ (class "flex flex-row flex-wrap gap-3"))
+                                 (form (@ (action ,(format #f "/~as/like/~a"
+                                                           entity
+                                                           (assoc-ref x
+                                                            "identifier"))))
+                                       ,(success-submit-button #:content (G_
+                                                                          "like")))
+                                 (form (@ (action ,(format #f
+                                                           "/~as/dislike/~a"
+                                                           entity
+                                                           (assoc-ref x
+                                                            "identifier"))))
+                                       ,(danger-submit-button #:content (G_
+                                                                         "dislike"))))))
+         (maybe-description (cond-render (lambda (description)
                                            `(div (p (@ (class
-                                                         "text-stone-700 font-bold"))
+                                                        "text-stone-700 font-bold"))
                                                     ,(G_ "description"))
                                                  (p (@ (class
-                                                         "pl-3 text-stone-800 max-w-prose"))
-                                                    ,description)))))
-         (maybe-last-edited-at (cond-render (assoc-ref x "last_edited_at")
-                                            (lambda (last-edited-at)
+                                                        "pl-3 text-stone-800 max-w-prose"))
+                                                    ,description)))
+                                         (assoc-ref x "description")))
+         (maybe-last-edited-at (cond-render (lambda (last-edited-at)
                                               `((dt (@ (class
-                                                         "text-stone-700 font-bold"))
+                                                        "text-stone-700 font-bold"))
                                                     ,(G_ "last edited"))
                                                 (dd (@ (class
-                                                         "pl-3 text-stone-800"))
-                                                    ,last-edited-at)))))
-         (maybe-approved-by (cond-render (assoc-ref x "approved_by")
-                                         (lambda (approved-by)
+                                                        "pl-3 text-stone-800"))
+                                                    ,last-edited-at)))
+                                            (assoc-ref x "last_edited_at")))
+         (maybe-approved-by (cond-render (lambda (approved-by)
                                            `((dt (@ (class
-                                                      "text-stone-700 font-bold"))
+                                                     "text-stone-700 font-bold"))
                                                  ,(G_ "approved by"))
                                              (dd (@ (class
-                                                      "pl-3 text-stone-800"))
-                                                 ,approved-by))))))
+                                                     "pl-3 text-stone-800"))
+                                                 ,approved-by)))
+                                         (assoc-ref x "approved_by"))))
     
     `((div (@ (class "py-4 flex flex-row flex-wrap gap-6"))
            (div ,rendered-artworks)
-           (div ,opinion-buttons
+           (div (div ,opinion-buttons
+                     (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity
+                                          (assoc-ref x "identifier"))))
+                        ,(action-button #:content (G_ "edit"))))
                 ,maybe-description
                 (dl (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "views"))
@@ -255,24 +265,24 @@
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "contributor"))
                     (dd (@ (class "pl-3 text-stone-800"))
-                        ,(cond-render (car (assoc-ref user-alist
-                                                      (assoc-ref x
-                                                                 "created_by")))
-                                      (lambda (u)
+                        ,(cond-render (lambda (u)
                                         `(div (@ (class
-                                                   "flex flex-wrap flex-row gap-2"))
+                                                  "flex flex-wrap flex-row gap-2"))
                                               (span ,(format #f
-                                                             "~a (~a) &lt;~a&gt;"
-                                                             (assoc-ref u
-                                                                        "display_name")
-                                                             (assoc-ref u "username")
-                                                             (assoc-ref u
-                                                                        "email_address")))))))
+                                                      "~a (~a) &lt;~a&gt;"
+                                                      (assoc-ref u
+                                                       "display_name")
+                                                      (assoc-ref u "username")
+                                                      (assoc-ref u
+                                                       "email_address")))))
+                                      (car (assoc-ref user-alist
+                                                      (assoc-ref x
+                                                                 "created_by")))))
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "visibility"))
                     (dd (@ (class "pl-3 text-stone-800"))
                         ,(render-visibility-status (assoc-ref x
-                                                              "visibility_status")))
+                                                    "visibility_status")))
                     ,maybe-approved-by
                     (dt (@ (class "text-stone-700 font-bold"))
                         ,(G_ "uuid"))

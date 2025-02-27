@@ -22,6 +22,9 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
+  #:use-module (hygguile abstraction)
+  #:use-module (hygguile components input)
+  #:use-module (hygguile components button)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
@@ -32,16 +35,16 @@
                           opinions
                           comments
                           x)
-  (let ((extra-info (cond-render (assoc-ref song-version-count-alist
-                                            (assoc-ref x "identifier"))
-                                 (lambda (vc)
+  (let ((extra-info (cond-render (lambda (vc)
                                    `(div (@ (class
                                              "flex flex-row gap-2 text-xs"))
 
                                          (span ,(format #f "~a"
 
                                                         (car vc)))
-                                         (span ,(G_ "versions")))))))
+                                         (span ,(G_ "versions"))))
+                                 (assoc-ref song-version-count-alist
+                                            (assoc-ref x "identifier")))))
     `((div ,(item-tile G_
                        'song
                        x
@@ -99,9 +102,7 @@
                   (details (@ (open "true")
                               (class "cursor-pointer"))
                            (summary (@ (class "p-6"))
-                                    ,(cond-render (assoc-ref version
-                                                             "version_name")
-                                                  (lambda (version-name)
+                                    ,(cond-render (lambda (version-name)
                                                     `(div (@ (class
                                                               "flex flex-row flex-wrap gap-4"))
                                                           (span (@ (class
@@ -110,36 +111,179 @@
                                                           (span (@ (class
                                                                     "text-xl font-bold text-stone-700"))
                                                                 ,version-name)
-                                                          ,(cond-render (assoc-ref
-                                                                         version
-                                                                         "instrument_type")
-                                                                        (lambda 
+                                                          ,(cond-render (lambda 
                                                                                 (instrument-type)
                                                                           `(span
                                                                             (@
                                                                              (class
                                                                               "text-xl font-bold text-stone-700"))
-                                                                            ,instrument-type)))))))
+                                                                            ,instrument-type))
+                                                                        (assoc-ref
+                                                                         version
+                                                                         "instrument_type"))))
+                                                  (assoc-ref version
+                                                             "version_name")))
                            (div (@ (class "p-4"))
 
-                                ,(cond-render (assoc-ref version
-                                                         "ascii_legend")
-                                              (lambda (ascii-legend)
+                                ,(cond-render (lambda (ascii-legend)
                                                 `(div (span (@ (class
                                                                 "text-xl font-bold text-stone-700"))
                                                             ,(G_
                                                               "ascii legend"))
                                                       (pre (@ (class
                                                                "p-6 m-4 bg-stone-200/75 text-black rounded-xl white-space-pre overflow-x-scroll text-sm"))
-                                                           ,ascii-legend))))
-                                ,(cond-render (assoc-ref version
-                                                         "ascii_contents")
-                                              (lambda (ascii-contents)
+                                                           ,ascii-legend)))
+                                              (assoc-ref version
+                                                         "ascii_legend"))
+                                ,(cond-render (lambda (ascii-contents)
                                                 `(div (span (@ (class
                                                                 "text-xl font-bold text-stone-700"))
                                                             ,(G_
                                                               "ascii contents"))
                                                       (pre (@ (class
                                                                "p-6 m-4 bg-stone-200/75 text-black rounded-xl white-space-pre overflow-x-scroll text-sm"))
-                                                           ,ascii-contents))))))))
+                                                           ,ascii-contents)))
+                                              (assoc-ref version
+                                                         "ascii_contents"))))))
               song-contents)))
+
+(begin
+  (define* (song-edit-page G_ song song-contents artworks)
+    (html-template G_
+                   #:body `(div (@ (class "container mx-auto"))
+                                (details (@ (class "cursor-pointer"))
+                                         (summary (@ (class
+                                                      "font-black text-stone-800 text-md"))
+                                                  ,(G_ "edit artworks"))
+                                         ,(map (lambda (a)
+                                                 `(div (figure (@ (class
+                                                                   "py-3 sm:w-36"))
+                                                               (img (@ (loading
+                                                                        "lazy")
+                                                                       (class
+                                                                        "rounded-xl")
+                                                                       (src ,(assoc-ref
+                                                                              a
+                                                                              "content_url")))))
+                                                       ,(song-artwork-form G_
+                                                                           #:song-identifier
+                                                                           (assoc-ref
+                                                                            song
+                                                                            "identifier")
+                                                                           #:artwork-identifier
+                                                                           (assoc-ref
+                                                                            a
+                                                                            "identifier")
+                                                                           #:content-url
+                                                                           (assoc-ref
+                                                                            a
+                                                                            "content_url")
+                                                                           #:content-caption
+                                                                           (assoc-ref-or-empty-str
+                                                                            a
+                                                                            "content_caption")
+                                                                           #:order-value
+                                                                           (assoc-ref
+                                                                            a
+                                                                            "order_value"))))
+                                               artworks))
+                                (hr (@ (class "my-6")))
+                                (details (@ (class "cursor-pointer"))
+                                         (summary (@ (class
+                                                      "font-black text-stone-800 text-md"))
+                                                  ,(G_ "new artwork"))
+                                         ,(song-artwork-form G_
+                                                             #:song-identifier
+                                                             (assoc-ref song
+                                                              "identifier")))
+                                (hr (@ (class "my-6")))
+                                (details (@ (class "cursor-pointer"))
+                                         (summary (@ (class
+                                                      "font-black text-stone-800 text-md"))
+                                                  ,(G_ "editing song"))
+                                         ,(song-form G_
+                                                     #:display-name (assoc-ref
+                                                                     song
+                                                                     "display_name")
+                                                     #:music-key (assoc-ref-or-empty-str
+                                                                  song
+                                                                  "music_key")
+                                                     #:music-tuning (assoc-ref-or-empty-str
+                                                                     song
+                                                                     "music_tuning")
+                                                     #:music-creation-date (assoc-ref-or-empty-str
+                                                                            song
+                                                                            "music_creation_date")
+                                                     #:album-name (assoc-ref-or-empty-str
+                                                                   song
+                                                                   "album_name")
+                                                     #:album-info-link (assoc-ref-or-empty-str
+                                                                        song
+                                                                        "album_info_link")
+                                                     #:description (assoc-ref-or-empty-str
+                                                                    song
+                                                                    "description"))))))
+  (export song-edit-page))
+
+(begin
+  (define* (song-form G_
+                      #:key (display-name "")
+                      (music-key "")
+                      (music-tuning "")
+                      (music-creation-date "")
+                      (album-name "")
+                      (album-info-link "")
+                      (description ""))
+    `((form (@ (method POST)
+               (content-type application/x-www-url-encoded))
+            (div ,(mk-input #:label (G_ "display name")
+                            #:name "display-name"
+                            #:value display-name
+                            #:required #t)
+                 ,(mk-input #:label (G_ "music key")
+                            #:name "music-key"
+                            #:value music-key)
+                 ,(mk-input #:label (G_ "music tuning")
+                            #:name "music-tuning"
+                            #:value music-tuning)
+                 ,(mk-input #:label (G_ "music creation date")
+                            #:name "music-creation-date"
+                            #:value music-creation-date)
+                 ,(mk-input #:label (G_ "album name")
+                            #:name "album-name"
+                            #:value album-name)
+                 ,(mk-input #:label (G_ "album info url")
+                            #:name "album-info-link"
+                            #:value album-info-link)
+                 ,(mk-textarea #:label (G_ "description")
+                               #:name "description"
+                               #:value description)))))
+  (export song-form))
+
+(begin
+  (define* (song-artwork-form G_
+                              #:key song-identifier
+                              (artwork-identifier #f)
+                              (content-url "")
+                              (content-caption "")
+                              (order-value 0))
+    (let* ((form-action (if (equal? #f artwork-identifier)
+                            (format #f "/songs/uuid/~a/artworks/new"
+                                    song-identifier)
+                            (format #f "/songs/uuid/~a/artworks/edit/~a"
+                                    song-identifier artwork-identifier))))
+      `((form (@ (method POST)
+                 (content-type application/x-www-url-encoded)
+                 (action ,form-action))
+              (div ,(mk-input #:label (G_ "content url")
+                              #:name "content-url"
+                              #:value content-url
+                              #:required #t)
+                   ,(mk-input #:label (G_ "content caption")
+                              #:name "content-captio"
+                              #:value content-caption)
+                   ,(mk-input #:label (G_ "order value")
+                              #:type 'number
+                              #:name "order-value"
+                              #:value order-value))))))
+  (export song-form))
