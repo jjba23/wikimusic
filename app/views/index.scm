@@ -29,8 +29,29 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               (div (h2 (@ (class
-                                           "font-black text-stone-800 text-md"))
-                                       ,(G_ "welcome to wikimusic"))
-                                   (p ,(G_
-                                        "wikimusic - the free music knowledge encyclopaedia"))))))
+                                            "font-black text-stone-800 text-xl"))
+                                       ,(G_ "Welcome to Wikimusic"))
+                                   (em ,(G_
+                                         "the free music knowledge encyclopaedia"))
+                                   ,(wikimusic-explain G_)))))
 
+(define (wikimusic-explain G_)
+  `((div (@(class "max-w-prose my-8"))
+         (p ,(G_ "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."))
+         
+         (p ,(G_ "At its core, WikiMusic leverages the expressive power of Lisp to build a dynamic interactive Music Gallery and Content Management System (CMS)."))
+         
+         (p ,(G_ "Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:"))
+         
+         (ul (@(class "my-4"))
+             (li ,(G_ "Discover music from diverse genres and traditions."))
+             (li ,(G_ "Organize information with structured metadata and multimedia content."))
+             (li ,(G_ "Contribute by adding new compositions, analyses, or educational materials."))
+             (li ,(G_ "Learn through curated resources that connect music theory, history, and practice.")))
+         
+         (div (@(class "my-2"))
+              (a (@(class "font-bold text-blue-800")(href "https://www.buymeacoffee.com/jjbigorra")) ,(G_ "Please donate by clicking here")))
+         (p ,(G_ "This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong."))
+         
+         (p ,(G_ "WikiMusic leverages a database-backed architecture to ensure all content is easily searchable, linkable, and reusable. The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively."))
+         (p ,(G_ "Join us in building an ever-growing library of musical knowledge — where every note tells a story.")))))

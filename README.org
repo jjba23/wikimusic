@@ -11,15 +11,27 @@ Work in progress 🚧
 This is 100% free software, licensed under the GNU General Public License v3 or later.
 [[https://www.gnu.org/licenses/gpl-3.0.en.html][Refer to the full license, on GNU's website]]
 
-The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education.
+The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms.
+
+At its core, WikiMusic leverages the expressive power of Lisp to build a dynamic interactive Music Gallery and Content Management System (CMS).
+
+Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:
+- Discover music from diverse genres and traditions.
+- Organize information with structured metadata and multimedia content.
+- Contribute by adding new compositions, analyses, or educational materials.
+- Learn through curated resources that connect music theory, history, and practice.
 
 [[https://www.buymeacoffee.com/jjbigorra][Please donate by clicking here]]. This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong.
+
+WikiMusic leverages a database-backed architecture to ensure all content is easily searchable, linkable, and reusable. The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively.
+
+Join us in building an ever-growing library of musical knowledge — where every note tells a story.
 
 -----
 
 This is a Lisp (Guile Scheme) version of the Wikimusic system.
 
-It will replace the Haskell REST API and SSR frontend with a GNU Artanis monolith.
+It replaces the Haskell REST API and SSR frontend with a GNU Artanis monolith.
 
 The productivity gains have been fantastic.
 
