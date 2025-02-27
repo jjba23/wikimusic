@@ -18,7 +18,9 @@
 (define-artanis-controller login)
 
 (import (wikimusic html)
+        (wikimusic url)
         (web uri)
+        (app models users)
         (ice-9 string-fun)
         (app views login))
 
@@ -31,24 +33,42 @@
 
 (post "/login"
       #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:session '(spawn "wikimusic-sid")
+      #:cookies '(names wikimusic-user-identifier)
       (lambda (rc)
-        (cond
-          ((:session rc
-                     'check)
-           (redirect-to rc
-                        (string->uri (format #f "~a/songs"
-                                             (current-myhost)))
-                        #:status 302))
-          ((:auth rc)
-           (:session rc
-                     'spawn)
-           (redirect-to rc
-                        (string->uri (format #f "~a/songs"
-                                             (current-myhost)))
-                        #:status 302))
-          (else (redirect-to rc
-                             (string->uri (format #f
-                                           "~a/login?login_failed=true"
-                                           (current-myhost)))
-                             #:status 302)))))
+        (let* ((body (rc-body rc))
+               (kv (read-url-encoded-body body))
+               (username (uri-decode (car (assoc-ref kv "username"))))
+               (identifier (assoc-ref (car ($users 'get #:ret 'top #:condition (where #:username username))) "identifier")))
+          (cond
+           ((:session rc
+             '(check "wikimusic-sid"))
+            (:cookies-set! rc
+             'wikimusic-user-identifier "wikimusic-user-identifier" identifier)
+            (:cookies-setattr! rc
+             'wikimusic-user-identifier
+             #:expires 12000000
+             #:path "/"
+             #:http-only #t)
+            (redirect-to rc
+                         (string->uri (format #f "~a/songs"
+                                              (current-myhost)))
+                         #:status 302))
+           ((:auth rc)
+            (:session rc '(check-and-spawn "wikimusic-sid"))
+            (:cookies-set! rc
+             'wikimusic-user-identifier "wikimusic-user-identifier" identifier)
+            (:cookies-setattr! rc
+             'wikimusic-user-identifier
+             #:expires 12000000
+             #:path "/"
+             #:http-only #t)
+            (redirect-to rc
+                         (string->uri (format #f "~a/songs"
+                                              (current-myhost)))
+                         #:status 302))
+           (else (redirect-to rc
+                              (string->uri (format #f
+                                                   "~a/login?login_failed=true"
+                                                   (current-myhost)))
+                              #:status 302))))))

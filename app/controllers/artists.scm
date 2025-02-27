@@ -20,10 +20,12 @@
 (import (wikimusic html)
         (web uri)
         (ice-9 string-fun)
+        (wikimusic auth)
         (app models artists)
         (app models artist_artworks)
         (app models artist_opinions)
         (app models artist_comments)
+        (uuid generate)
         (app models users)
         (app views artists))
 
@@ -78,19 +80,19 @@
                                           #:ret 'all
                                           #:order-by '(order_value asc)
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))
+                                                       #:artist_identifier
+                                                       uuid)))
               (opinions ($artist_opinions 'get
                                           #:ret 'all
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))
+                                                       #:artist_identifier
+                                                       uuid)))
               (comments ($artist_comments 'get
                                           #:ret 'all
                                           #:order-by '(created_at asc)
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))
+                                                       #:artist_identifier
+                                                       uuid)))
               (users ($users 'get
                              #:ret 'all
                              #:order-by '(display_name asc)
@@ -105,10 +107,42 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                               (artists-detail-page (:i18n rc)
-                                                    artist
-                                                    artworks
-                                                    opinions
-                                                    comments
-                                                    user-alist))))))
+                         (artists-detail-page (:i18n rc)
+                                              artist
+                                              artworks
+                                              opinions
+                                              comments
+                                              user-alist))))))
 
+
+(define (do-opinion rc is-like is-dislike)
+  (let* ((uuid (params rc "uuid"))
+         (user-identifier (:cookies-value rc "wikimusic-user-identifier"))
+         (rec (car($artists 'get #:condition (where #:identifier uuid))))
+         (new-uuid (generate-string-uuid))
+         (ex-op (filter (lambda(o) (equal? user-identifier (assoc-ref o "created_by")))
+                        ($artist_opinions 'get #:condition (where #:artist_identifier uuid)))))
+    (write rec)
+    (if (not (nil? ex-op))
+        ($artist_opinions 'mod 'row-delete
+                          (where #:identifier (assoc-ref (car ex-op) "identifier"))))
+    ($artist_opinions 'set
+                      #:identifier new-uuid
+                      #:artist_identifier uuid
+                      #:created_by user-identifier
+                      #:is_like is-like
+                      #:is_dislike is-dislike
+                      #:created_at (current-time))
+    (redirect-to rc (string->uri (format #f "~a/artists/uuid/~a" (current-myhost) uuid)) #:status 302)))
+
+(post "/artists/uuid/:uuid/like"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda(rc)
+        (protected-endpoint rc (lambda() (do-opinion rc 1 0)))))
+
+(post "/artists/uuid/:uuid/dislike"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda(rc)
+        (protected-endpoint rc (lambda() (do-opinion rc 0 1)))))
