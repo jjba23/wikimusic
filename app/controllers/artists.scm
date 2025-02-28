@@ -137,10 +137,12 @@
 (define (do-edit rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))
+    (write kv)
     (DB-query (get-conn-from-pool!)
               (->sql update
                      'artists set
-                     `((display_name ,(assoc-ref kv "display_name")))
+                     `((display_name ,(assoc-ref kv "display-name"))
+                       (description ,(assoc-ref kv "description")))
                      (where #:identifier (params rc "uuid"))))
     (redirect-to rc
                  (string->uri (format #f "~a/artists/uuid/~a"

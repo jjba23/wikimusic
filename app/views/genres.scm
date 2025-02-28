@@ -139,7 +139,7 @@
                        (description ""))
     `((form (@ (method POST)
                (action "/genres/uuid/~a/")
-               (content-type application/x-www-url-encoded))
+               (content-type application/x-www-form-urlencoded))
             (div ,(mk-input #:label (G_ "display name")
                             #:name "display-name"
                             #:value display-name

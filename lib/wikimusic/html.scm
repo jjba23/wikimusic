@@ -348,7 +348,7 @@
                             (format #f "/~as/uuid/~a/artworks/edit/~a" entity
                                     entity-identifier artwork-identifier))))
       `((form (@ (method POST)
-                 (content-type application/x-www-url-encoded)
+                 (content-type application/x-www-form-urlencoded)
                  (action ,form-action))
               (div ,(mk-input #:label (G_ "content url")
                               #:name "content-url"

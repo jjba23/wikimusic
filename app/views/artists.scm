@@ -144,7 +144,7 @@
                (action ,(if identifier
                             (format #f "/artists/uuid/~a/edit" identifier)
                             (format #f "/artists/new" identifier)))
-               (content-type application/x-www-url-encoded))
+               (content-type application/x-www-form-urlencoded))
             (div ,(mk-input #:label (G_ "display name")
                             #:name "display-name"
                             #:value display-name
