@@ -19,6 +19,7 @@
 
 (import (app views songs))
 (import (wikimusic html)
+        (wikimusic url)
         (web uri)
         (ice-9 string-fun)
         (wikimusic auth)
@@ -28,6 +29,7 @@
         (app models song_comments)
         (app models song_opinions)
         (uuid generate)
+        (wikimusic query-escape)
         (app models users)
         (app views songs))
 
@@ -169,6 +171,27 @@
          (response-emit (:mime rc
                                (song-edit-page (:i18n rc) song song-contents
                                                artworks))))))
+
+(define (do-edit rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body)))
+    (DB-query (get-conn-from-pool!)
+              (->sql update
+                     'artists set
+                     `((display_name ,(assoc-ref kv "display-name")))
+                     (where #:identifier (params rc "uuid"))))
+    (redirect-to rc
+                 (string->uri (format #f "~a/songs/uuid/~a"
+                                      (current-myhost) (params rc "uuid")))
+                 #:status 302)))
+
+(post "/songs/uuid/:uuid/edit"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-edit rc)))))
 
 (define (do-opinion rc is-like is-dislike)
   (let* ((uuid (params rc "uuid"))

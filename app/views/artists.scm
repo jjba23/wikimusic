@@ -58,7 +58,7 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-black text-stone-800 text-xl"))
+                                       "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref artist "display_name"))
                                (div (div ,(entity-details G_
                                                           'artist
@@ -116,15 +116,16 @@
                                                   ,(G_ "new artwork"))
                                          ,(artwork-form G_
                                                         #:entity 'artist
-                                                        #:entity-identifier
-                                                        (assoc-ref artist
-                                                                   "identifier")))
+                                                        #:entity-identifier (assoc-ref
+                                                                             artist
+                                                                             "identifier")))
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
                                                        "font-black text-stone-800 text-md"))
                                                   ,(G_ "editing artist"))
                                          ,(artist-form G_
+                                                       #:identifier (assoc-ref artist "identifier")
                                                        #:display-name (assoc-ref
                                                                        artist
                                                                        "display_name")
@@ -135,9 +136,14 @@
 
 (begin
   (define* (artist-form G_
-                        #:key (display-name "")
+                        #:key
+                        (identifier #f)
+                        (display-name "")
                         (description ""))
     `((form (@ (method POST)
+               (action ,(if identifier
+                            (format #f "/artists/uuid/~a/edit" identifier)
+                            (format #f "/artists/new" identifier)))
                (content-type application/x-www-url-encoded))
             (div ,(mk-input #:label (G_ "display name")
                             #:name "display-name"
@@ -145,6 +151,7 @@
                             #:required #t)
                  ,(mk-textarea #:label (G_ "description")
                                #:name "description"
-                               #:value description)))))
+                               #:value description)))
+      (div ,(success-submit-button #:content (G_ "edit")))))
   (export artist-form))
 

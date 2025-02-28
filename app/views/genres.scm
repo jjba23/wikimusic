@@ -58,7 +58,7 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-black text-stone-800 text-xl"))
+                                       "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref genre "display_name"))
                                (div (div ,(entity-details G_
                                                           'genre
@@ -68,23 +68,21 @@
                                                           comments
                                                           user-alist)))))))
 
-
-
 (begin
   (define* (genre-edit-page G_ genre artworks)
     (html-template G_
                    #:body `(div (@ (class "container mx-auto"))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                       "font-black text-stone-800 text-md"))
+                                                      "font-black text-stone-800 text-md"))
                                                   ,(G_ "edit artworks"))
                                          ,(map (lambda (a)
                                                  `(div (figure (@ (class
-                                                                    "py-3 sm:w-36"))
+                                                                   "py-3 sm:w-36"))
                                                                (img (@ (loading
                                                                         "lazy")
                                                                        (class
-                                                                         "rounded-xl")
+                                                                        "rounded-xl")
                                                                        (src ,(assoc-ref
                                                                               a
                                                                               "content_url")))))
@@ -114,17 +112,17 @@
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                       "font-black text-stone-800 text-md"))
+                                                      "font-black text-stone-800 text-md"))
                                                   ,(G_ "new artwork"))
                                          ,(artwork-form G_
                                                         #:entity 'genre
-                                                        #:entity-identifier
-                                                        (assoc-ref genre
-                                                                   "identifier")))
+                                                        #:entity-identifier (assoc-ref
+                                                                             genre
+                                                                             "identifier")))
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                       "font-black text-stone-800 text-md"))
+                                                      "font-black text-stone-800 text-md"))
                                                   ,(G_ "editing genre"))
                                          ,(genre-form G_
                                                       #:display-name (assoc-ref
@@ -140,6 +138,7 @@
                        #:key (display-name "")
                        (description ""))
     `((form (@ (method POST)
+               (action "/genres/uuid/~a/")
                (content-type application/x-www-url-encoded))
             (div ,(mk-input #:label (G_ "display name")
                             #:name "display-name"
@@ -147,6 +146,7 @@
                             #:required #t)
                  ,(mk-textarea #:label (G_ "description")
                                #:name "description"
-                               #:value description)))))
+                               #:value description)))
+      (div ,(success-submit-button #:content (G_ "edit")))))
   (export genre-form))
 

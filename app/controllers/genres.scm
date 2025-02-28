@@ -19,6 +19,7 @@
 
 (import (wikimusic html)
         (web uri)
+        (wikimusic url)
         (wikimusic auth)
         (ice-9 string-fun)
         (app models genres)
@@ -26,6 +27,7 @@
         (app models genre_comments)
         (app models genre_opinions)
         (app models users)
+        (wikimusic query-escape)
         (uuid generate)
         (app views genres))
 
@@ -127,6 +129,27 @@
          
          (response-emit (:mime rc
                                (genre-edit-page (:i18n rc) genre artworks))))))
+
+(define (do-edit rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body)))
+    (DB-query (get-conn-from-pool!)
+              (->sql update
+                     'genres set
+                     `((display_name ,(escape-str (assoc-ref kv "display_name"))))
+                     (where #:identifier (params rc "uuid"))))
+    (redirect-to rc
+                 (string->uri (format #f "~a/genres/uuid/~a"
+                                      (current-myhost) (params rc "uuid")))
+                 #:status 302)))
+
+(post "/genres/uuid/:uuid/edit"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-edit rc)))))
 
 (define (do-opinion rc is-like is-dislike)
   (let* ((uuid (params rc "uuid"))

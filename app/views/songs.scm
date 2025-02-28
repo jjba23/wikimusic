@@ -153,15 +153,15 @@
                    #:body `(div (@ (class "container mx-auto"))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                       "font-black text-stone-800 text-md"))
+                                                      "font-black text-stone-800 text-md"))
                                                   ,(G_ "edit artworks"))
                                          ,(map (lambda (a)
                                                  `(div (figure (@ (class
-                                                                    "py-3 sm:w-36"))
+                                                                   "py-3 sm:w-36"))
                                                                (img (@ (loading
                                                                         "lazy")
                                                                        (class
-                                                                         "rounded-xl")
+                                                                        "rounded-xl")
                                                                        (src ,(assoc-ref
                                                                               a
                                                                               "content_url")))))
@@ -191,17 +191,17 @@
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                       "font-black text-stone-800 text-md"))
+                                                      "font-black text-stone-800 text-md"))
                                                   ,(G_ "new artwork"))
                                          ,(artwork-form G_
                                                         #:entity 'song
-                                                        #:entity-identifier
-                                                        (assoc-ref song
-                                                                   "identifier")))
+                                                        #:entity-identifier (assoc-ref
+                                                                             song
+                                                                             "identifier")))
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                       "font-black text-stone-800 text-md"))
+                                                      "font-black text-stone-800 text-md"))
                                                   ,(G_ "editing song"))
                                          ,(song-form G_
                                                      #:display-name (assoc-ref
@@ -259,6 +259,7 @@
                             #:value album-info-link)
                  ,(mk-textarea #:label (G_ "description")
                                #:name "description"
-                               #:value description)))))
+                               #:value description)))
+      (div ,(success-submit-button #:content (G_ "edit")))))
   (export song-form))
 
