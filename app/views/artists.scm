@@ -18,6 +18,7 @@
 (define-module (app views artists)
   #:use-module (wikimusic html)
   #:use-module (wikimusic abstraction)
+  #:use-module (wikimusic query-escape)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -33,7 +34,7 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                       "font-black text-stone-800 text-md"))
+                                       "font-black text-stone-800 text-2xl py-4"))
                                    ,(G_ "viewing artists"))
                                (div (div (@ (class
                                              "flex flex-row flex-wrap gap-3 items-center"))
@@ -147,11 +148,11 @@
                (content-type application/x-www-form-urlencoded))
             (div ,(mk-input #:label (G_ "display name")
                             #:name "display-name"
-                            #:value display-name
+                            #:value (unescape-str display-name)
                             #:required #t)
                  ,(mk-textarea #:label (G_ "description")
                                #:name "description"
-                               #:value description)))
+                               #:value (unescape-str description))))
       (div ,(success-submit-button #:content (G_ "edit")))))
   (export artist-form))
 

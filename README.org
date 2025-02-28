@@ -41,3 +41,10 @@ https://codeberg.org/jjba23/wikimusic-ssr
 
 
 -----
+
+** Tips
+
+
+It's recommended to run your SQLite database in WAL mode for concurrent writes.
+
+sqlite3 lucidplan.db 'PRAGMA journal_mode=WAL;'

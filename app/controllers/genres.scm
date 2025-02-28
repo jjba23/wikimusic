@@ -136,8 +136,8 @@
     (DB-query (get-conn-from-pool!)
               (->sql update
                      'genres set
-                     `((display_name ,(assoc-ref kv "display-name"))
-                       (description ,(assoc-ref kv "description")))
+                     `((display_name ,(escape-str (uri-decode (car (assoc-ref kv "display-name")))))
+                       (description ,(escape-str (uri-decode (car (assoc-ref kv "description"))))))
                      (where #:identifier (params rc "uuid"))))
     (redirect-to rc
                  (string->uri (format #f "~a/genres/uuid/~a"

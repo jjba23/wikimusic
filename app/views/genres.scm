@@ -20,6 +20,7 @@
   #:use-module (wikimusic abstraction)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
+  #:use-module (wikimusic query-escape)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (hygguile abstraction)
@@ -33,7 +34,7 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                       "font-black text-stone-800 text-md"))
+                                       "font-black text-stone-800 text-2xl py-4"))
                                    ,(G_ "viewing genres"))
                                (div (div (@ (class
                                              "flex flex-row flex-wrap gap-3 items-center"))
@@ -74,15 +75,15 @@
                    #:body `(div (@ (class "container mx-auto"))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                      "font-black text-stone-800 text-md"))
+                                                       "font-black text-stone-800 text-md"))
                                                   ,(G_ "edit artworks"))
                                          ,(map (lambda (a)
                                                  `(div (figure (@ (class
-                                                                   "py-3 sm:w-36"))
+                                                                    "py-3 sm:w-36"))
                                                                (img (@ (loading
                                                                         "lazy")
                                                                        (class
-                                                                        "rounded-xl")
+                                                                         "rounded-xl")
                                                                        (src ,(assoc-ref
                                                                               a
                                                                               "content_url")))))
@@ -112,7 +113,7 @@
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                      "font-black text-stone-800 text-md"))
+                                                       "font-black text-stone-800 text-md"))
                                                   ,(G_ "new artwork"))
                                          ,(artwork-form G_
                                                         #:entity 'genre
@@ -122,9 +123,10 @@
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                      "font-black text-stone-800 text-md"))
+                                                       "font-black text-stone-800 text-md"))
                                                   ,(G_ "editing genre"))
                                          ,(genre-form G_
+                                                      #:identifier (assoc-ref song "identifier")
                                                       #:display-name (assoc-ref
                                                                       genre
                                                                       "display_name")
@@ -135,18 +137,22 @@
 
 (begin
   (define* (genre-form G_
-                       #:key (display-name "")
+                       #:key
+                       (identifier #f)
+                       (display-name "")
                        (description ""))
     `((form (@ (method POST)
-               (action "/genres/uuid/~a/")
+               (action ,(if identifier
+                            (format #f "/genres/uuid/~a/edit" identifier)
+                            (format #f "/genres/new" identifier)))
                (content-type application/x-www-form-urlencoded))
             (div ,(mk-input #:label (G_ "display name")
                             #:name "display-name"
-                            #:value display-name
+                            #:value (unescape-str display-name)
                             #:required #t)
                  ,(mk-textarea #:label (G_ "description")
                                #:name "description"
-                               #:value description)))
+                               #:value (unescape-str description))))
       (div ,(success-submit-button #:content (G_ "edit")))))
   (export genre-form))
 

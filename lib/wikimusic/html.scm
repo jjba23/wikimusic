@@ -41,10 +41,10 @@
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
          (div (@ (class
-                  "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
+                   "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
               (p (@ (class "text-sm text-stone-600"))
                  ,(G_ "find the source code here"))
-              (a (@ (class "text-blue-800 font-bold cursor-pointer text-sm")
+              (a (@ (class "text-blue-900 hover:text-blue-700 font-bold cursor-pointer text-sm")
                     (href "https://codeberg.org/jjba23/wikimusic"))
                  "https://codeberg.org/jjba23/wikimusic"))
          (p (@ (class "py-3"))
@@ -58,25 +58,26 @@
   (define* (html-template G_
                           #:key body
                           (proj '()))
+    (define nav-css "text-xs text-blue-900 hover:text-blue-700 font-sans font-light px-2 uppercase")
     (define nav
       `(div (@ (class
-                "flex flex-row flex-wrap gap-3 p-3 bg-transparent items-center justify-left w-full shadow-md"))
-            (a (@ (class "text-md text-stone-800 font-sans font-black px-4")
-                  (href "/")) "Wikimusic")
+                 "flex flex-row flex-wrap gap-3 p-3 items-center justify-left w-full bg-stone-200"))
+            (a (@ (class "text-md text-stone-700 hover:text-blue-700 font-sans font-bold px-4 uppercase")
+                  (href "/")) ,(G_ "Wikimusic"))
             (a (@ (class
-                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
+                    ,nav-css)
                   (href "/songs"))
                ,(G_ "Songs"))
             (a (@ (class
-                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
+                    ,nav-css)
                   (href "/genres"))
                ,(G_ "Genres"))
             (a (@ (class
-                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
+                    ,nav-css)
                   (href "/artists"))
                ,(G_ "Artists"))
             (a (@ (class
-                   "text-sm lowercase text-blue-800 font-sans font-medium px-2")
+                    ,nav-css)
                   (href "/login"))
                ,(G_ "Login"))))
     `(html (head (title "Wikimusic")
@@ -118,38 +119,39 @@
                                       (equal? 1
                                               (assoc-ref o "is_dislike")))
                                     opinions))))
-      `(div (@ (class "flex flex-col py-3"))
-            ,(cond-render (lambda (art)
-                            `(figure (@ (class "py-3 sm:w-48"))
-                                     (a (@ (href ,item-link))
-                                        (img (@ (loading "lazy")
-                                                (class "rounded-xl")
-                                                (src ,(assoc-ref art
-                                                       "content_url")))))))
-                          (cond
-                            ((equal? 0
-                                     (length artworks))
-                             '())
-                            (else (car artworks))))
-            (a (@ (class "text-blue-800 text-xl font-medium")
-                  (href ,item-link))
-               (span ,(assoc-ref x "display_name")))
-            (div (@ (class "flex flex-row gap-2"))
-                 (span ,(G_ "views"))
-                 (span ,(format #f "~a"
-                                (assoc-ref x "views"))))
-            (div (@ (class "flex flex-row gap-2"))
-                 (span (@ (class "font-black text-green-800 text-xs"))
-                       ,(format #f "~a" likes))
-                 (span (@ (class "font-black text-red-800 text-xs"))
-                       ,(format #f "~a" dislikes)))
-            (div (@ (class "flex flex-row gap-2"))
-                 (span (@ (class "text-xs"))
-                       ,(format #f "~a"
-                                (length comments)))
-                 (span (@ (class "text-xs"))
-                       ,(G_ "comments")))
-            ,extra-info)))
+      `((div (@(class "bg-stone-200 rounded-2xl"))
+             (div (@ (class "flex flex-col py-3 px-2"))
+                  ,(cond-render (lambda (art)
+                                  `(figure (@ (class "py-3 sm:w-48"))
+                                           (a (@ (href ,item-link))
+                                              (img (@ (loading "lazy")
+                                                      (class "rounded-xl")
+                                                      (src ,(assoc-ref art
+                                                                       "content_url")))))))
+                                (cond
+                                 ((equal? 0
+                                          (length artworks))
+                                  '())
+                                 (else (car artworks))))
+                  (a (@ (class "text-blue-900 hover:text-blue-700 text-xl font-bold max-w-prose break-all")
+                        (href ,item-link))
+                     (span ,(assoc-ref x "display_name")))
+                  (div (@ (class "flex flex-row gap-2"))
+                       (span ,(G_ "views"))
+                       (span ,(format #f "~a"
+                                      (assoc-ref x "views"))))
+                  (div (@ (class "flex flex-row gap-2"))
+                       (span (@ (class "font-black text-green-800 text-xs"))
+                             ,(format #f "~a" likes))
+                       (span (@ (class "font-black text-red-800 text-xs"))
+                             ,(format #f "~a" dislikes)))
+                  (div (@ (class "flex flex-row gap-2"))
+                       (span (@ (class "text-xs"))
+                             ,(format #f "~a"
+                                      (length comments)))
+                       (span (@ (class "text-xs"))
+                             ,(G_ "comments")))
+                  ,extra-info)))))
   (export item-tile))
 
 (define-public (render-visibility-status status)

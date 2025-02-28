@@ -26,6 +26,7 @@
   #:use-module (hygguile components input)
   #:use-module (hygguile components button)
   #:use-module (ice-9 i18n)
+  #:use-module (wikimusic query-escape)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
@@ -62,7 +63,7 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                       "font-black text-stone-800 text-md"))
+                                       "font-black text-stone-800 text-2xl py-4"))
                                    ,(G_ "viewing songs"))
                                (div (div (@ (class
                                              "flex flex-row flex-wrap gap-3 items-center"))
@@ -153,15 +154,15 @@
                    #:body `(div (@ (class "container mx-auto"))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                      "font-black text-stone-800 text-md"))
+                                                       "font-black text-stone-800 text-md"))
                                                   ,(G_ "edit artworks"))
                                          ,(map (lambda (a)
                                                  `(div (figure (@ (class
-                                                                   "py-3 sm:w-36"))
+                                                                    "py-3 sm:w-36"))
                                                                (img (@ (loading
                                                                         "lazy")
                                                                        (class
-                                                                        "rounded-xl")
+                                                                         "rounded-xl")
                                                                        (src ,(assoc-ref
                                                                               a
                                                                               "content_url")))))
@@ -191,7 +192,7 @@
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                      "font-black text-stone-800 text-md"))
+                                                       "font-black text-stone-800 text-md"))
                                                   ,(G_ "new artwork"))
                                          ,(artwork-form G_
                                                         #:entity 'song
@@ -201,9 +202,10 @@
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                      "font-black text-stone-800 text-md"))
+                                                       "font-black text-stone-800 text-md"))
                                                   ,(G_ "editing song"))
                                          ,(song-form G_
+                                                     #:identifier (assoc-ref song "identifier")
                                                      #:display-name (assoc-ref
                                                                      song
                                                                      "display_name")
@@ -229,7 +231,9 @@
 
 (begin
   (define* (song-form G_
-                      #:key (display-name "")
+                      #:key
+                      (identifier #f)
+                      (display-name "")
                       (music-key "")
                       (music-tuning "")
                       (music-creation-date "")
@@ -237,29 +241,32 @@
                       (album-info-link "")
                       (description ""))
     `((form (@ (method POST)
+               (action ,(if identifier
+                            (format #f "/songs/uuid/~a/edit" identifier)
+                            (format #f "/songs/new" identifier)))
                (content-type application/x-www-form-urlencoded))
             (div ,(mk-input #:label (G_ "display name")
                             #:name "display-name"
-                            #:value display-name
+                            #:value (unescape-str display-name)
                             #:required #t)
                  ,(mk-input #:label (G_ "music key")
                             #:name "music-key"
-                            #:value music-key)
+                            #:value (unescape-str music-key))
                  ,(mk-input #:label (G_ "music tuning")
                             #:name "music-tuning"
-                            #:value music-tuning)
+                            #:value (unescape-str music-tuning))
                  ,(mk-input #:label (G_ "music creation date")
                             #:name "music-creation-date"
-                            #:value music-creation-date)
+                            #:value (unescape-str music-creation-date))
                  ,(mk-input #:label (G_ "album name")
                             #:name "album-name"
-                            #:value album-name)
+                            #:value (unescape-str album-name))
                  ,(mk-input #:label (G_ "album info url")
                             #:name "album-info-link"
-                            #:value album-info-link)
+                            #:value (unescape-str album-info-link))
                  ,(mk-textarea #:label (G_ "description")
                                #:name "description"
-                               #:value description)))
+                               #:value (unescape-str description))))
       (div ,(success-submit-button #:content (G_ "edit")))))
   (export song-form))
 

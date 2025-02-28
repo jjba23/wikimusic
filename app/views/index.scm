@@ -28,15 +28,16 @@
 (define-public (welcome-page G_)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
-                              (div (h2 (@ (class
-                                           "font-black text-stone-800 text-xl"))
+                              (div (@(class "p-2"))
+                                   (h2 (@ (class
+                                            "font-black text-stone-800 text-xl"))
                                        ,(G_ "Welcome to Wikimusic"))
                                    (em ,(G_
                                          "the free music knowledge encyclopaedia"))
                                    ,(wikimusic-explain G_)))))
 
 (define (wikimusic-explain G_)
-  `((div (@ (class "max-w-prose my-8"))
+  `((div (@ (class "max-w-prose my-8 p-4 bg-stone-300/50 rounded-2xl"))
          (p ,(G_
               "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."))
 
@@ -56,9 +57,11 @@
                    "Learn through curated resources that connect music theory, history, and practice.")))
 
          (div (@ (class "my-2"))
-              (a (@ (class "font-bold text-blue-800")
+              (a (@ (class "font-bold text-blue-900 hover:text-blue-700 flex flex-row gap-3")
                     (href "https://www.buymeacoffee.com/jjbigorra"))
-                 ,(G_ "Please donate by clicking here")))
+                 (span "💙")
+                 ,(G_ "Please donate by clicking here")
+                 (span "💙")))
          (p ,(G_
               "This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong."))
 

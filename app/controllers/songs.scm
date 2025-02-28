@@ -177,9 +177,9 @@
          (kv (read-url-encoded-body body)))
     (DB-query (get-conn-from-pool!)
               (->sql update
-                     'artists set
-                     `((display_name ,(assoc-ref kv "display-name"))
-                       (description ,(assoc-ref kv "description")))
+                     'songs set
+                     `((display_name ,(escape-str (uri-decode (car (assoc-ref kv "display-name")))))
+                       (description ,(escape-str (uri-decode (car (assoc-ref kv "description"))))))
                      (where #:identifier (params rc "uuid"))))
     (redirect-to rc
                  (string->uri (format #f "~a/songs/uuid/~a"
