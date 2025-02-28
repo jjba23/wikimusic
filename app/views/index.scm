@@ -43,7 +43,7 @@
          
          (p ,(G_ "Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:"))
          
-         (ul (@(class "my-4 list-disc"))
+         (ul (@(class "my-4 px-2 list-disc"))
              (li ,(G_ "Discover music from diverse genres and traditions."))
              (li ,(G_ "Organize information with structured metadata and multimedia content."))
              (li ,(G_ "Contribute by adding new compositions, analyses, or educational materials."))
