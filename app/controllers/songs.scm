@@ -163,25 +163,31 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                          #:song_identifier
-                                                          uuid))))
+                                                                #:song_identifier
+                                                                uuid))))
          
          (response-emit (:mime rc
-                         (song-edit-page (:i18n rc) song song-contents
-                                         artworks))))))
-
+                               (song-edit-page (:i18n rc) song song-contents
+                                               artworks))))))
 
 (define (do-opinion rc is-like is-dislike)
   (let* ((uuid (params rc "uuid"))
          (user-identifier (:cookies-value rc "wikimusic-user-identifier"))
-         (rec (car($songs 'get #:condition (where #:identifier uuid))))
+         (rec (car ($songs 'get
+                           #:condition (where #:identifier uuid))))
          (new-uuid (generate-string-uuid))
-         (ex-op (filter (lambda(o) (equal? user-identifier (assoc-ref o "created_by")))
-                        ($song_opinions 'get #:condition (where #:song_identifier uuid)))))
+         (ex-op (filter (lambda (o)
+                          (equal? user-identifier
+                                  (assoc-ref o "created_by")))
+                        ($song_opinions 'get
+                                        #:condition (where #:song_identifier
+                                                           uuid)))))
     (write rec)
     (if (not (nil? ex-op))
-        ($song_opinions 'mod 'row-delete
-                        (where #:identifier (assoc-ref (car ex-op) "identifier"))))
+        ($song_opinions 'mod
+                        'row-delete
+                        (where #:identifier (assoc-ref (car ex-op)
+                                                       "identifier"))))
     ($song_opinions 'set
                     #:identifier new-uuid
                     #:song_identifier uuid
@@ -189,16 +195,23 @@
                     #:is_like is-like
                     #:is_dislike is-dislike
                     #:created_at (current-time))
-    (redirect-to rc (string->uri (format #f "~a/songs/uuid/~a" (current-myhost) uuid)) #:status 302)))
+    (redirect-to rc
+                 (string->uri (format #f "~a/songs/uuid/~a"
+                                      (current-myhost) uuid))
+                 #:status 302)))
 
 (post "/songs/uuid/:uuid/like"
       #:auth '(table users "username" "password_hash")
       #:session #t
-      (lambda(rc)
-        (protected-endpoint rc (lambda() (do-opinion rc 1 0)))))
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-opinion rc 1 0)))))
 
 (post "/songs/uuid/:uuid/dislike"
       #:auth '(table users "username" "password_hash")
       #:session #t
-      (lambda(rc)
-        (protected-endpoint rc (lambda() (do-opinion rc 0 1)))))
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-opinion rc 0 1)))))

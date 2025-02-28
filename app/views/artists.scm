@@ -23,6 +23,9 @@
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
+  #:use-module (hygguile abstraction)
+  #:use-module (hygguile components button)
+  #:use-module (hygguile components input)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
@@ -55,7 +58,7 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                       "font-black text-stone-800 text-xl"))
+                                        "font-black text-stone-800 text-xl"))
                                    ,(assoc-ref artist "display_name"))
                                (div (div ,(entity-details G_
                                                           'artist
@@ -64,4 +67,84 @@
                                                           opinions
                                                           comments
                                                           user-alist)))))))
+
+(begin
+  (define* (artist-edit-page G_ artist artworks)
+    (html-template G_
+                   #:body `(div (@ (class "container mx-auto"))
+                                (details (@ (class "cursor-pointer"))
+                                         (summary (@ (class
+                                                       "font-black text-stone-800 text-md"))
+                                                  ,(G_ "edit artworks"))
+                                         ,(map (lambda (a)
+                                                 `(div (figure (@ (class
+                                                                    "py-3 sm:w-36"))
+                                                               (img (@ (loading
+                                                                        "lazy")
+                                                                       (class
+                                                                         "rounded-xl")
+                                                                       (src ,(assoc-ref
+                                                                              a
+                                                                              "content_url")))))
+                                                       ,(artwork-form G_
+                                                                      #:entity 'artist
+                                                                      #:entity-identifier
+                                                                      (assoc-ref
+                                                                       artist
+                                                                       "identifier")
+                                                                      #:artwork-identifier
+                                                                      (assoc-ref
+                                                                       a
+                                                                       "identifier")
+                                                                      #:content-url
+                                                                      (assoc-ref
+                                                                       a
+                                                                       "content_url")
+                                                                      #:content-caption
+                                                                      (assoc-ref-or-empty-str
+                                                                       a
+                                                                       "content_caption")
+                                                                      #:order-value
+                                                                      (assoc-ref
+                                                                       a
+                                                                       "order_value"))))
+                                               artworks))
+                                (hr (@ (class "my-6")))
+                                (details (@ (class "cursor-pointer"))
+                                         (summary (@ (class
+                                                       "font-black text-stone-800 text-md"))
+                                                  ,(G_ "new artwork"))
+                                         ,(artwork-form G_
+                                                        #:entity 'artist
+                                                        #:entity-identifier
+                                                        (assoc-ref artist
+                                                                   "identifier")))
+                                (hr (@ (class "my-6")))
+                                (details (@ (class "cursor-pointer"))
+                                         (summary (@ (class
+                                                       "font-black text-stone-800 text-md"))
+                                                  ,(G_ "editing artist"))
+                                         ,(artist-form G_
+                                                       #:display-name (assoc-ref
+                                                                       artist
+                                                                       "display_name")
+                                                       #:description (assoc-ref-or-empty-str
+                                                                      artist
+                                                                      "description"))))))
+  (export artist-edit-page))
+
+(begin
+  (define* (artist-form G_
+                        #:key (display-name "")
+                        (description ""))
+    `((form (@ (method POST)
+               (content-type application/x-www-url-encoded))
+            (div ,(mk-input #:label (G_ "display name")
+                            #:name "display-name"
+                            #:value display-name
+                            #:required #t)
+                 ,(mk-textarea #:label (G_ "description")
+                               #:name "description"
+                               #:value description)))))
+  (export artist-form))
 

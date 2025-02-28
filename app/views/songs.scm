@@ -153,53 +153,55 @@
                    #:body `(div (@ (class "container mx-auto"))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                      "font-black text-stone-800 text-md"))
+                                                       "font-black text-stone-800 text-md"))
                                                   ,(G_ "edit artworks"))
                                          ,(map (lambda (a)
                                                  `(div (figure (@ (class
-                                                                   "py-3 sm:w-36"))
+                                                                    "py-3 sm:w-36"))
                                                                (img (@ (loading
                                                                         "lazy")
                                                                        (class
-                                                                        "rounded-xl")
+                                                                         "rounded-xl")
                                                                        (src ,(assoc-ref
                                                                               a
                                                                               "content_url")))))
-                                                       ,(song-artwork-form G_
-                                                                           #:song-identifier
-                                                                           (assoc-ref
-                                                                            song
-                                                                            "identifier")
-                                                                           #:artwork-identifier
-                                                                           (assoc-ref
-                                                                            a
-                                                                            "identifier")
-                                                                           #:content-url
-                                                                           (assoc-ref
-                                                                            a
-                                                                            "content_url")
-                                                                           #:content-caption
-                                                                           (assoc-ref-or-empty-str
-                                                                            a
-                                                                            "content_caption")
-                                                                           #:order-value
-                                                                           (assoc-ref
-                                                                            a
-                                                                            "order_value"))))
+                                                       ,(artwork-form G_
+                                                                      #:entity 'song
+                                                                      #:entity-identifier
+                                                                      (assoc-ref
+                                                                       song
+                                                                       "identifier")
+                                                                      #:artwork-identifier
+                                                                      (assoc-ref
+                                                                       a
+                                                                       "identifier")
+                                                                      #:content-url
+                                                                      (assoc-ref
+                                                                       a
+                                                                       "content_url")
+                                                                      #:content-caption
+                                                                      (assoc-ref-or-empty-str
+                                                                       a
+                                                                       "content_caption")
+                                                                      #:order-value
+                                                                      (assoc-ref
+                                                                       a
+                                                                       "order_value"))))
                                                artworks))
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                      "font-black text-stone-800 text-md"))
+                                                       "font-black text-stone-800 text-md"))
                                                   ,(G_ "new artwork"))
-                                         ,(song-artwork-form G_
-                                                             #:song-identifier
-                                                             (assoc-ref song
-                                                              "identifier")))
+                                         ,(artwork-form G_
+                                                        #:entity 'song
+                                                        #:entity-identifier
+                                                        (assoc-ref song
+                                                                   "identifier")))
                                 (hr (@ (class "my-6")))
                                 (details (@ (class "cursor-pointer"))
                                          (summary (@ (class
-                                                      "font-black text-stone-800 text-md"))
+                                                       "font-black text-stone-800 text-md"))
                                                   ,(G_ "editing song"))
                                          ,(song-form G_
                                                      #:display-name (assoc-ref
@@ -260,30 +262,3 @@
                                #:value description)))))
   (export song-form))
 
-(begin
-  (define* (song-artwork-form G_
-                              #:key song-identifier
-                              (artwork-identifier #f)
-                              (content-url "")
-                              (content-caption "")
-                              (order-value 0))
-    (let* ((form-action (if (equal? #f artwork-identifier)
-                            (format #f "/songs/uuid/~a/artworks/new"
-                                    song-identifier)
-                            (format #f "/songs/uuid/~a/artworks/edit/~a"
-                                    song-identifier artwork-identifier))))
-      `((form (@ (method POST)
-                 (content-type application/x-www-url-encoded)
-                 (action ,form-action))
-              (div ,(mk-input #:label (G_ "content url")
-                              #:name "content-url"
-                              #:value content-url
-                              #:required #t)
-                   ,(mk-input #:label (G_ "content caption")
-                              #:name "content-captio"
-                              #:value content-caption)
-                   ,(mk-input #:label (G_ "order value")
-                              #:type 'number
-                              #:name "order-value"
-                              #:value order-value))))))
-  (export song-form))

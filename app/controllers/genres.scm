@@ -104,25 +104,48 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                         (genres-detail-page (:i18n rc)
-                                             genre
-                                             artworks
-                                             opinions
-                                             comments
-                                             user-alist))))))
+                               (genres-detail-page (:i18n rc)
+                                                   genre
+                                                   artworks
+                                                   opinions
+                                                   comments
+                                                   user-alist))))))
 
+(get "/genres/uuid/:uuid/edit"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     (lambda (rc)
+       (let* ((uuid (params rc "uuid"))
+              (genre (car ($genres 'get
+                                   #:ret 'top
+                                   #:condition (where #:identifier uuid))))
+              (artworks ($genre_artworks 'get
+                                         #:ret 'all
+                                         #:order-by '(order_value asc)
+                                         #:condition (where #:genre_identifier
+                                                            uuid))))
+         
+         (response-emit (:mime rc
+                               (genre-edit-page (:i18n rc) genre artworks))))))
 
 (define (do-opinion rc is-like is-dislike)
   (let* ((uuid (params rc "uuid"))
          (user-identifier (:cookies-value rc "wikimusic-user-identifier"))
-         (rec (car($genres 'get #:condition (where #:identifier uuid))))
+         (rec (car ($genres 'get
+                            #:condition (where #:identifier uuid))))
          (new-uuid (generate-string-uuid))
-         (ex-op (filter (lambda(o) (equal? user-identifier (assoc-ref o "created_by")))
-                        ($genre_opinions 'get #:condition (where #:genre_identifier uuid)))))
+         (ex-op (filter (lambda (o)
+                          (equal? user-identifier
+                                  (assoc-ref o "created_by")))
+                        ($genre_opinions 'get
+                                         #:condition (where #:genre_identifier
+                                                            uuid)))))
     (write rec)
     (if (not (nil? ex-op))
-        ($genre_opinions 'mod 'row-delete
-                         (where #:identifier (assoc-ref (car ex-op) "identifier"))))
+        ($genre_opinions 'mod
+                         'row-delete
+                         (where #:identifier (assoc-ref (car ex-op)
+                                                        "identifier"))))
     ($genre_opinions 'set
                      #:identifier new-uuid
                      #:genre_identifier uuid
@@ -130,16 +153,23 @@
                      #:is_like is-like
                      #:is_dislike is-dislike
                      #:created_at (current-time))
-    (redirect-to rc (string->uri (format #f "~a/genres/uuid/~a" (current-myhost) uuid)) #:status 302)))
+    (redirect-to rc
+                 (string->uri (format #f "~a/genres/uuid/~a"
+                                      (current-myhost) uuid))
+                 #:status 302)))
 
 (post "/genres/uuid/:uuid/like"
       #:auth '(table users "username" "password_hash")
       #:session #t
-      (lambda(rc)
-        (protected-endpoint rc (lambda() (do-opinion rc 1 0)))))
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-opinion rc 1 0)))))
 
 (post "/genres/uuid/:uuid/dislike"
       #:auth '(table users "username" "password_hash")
       #:session #t
-      (lambda(rc)
-        (protected-endpoint rc (lambda() (do-opinion rc 0 1)))))
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-opinion rc 0 1)))))
