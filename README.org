@@ -6,11 +6,6 @@
 
 [[https://jointhefreeworld.org/static-assets/badges/GNU-Guix-c48702.png]] [[https://jointhefreeworld.org/static-assets/badges/Scheme-Guile-d0730f.png]] [[https://ci.codeberg.org/api/badges/14274/status.svg]]
 
-Work in progress 🚧
-
-This is 100% free software, licensed under the GNU General Public License v3 or later.
-[[https://www.gnu.org/licenses/gpl-3.0.en.html][Refer to the full license, on GNU's website]]
-
 The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms.
 
 At its core, WikiMusic leverages the expressive power of Lisp to build a dynamic interactive Music Gallery and Content Management System (CMS).
@@ -20,6 +15,9 @@ Whether you're a musician, educator, researcher, or simply a music lover, WikiMu
 - Organize information with structured metadata and multimedia content.
 - Contribute by adding new compositions, analyses, or educational materials.
 - Learn through curated resources that connect music theory, history, and practice.
+
+This is 100% free software, licensed under the GNU General Public License v3 or later.
+[[https://www.gnu.org/licenses/gpl-3.0.en.html][Refer to the full license, on GNU's website]]
 
 [[https://www.buymeacoffee.com/jjbigorra][Please donate by clicking here]]. This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong.
 
@@ -31,14 +29,9 @@ Join us in building an ever-growing library of musical knowledge — where every
 
 This is a Lisp (Guile Scheme) version of the Wikimusic system.
 
+The productivity gains have been fantastic and some things are now possible, which previously were unthinkable, thanks to Lisp.
+
 It replaces the Haskell REST API and SSR frontend with a GNU Artanis monolith.
-
-The productivity gains have been fantastic.
-
-https://codeberg.org/jjba23/wikimusic-api
-
-https://codeberg.org/jjba23/wikimusic-ssr
-
 
 -----
 
