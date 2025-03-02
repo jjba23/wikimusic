@@ -29,11 +29,12 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               (div (@(class "p-2"))
-                                   (h2 (@ (class
+                                   (h2 (@ (id welcome-page-title)
+                                          (class
                                             "font-black text-stone-800 text-xl"))
                                        ,(G_ "Welcome to Wikimusic"))
-                                   (em ,(G_
-                                         "the free music knowledge encyclopaedia"))
+                                   (em (@(id welcome-page-subtitle)) ,(G_
+                                                                       "the free music knowledge encyclopaedia"))
                                    ,(wikimusic-explain G_)))))
 
 (define (wikimusic-explain G_)
