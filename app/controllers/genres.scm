@@ -21,6 +21,7 @@
         (web uri)
         (wikimusic url)
         (wikimusic auth)
+        (wikimusic abstraction)
         (ice-9 string-fun)
         (app models genres)
         (app models genre_artworks)
@@ -31,12 +32,16 @@
         (uuid generate)
         (app views genres))
 
-(get "/genres"
+(get "/genres?"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((genres ($genres 'get
-                               #:order-by '(created_at desc)))
+       (let* ((user-sort (get-from-qstr rc "sort"))
+              (query-sort (entity-sort-from-query user-sort))
+              (user-limit (get-from-qstr rc "limit"))
+              (user-offset (get-from-qstr rc "offset"))
+              (genres ($genres 'get
+                               #:order-by query-sort))
               (genre-ids (map (lambda (s)
                                 (assoc-ref s "identifier")) genres))
               (artworks (cond
@@ -136,13 +141,18 @@
     (DB-query (get-conn-from-pool!)
               (->sql update
                      'genres set
-                     `((display_name ,(escape-str (uri-decode (car (assoc-ref kv "display-name")))))
-                       (description ,(escape-str (uri-decode (car (assoc-ref kv "description")))))
+                     `((display_name ,(escape-str (uri-decode (car (assoc-ref
+                                                                    kv
+                                                                    "display-name")))))
+                       (description ,(escape-str (uri-decode (car (assoc-ref
+                                                                   kv
+                                                                   "description")))))
                        (last_edited_at ,(current-time)))
                      (where #:identifier (params rc "uuid"))))
     (redirect-to rc
                  (string->uri (format #f "~a/genres/uuid/~a"
-                                      (current-myhost) (params rc "uuid")))
+                                      (current-myhost)
+                                      (params rc "uuid")))
                  #:status 302)))
 
 (post "/genres/uuid/:uuid/edit"

@@ -28,13 +28,14 @@
 (define-public (welcome-page G_)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
-                              (div (@(class "p-2"))
+                              (div (@ (class "p-2"))
                                    (h2 (@ (id welcome-page-title)
                                           (class
-                                            "font-black text-stone-800 text-xl"))
+                                           "font-black text-stone-800 text-xl"))
                                        ,(G_ "Welcome to Wikimusic"))
-                                   (em (@(id welcome-page-subtitle)) ,(G_
-                                                                       "the free music knowledge encyclopaedia"))
+                                   (em (@ (id welcome-page-subtitle))
+                                       ,(G_
+                                         "the free music knowledge encyclopaedia"))
                                    ,(wikimusic-explain G_)))))
 
 (define (wikimusic-explain G_)
@@ -58,7 +59,8 @@
                    "Learn through curated resources that connect music theory, history, and practice.")))
 
          (div (@ (class "my-2"))
-              (a (@ (class "font-bold text-blue-900 hover:text-blue-700 flex flex-row gap-3")
+              (a (@ (class
+                     "font-bold text-blue-900 hover:text-blue-700 flex flex-row gap-3")
                     (href "https://www.buymeacoffee.com/jjbigorra"))
                  (span "💙")
                  ,(G_ "Please donate by clicking here")

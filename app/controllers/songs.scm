@@ -20,6 +20,7 @@
 (import (app views songs))
 (import (wikimusic html)
         (wikimusic url)
+        (wikimusic abstraction)
         (web uri)
         (ice-9 string-fun)
         (wikimusic auth)
@@ -33,12 +34,16 @@
         (app models users)
         (app views songs))
 
-(get "/songs"
+(get "/songs?"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((songs ($songs 'get
-                             #:order-by '(created_at desc)))
+       (let* ((user-sort (get-from-qstr rc "sort"))
+              (query-sort (entity-sort-from-query user-sort))
+              (user-limit (get-from-qstr rc "limit"))
+              (user-offset (get-from-qstr rc "offset"))
+              (songs ($songs 'get
+                             #:order-by query-sort))
               (song-ids (map (lambda (s)
                                (assoc-ref s "identifier")) songs))
               (artworks (cond
@@ -178,13 +183,18 @@
     (DB-query (get-conn-from-pool!)
               (->sql update
                      'songs set
-                     `((display_name ,(escape-str (uri-decode (car (assoc-ref kv "display-name")))))
-                       (description ,(escape-str (uri-decode (car (assoc-ref kv "description")))))
+                     `((display_name ,(escape-str (uri-decode (car (assoc-ref
+                                                                    kv
+                                                                    "display-name")))))
+                       (description ,(escape-str (uri-decode (car (assoc-ref
+                                                                   kv
+                                                                   "description")))))
                        (last_edited_at ,(current-time)))
                      (where #:identifier (params rc "uuid"))))
     (redirect-to rc
                  (string->uri (format #f "~a/songs/uuid/~a"
-                                      (current-myhost) (params rc "uuid")))
+                                      (current-myhost)
+                                      (params rc "uuid")))
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/edit"
