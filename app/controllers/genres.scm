@@ -35,8 +35,22 @@
 (get "/genres?"
      #:mime 'xml
      #:i18n '(cookie "lang")
+     #:cookies '(names wikimusic-genre-sort)
      (lambda (rc)
-       (let* ((user-sort (get-from-qstr rc "sort"))
+       (let* ((user-sort (cond
+                          ((not (equal? #f (get-from-qstr rc "sort")))
+                           (:cookies-set! rc
+                            'wikimusic-genre-sort
+                            "wikimusic-genre-sort" (get-from-qstr rc "sort"))
+                           (:cookies-setattr! rc
+                            'wikimusic-genre-sort
+                            #:expires 12000000
+                            #:path "/"
+                            #:http-only #t)
+                           (get-from-qstr rc "sort"))
+                          ((not (equal? #f (:cookies-value rc "wikimusic-genre-sort")))
+                           (:cookies-value rc "wikimusic-genre-sort"))  
+                          (else "display-name-asc")))
               (query-sort (entity-sort-from-query user-sort))
               (user-limit (get-from-qstr rc "limit"))
               (user-offset (get-from-qstr rc "offset"))
@@ -45,33 +59,33 @@
               (genre-ids (map (lambda (s)
                                 (assoc-ref s "identifier")) genres))
               (artworks (cond
-                          ((nil? genre-ids)
-                           '())
-                          (else ($genre_artworks 'get
-                                                 #:ret 'all
-                                                 #:order-by '(order_value asc)
-                                                 #:condition (where
-                                                                    #:genre_identifier
-                                                                    genre-ids)))))
+                         ((nil? genre-ids)
+                          '())
+                         (else ($genre_artworks 'get
+                                                #:ret 'all
+                                                #:order-by '(order_value asc)
+                                                #:condition (where
+                                                             #:genre_identifier
+                                                             genre-ids)))))
               (opinions (cond
-                          ((nil? genre-ids)
-                           '())
-                          (else ($genre_opinions 'get
-                                                 #:ret 'all
-                                                 #:condition (where
-                                                                    #:genre_identifier
-                                                                    genre-ids)))))
+                         ((nil? genre-ids)
+                          '())
+                         (else ($genre_opinions 'get
+                                                #:ret 'all
+                                                #:condition (where
+                                                             #:genre_identifier
+                                                             genre-ids)))))
               (comments (cond
-                          ((nil? genre-ids)
-                           '())
-                          (else ($genre_comments 'get
-                                                 #:ret 'all
-                                                 #:condition (where
-                                                                    #:genre_identifier
-                                                                    genre-ids))))))
+                         ((nil? genre-ids)
+                          '())
+                         (else ($genre_comments 'get
+                                                #:ret 'all
+                                                #:condition (where
+                                                             #:genre_identifier
+                                                             genre-ids))))))
          (response-emit (:mime rc
-                               (genres-list-page (:i18n rc) genres artworks
-                                                 opinions comments))))))
+                         (genres-list-page (:i18n rc) genres artworks
+                                           opinions comments))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
