@@ -387,21 +387,25 @@
                                                         entity
                                                         (car s))))
                                      ,(cdr s))))
-                         `(("display-name-desc" unquote
-                            (G_ "Name - Descending"))
-                           ("display-name-asc" unquote
+                         `(("display-name-asc" unquote
                             (G_ "Name - Ascending"))
-                           ("created-at-desc" unquote
-                            (G_ "Created - Descending"))
+                           ("display-name-desc" unquote
+                            (G_ "Name - Descending"))
+
                            ("created-at-asc" unquote
                             (G_ "Created - Ascending"))
-                           ("last-edited-at-desc" unquote
-                            (G_ "Last edited - Descending"))
+                           ("created-at-desc" unquote
+                            (G_ "Created - Descending"))
+
                            ("last-edited-at-asc" unquote
                             (G_ "Last edited - Ascending"))
+                           ("last-edited-at-desc" unquote
+                            (G_ "Last edited - Descending"))
 
+                           ("views-asc" unquote
+                            (G_ "Views - Ascending"))
                            ("views-desc" unquote
                             (G_ "Views - Descending"))
-                           ("views-asc" unquote
-                            (G_ "Views - Ascending"))))))))
+
+                           ))))))
   (export sort-select))
