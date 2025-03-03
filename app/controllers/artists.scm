@@ -142,7 +142,8 @@
               (->sql update
                      'artists set
                      `((display_name ,(escape-str (uri-decode (car (assoc-ref kv "display-name")))))
-                       (description ,(escape-str (uri-decode (car (assoc-ref kv "description"))))))
+                       (description ,(escape-str (uri-decode (car (assoc-ref kv "description")))))
+                       (last_edited_at ,(current-time)))
                      (where #:identifier (params rc "uuid"))))
     (redirect-to rc
                  (string->uri (format #f "~a/artists/uuid/~a"

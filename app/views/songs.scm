@@ -100,24 +100,23 @@
   `(div (@ (class "flex flex-col gap-6"))
         ,(map (lambda (version)
                 `((hr)
-                  (details (@ (open "true")
-                              (class "cursor-pointer"))
-                           (summary (@ (class "p-6"))
+                  (details (@ (open "true"))
+                           (summary (@ (class "p-6 cursor-pointer"))
                                     ,(cond-render (lambda (version-name)
                                                     `(div (@ (class
-                                                              "flex flex-row flex-wrap gap-4"))
+                                                               "flex flex-row flex-wrap gap-4"))
                                                           (span (@ (class
-                                                                    "text-xl font-bold text-stone-700"))
+                                                                     "text-xl font-bold text-stone-700"))
                                                                 ,(G_ "version"))
                                                           (span (@ (class
-                                                                    "text-xl font-bold text-stone-700"))
+                                                                     "text-xl font-bold text-stone-700"))
                                                                 ,version-name)
                                                           ,(cond-render (lambda 
-                                                                                (instrument-type)
+                                                                            (instrument-type)
                                                                           `(span
                                                                             (@
                                                                              (class
-                                                                              "text-xl font-bold text-stone-700"))
+                                                                               "text-xl font-bold text-stone-700"))
                                                                             ,instrument-type))
                                                                         (assoc-ref
                                                                          version
@@ -128,21 +127,21 @@
 
                                 ,(cond-render (lambda (ascii-legend)
                                                 `(div (span (@ (class
-                                                                "text-xl font-bold text-stone-700"))
+                                                                 "text-xl font-bold text-stone-700"))
                                                             ,(G_
                                                               "ascii legend"))
                                                       (pre (@ (class
-                                                               "p-6 m-4 bg-stone-200/75 text-black rounded-xl white-space-pre overflow-x-scroll text-sm"))
+                                                                "p-6 m-4 bg-stone-200/75 text-black rounded-xl white-space-pre overflow-x-scroll text-sm"))
                                                            ,ascii-legend)))
                                               (assoc-ref version
                                                          "ascii_legend"))
                                 ,(cond-render (lambda (ascii-contents)
                                                 `(div (span (@ (class
-                                                                "text-xl font-bold text-stone-700"))
+                                                                 "text-xl font-bold text-stone-700"))
                                                             ,(G_
                                                               "ascii contents"))
                                                       (pre (@ (class
-                                                               "p-6 m-4 bg-stone-200/75 text-black rounded-xl white-space-pre overflow-x-scroll text-sm"))
+                                                                "p-6 m-4 bg-stone-200/75 text-black rounded-xl white-space-pre overflow-x-scroll text-sm"))
                                                            ,ascii-contents)))
                                               (assoc-ref version
                                                          "ascii_contents"))))))
@@ -200,33 +199,33 @@
                                                                              song
                                                                              "identifier")))
                                 (hr (@ (class "my-6")))
-                                (details (@ (class "cursor-pointer"))
-                                         (summary (@ (class
-                                                       "font-black text-stone-800 text-md"))
-                                                  ,(G_ "editing song"))
-                                         ,(song-form G_
-                                                     #:identifier (assoc-ref song "identifier")
-                                                     #:display-name (assoc-ref
-                                                                     song
-                                                                     "display_name")
-                                                     #:music-key (assoc-ref-or-empty-str
-                                                                  song
-                                                                  "music_key")
-                                                     #:music-tuning (assoc-ref-or-empty-str
-                                                                     song
-                                                                     "music_tuning")
-                                                     #:music-creation-date (assoc-ref-or-empty-str
-                                                                            song
-                                                                            "music_creation_date")
-                                                     #:album-name (assoc-ref-or-empty-str
-                                                                   song
-                                                                   "album_name")
-                                                     #:album-info-link (assoc-ref-or-empty-str
-                                                                        song
-                                                                        "album_info_link")
-                                                     #:description (assoc-ref-or-empty-str
+                                (details 
+                                 (summary (@ (class
+                                               "font-black text-stone-800 text-md cursor-pointer"))
+                                          ,(G_ "editing song"))
+                                 ,(song-form G_
+                                             #:identifier (assoc-ref song "identifier")
+                                             #:display-name (assoc-ref
+                                                             song
+                                                             "display_name")
+                                             #:music-key (assoc-ref-or-empty-str
+                                                          song
+                                                          "music_key")
+                                             #:music-tuning (assoc-ref-or-empty-str
+                                                             song
+                                                             "music_tuning")
+                                             #:music-creation-date (assoc-ref-or-empty-str
                                                                     song
-                                                                    "description"))))))
+                                                                    "music_creation_date")
+                                             #:album-name (assoc-ref-or-empty-str
+                                                           song
+                                                           "album_name")
+                                             #:album-info-link (assoc-ref-or-empty-str
+                                                                song
+                                                                "album_info_link")
+                                             #:description (assoc-ref-or-empty-str
+                                                            song
+                                                            "description"))))))
   (export song-edit-page))
 
 (begin
