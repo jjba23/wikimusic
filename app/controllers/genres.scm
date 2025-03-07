@@ -188,6 +188,74 @@
                             (lambda ()
                               (do-edit rc)))))
 
+(define (do-edit-artwork rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body)))
+    (DB-query (get-conn-from-pool!)
+              (->sql update
+                     'genre_artworks set
+                     `((content_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                   kv
+                                                                   "content-url")))))
+                       (content_caption ,(escape-str (uri-decode (car (assoc-ref
+                                                                       kv
+                                                                       "content-caption")))))
+                       (order_value ,(escape-str (uri-decode (car (assoc-ref
+                                                                   kv
+                                                                   "order-value")))))
+                       (last_edited_at ,(current-time)))
+                     (where #:identifier (params rc "artwork-uuid"))))
+    (redirect-to rc
+                 (string->uri (format #f "~a/genres/uuid/~a/edit"
+                                      (current-myhost)
+                                      (params rc "uuid")))
+                 #:status 302)))
+
+(post "/genres/uuid/:uuid/artworks/edit/:artwork-uuid"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-edit-artwork rc)))))
+
+;; 
+;; ====== Data create POST routes ======
+;; 
+
+(define (do-new-artwork rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body))
+         (new-uuid (generate-string-uuid))
+         (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
+    ($genre_artworks 'set
+                     #:identifier new-uuid
+                     #:genre_identifier (params rc "uuid")
+                     #:created_by user-identifier
+                     #:visibility_status 0
+                     #:content_url (escape-str (uri-decode (car (assoc-ref kv
+                                                                 "content-url"))))
+                     #:content_caption (escape-str (uri-decode (car (assoc-ref
+                                                                     kv
+                                                                     "content-caption"))))
+                     #:order_value (escape-str (uri-decode (car (assoc-ref kv
+                                                                 "order-value"))))
+                     #:created_at (current-time))
+
+    (redirect-to rc
+                 (string->uri (format #f "~a/genres/uuid/~a/edit"
+                                      (current-myhost)
+                                      (params rc "uuid")))
+                 #:status 302)))
+
+(post "/genres/uuid/:uuid/artworks/new"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-new-artwork rc)))))
+
 (define (do-new rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body))
@@ -262,3 +330,21 @@
         (protected-endpoint rc
                             (lambda ()
                               (do-opinion rc 0 1)))))
+
+;; ====== Delete data routes ======
+
+(post "/genres/uuid/:uuid/artworks/:artwork-uuid/delete"
+      #:auth '(table user "username" "password")
+      #:session #t
+      (lambda (rc)
+        (define (do-delete)
+          ($genre_artworks 'mod
+                           'row-delete
+                           (where #:identifier (params rc "artwork-uuid")))
+
+          (redirect-to rc
+                       (string->uri (format #f "~a/genres/uuid/~a/edit"
+                                            (current-myhost)
+                                            (params rc "uuid")))
+                       #:status 302))
+        (protected-endpoint rc do-delete)))

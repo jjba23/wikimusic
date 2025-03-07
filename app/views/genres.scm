@@ -82,7 +82,8 @@
   (define* (genre-edit-page G_ genre artworks)
     (html-template G_
                    #:body `(div (@ (class "container mx-auto"))
-                                (details (summary (@ (class
+                                (details (@ (open true))
+                                         (summary (@ (class
                                                       "font-black text-stone-800 text-md cursor-pointer"))
                                                   ,(G_ "edit artworks"))
                                          ,(map (lambda (a)
@@ -119,7 +120,8 @@
                                                                        "order_value"))))
                                                artworks))
                                 (hr (@ (class "my-6")))
-                                (details (summary (@ (class
+                                (details (@ (open true))
+                                         (summary (@ (class
                                                       "font-black text-stone-800 text-md cursor-pointer"))
                                                   ,(G_ "new artwork"))
                                          ,(artwork-form G_
@@ -128,12 +130,13 @@
                                                                              genre
                                                                              "identifier")))
                                 (hr (@ (class "my-6")))
-                                (details (summary (@ (class
+                                (details (@ (open true))
+                                         (summary (@ (class
                                                       "font-black text-stone-800 text-md cursor-pointer"))
                                                   ,(G_ "editing genre"))
                                          ,(genre-form G_
                                                       #:identifier (assoc-ref
-                                                                    song
+                                                                    genre
                                                                     "identifier")
                                                       #:display-name (assoc-ref
                                                                       genre

@@ -355,7 +355,7 @@
                                     entity-identifier)
                             (format #f "/~as/uuid/~a/artworks/edit/~a" entity
                                     entity-identifier artwork-identifier))))
-      `((div (@(class "flex flex-col gap-2"))
+      `((div (@ (class "flex flex-col gap-2"))
              (form (@ (method POST)
                       (content-type application/x-www-form-urlencoded)
                       (action ,form-action))
@@ -370,17 +370,21 @@
                                    #:type 'number
                                    #:name "order-value"
                                    #:value order-value)
-                        (div
-                         ,(success-submit-button #:content (if artwork-identifier
-                                                               (G_ "edit")
-                                                               (G_ "create"))))))
-             ,(cond-render 
-               (lambda(artwork-id)
-                 `(form (@(method POST)
-                         (content-type application/x-www-form-urlencoded)
-                         (action ,(format #f "/~as/uuid/~a/artworks/delete/~a" entity entity-identifier artwork-identifier)))
-                        ,(danger-submit-button #:content (G_ "delete"))))
-               artwork-identifier)))))
+                        (div ,(success-submit-button #:content (if
+                                                                artwork-identifier
+                                                                (G_ "edit")
+                                                                (G_ "create"))))))
+             ,(cond-render (lambda (artwork-id)
+                             `(form (@ (method POST)
+                                       (content-type
+                                        application/x-www-form-urlencoded)
+                                       (action ,(format #f
+                                                 "/~as/uuid/~a/artworks/~a/delete"
+                                                 entity entity-identifier
+                                                 artwork-identifier)))
+                                    ,(danger-submit-button #:content (G_
+                                                                      "delete"))))
+                           artwork-identifier)))))
   (export artwork-form))
 
 (begin

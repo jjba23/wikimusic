@@ -160,9 +160,9 @@
   (define* (song-edit-page G_ song song-contents artworks)
     (html-template G_
                    #:body `(div (@ (class "container mx-auto"))
-                                (details (@ (class "cursor-pointer"))
+                                (details (@ (open true))
                                          (summary (@ (class
-                                                      "font-black text-stone-800 text-md"))
+                                                      "font-black text-stone-800 text-md cursor-pointer"))
                                                   ,(G_ "edit artworks"))
                                          ,(map (lambda (a)
                                                  `(div (figure (@ (class
@@ -198,7 +198,8 @@
                                                                        "order_value"))))
                                                artworks))
                                 (hr (@ (class "my-6")))
-                                (details (@ (class "cursor-pointer"))
+                                (details (@ (open true)
+                                            (class "cursor-pointer"))
                                          (summary (@ (class
                                                       "font-black text-stone-800 text-md"))
                                                   ,(G_ "new artwork"))
@@ -208,7 +209,8 @@
                                                                              song
                                                                              "identifier")))
                                 (hr (@ (class "my-6")))
-                                (details (summary (@ (class
+                                (details (@ (open true))
+                                         (summary (@ (class
                                                       "font-black text-stone-800 text-md cursor-pointer"))
                                                   ,(G_ "editing song"))
                                          ,(song-form G_
