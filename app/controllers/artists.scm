@@ -91,6 +91,13 @@
                                (artists-list-page (:i18n rc) artists artworks
                                                   opinions comments))))))
 
+(get "/artists/new"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     (lambda (rc)
+       (response-emit (:mime rc
+                             (artist-new-page (:i18n rc))))))
+
 (get "/artists/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")

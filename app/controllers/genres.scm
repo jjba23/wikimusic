@@ -91,6 +91,13 @@
                                (genres-list-page (:i18n rc) genres artworks
                                                  opinions comments))))))
 
+(get "/genres/new"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     (lambda (rc)
+       (response-emit (:mime rc
+                             (genre-new-page (:i18n rc))))))
+
 (get "/genres/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")

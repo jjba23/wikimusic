@@ -36,8 +36,15 @@
                               ((h2 (@ (class
                                        "font-black text-stone-800 text-2xl py-4"))
                                    ,(G_ "viewing artists"))
-                               ,(sort-select G_
-                                             #:entity 'artist)
+                               (details (summary (@ (class "cursor-pointer"))
+                                                 ,(G_ "options"))
+                                        (div (@ (class
+                                                 "flex flex-row flex-wrap gap-3 items-center my-4"))
+                                             ,(sort-select G_
+                                                           #:entity 'artist)
+                                             (a (@ (href "/artists/new"))
+                                                ,(action-button #:content (G_
+                                                                           "new artist")))))
                                (div (div (@ (class
                                              "flex flex-row flex-wrap gap-3 items-center"))
                                          ,(map (lambda (x)
@@ -135,6 +142,13 @@
                                                                       artist
                                                                       "description"))))))
   (export artist-edit-page))
+
+(begin
+  (define* (artist-new-page G_)
+    (html-template G_
+                   #:body `(div (@ (class "container mx-auto"))
+                                ,(artist-form G_))))
+  (export artist-new-page))
 
 (begin
   (define* (artist-form G_

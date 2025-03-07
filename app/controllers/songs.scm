@@ -118,6 +118,13 @@
                                                 opinions
                                                 comments))))))
 
+(get "/songs/new"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     (lambda (rc)
+       (response-emit (:mime rc
+                             (song-new-page (:i18n rc))))))
+
 (get "/songs/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")

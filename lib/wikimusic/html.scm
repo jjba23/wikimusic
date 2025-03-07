@@ -375,13 +375,11 @@
   (define* (sort-select G_
                         #:key entity)
     `((div (@ (class "flex flex-col gap-2 w-min"))
-           (label (@ (for "sort-select"))
-                  ,(G_ "sort order"))
            (select (@ (onchange "window.location.href=this.value;")
                       (name "sort-select")
                       (id "sort-select")
                       (class (->css '(p-2 rounded-xl bg-stone-200))))
-                   (option ,(G_ "..."))
+                   (option ,(G_ "sort order"))
                    ,(map (lambda (s)
                            `((option (@ (value ,(format #f "/~as?sort=~a"
                                                         entity

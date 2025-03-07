@@ -36,8 +36,15 @@
                               ((h2 (@ (class
                                        "font-black text-stone-800 text-2xl py-4"))
                                    ,(G_ "viewing genres"))
-                               ,(sort-select G_
-                                             #:entity 'genre)
+                               (details (summary (@ (class "cursor-pointer"))
+                                                 ,(G_ "options"))
+                                        (div (@ (class
+                                                 "flex flex-row flex-wrap gap-3 items-center my-4"))
+                                             ,(sort-select G_
+                                                           #:entity 'genre)
+                                             (a (@ (href "/genres/new"))
+                                                ,(action-button #:content (G_
+                                                                           "new genre")))))
                                (div (div (@ (class
                                              "flex flex-row flex-wrap gap-3 items-center"))
                                          ,(map (lambda (x)
@@ -135,6 +142,13 @@
                                                                      genre
                                                                      "description"))))))
   (export genre-edit-page))
+
+(begin
+  (define* (genre-new-page G_)
+    (html-template G_
+                   #:body `(div (@ (class "container mx-auto"))
+                                ,(genre-form G_))))
+  (export genre-new-page))
 
 (begin
   (define* (genre-form G_
