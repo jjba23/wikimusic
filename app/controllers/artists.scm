@@ -32,29 +32,31 @@
         (app models users)
         (app views artists))
 
-(get "/artists?"
+;; ====== Data view GET routes ======
+
+(get "/artists"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names wikimusic-artist-sort)
      (lambda (rc)
        (let* ((user-sort (cond
-                           ((not (equal? #f
-                                         (get-from-qstr rc "sort")))
-                            (:cookies-set! rc
-                                           'wikimusic-artist-sort
-                                           "wikimusic-artist-sort"
-                                           (get-from-qstr rc "sort"))
-                            (:cookies-setattr! rc
-                                               'wikimusic-artist-sort
-                                               #:expires 12000000
-                                               #:path "/"
-                                               #:http-only #t)
+                          ((not (equal? #f
+                                        (get-from-qstr rc "sort")))
+                           (:cookies-set! rc
+                            'wikimusic-artist-sort
+                            "wikimusic-artist-sort"
                             (get-from-qstr rc "sort"))
-                           ((not (equal? #f
-                                         (:cookies-value rc
-                                          "wikimusic-artist-sort")))
-                            (:cookies-value rc "wikimusic-artist-sort"))
-                           (else "display-name-asc")))
+                           (:cookies-setattr! rc
+                            'wikimusic-artist-sort
+                            #:expires 12000000
+                            #:path "/"
+                            #:http-only #t)
+                           (get-from-qstr rc "sort"))
+                          ((not (equal? #f
+                                        (:cookies-value rc
+                                         "wikimusic-artist-sort")))
+                           (:cookies-value rc "wikimusic-artist-sort"))
+                          (else "display-name-asc")))
               (query-sort (entity-sort-from-query user-sort))
               (user-limit (get-from-qstr rc "limit"))
               (user-offset (get-from-qstr rc "offset"))
@@ -63,40 +65,33 @@
               (artist-ids (map (lambda (s)
                                  (assoc-ref s "identifier")) artists))
               (artworks (cond
-                          ((nil? artist-ids)
-                           '())
-                          (else ($artist_artworks 'get
-                                                  #:ret 'all
-                                                  #:order-by '(order_value asc)
-                                                  #:condition (where
-                                                               #:artist_identifier
-                                                               artist-ids)))))
+                         ((nil? artist-ids)
+                          '())
+                         (else ($artist_artworks 'get
+                                                 #:ret 'all
+                                                 #:order-by '(order_value asc)
+                                                 #:condition (where
+                                                              #:artist_identifier
+                                                              artist-ids)))))
               (opinions (cond
-                          ((nil? artist-ids)
-                           '())
-                          (else ($artist_opinions 'get
-                                                  #:ret 'all
-                                                  #:condition (where
-                                                               #:artist_identifier
-                                                               artist-ids)))))
+                         ((nil? artist-ids)
+                          '())
+                         (else ($artist_opinions 'get
+                                                 #:ret 'all
+                                                 #:condition (where
+                                                              #:artist_identifier
+                                                              artist-ids)))))
               (comments (cond
-                          ((nil? artist-ids)
-                           '())
-                          (else ($artist_comments 'get
-                                                  #:ret 'all
-                                                  #:condition (where
-                                                               #:artist_identifier
-                                                               artist-ids))))))
+                         ((nil? artist-ids)
+                          '())
+                         (else ($artist_comments 'get
+                                                 #:ret 'all
+                                                 #:condition (where
+                                                              #:artist_identifier
+                                                              artist-ids))))))
          (response-emit (:mime rc
-                               (artists-list-page (:i18n rc) artists artworks
-                                                  opinions comments))))))
-
-(get "/artists/new"
-     #:mime 'xml
-     #:i18n '(cookie "lang")
-     (lambda (rc)
-       (response-emit (:mime rc
-                             (artist-new-page (:i18n rc))))))
+                         (artists-list-page (:i18n rc) artists artworks
+                                            opinions comments))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
@@ -112,19 +107,19 @@
                                           #:ret 'all
                                           #:order-by '(order_value asc)
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))
+                                                       #:artist_identifier
+                                                       uuid)))
               (opinions ($artist_opinions 'get
                                           #:ret 'all
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))
+                                                       #:artist_identifier
+                                                       uuid)))
               (comments ($artist_comments 'get
                                           #:ret 'all
                                           #:order-by '(created_at asc)
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))
+                                                       #:artist_identifier
+                                                       uuid)))
               (users ($users 'get
                              #:ret 'all
                              #:order-by '(display_name asc)
@@ -139,12 +134,21 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                               (artists-detail-page (:i18n rc)
-                                                    artist
-                                                    artworks
-                                                    opinions
-                                                    comments
-                                                    user-alist))))))
+                         (artists-detail-page (:i18n rc)
+                                              artist
+                                              artworks
+                                              opinions
+                                              comments
+                                              user-alist))))))
+
+;; ====== Data edit GET routes ======
+
+(get "/artists/new"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     (lambda (rc)
+       (response-emit (:mime rc
+                       (artist-new-page (:i18n rc))))))
 
 (get "/artists/uuid/:uuid/edit"
      #:mime 'xml
@@ -158,11 +162,13 @@
                                           #:ret 'all
                                           #:order-by '(order_value asc)
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid))))
+                                                       #:artist_identifier
+                                                       uuid))))
          
          (response-emit (:mime rc
-                               (artist-edit-page (:i18n rc) artist artworks))))))
+                         (artist-edit-page (:i18n rc) artist artworks))))))
+
+;; ====== Data edit POST routes ======
 
 (define (do-edit rc)
   (let* ((body (rc-body rc))
@@ -193,6 +199,36 @@
                             (lambda ()
                               (do-edit rc)))))
 
+;; ====== Data create POST routes ======
+
+(define (do-new rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body))
+         (new-uuid (generate-string-uuid))
+         (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
+    ($artists 'set
+              #:identifier new-uuid
+              #:display_name (escape-str (uri-decode (car (assoc-ref kv "display-name"))))
+              #:description (escape-str (uri-decode (car (assoc-ref kv "description"))))
+              #:created_by user-identifier
+              #:visibility_status 0
+              #:views 0
+              #:created_at (current-time))
+    
+    (redirect-to rc
+                 (string->uri (format #f "~a/artists/uuid/~a"
+                                      (current-myhost)
+                                      new-uuid))
+                 #:status 302)))
+
+(post "/artists/new"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-new rc)))))
+
 (define (do-opinion rc is-like is-dislike)
   (let* ((uuid (params rc "uuid"))
          (user-identifier (:cookies-value rc "wikimusic-user-identifier"))
@@ -204,8 +240,8 @@
                                   (assoc-ref o "created_by")))
                         ($artist_opinions 'get
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))))
+                                                       #:artist_identifier
+                                                       uuid)))))
     (write rec)
     (if (not (nil? ex-op))
         ($artist_opinions 'mod
@@ -239,3 +275,5 @@
         (protected-endpoint rc
                             (lambda ()
                               (do-opinion rc 0 1)))))
+
+

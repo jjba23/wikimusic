@@ -282,6 +282,8 @@
                  ,(mk-textarea #:label (G_ "description")
                                #:name "description"
                                #:value (unescape-str description))))
-      (div ,(success-submit-button #:content (G_ "edit")))))
+      (div ,(success-submit-button #:content (if identifier
+                                                 (G_ "edit")
+                                                 (G_ "create"))))))
   (export song-form))
 

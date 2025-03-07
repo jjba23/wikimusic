@@ -188,6 +188,34 @@
                             (lambda ()
                               (do-edit rc)))))
 
+(define (do-new rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body))
+         (new-uuid (generate-string-uuid))
+         (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
+    ($genres 'set
+             #:identifier new-uuid
+             #:display_name (escape-str (uri-decode (car (assoc-ref kv "display-name"))))
+             #:description (escape-str (uri-decode (car (assoc-ref kv "description"))))
+             #:created_by user-identifier
+             #:visibility_status 0
+             #:views 0
+             #:created_at (current-time))
+    
+    (redirect-to rc
+                 (string->uri (format #f "~a/genres/uuid/~a"
+                                      (current-myhost)
+                                      new-uuid))
+                 #:status 302)))
+
+(post "/genres/new"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-new rc)))))
+
 (define (do-opinion rc is-like is-dislike)
   (let* ((uuid (params rc "uuid"))
          (user-identifier (:cookies-value rc "wikimusic-user-identifier"))
