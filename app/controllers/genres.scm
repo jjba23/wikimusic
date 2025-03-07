@@ -195,17 +195,18 @@
          (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
     ($genres 'set
              #:identifier new-uuid
-             #:display_name (escape-str (uri-decode (car (assoc-ref kv "display-name"))))
-             #:description (escape-str (uri-decode (car (assoc-ref kv "description"))))
+             #:display_name (escape-str (uri-decode (car (assoc-ref kv
+                                                          "display-name"))))
+             #:description (escape-str (uri-decode (car (assoc-ref kv
+                                                         "description"))))
              #:created_by user-identifier
              #:visibility_status 0
              #:views 0
              #:created_at (current-time))
-    
+
     (redirect-to rc
                  (string->uri (format #f "~a/genres/uuid/~a"
-                                      (current-myhost)
-                                      new-uuid))
+                                      (current-myhost) new-uuid))
                  #:status 302)))
 
 (post "/genres/new"

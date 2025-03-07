@@ -237,22 +237,27 @@
          (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
     ($songs 'set
             #:identifier new-uuid
-            #:display_name (escape-str (uri-decode (car (assoc-ref kv "display-name"))))
+            #:display_name (escape-str (uri-decode (car (assoc-ref kv
+                                                         "display-name"))))
             #:music_key (escape-str (uri-decode (car (assoc-ref kv "music-key"))))
-            #:music_tuning (escape-str (uri-decode (car (assoc-ref kv "music-tuning"))))
-            #:music_creation_date (escape-str (uri-decode (car (assoc-ref kv "music-creation-date"))))
-            #:album_name (escape-str (uri-decode (car (assoc-ref kv "album-name"))))
-            #:album_info_link (escape-str (uri-decode (car (assoc-ref kv "album-info-link"))))
-            #:description (escape-str (uri-decode (car (assoc-ref kv "description"))))
+            #:music_tuning (escape-str (uri-decode (car (assoc-ref kv
+                                                         "music-tuning"))))
+            #:music_creation_date (escape-str (uri-decode (car (assoc-ref kv
+                                                                "music-creation-date"))))
+            #:album_name (escape-str (uri-decode (car (assoc-ref kv
+                                                                 "album-name"))))
+            #:album_info_link (escape-str (uri-decode (car (assoc-ref kv
+                                                            "album-info-link"))))
+            #:description (escape-str (uri-decode (car (assoc-ref kv
+                                                        "description"))))
             #:created_by user-identifier
             #:visibility_status 0
             #:views 0
             #:created_at (current-time))
-    
+
     (redirect-to rc
                  (string->uri (format #f "~a/songs/uuid/~a"
-                                      (current-myhost)
-                                      new-uuid))
+                                      (current-myhost) new-uuid))
                  #:status 302)))
 
 (post "/songs/new"
