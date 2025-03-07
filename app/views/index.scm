@@ -31,12 +31,22 @@
                               (div (@ (class "p-2"))
                                    (h2 (@ (id welcome-page-title)
                                           (class
-                                           "font-black text-stone-800 text-xl"))
+                                            "font-black text-stone-800 text-xl"))
                                        ,(G_ "Welcome to Wikimusic"))
                                    (em (@ (id welcome-page-subtitle))
                                        ,(G_
                                          "the free music knowledge encyclopaedia"))
-                                   ,(wikimusic-explain G_)))))
+                                   (div (@(class "flex flex-row flex-wrap justify-between"))
+                                        ,(wikimusic-explain G_)
+                                        ,(wikimusic-img))))))
+
+(define (wikimusic-img)
+  `((div 
+     (div
+      (@(class "bg-stone-300/50 max-w-56 p-4 rounded-xl"))
+      (figure
+       (img (@(class "rounded-2xl h-auto")(src "/img/wikimusic.png")))))
+     )))
 
 (define (wikimusic-explain G_)
   `((div (@ (class "max-w-prose my-8 p-4 bg-stone-300/50 rounded-2xl"))
@@ -60,7 +70,7 @@
 
          (div (@ (class "my-2"))
               (a (@ (class
-                     "font-bold text-blue-900 hover:text-blue-700 flex flex-row gap-3")
+                      "font-bold text-blue-900 hover:text-blue-700 flex flex-row gap-3")
                     (href "https://www.buymeacoffee.com/jjbigorra"))
                  (span "💙")
                  ,(G_ "Please donate by clicking here")
