@@ -32,7 +32,7 @@
         (uuid generate)
         (app views genres))
 
-(get "/genres?"
+(get "/genres"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names wikimusic-genre-sort)
