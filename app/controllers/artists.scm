@@ -201,6 +201,38 @@
 
 ;; ====== Data create POST routes ======
 
+(define (do-new-artwork rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body))
+         (new-uuid (generate-string-uuid))
+         (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
+    ($artist_artworks 'set
+                      #:identifier new-uuid
+                      #:artist_identifier (params rc "uuid")                      
+                      #:created_by user-identifier                      
+                      #:visibility_status 0
+                      #:content_url (escape-str (uri-decode (car (assoc-ref kv
+                                                                            "content-url"))))
+                      #:content_caption (escape-str (uri-decode (car (assoc-ref kv
+                                                                                "content-caption"))))
+                      #:order_value (escape-str (uri-decode (car (assoc-ref kv
+                                                                            "order-value"))))
+                      #:created_at (current-time))
+
+    (redirect-to rc
+                 (string->uri (format #f "~a/artists/uuid/~a/edit"
+                                      (current-myhost) (params rc "uuid")))
+                 #:status 302)))
+
+(post "/artists/uuid/:uuid/artworks/new"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-new-artwork rc)))))
+
+
 (define (do-new rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body))
@@ -209,9 +241,9 @@
     ($artists 'set
               #:identifier new-uuid
               #:display_name (escape-str (uri-decode (car (assoc-ref kv
-                                                           "display-name"))))
+                                                                     "display-name"))))
               #:description (escape-str (uri-decode (car (assoc-ref kv
-                                                          "description"))))
+                                                                    "description"))))
               #:created_by user-identifier
               #:visibility_status 0
               #:views 0
@@ -276,4 +308,5 @@
         (protected-endpoint rc
                             (lambda ()
                               (do-opinion rc 0 1)))))
+
 

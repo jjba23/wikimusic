@@ -355,20 +355,32 @@
                                     entity-identifier)
                             (format #f "/~as/uuid/~a/artworks/edit/~a" entity
                                     entity-identifier artwork-identifier))))
-      `((form (@ (method POST)
-                 (content-type application/x-www-form-urlencoded)
-                 (action ,form-action))
-              (div ,(mk-input #:label (G_ "content url")
-                              #:name "content-url"
-                              #:value content-url
-                              #:required #t)
-                   ,(mk-input #:label (G_ "content caption")
-                              #:name "content-caption"
-                              #:value content-caption)
-                   ,(mk-input #:label (G_ "order value")
-                              #:type 'number
-                              #:name "order-value"
-                              #:value order-value))))))
+      `((div (@(class "flex flex-col gap-2"))
+             (form (@ (method POST)
+                      (content-type application/x-www-form-urlencoded)
+                      (action ,form-action))
+                   (div ,(mk-input #:label (G_ "content url")
+                                   #:name "content-url"
+                                   #:value content-url
+                                   #:required #t)
+                        ,(mk-input #:label (G_ "content caption")
+                                   #:name "content-caption"
+                                   #:value content-caption)
+                        ,(mk-input #:label (G_ "order value")
+                                   #:type 'number
+                                   #:name "order-value"
+                                   #:value order-value)
+                        (div
+                         ,(success-submit-button #:content (if artwork-identifier
+                                                               (G_ "edit")
+                                                               (G_ "create"))))))
+             ,(cond-render 
+               (lambda(artwork-id)
+                 `(form (@(method POST)
+                         (content-type application/x-www-form-urlencoded)
+                         (action ,(format #f "/~as/uuid/~a/artworks/delete/~a" entity entity-identifier artwork-identifier)))
+                        ,(danger-submit-button #:content (G_ "delete"))))
+               artwork-identifier)))))
   (export artwork-form))
 
 (begin
