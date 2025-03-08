@@ -19,6 +19,7 @@
 
 (import (wikimusic html)
         (web uri)
+        (wikimusic controller)
         (wikimusic url)
         (ice-9 string-fun)
         (wikimusic auth)
@@ -345,18 +346,23 @@
 
 ;; ====== Delete data routes ======
 
+
+
+
 (post "/artists/uuid/:uuid/artworks/:artwork-uuid/delete"
       #:auth '(table user "username" "password")
       #:session #t
       (lambda (rc)
-        (define (do-delete)
-          ($artist_artworks 'mod
-                            'row-delete
-                            (where #:identifier (params rc "artwork-uuid")))
-
-          (redirect-to rc
-                       (string->uri (format #f "~a/artists/uuid/~a/edit"
-                                            (current-myhost)
-                                            (params rc "uuid")))
-                       #:status 302))
-        (protected-endpoint rc do-delete)))
+        (protected-endpoint rc
+                            (lambda ()
+                              (delete-artwork #:rc rc
+                                              #:entity 'artist
+                                              #:delete-condition (where
+                                                                  #:identifier
+                                                                  (params
+                                                                   rc
+                                                                   "artwork-uuid"))
+                                              #:redirect-url (format #f
+                                                                     "~a/artists/uuid/~a/edit"
+                                                                     (current-myhost)
+                                                                     (params rc "uuid")))))))
