@@ -31,33 +31,35 @@
   #:use-module (ice-9 string-fun))
 
 (define-public (genres-list-page G_ genres artworks opinions comments)
-  (html-template G_
-                 #:body `(div (@ (class "container mx-auto"))
-                              ((h2 (@ (class
-                                       "font-black text-stone-800 text-2xl py-4"))
-                                   ,(G_ "viewing genres"))
-                               (details (summary (@ (class "cursor-pointer"))
-                                                 ,(G_ "options"))
-                                        (div (@ (class
-                                                 "flex flex-row flex-wrap gap-3 items-center my-4"))
-                                             ,(sort-select G_
-                                                           #:entity 'genre)
-                                             (a (@ (href "/genres/new"))
-                                                ,(action-button #:content (G_
-                                                                           "new genre")))))
-                               (div (div (@ (class
-                                             "flex flex-row flex-wrap gap-3 items-center"))
-                                         ,(map (lambda (x)
-                                                 `(div ,(item-tile G_
-                                                                   'genre
-                                                                   x
-                                                                   (relevant-entities 'genre
-                                                                    artworks x)
-                                                                   (relevant-entities 'genre
-                                                                    opinions x)
-                                                                   (relevant-entities 'genre
-                                                                    comments x))))
-                                               genres)))))))
+  (let ((body `(div (@ (class ,(->css '(container mx-auto))))
+                    ((h2 (@ (class ,(->css '(font-black text-stone-800
+                                                        text-2xl py-4))))
+                         ,(G_ "viewing genres"))
+                     (details (summary (@ (class ,(->css '(cursor-pointer))))
+                                       ,(G_ "options"))
+                              (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                            gap-3 items-center
+                                                            my-4))))
+                                   ,(sort-select G_
+                                                 #:entity 'genre)
+                                   (a (@ (href "/genres/new"))
+                                      ,(action-button #:content (G_
+                                                                 "new genre")))))
+                     (div (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                        gap-3 items-center))))
+                               ,(map (lambda (x)
+                                       `(div ,(item-tile G_
+                                                         'genre
+                                                         x
+                                                         (relevant-entities 'genre
+                                                          artworks x)
+                                                         (relevant-entities 'genre
+                                                          opinions x)
+                                                         (relevant-entities 'genre
+                                                          comments x))))
+                                     genres)))))))
+    (html-template G_
+                   #:body body)))
 
 (define-public (genres-detail-page G_
                                    genre
@@ -66,9 +68,9 @@
                                    comments
                                    user-alist)
   (html-template G_
-                 #:body `(div (@ (class "container mx-auto"))
-                              ((h2 (@ (class
-                                       "font-black text-stone-800 text-xl"))
+                 #:body `(div (@ (class ,(->css '(container mx-auto))))
+                              ((h2 (@ (class ,(->css '(font-black
+                                                       text-stone-800 text-xl))))
                                    ,(assoc-ref genre "display_name"))
                                (div (div ,(entity-details G_
                                                           'genre
@@ -80,76 +82,69 @@
 
 (begin
   (define* (genre-edit-page G_ genre artworks)
-    (html-template G_
-                   #:body `(div (@ (class "container mx-auto"))
-                                (details (@ (open true))
-                                         (summary (@ (class
-                                                      "font-black text-stone-800 text-md cursor-pointer"))
-                                                  ,(G_ "edit artworks"))
-                                         ,(map (lambda (a)
-                                                 `(div (figure (@ (class
-                                                                   "py-3 sm:w-36"))
-                                                               (img (@ (loading
-                                                                        "lazy")
-                                                                       (class
-                                                                        "rounded-xl")
-                                                                       (src ,(assoc-ref
-                                                                              a
-                                                                              "content_url")))))
-                                                       ,(artwork-form G_
-                                                                      #:entity 'genre
-                                                                      #:entity-identifier
-                                                                      (assoc-ref
-                                                                       genre
-                                                                       "identifier")
-                                                                      #:artwork-identifier
-                                                                      (assoc-ref
-                                                                       a
-                                                                       "identifier")
-                                                                      #:content-url
-                                                                      (assoc-ref
-                                                                       a
-                                                                       "content_url")
-                                                                      #:content-caption
-                                                                      (assoc-ref-or-empty-str
-                                                                       a
-                                                                       "content_caption")
-                                                                      #:order-value
-                                                                      (assoc-ref
-                                                                       a
-                                                                       "order_value"))))
-                                               artworks))
-                                (hr (@ (class "my-6")))
-                                (details (@ (open true))
-                                         (summary (@ (class
-                                                      "font-black text-stone-800 text-md cursor-pointer"))
-                                                  ,(G_ "new artwork"))
-                                         ,(artwork-form G_
-                                                        #:entity 'genre
-                                                        #:entity-identifier (assoc-ref
-                                                                             genre
-                                                                             "identifier")))
-                                (hr (@ (class "my-6")))
-                                (details (@ (open true))
-                                         (summary (@ (class
-                                                      "font-black text-stone-800 text-md cursor-pointer"))
-                                                  ,(G_ "editing genre"))
-                                         ,(genre-form G_
-                                                      #:identifier (assoc-ref
+    (let* ((arts (map (lambda (a)
+                        `(div (figure (@ (class ,(->css '(py-3 sm:w-36))))
+                                      (img (@ (loading "lazy")
+                                              (class ,(->css '(rounded-xl)))
+                                              (src ,(assoc-ref a "content_url")))))
+                              ,(artwork-form G_
+                                             #:entity 'genre
+                                             #:entity-identifier (assoc-ref
+                                                                  genre
+                                                                  "identifier")
+                                             #:artwork-identifier (assoc-ref a
+                                                                   "identifier")
+                                             #:content-url (assoc-ref a
+                                                            "content_url")
+                                             #:content-caption (assoc-ref-or-empty-str
+                                                                a
+                                                                "content_caption")
+                                             #:order-value (assoc-ref a
+                                                            "order_value"))))
+                      artworks))
+           (body `(div (@ (class ,(->css '(container mx-auto))))
+                       (details (@ (open true))
+                                (summary (@ (class ,(->css '(font-black
+                                                             text-stone-800
+                                                             text-md
+                                                             cursor-pointer))))
+                                         ,(G_ "edit artworks"))
+                                ,arts)
+                       (hr (@ (class "my-6")))
+                       (details (@ (open true))
+                                (summary (@ (class ,(->css '(font-black
+                                                             text-stone-800
+                                                             text-md
+                                                             cursor-pointer))))
+                                         ,(G_ "new artwork"))
+                                ,(artwork-form G_
+                                               #:entity 'genre
+                                               #:entity-identifier (assoc-ref
                                                                     genre
-                                                                    "identifier")
-                                                      #:display-name (assoc-ref
-                                                                      genre
-                                                                      "display_name")
-                                                      #:description (assoc-ref-or-empty-str
-                                                                     genre
-                                                                     "description"))))))
+                                                                    "identifier")))
+                       (hr (@ (class ,(->css '(my-6)))))
+                       (details (@ (open true))
+                                (summary (@ (class ,(->css '(font-black
+                                                             text-stone-800
+                                                             text-md
+                                                             cursor-pointer))))
+                                         ,(G_ "editing genre"))
+                                ,(genre-form G_
+                                             #:identifier (assoc-ref genre
+                                                           "identifier")
+                                             #:display-name (assoc-ref genre
+                                                             "display_name")
+                                             #:description (assoc-ref-or-empty-str
+                                                            genre
+                                                            "description"))))))
+      (html-template G_
+                     #:body body)))
   (export genre-edit-page))
 
 (begin
   (define* (genre-new-page G_)
     (html-template G_
-                   #:body `(div (@ (class "container mx-auto"))
+                   #:body `(div (@ (class ,(->css '(container mx-auto))))
                                 ,(genre-form G_))))
   (export genre-new-page))
 

@@ -21,6 +21,7 @@
         (web uri)
         (wikimusic url)
         (wikimusic auth)
+        (wikimusic controller)
         (wikimusic abstraction)
         (ice-9 string-fun)
         (app models genres)
@@ -333,18 +334,18 @@
 
 ;; ====== Delete data routes ======
 
+
 (post "/genres/uuid/:uuid/artworks/:artwork-uuid/delete"
       #:auth '(table user "username" "password")
       #:session #t
       (lambda (rc)
         (define (do-delete)
-          ($genre_artworks 'mod
-                           'row-delete
-                           (where #:identifier (params rc "artwork-uuid")))
-
-          (redirect-to rc
-                       (string->uri (format #f "~a/genres/uuid/~a/edit"
-                                            (current-myhost)
-                                            (params rc "uuid")))
-                       #:status 302))
+          (delete-artwork #:rc rc
+                          #:conn (get-conn-from-pool!)
+                          #:entity 'genre
+                          #:delete-condition (where #:identifier (params rc
+                                                                         "artwork-uuid"))
+                          #:redirect-url (format #f "~a/genres/uuid/~a/edit"
+                                                 (current-myhost)
+                                                 (params rc "uuid"))))
         (protected-endpoint rc do-delete)))

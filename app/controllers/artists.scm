@@ -346,23 +346,17 @@
 
 ;; ====== Delete data routes ======
 
-
-
-
 (post "/artists/uuid/:uuid/artworks/:artwork-uuid/delete"
       #:auth '(table user "username" "password")
       #:session #t
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (delete-artwork #:rc rc
-                                              #:entity 'artist
-                                              #:delete-condition (where
-                                                                  #:identifier
-                                                                  (params
-                                                                   rc
-                                                                   "artwork-uuid"))
-                                              #:redirect-url (format #f
-                                                                     "~a/artists/uuid/~a/edit"
-                                                                     (current-myhost)
-                                                                     (params rc "uuid")))))))
+        (define (do-delete)
+          (delete-artwork #:rc rc
+                          #:conn (get-conn-from-pool!)
+                          #:entity 'artist
+                          #:delete-condition (where #:identifier (params rc
+                                                                  "artwork-uuid"))
+                          #:redirect-url (format #f "~a/artists/uuid/~a/edit"
+                                                 (current-myhost)
+                                                 (params rc "uuid"))))
+        (protected-endpoint rc do-delete)))

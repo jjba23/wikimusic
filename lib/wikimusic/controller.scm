@@ -43,8 +43,8 @@
   #:use-module (artanis artanis)
   #:export (delete-artwork))
 
-(define* (delete-artwork #:key rc entity delete-condition redirect-url)
-  (DB-query (get-conn-from-pool!)
+(define* (delete-artwork #:key rc conn entity delete-condition redirect-url)
+  (DB-query conn
             (->sql delete from
                    (string->symbol (format #f "~a_artworks" entity))
                    delete-condition))

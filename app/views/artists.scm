@@ -31,33 +31,35 @@
   #:use-module (ice-9 string-fun))
 
 (define-public (artists-list-page G_ artists artworks opinions comments)
-  (html-template G_
-                 #:body `(div (@ (class "container mx-auto"))
-                              ((h2 (@ (class
-                                       "font-black text-stone-800 text-2xl py-4"))
-                                   ,(G_ "viewing artists"))
-                               (details (summary (@ (class "cursor-pointer"))
-                                                 ,(G_ "options"))
-                                        (div (@ (class
-                                                 "flex flex-row flex-wrap gap-3 items-center my-4"))
-                                             ,(sort-select G_
-                                                           #:entity 'artist)
-                                             (a (@ (href "/artists/new"))
-                                                ,(action-button #:content (G_
-                                                                           "new artist")))))
-                               (div (div (@ (class
-                                             "flex flex-row flex-wrap gap-3 items-center"))
-                                         ,(map (lambda (x)
-                                                 `(div ,(item-tile G_
-                                                                   'artist
-                                                                   x
-                                                                   (relevant-entities 'artist
-                                                                    artworks x)
-                                                                   (relevant-entities 'artist
-                                                                    opinions x)
-                                                                   (relevant-entities 'artist
-                                                                    comments x))))
-                                               artists)))))))
+  (let ((body `(div (@ (class ,(->css '(container mx-auto))))
+                    ((h2 (@ (class ,(->css '(font-black text-stone-800
+                                                        text-2xl py-4))))
+                         ,(G_ "viewing artists"))
+                     (details (summary (@ (class ,(->css '(cursor-pointer))))
+                                       ,(G_ "options"))
+                              (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                            gap-3 items-center
+                                                            my-4))))
+                                   ,(sort-select G_
+                                                 #:entity 'artist)
+                                   (a (@ (href "/artists/new"))
+                                      ,(action-button #:content (G_
+                                                                 "new artist")))))
+                     (div (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                        gap-3 items-center))))
+                               ,(map (lambda (x)
+                                       `(div ,(item-tile G_
+                                                         'artist
+                                                         x
+                                                         (relevant-entities 'artist
+                                                          artworks x)
+                                                         (relevant-entities 'artist
+                                                          opinions x)
+                                                         (relevant-entities 'artist
+                                                          comments x))))
+                                     artists)))))))
+    (html-template G_
+                   #:body body)))
 
 (define-public (artists-detail-page G_
                                     artist
@@ -66,9 +68,9 @@
                                     comments
                                     user-alist)
   (html-template G_
-                 #:body `(div (@ (class "container mx-auto"))
-                              ((h2 (@ (class
-                                       "font-black text-stone-800 text-xl"))
+                 #:body `(div (@ (class ,(->css '(container mx-auto))))
+                              ((h2 (@ (class ,(->css '(font-black
+                                                       text-stone-800 text-xl))))
                                    ,(assoc-ref artist "display_name"))
                                (div (div ,(entity-details G_
                                                           'artist
@@ -80,70 +82,68 @@
 
 (begin
   (define* (artist-edit-page G_ artist artworks)
-    (html-template G_
-                   #:body `(div (@ (class "container mx-auto"))
-                                (details (@ (open true))
-                                         (summary (@ (class
-                                                      "font-black text-stone-800 text-md cursor-pointer"))
-                                                  ,(G_ "edit artworks"))
-                                         ,(map (lambda (a)
-                                                 `(div (figure (@ (class
-                                                                   "py-3 sm:w-36"))
-                                                               (img (@ (loading
-                                                                        "lazy")
-                                                                       (class
-                                                                        "rounded-xl")
-                                                                       (src ,(assoc-ref
-                                                                              a
-                                                                              "content_url")))))
-                                                       ,(artwork-form G_
-                                                                      #:entity 'artist
-                                                                      #:entity-identifier
-                                                                      (assoc-ref
-                                                                       artist
-                                                                       "identifier")
-                                                                      #:artwork-identifier
-                                                                      (assoc-ref
-                                                                       a
-                                                                       "identifier")
-                                                                      #:content-url
-                                                                      (assoc-ref
-                                                                       a
-                                                                       "content_url")
-                                                                      #:content-caption
-                                                                      (assoc-ref-or-empty-str
-                                                                       a
-                                                                       "content_caption")
-                                                                      #:order-value
-                                                                      (assoc-ref
-                                                                       a
-                                                                       "order_value"))))
-                                               artworks))
-                                (hr (@ (class "my-6")))
-                                (details (@ (open true))
-                                         (summary (@ (class
-                                                      "font-black text-stone-800 text-md cursor-pointer"))
-                                                  ,(G_ "new artwork"))
-                                         ,(artwork-form G_
-                                                        #:entity 'artist
-                                                        #:entity-identifier (assoc-ref
-                                                                             artist
-                                                                             "identifier")))
-                                (hr (@ (class "my-6")))
-                                (details (@ (open true))
-                                         (summary (@ (class
-                                                      "font-black text-stone-800 text-md cursor-pointer"))
-                                                  ,(G_ "editing artist"))
-                                         ,(artist-form G_
-                                                       #:identifier (assoc-ref
-                                                                     artist
-                                                                     "identifier")
-                                                       #:display-name (assoc-ref
-                                                                       artist
-                                                                       "display_name")
-                                                       #:description (assoc-ref-or-empty-str
-                                                                      artist
-                                                                      "description"))))))
+    (let* ((artwork-forms (map (lambda (a)
+                                 `(div (figure (@ (class ,(->css '(py-3
+                                                                   sm:w-36))))
+                                               (img (@ (loading "lazy")
+                                                       (class "rounded-xl")
+                                                       (src ,(assoc-ref a
+                                                              "content_url")))))
+                                       ,(artwork-form G_
+                                                      #:entity 'artist
+                                                      #:entity-identifier (assoc-ref
+                                                                           artist
+                                                                           "identifier")
+                                                      #:artwork-identifier (assoc-ref
+                                                                            a
+                                                                            "identifier")
+                                                      #:content-url (assoc-ref
+                                                                     a
+                                                                     "content_url")
+                                                      #:content-caption (assoc-ref-or-empty-str
+                                                                         a
+                                                                         "content_caption")
+                                                      #:order-value (assoc-ref
+                                                                     a
+                                                                     "order_value"))))
+                               artworks))
+           (body `(div (@ (class ,(->css '(container mx-auto))))
+                       (details (@ (open true))
+                                (summary (@ (class ,(->css '(font-black
+                                                             text-stone-800
+                                                             text-md
+                                                             cursor-pointer))))
+                                         ,(G_ "edit artworks"))
+                                ,artwork-forms)
+                       (hr (@ (class "my-6")))
+                       (details (@ (open true))
+                                (summary (@ (class ,(->css '(font-black
+                                                             text-stone-800
+                                                             text-md
+                                                             cursor-pointer))))
+                                         ,(G_ "new artwork"))
+                                ,(artwork-form G_
+                                               #:entity 'artist
+                                               #:entity-identifier (assoc-ref
+                                                                    artist
+                                                                    "identifier")))
+                       (hr (@ (class "my-6")))
+                       (details (@ (open true))
+                                (summary (@ (class ,(->css '(font-black
+                                                             text-stone-800
+                                                             text-md
+                                                             cursor-pointer))))
+                                         ,(G_ "editing artist"))
+                                ,(artist-form G_
+                                              #:identifier (assoc-ref artist
+                                                            "identifier")
+                                              #:display-name (assoc-ref artist
+                                                              "display_name")
+                                              #:description (assoc-ref-or-empty-str
+                                                             artist
+                                                             "description"))))))
+      (html-template G_
+                     #:body body)))
   (export artist-edit-page))
 
 (begin
