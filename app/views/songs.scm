@@ -91,9 +91,9 @@
                                   comments
                                   user-alist)
   (html-template G_
-                 #:body `((div (@ (class "container mx-auto"))
+                 #:body `((div (@ (class ,(->css '(container mx-auto))))
                                ((h2 (@ (class
-                                        "font-black text-stone-800 text-xl"))
+                                         ,(->css '(font-black text-stone-800 text-xl))))
                                     ,(assoc-ref song "display_name"))
                                 (div (div ,(entity-details G_
                                                            'song
