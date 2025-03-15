@@ -70,7 +70,7 @@
   (html-template G_
                  #:body `(div (@ (class ,(->css '(container mx-auto))))
                               ((h2 (@ (class ,(->css '(font-black
-                                                       text-stone-800 text-xl))))
+                                                       text-stone-800 text-3xl))))
                                    ,(assoc-ref genre "display_name"))
                                (div (div ,(entity-details G_
                                                           'genre
@@ -158,15 +158,15 @@
                             (format #f "/genres/uuid/~a/edit" identifier)
                             (format #f "/genres/new" identifier)))
                (content-type application/x-www-form-urlencoded))
-            (div ,(mk-input #:label (G_ "display name")
-                            #:name "display-name"
-                            #:value (unescape-str display-name)
-                            #:required #t)
+            (div ,(hyg-input #:label (G_ "display name")
+                             #:name "display-name"
+                             #:value (unescape-str display-name)
+                             #:required #t)
                  ,(mk-textarea #:label (G_ "description")
                                #:name "description"
                                #:value (unescape-str description))))
-      (div ,(success-submit-button #:content (if identifier
-                                                 (G_ "edit")
-                                                 (G_ "create"))))))
+      (div ,(hyg-submit-button #:content (if identifier
+                                             (G_ "edit")
+                                             (G_ "create"))))))
   (export genre-form))
 

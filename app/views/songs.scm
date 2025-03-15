@@ -207,30 +207,31 @@
                             (format #f "/songs/uuid/~a/edit" identifier)
                             (format #f "/songs/new" identifier)))
                (content-type application/x-www-form-urlencoded))
-            (div ,(mk-input #:label (G_ "display name")
-                            #:name "display-name"
-                            #:value (unescape-str display-name)
-                            #:required #t)
-                 ,(mk-input #:label (G_ "music key")
-                            #:name "music-key"
-                            #:value (unescape-str music-key))
-                 ,(mk-input #:label (G_ "music tuning")
-                            #:name "music-tuning"
-                            #:value (unescape-str music-tuning))
-                 ,(mk-input #:label (G_ "music creation date")
-                            #:name "music-creation-date"
-                            #:value (unescape-str music-creation-date))
-                 ,(mk-input #:label (G_ "album name")
-                            #:name "album-name"
-                            #:value (unescape-str album-name))
-                 ,(mk-input #:label (G_ "album info url")
-                            #:name "album-info-link"
-                            #:value (unescape-str album-info-link))
-                 ,(mk-textarea #:label (G_ "description")
-                               #:name "description"
-                               #:value (unescape-str description))))
-      (div ,(success-submit-button #:content (if identifier
-                                                 (G_ "edit")
-                                                 (G_ "create"))))))
+            (div ,(hyg-input #:label (G_ "display name")
+                             #:name "display-name"
+                             #:value (unescape-str display-name)
+                             #:required #t)
+                 
+                 ,(hyg-input #:label (G_ "music key")
+                             #:name "music-key"
+                             #:value (unescape-str music-key))
+                 ,(hyg-input #:label (G_ "music tuning")
+                             #:name "music-tuning"
+                             #:value (unescape-str music-tuning))
+                 ,(hyg-input #:label (G_ "music creation date")
+                             #:name "music-creation-date"
+                             #:value (unescape-str music-creation-date))
+                 ,(hyg-input #:label (G_ "album name")
+                             #:name "album-name"
+                             #:value (unescape-str album-name))
+                 ,(hyg-input #:label (G_ "album info url")
+                             #:name "album-info-link"
+                             #:value (unescape-str album-info-link))
+                 ,(hyg-textarea #:label (G_ "description")
+                                #:name "description"
+                                #:value (unescape-str description))))
+      (div ,(hyg-submit-button #:content (if identifier
+                                             (G_ "edit")
+                                             (G_ "create"))))))
   (export song-form))
 

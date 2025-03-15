@@ -151,8 +151,8 @@
                                #:name "ascii-contents"
                                #:value (unescape-str ascii-contents)
                                #:required #f)))
-      (div ,(success-submit-button #:content (if song-content-identifier
-                                                 (G_ "edit")
-                                                 (G_ "create"))))))
+      (div ,(hyg-submit-button #:content (if song-content-identifier
+                                             (G_ "edit")
+                                             (G_ "create"))))))
   (export song-content-form))
 

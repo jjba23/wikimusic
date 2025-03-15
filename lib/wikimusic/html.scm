@@ -63,14 +63,30 @@
                           #:key body
                           (proj '()))
     (define nav-css
-      (->css '(text-xs text-blue-900 hover:text-blue-700 font-sans font-light px-2 uppercase)))
+      (->css '(text-sm text-blue-900
+                       hover:text-blue-700
+                       font-sans
+                       font-light
+                       px-2
+                       uppercase)))
     (define nav
-      `(div (@ (class
-                 ,(->css '(flex flex-row flex-wrap gap-3 p-3 items-center justify-left w-full bg-stone-200))))
-            (a (@                 (href "/"))
-               (div (@(class ,(->css '(flex flex-row gap-2))))
+      `(div (@ (class ,(->css '(flex flex-row
+                                     flex-wrap
+                                     gap-3
+                                     p-3
+                                     items-center
+                                     justify-left
+                                     w-full
+                                     bg-stone-200))))
+            (a (@ (href "/"))
+               (div (@ (class ,(->css '(flex flex-row gap-2 items-center px-4))))
                     (span ,(hyg-icon #:type 'music-note))
-                    (span (@(class ,(->css '(text-md text-stone-700 hover:text-blue-700 font-sans font-bold px-4 uppercase)))) ,(G_ "Wikimusic"))))
+                    (span (@ (class ,(->css '(text-md text-stone-700
+                                                      hover:text-blue-700
+                                                      font-sans
+                                                      font-bold
+                                                      uppercase))))
+                          ,(G_ "Wikimusic"))))
             (a (@ (class ,nav-css)
                   (href "/songs"))
                ,(G_ "Songs"))
@@ -83,24 +99,25 @@
             (a (@ (class ,nav-css)
                   (href "/login"))
                ,(G_ "Login"))))
-    `("<!DOCTYPE html>"
-      (html (head (title "Wikimusic")
-                  (style ,(assoc-ref asset-library
-                                     "pub/css/fonts.css"))
-                  (style ,(assoc-ref asset-library
-                                     "pub/css/phosphor.css"))
-                  (meta (@ (name "viewport")
-                           (content "width=device-width, initial-scale=1.0")))
-                  (script ,(assoc-ref asset-library
-                                      "pub/js/tailwind.js"))
-                  (script ,(assoc-ref asset-library
-                                      "pub/js/tailwind.config.js")))
-            (body (@ (class "bg-stone-200/50"))
-                  (div (@ (class "flex flex-col h-screen justify-between"))
-                       (div ,nav
-                            (div (@ (class "py-8"))
-                                 ,body))
-                       (footer ,(page-footer G_)))))))
+    `("<!DOCTYPE html>" (html (head (title "Wikimusic")
+                                    (style ,(assoc-ref asset-library
+                                                       "pub/css/fonts.css"))
+                                    (style ,(assoc-ref asset-library
+                                                       "pub/css/phosphor.css"))
+                                    (meta (@ (name "viewport")
+                                             (content
+                                              "width=device-width, initial-scale=1.0")))
+                                    (script ,(assoc-ref asset-library
+                                                        "pub/js/tailwind.js"))
+                                    (script ,(assoc-ref asset-library
+                                                        "pub/js/tailwind.config.js")))
+                              (body (@ (class "bg-stone-200/50"))
+                                    (div (@ (class
+                                              "flex flex-col h-screen justify-between"))
+                                         (div ,nav
+                                              (div (@ (class "py-8"))
+                                                   ,body))
+                                         (footer ,(page-footer G_)))))))
   (export html-template))
 
 (begin
@@ -128,14 +145,15 @@
                                               (img (@ (loading "lazy")
                                                       (class "rounded-xl")
                                                       (src ,(assoc-ref art
-                                                                       "content_url")))))))
+                                                             "content_url")))))))
                                 (cond
-                                 ((equal? 0
-                                          (length artworks))
-                                  '())
-                                 (else (car artworks))))
-                  (a (@ (class
-                          ,(->css '(text-blue-900 hover:text-blue-700 text-xl font-bold max-w-prose break-all)))
+                                  ((equal? 0
+                                           (length artworks))
+                                   '())
+                                  (else (car artworks))))
+                  (a (@ (class ,(->css '(text-blue-900 hover:text-blue-700
+                                                       text-xl font-bold
+                                                       max-w-prose break-all)))
                         (href ,item-link))
                      (span ,(assoc-ref x "display_name")))
                   (div (@ (class "flex flex-row gap-2"))
@@ -234,36 +252,36 @@
                                           (action ,(format #f
                                                            "/~as/uuid/~a/like" entity
                                                            (assoc-ref x "identifier"))))
-                                       ,(success-submit-button #:content `(div ,
-                                                                           (G_
-                                                                            "like")
-                                                                           (span
-                                                                            (@
-                                                                             (class
-                                                                               "font-light text-xs"))
-                                                                            ,(format
-                                                                              #f
-                                                                              " ( ~a ) "
-                                                                              like-count)))))
+                                       ,(hyg-submit-button #:content `(div ,
+                                                                       (G_
+                                                                        "like")
+                                                                       (span
+                                                                        (@
+                                                                         (class
+                                                                           "font-light text-xs"))
+                                                                        ,(format
+                                                                          #f
+                                                                          " ( ~a ) "
+                                                                          like-count)))))
                                  (form (@ (method POST)
                                           (action ,(format #f
                                                            "/~as/uuid/~a/dislike"
                                                            entity
                                                            (assoc-ref x "identifier"))))
-                                       ,(danger-submit-button #:content `(div ,
-                                                                          (G_
-                                                                           "dislike")
+                                       ,(hyg-danger-submit-button #:content `(div ,
+                                                                              (G_
+                                                                               "dislike")
 
-                                                                          
-                                                                          (span
-                                                                           (@
-                                                                            (class
-                                                                              "font-light text-xs"))
-                                                                           ,
-                                                                           (format
-                                                                            #f
-                                                                            " ( ~a ) "
-                                                                            dislike-count))))))))
+                                                                              
+                                                                              (span
+                                                                               (@
+                                                                                (class
+                                                                                  "font-light text-xs"))
+                                                                               ,
+                                                                               (format
+                                                                                #f
+                                                                                " ( ~a ) "
+                                                                                dislike-count))))))))
          (maybe-description (cond-render (lambda (description)
                                            `(div (p (@ (class
                                                          "text-stone-700 font-bold"))
@@ -296,8 +314,7 @@
            (div (div ,opinion-buttons
                      (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity
                                           (assoc-ref x "identifier"))))
-                        ,(hyg-button #:content (G_ "edit")))
-                     )
+                        ,(hyg-button #:content (G_ "edit"))))
                 ,maybe-description
                 (dl (dt (@ (class ,(->css '(text-stone-700 font-bold))))
                         ,(G_ "views"))
@@ -360,31 +377,31 @@
              (form (@ (method POST)
                       (content-type application/x-www-form-urlencoded)
                       (action ,form-action))
-                   (div ,(mk-input #:label (G_ "content url")
-                                   #:name "content-url"
-                                   #:value content-url
-                                   #:required #t)
-                        ,(mk-input #:label (G_ "content caption")
-                                   #:name "content-caption"
-                                   #:value content-caption)
-                        ,(mk-input #:label (G_ "order value")
-                                   #:type 'number
-                                   #:name "order-value"
-                                   #:value order-value)
-                        (div ,(success-submit-button #:content (if
-                                                                artwork-identifier
-                                                                (G_ "edit")
-                                                                (G_ "create"))))))
+                   (div ,(hyg-input #:label (G_ "content url")
+                                    #:name "content-url"
+                                    #:value content-url
+                                    #:required #t)
+                        ,(hyg-input #:label (G_ "content caption")
+                                    #:name "content-caption"
+                                    #:value content-caption)
+                        ,(hyg-input #:label (G_ "order value")
+                                    #:type 'number
+                                    #:name "order-value"
+                                    #:value order-value)
+                        (div ,(hyg-submit-button #:content (if
+                                                            artwork-identifier
+                                                            (G_ "edit")
+                                                            (G_ "create"))))))
              ,(cond-render (lambda (artwork-id)
                              `(form (@ (method POST)
                                        (content-type
                                         application/x-www-form-urlencoded)
                                        (action ,(format #f
-                                                 "/~as/uuid/~a/artworks/~a/delete"
-                                                 entity entity-identifier
-                                                 artwork-identifier)))
-                                    ,(danger-submit-button #:content (G_
-                                                                      "delete"))))
+                                                        "/~as/uuid/~a/artworks/~a/delete"
+                                                        entity entity-identifier
+                                                        artwork-identifier)))
+                                    ,(hyg-danger-submit-button #:content (G_
+                                                                          "delete"))))
                            artwork-identifier)))))
   (export artwork-form))
 
