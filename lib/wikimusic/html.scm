@@ -35,6 +35,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (hygguile abstraction)
   #:use-module (hygguile components input)
+  #:use-module (hygguile components icon)
   #:use-module (hygguile components button)
   #:use-module (srfi srfi-19)
   #:use-module (ice-9 textual-ports)
@@ -62,14 +63,14 @@
                           #:key body
                           (proj '()))
     (define nav-css
-      "text-xs text-blue-900 hover:text-blue-700 font-sans font-light px-2 uppercase")
+      (->css '(text-xs text-blue-900 hover:text-blue-700 font-sans font-light px-2 uppercase)))
     (define nav
       `(div (@ (class
-                 "flex flex-row flex-wrap gap-3 p-3 items-center justify-left w-full bg-stone-200"))
-            (a (@ (class
-                    "text-md text-stone-700 hover:text-blue-700 font-sans font-bold px-4 uppercase")
-                  (href "/"))
-               ,(G_ "Wikimusic"))
+                 ,(->css '(flex flex-row flex-wrap gap-3 p-3 items-center justify-left w-full bg-stone-200))))
+            (a (@                 (href "/"))
+               (div (@(class ,(->css '(flex flex-row gap-2))))
+                    (span ,(hyg-icon #:type 'music-note))
+                    (span (@(class ,(->css '(text-md text-stone-700 hover:text-blue-700 font-sans font-bold px-4 uppercase)))) ,(G_ "Wikimusic"))))
             (a (@ (class ,nav-css)
                   (href "/songs"))
                ,(G_ "Songs"))
@@ -295,7 +296,7 @@
            (div (div ,opinion-buttons
                      (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity
                                           (assoc-ref x "identifier"))))
-                        ,(action-button #:content (G_ "edit")))
+                        ,(hyg-button #:content (G_ "edit")))
                      )
                 ,maybe-description
                 (dl (dt (@ (class ,(->css '(text-stone-700 font-bold))))

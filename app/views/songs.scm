@@ -67,20 +67,20 @@
                      (details (summary (@ (class "cursor-pointer"))
                                        ,(G_ "options"))
                               (div (@ (class
-                                       "flex flex-row flex-wrap gap-3 items-center my-4"))
+                                        "flex flex-row flex-wrap gap-3 items-center my-4"))
                                    ,(sort-select G_
                                                  #:entity 'song)
                                    (a (@ (href "/songs/new"))
-                                      ,(action-button #:content (G_ "new song")))))
+                                      ,(hyg-button #:content (G_ "new song")))))
                      (div (div (@ (class
-                                   "flex flex-row flex-wrap gap-3 items-center"))
+                                    "flex flex-row flex-wrap gap-3 items-center"))
                                ,(map (lambda (x)
                                        (render-song-tile G_
-                                        artworks
-                                        song-version-count-alist
-                                        opinions
-                                        comments
-                                        x)) songs)))))))
+                                                         artworks
+                                                         song-version-count-alist
+                                                         opinions
+                                                         comments
+                                                         x)) songs)))))))
     (html-template G_
                    #:body body)))
 

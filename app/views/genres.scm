@@ -43,8 +43,8 @@
                                    ,(sort-select G_
                                                  #:entity 'genre)
                                    (a (@ (href "/genres/new"))
-                                      ,(action-button #:content (G_
-                                                                 "new genre")))))
+                                      ,(hyg-button #:content (G_
+                                                              "new genre")))))
                      (div (div (@ (class ,(->css '(flex flex-row flex-wrap
                                                         gap-3 items-center))))
                                ,(map (lambda (x)
@@ -52,11 +52,11 @@
                                                          'genre
                                                          x
                                                          (relevant-entities 'genre
-                                                          artworks x)
+                                                                            artworks x)
                                                          (relevant-entities 'genre
-                                                          opinions x)
+                                                                            opinions x)
                                                          (relevant-entities 'genre
-                                                          comments x))))
+                                                                            comments x))))
                                      genres)))))))
     (html-template G_
                    #:body body)))

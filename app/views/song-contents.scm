@@ -40,7 +40,7 @@
                           (render-version G_ version)) song-contents))
              (a (@ (href ,(format #f "/songs/uuid/~a/contents/new"
                                   (assoc-ref song "identifier"))))
-                ,(action-button #:content (G_ "new version"))))))
+                ,(hyg-button #:content (G_ "new version"))))))
 
 (define-public (render-version G_ version)
   `((hr)
