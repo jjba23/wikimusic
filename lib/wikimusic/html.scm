@@ -29,6 +29,7 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
+  #:use-module (wikimusic prelude)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
@@ -64,9 +65,9 @@
       "text-xs text-blue-900 hover:text-blue-700 font-sans font-light px-2 uppercase")
     (define nav
       `(div (@ (class
-                "flex flex-row flex-wrap gap-3 p-3 items-center justify-left w-full bg-stone-200"))
+                 "flex flex-row flex-wrap gap-3 p-3 items-center justify-left w-full bg-stone-200"))
             (a (@ (class
-                   "text-md text-stone-700 hover:text-blue-700 font-sans font-bold px-4 uppercase")
+                    "text-md text-stone-700 hover:text-blue-700 font-sans font-bold px-4 uppercase")
                   (href "/"))
                ,(G_ "Wikimusic"))
             (a (@ (class ,nav-css)
@@ -81,26 +82,24 @@
             (a (@ (class ,nav-css)
                   (href "/login"))
                ,(G_ "Login"))))
-    `(html (head (title "Wikimusic")
-                 (link (@ (rel "preconnect")
-                          (href "https://fonts.googleapis.com")))
-                 (link (@ (rel "preconnect")
-                          (href "https://fonts.gstatic.com")
-                          (crossorigin "")))
-                 (link (@ (rel "stylesheet")
-                          (href "https://fonts.cdnfonts.com/css/work-sans")))
-                 (link (@ (rel "stylesheet")
-                          (href "/css/fonts.css")))
-                 (meta (@ (name "viewport")
-                          (content "width=device-width, initial-scale=1.0")))
-                 (script (@ (src "https://cdn.tailwindcss.com")) "")
-                 (script (@ (src "/js/tailwind.config.js")) ()))
-           (body (@ (class "bg-stone-200/50"))
-                 (div (@ (class "flex flex-col h-screen justify-between"))
-                      (div ,nav
-                           (div (@ (class "py-8"))
-                                ,body))
-                      (footer ,(page-footer G_))))))
+    `("<!DOCTYPE html>"
+      (html (head (title "Wikimusic")
+                  (style ,(assoc-ref asset-library
+                                     "pub/css/fonts.css"))
+                  (style ,(assoc-ref asset-library
+                                     "pub/css/phosphor.css"))
+                  (meta (@ (name "viewport")
+                           (content "width=device-width, initial-scale=1.0")))
+                  (script ,(assoc-ref asset-library
+                                      "pub/js/tailwind.js"))
+                  (script ,(assoc-ref asset-library
+                                      "pub/js/tailwind.config.js")))
+            (body (@ (class "bg-stone-200/50"))
+                  (div (@ (class "flex flex-col h-screen justify-between"))
+                       (div ,nav
+                            (div (@ (class "py-8"))
+                                 ,body))
+                       (footer ,(page-footer G_)))))))
   (export html-template))
 
 (begin
@@ -120,7 +119,7 @@
                                       (equal? 1
                                               (assoc-ref o "is_dislike")))
                                     opinions))))
-      `((div (@ (class "bg-stone-200 rounded-2xl"))
+      `((div (@ (class ,(->css '(bg-stone-200 rounded-2xl))))
              (div (@ (class "flex flex-col py-3 px-2"))
                   ,(cond-render (lambda (art)
                                   `(figure (@ (class "py-3 sm:w-48"))
@@ -128,14 +127,14 @@
                                               (img (@ (loading "lazy")
                                                       (class "rounded-xl")
                                                       (src ,(assoc-ref art
-                                                             "content_url")))))))
+                                                                       "content_url")))))))
                                 (cond
-                                  ((equal? 0
-                                           (length artworks))
-                                   '())
-                                  (else (car artworks))))
+                                 ((equal? 0
+                                          (length artworks))
+                                  '())
+                                 (else (car artworks))))
                   (a (@ (class
-                         "text-blue-900 hover:text-blue-700 text-xl font-bold max-w-prose break-all")
+                          ,(->css '(text-blue-900 hover:text-blue-700 text-xl font-bold max-w-prose break-all)))
                         (href ,item-link))
                      (span ,(assoc-ref x "display_name")))
                   (div (@ (class "flex flex-row gap-2"))
@@ -165,7 +164,7 @@
 (define-public (render-comment G_ user-alist comment)
   `(div (@ (class "py-3"))
         ,(cond-render (lambda (u)
-                        `(p (@ (class "text-xs text-stone-600"))
+                        `(p (@ (class ,(->css '(text-xs text-stone-600))))
                             ,(format #f "~a (~a) &lt;~a&gt;"
                                      (assoc-ref u "display_name")
                                      (assoc-ref u "username")
@@ -291,7 +290,7 @@
                                                  ,approved-by)))
                                          (assoc-ref x "approved_by"))))
     
-    `((div (@ (class "py-4 flex flex-row flex-wrap gap-6"))
+    `((div (@ (class ,(->css '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div ,opinion-buttons
                      (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity
@@ -299,7 +298,7 @@
                         ,(action-button #:content (G_ "edit")))
                      )
                 ,maybe-description
-                (dl (dt (@ (class "text-stone-700 font-bold"))
+                (dl (dt (@ (class ,(->css '(text-stone-700 font-bold))))
                         ,(G_ "views"))
                     (dd (@ (class "pl-3 text-stone-800"))
                         ,(format #f "~a"

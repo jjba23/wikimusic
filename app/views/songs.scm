@@ -94,7 +94,7 @@
   (html-template G_
                  #:body `((div (@ (class ,(->css '(container mx-auto))))
                                ((h2 (@ (class
-                                         ,(->css '(font-black text-stone-800 text-xl))))
+                                         ,(->css '(font-black text-stone-800 text-3xl))))
                                     ,(assoc-ref song "display_name"))
                                 (div (div ,(entity-details G_
                                                            'song
