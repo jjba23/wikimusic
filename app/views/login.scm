@@ -32,11 +32,11 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((h2 (@ (class
-                                        "font-bold text-stone-800 text-md"))
+                                       "font-bold text-stone-800 text-md"))
                                    ,(G_ "login to wikimusic"))
                                (div (form (@ (action "/login")
                                              (class
-                                               "w-full rounded-xl bg-stone-200/75 p-4 flex flex-row flex-wrap items-center gap-4 align-center")
+                                              "w-full rounded-xl bg-stone-200/75 p-4 flex flex-row flex-wrap items-center gap-4 align-center")
                                              (method POST))
                                           ,(hyg-input #:label (G_ "username")
                                                       #:name "username"
@@ -47,8 +47,6 @@
                                                       #:value ""
                                                       #:type 'password
                                                       #:required #t)
-                                          (div ,(hyg-submit-button
-                                                 #:content
-                                                 (G_
-                                                  "login")))))))))
+                                          (div ,(hyg-submit-button #:content (G_
+                                                                              "login")))))))))
 

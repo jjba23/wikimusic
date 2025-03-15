@@ -61,26 +61,29 @@
                                 song-version-count-alist
                                 opinions
                                 comments)
-  (let ((body `(div (@ (class "container mx-auto"))
-                    ((h2 (@ (class "font-black text-stone-800 text-2xl py-4"))
+  (let ((body `(div (@ (class ,(->css '(container mx-auto))))
+                    ((h2 (@ (class ,(->css '(font-black text-stone-800
+                                                        text-2xl py-4))))
                          ,(G_ "viewing songs"))
-                     (details (summary (@ (class "cursor-pointer"))
+                     (details (summary (@ (class ,(->css '(cursor-pointer))))
                                        ,(G_ "options"))
-                              (div (@ (class
-                                        "flex flex-row flex-wrap gap-3 items-center my-4"))
+                              (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                            gap-3 items-center
+                                                            my-4))))
                                    ,(sort-select G_
                                                  #:entity 'song)
                                    (a (@ (href "/songs/new"))
                                       ,(hyg-button #:content (G_ "new song")))))
-                     (div (div (@ (class
-                                    "flex flex-row flex-wrap gap-3 items-center"))
+                     (div (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                        gap-3 items-center
+                                                        justify-center))))
                                ,(map (lambda (x)
                                        (render-song-tile G_
-                                                         artworks
-                                                         song-version-count-alist
-                                                         opinions
-                                                         comments
-                                                         x)) songs)))))))
+                                        artworks
+                                        song-version-count-alist
+                                        opinions
+                                        comments
+                                        x)) songs)))))))
     (html-template G_
                    #:body body)))
 
@@ -93,8 +96,9 @@
                                   user-alist)
   (html-template G_
                  #:body `((div (@ (class ,(->css '(container mx-auto))))
-                               ((h2 (@ (class
-                                         ,(->css '(font-black text-stone-800 text-3xl))))
+                               ((h2 (@ (class ,(->css '(font-black
+                                                        text-stone-800
+                                                        text-3xl))))
                                     ,(assoc-ref song "display_name"))
                                 (div (div ,(entity-details G_
                                                            'song
@@ -119,7 +123,7 @@
                                                                           sm:w-36))))
                                                       (img (@ (loading "lazy")
                                                               (class
-                                                                "rounded-xl")
+                                                               "rounded-xl")
                                                               (src ,(assoc-ref
                                                                      a
                                                                      "content_url")))))
@@ -127,10 +131,10 @@
                                                              #:entity 'song
                                                              #:entity-identifier
                                                              (assoc-ref song
-                                                                        "identifier")
+                                                              "identifier")
                                                              #:artwork-identifier
                                                              (assoc-ref a
-                                                                        "identifier")
+                                                              "identifier")
                                                              #:content-url (assoc-ref
                                                                             a
                                                                             "content_url")
@@ -163,9 +167,9 @@
                                          ,(G_ "editing song"))
                                 ,(song-form G_
                                             #:identifier (assoc-ref song
-                                                                    "identifier")
+                                                          "identifier")
                                             #:display-name (assoc-ref song
-                                                                      "display_name")
+                                                            "display_name")
                                             #:music-key (assoc-ref-or-empty-str
                                                          song "music_key")
                                             #:music-tuning (assoc-ref-or-empty-str
@@ -211,7 +215,7 @@
                              #:name "display-name"
                              #:value (unescape-str display-name)
                              #:required #t)
-                 
+
                  ,(hyg-input #:label (G_ "music key")
                              #:name "music-key"
                              #:value (unescape-str music-key))

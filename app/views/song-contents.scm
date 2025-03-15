@@ -40,55 +40,56 @@
                           (render-version G_ version)) song-contents))
              (a (@ (href ,(format #f "/songs/uuid/~a/contents/new"
                                   (assoc-ref song "identifier"))))
-                ,(hyg-button #:content (G_ "new version"))))))
+                ,(hyg-icon-button #:icon 'plus
+                                  #:content (G_ "new version"))))))
 
 (define-public (render-version G_ version)
   `((hr)
-    (details 
-     (summary (@ (class ,(->css '(text-xl
-                                  font-bold
-                                  text-stone-700
-                                  cursor-pointer))))
-              ,(cond-render (lambda (version-name)
-                              (format #f "~a ~a ~a" (G_ "version") version-name (assoc-ref version "instrument_type"))
-                              )
-                            (assoc-ref version "version_name")))
-     (div (@(class ,(->css '(my-4))))
+    (details (@ (open true))
+             (summary (@ (class ,(->css '(text-xl font-bold text-stone-700
+                                                  cursor-pointer))))
+                      ,(cond-render (lambda (version-name)
+                                      (format #f "~a ~a ~a"
+                                              (G_ "version") version-name
+                                              (assoc-ref version
+                                                         "instrument_type")))
+                                    (assoc-ref version "version_name")))
+             (div (@ (class ,(->css '(my-4))))
 
-          ,(cond-render (lambda (ascii-legend)
-                          `(details (@ (open "true"))
-                                    (summary (@ (class ,(->css '(text-xl
-                                                                 font-bold
-                                                                 text-stone-700
-                                                                 cursor-pointer))))
-                                             ,(G_ "ascii legend"))
-                                    (pre (@ (class ,(->css '(p-4
-                                                             md:p-6
-                                                             bg-stone-200/75
-                                                             text-black
-                                                             rounded-xl
-                                                             white-space-pre
-                                                             overflow-x-scroll
-                                                             text-sm))))
-                                         ,ascii-legend)))
-                        (assoc-ref version "ascii_legend"))
-          ,(cond-render (lambda (ascii-contents)
-                          `(details (@ (open "true"))
-                                    (summary (@ (class ,(->css '(text-xl
-                                                                 font-bold
-                                                                 text-stone-700
-                                                                 cursor-pointer))))
-                                             ,(G_ "ascii contents"))
-                                    (pre (@ (class ,(->css '(p-4
-                                                             md:p-6
-                                                             bg-stone-200/75
-                                                             text-black
-                                                             rounded-xl
-                                                             white-space-pre
-                                                             overflow-x-scroll
-                                                             text-sm))))
-                                         ,ascii-contents)))
-                        (assoc-ref version "ascii_contents"))))))
+                  ,(cond-render (lambda (ascii-legend)
+                                  `(details (@ (open true))
+                                            (summary (@ (class ,(->css '(text-xl
+                                                                         font-bold
+                                                                         text-stone-700
+                                                                         cursor-pointer))))
+                                                     ,(G_ "ascii legend"))
+                                            (pre (@ (class ,(->css '(p-4
+                                                                     md:p-6
+                                                                     bg-stone-200/75
+                                                                     text-black
+                                                                     rounded-xl
+                                                                     white-space-pre
+                                                                     overflow-x-scroll
+                                                                     text-sm))))
+                                                 ,ascii-legend)))
+                                (assoc-ref version "ascii_legend"))
+                  ,(cond-render (lambda (ascii-contents)
+                                  `(details (@ (open "true"))
+                                            (summary (@ (class ,(->css '(text-xl
+                                                                         font-bold
+                                                                         text-stone-700
+                                                                         cursor-pointer))))
+                                                     ,(G_ "ascii contents"))
+                                            (pre (@ (class ,(->css '(p-4
+                                                                     md:p-6
+                                                                     bg-stone-200/75
+                                                                     text-black
+                                                                     rounded-xl
+                                                                     white-space-pre
+                                                                     overflow-x-scroll
+                                                                     text-sm))))
+                                                 ,ascii-contents)))
+                                (assoc-ref version "ascii_contents"))))))
 
 (begin
   (define* (song-content-edit-page G_ song song-contents artworks)

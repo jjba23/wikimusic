@@ -42,33 +42,34 @@
   #:use-module (artanis route))
 
 (define-public (page-footer G_)
-  `((div (@ (class "block text-center font-sans"))
-         (div (@ (class
-                  "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
-              (p (@ (class "text-sm text-stone-600"))
-                 ,(G_ "find the source code here"))
-              (a (@ (class
-                     "text-blue-900 hover:text-blue-700 font-bold cursor-pointer text-sm")
+  `((div (@ (class ,(->css '(font-sans bg-stone-200))))
+
+         (div (@ (class ,(->css '(flex flex-row justify-between px-3 py-3))))
+              (em (@ (class ,(->css '(text-xs text-stone-600))))
+                  ,(G_ "Copyright 2025 © Josep Bigorra"))
+              (em (@ (class ,(->css '(text-sm text-stone-600))))
+                  ,(G_ "the free music knowledge encyclopaedia")))
+         (div (@ (class ,(->css '(flex flex-row
+                                       flex-wrap
+                                       gap-2
+                                       justify-left
+                                       px-3
+                                       py-3))))
+              (p (@ (class ,(->css '(text-xs text-stone-600))))
+                 ,(G_ "find the source code here") ":")
+              (a (@ (class ,(->css '(text-blue-900 hover:text-blue-700
+                                                   font-bold cursor-pointer
+                                                   text-xs)))
                     (href "https://codeberg.org/jjba23/wikimusic"))
-                 "https://codeberg.org/jjba23/wikimusic"))
-         (p (@ (class "py-3"))
-            (em (@ (class "text-md text-stone-600"))
-                ,(G_ "Copyright 2025 © Josep Bigorra")))
-         (p (@ (class "py-3"))
-            (span (@ (class "text-sm text-stone-600"))
-                  ,(G_ "the free music knowledge encyclopaedia"))))))
+                 "https://codeberg.org/jjba23/wikimusic")))))
 
 (begin
   (define* (html-template G_
                           #:key body
                           (proj '()))
     (define nav-css
-      (->css '(text-sm text-blue-900
-                       hover:text-blue-700
-                       font-sans
-                       font-light
-                       px-2
-                       uppercase)))
+      (->css '(text-sm text-blue-900 hover:text-blue-700 font-sans font-light
+                       px-2)))
     (define nav
       `(div (@ (class ,(->css '(flex flex-row
                                      flex-wrap
@@ -83,9 +84,7 @@
                     (span ,(hyg-icon #:type 'music-note))
                     (span (@ (class ,(->css '(text-md text-stone-700
                                                       hover:text-blue-700
-                                                      font-sans
-                                                      font-bold
-                                                      uppercase))))
+                                                      font-sans font-bold))))
                           ,(G_ "Wikimusic"))))
             (a (@ (class ,nav-css)
                   (href "/songs"))
@@ -110,10 +109,10 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
-                                                        "pub/js/tailwind.config.js")))
+                                              "pub/js/tailwind.config.js")))
                               (body (@ (class "bg-stone-200/50"))
                                     (div (@ (class
-                                              "flex flex-col h-screen justify-between"))
+                                             "flex flex-col h-screen justify-between"))
                                          (div ,nav
                                               (div (@ (class "py-8"))
                                                    ,body))
@@ -220,139 +219,151 @@
                                             (img (@ (loading "lazy")
                                                     (class "rounded-xl")
                                                     (src ,(assoc-ref art
-                                                                     "content_url"))))
+                                                           "content_url"))))
                                             ,(cond-render (lambda (fc)
                                                             `(figcaption ,fc))
                                                           (assoc-ref art
-                                                                     "content_caption"))))
+                                                           "content_caption"))))
                                  artworks))
          (rendered-comments (render-comments G_ user-alist #f comments))
          (like-count (length (filter (lambda (o)
                                        (and (equal? (assoc-ref x "identifier")
                                                     (assoc-ref o
                                                                (format #f
-                                                                       "~a_identifier"
-                                                                       entity)))
+                                                                "~a_identifier"
+                                                                entity)))
                                             (equal? 1
                                                     (assoc-ref o "is_like"))))
                                      opinions)))
          (dislike-count (length (filter (lambda (o)
                                           (and (equal? (assoc-ref x
-                                                                  "identifier")
+                                                        "identifier")
                                                        (assoc-ref o
                                                                   (format #f
-                                                                          "~a_identifier"
-                                                                          entity)))
+                                                                   "~a_identifier"
+                                                                   entity)))
                                                (equal? 1
                                                        (assoc-ref o
-                                                                  "is_dislike"))))
+                                                        "is_dislike"))))
                                         opinions)))
-         (opinion-buttons `((div (@ (class "flex flex-row flex-wrap gap-3"))
+         (opinion-buttons `((div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                          gap-3))))
                                  (form (@ (method POST)
                                           (action ,(format #f
-                                                           "/~as/uuid/~a/like" entity
-                                                           (assoc-ref x "identifier"))))
-                                       ,(hyg-submit-button #:content `(div ,
-                                                                       (G_
-                                                                        "like")
-                                                                       (span
-                                                                        (@
-                                                                         (class
-                                                                           "font-light text-xs"))
-                                                                        ,(format
-                                                                          #f
-                                                                          " ( ~a ) "
-                                                                          like-count)))))
+                                                    "/~as/uuid/~a/like" entity
+                                                    (assoc-ref x "identifier"))))
+                                       ,(hyg-icon-button #:icon 'thumbs-up
+                                                         #:background 'bg-green-700
+                                                         #:hover-background 'hover:bg-green-800
+                                                         #:border-color 'border-stone-700
+                                                         #:type 'submit
+                                                         #:content `(div ,(G_
+                                                                           "like")
+                                                                         (span
+                                                                          (@ (class
+                                                                              "font-light text-xs"))
+                                                                          ,(format
+                                                                            #f
+                                                                            " ( ~a ) "
+                                                                            like-count)))))
                                  (form (@ (method POST)
                                           (action ,(format #f
-                                                           "/~as/uuid/~a/dislike"
-                                                           entity
-                                                           (assoc-ref x "identifier"))))
-                                       ,(hyg-danger-submit-button #:content `(div ,
-                                                                              (G_
-                                                                               "dislike")
+                                                    "/~as/uuid/~a/dislike"
+                                                    entity
+                                                    (assoc-ref x "identifier"))))
+                                       ,(hyg-icon-button #:icon 'thumbs-down
+                                                         #:background 'bg-red-700
+                                                         #:hover-background 'hover:bg-red-800
+                                                         #:border-color 'border-stone-700
+                                                         #:type 'submit
+                                                         #:content `(div ,(G_
+                                                                           "dislike")
 
-                                                                              
-                                                                              (span
-                                                                               (@
-                                                                                (class
-                                                                                  "font-light text-xs"))
-                                                                               ,
-                                                                               (format
-                                                                                #f
-                                                                                " ( ~a ) "
-                                                                                dislike-count))))))))
+                                                                         (span
+                                                                          (@ (class ,
+                                                                              (->css '
+                                                                               (font-light
+                                                                                text-xs))))
+                                                                          ,(format
+                                                                            #f
+                                                                            " ( ~a ) "
+                                                                            dislike-count))))))))
          (maybe-description (cond-render (lambda (description)
-                                           `(div (p (@ (class
-                                                         "text-stone-700 font-bold"))
+                                           `(div (p (@ (class ,(->css '(text-stone-700
+                                                                        font-bold))))
                                                     ,(G_ "description"))
-                                                 (p (@ (class
-                                                         "pl-3 text-stone-800 max-w-prose"))
+                                                 (p (@ (class ,(->css '(pl-3
+                                                                        text-stone-800
+                                                                        max-w-prose))))
                                                     ,description)))
                                          (assoc-ref x "description")))
          (maybe-last-edited-at (cond-render (lambda (last-edited-at)
-                                              `((dt (@ (class
-                                                         "text-stone-700 font-bold"))
+                                              `((dt (@ (class ,(->css '(text-stone-700
+                                                                        font-bold))))
                                                     ,(G_ "last edited"))
                                                 (dd (@ (class
-                                                         "pl-3 text-stone-800"))
+                                                        "pl-3 text-stone-800"))
                                                     ,(strftime "%c"
                                                                (localtime (string->number
                                                                            last-edited-at))))))
                                             (assoc-ref x "last_edited_at")))
          (maybe-approved-by (cond-render (lambda (approved-by)
-                                           `((dt (@ (class
-                                                      "text-stone-700 font-bold"))
+                                           `((dt (@ (class ,(->css '(text-stone-700
+                                                                     font-bold))))
                                                  ,(G_ "approved by"))
-                                             (dd (@ (class
-                                                      "pl-3 text-stone-800"))
+                                             (dd (@ (class ,(->css '(pl-3
+                                                                     text-stone-800))))
                                                  ,approved-by)))
                                          (assoc-ref x "approved_by"))))
     
     `((div (@ (class ,(->css '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
-           (div (div ,opinion-buttons
+           (div (div (@ (class ,(->css '(flex flex-col gap-3 my-4))))
+                     ,opinion-buttons
                      (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity
                                           (assoc-ref x "identifier"))))
-                        ,(hyg-button #:content (G_ "edit"))))
+                        ,(hyg-icon-button #:icon 'pencil
+                                          #:content (G_ "edit"))))
                 ,maybe-description
                 (dl (dt (@ (class ,(->css '(text-stone-700 font-bold))))
                         ,(G_ "views"))
-                    (dd (@ (class "pl-3 text-stone-800"))
+                    (dd (@ (class ,(->css '(pl-3 text-stone-800))))
                         ,(format #f "~a"
                                  (assoc-ref x "views")))
-                    (dt (@ (class "text-stone-700 font-bold"))
+                    (dt (@ (class ,(->css '(text-stone-700 font-bold))))
                         ,(G_ "created"))
-                    (dd (@ (class "pl-3 text-stone-800"))
+                    (dd (@ (class ,(->css '(pl-3 text-stone-800))))
                         ,(strftime "%c"
                                    (localtime (string->number (assoc-ref x
-                                                                         "created_at")))))
+                                                               "created_at")))))
                     ,maybe-last-edited-at
-                    (dt (@ (class "text-stone-700 font-bold"))
+                    (dt (@ (class ,(->css '(text-stone-700 font-bold))))
                         ,(G_ "contributor"))
-                    (dd (@ (class "pl-3 text-stone-800"))
+                    (dd (@ (class ,(->css '(pl-3 text-stone-800))))
                         ,(cond-render (lambda (u)
-                                        `(div (@ (class
-                                                   "flex flex-wrap flex-row gap-2"))
+                                        `(div (@ (class ,(->css '(flex
+                                                                  flex-wrap
+                                                                  flex-row
+                                                                  gap-2))))
                                               (span ,(format #f
-                                                             "~a (~a) &lt;~a&gt;"
-                                                             (assoc-ref u
-                                                                        "display_name")
-                                                             (assoc-ref u "username")
-                                                             (assoc-ref u
-                                                                        "email_address")))))
+                                                      "~a (~a) &lt;~a&gt;"
+                                                      (assoc-ref u
+                                                       "display_name")
+                                                      (assoc-ref u "username")
+                                                      (assoc-ref u
+                                                       "email_address")))))
                                       (car (assoc-ref user-alist
                                                       (assoc-ref x
                                                                  "created_by")))))
-                    (dt (@ (class "text-stone-700 font-bold"))
+                    (dt (@ (class ,(->css '(text-stone-700 font-bold))))
                         ,(G_ "visibility"))
-                    (dd (@ (class "pl-3 text-stone-800"))
+                    (dd (@ (class ,(->css '(pl-3 text-stone-800))))
                         ,(render-visibility-status (assoc-ref x
-                                                              "visibility_status")))
+                                                    "visibility_status")))
                     ,maybe-approved-by
-                    (dt (@ (class "text-stone-700 font-bold"))
+                    (dt (@ (class ,(->css '(text-stone-700 font-bold))))
                         ,(G_ "uuid"))
-                    (dd (@ (class "pl-3 text-sm text-stone-500"))
+                    (dd (@ (class ,(->css '(pl-3 text-sm text-stone-600))))
                         ,(assoc-ref x "identifier")))))
       (details (summary (@ (class "cursor-pointer"))
                         ,(format #f "~a ~a"
@@ -397,9 +408,9 @@
                                        (content-type
                                         application/x-www-form-urlencoded)
                                        (action ,(format #f
-                                                        "/~as/uuid/~a/artworks/~a/delete"
-                                                        entity entity-identifier
-                                                        artwork-identifier)))
+                                                 "/~as/uuid/~a/artworks/~a/delete"
+                                                 entity entity-identifier
+                                                 artwork-identifier)))
                                     ,(hyg-danger-submit-button #:content (G_
                                                                           "delete"))))
                            artwork-identifier)))))
@@ -408,7 +419,7 @@
 (begin
   (define* (sort-select G_
                         #:key entity)
-    `((div (@ (class "flex flex-col gap-2 w-min"))
+    `((div (@ (class ,(->css '(flex flex-col gap-2 w-min))))
            (select (@ (onchange "window.location.href=this.value;")
                       (name "sort-select")
                       (id "sort-select")

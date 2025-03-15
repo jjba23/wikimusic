@@ -125,14 +125,15 @@
      #:i18n '(cookie "lang")
      (lambda (rc)
        (response-emit (:mime rc
-                       (song-new-page (:i18n rc))))))
+                             (song-new-page (:i18n rc))))))
 
 (get "/songs/uuid/:uuid/contents/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
        (response-emit (:mime rc
-                       (song-contents-new-page (:i18n rc) (params rc "uuid"))))))
+                             (song-contents-new-page (:i18n rc)
+                                                     (params rc "uuid"))))))
 
 (get "/songs/uuid/:uuid"
      #:mime 'xml
@@ -168,8 +169,8 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                          #:song_identifier
-                                                          uuid))))
+                                                                #:song_identifier
+                                                                uuid))))
          
          ;; do views update
          (DB-query (DB-open rc)
@@ -180,13 +181,13 @@
 
          ;; return rendered view
          (response-emit (:mime rc
-                         (songs-detail-page (:i18n rc)
-                                            song
-                                            artworks
-                                            song-contents
-                                            opinions
-                                            comments
-                                            user-alist))))))
+                               (songs-detail-page (:i18n rc)
+                                                  song
+                                                  artworks
+                                                  song-contents
+                                                  opinions
+                                                  comments
+                                                  user-alist))))))
 
 (get "/songs/uuid/:uuid/edit"
      #:mime 'xml
@@ -393,7 +394,6 @@
 
 ;; ====== Delete data routes ======
 
-
 (post "/songs/uuid/:uuid/artworks/:artwork-uuid/delete"
       #:auth '(table user "username" "password")
       #:session #t
@@ -403,7 +403,7 @@
                           #:conn (get-conn-from-pool!)
                           #:entity 'song
                           #:delete-condition (where #:identifier (params rc
-                                                                         "artwork-uuid"))
+                                                                  "artwork-uuid"))
                           #:redirect-url (format #f "~a/songs/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))

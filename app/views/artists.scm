@@ -43,20 +43,20 @@
                                    ,(sort-select G_
                                                  #:entity 'artist)
                                    (a (@ (href "/artists/new"))
-                                      ,(hyg-button #:content (G_
-                                                              "new artist")))))
+                                      ,(hyg-button #:content (G_ "new artist")))))
                      (div (div (@ (class ,(->css '(flex flex-row flex-wrap
-                                                        gap-3 items-center))))
+                                                        gap-3 items-center
+                                                        justify-center))))
                                ,(map (lambda (x)
                                        `(div ,(item-tile G_
                                                          'artist
                                                          x
                                                          (relevant-entities 'artist
-                                                                            artworks x)
+                                                          artworks x)
                                                          (relevant-entities 'artist
-                                                                            opinions x)
+                                                          opinions x)
                                                          (relevant-entities 'artist
-                                                                            comments x))))
+                                                          comments x))))
                                      artists)))))))
     (html-template G_
                    #:body body)))

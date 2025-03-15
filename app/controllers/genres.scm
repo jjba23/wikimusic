@@ -334,7 +334,6 @@
 
 ;; ====== Delete data routes ======
 
-
 (post "/genres/uuid/:uuid/artworks/:artwork-uuid/delete"
       #:auth '(table user "username" "password")
       #:session #t
@@ -344,7 +343,7 @@
                           #:conn (get-conn-from-pool!)
                           #:entity 'genre
                           #:delete-condition (where #:identifier (params rc
-                                                                         "artwork-uuid"))
+                                                                  "artwork-uuid"))
                           #:redirect-url (format #f "~a/genres/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))

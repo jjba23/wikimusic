@@ -21,6 +21,8 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
+  #:use-module (hygguile abstraction)
+  #:use-module (hygguile components icon)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
@@ -30,10 +32,13 @@
                  #:body `(div (@ (class "container mx-auto"))
                               (div (@ (class "p-2"))
                                    (h2 (@ (id welcome-page-title)
-                                          (class
-                                           "font-black text-stone-800 text-xl"))
+                                          (class ,(->css '(font-black
+                                                           text-stone-800
+                                                           text-2xl))))
                                        ,(G_ "Welcome to Wikimusic"))
-                                   (em (@ (id welcome-page-subtitle))
+                                   (em (@ (id welcome-page-subtitle)
+                                          (class ,(->css '(text-lg
+                                                           text-stone-600))))
                                        ,(G_
                                          "the free music knowledge encyclopaedia"))
                                    (div (@ (class

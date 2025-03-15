@@ -34,10 +34,10 @@
       (for-each (lambda (f)
                   (let* ((file-contents (get-string-all (open-input-file f)))
                          (min-contents (cond
-                                        ((string-suffix? ".css" f)
-                                         (string-replace-substring
-                                          file-contents "\n" ""))
-                                        (else file-contents))))
+                                         ((string-suffix? ".css" f)
+                                          (string-replace-substring
+                                           file-contents "\n" ""))
+                                         (else file-contents))))
                     (set! lib
                           (assoc-set! lib f min-contents)))) assets) lib))
   (export build-asset-library))
