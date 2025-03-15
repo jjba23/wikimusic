@@ -42,7 +42,7 @@
   #:use-module (artanis route))
 
 (define-public (page-footer G_)
-  `((div (@ (class ,(->css '(font-sans bg-stone-200))))
+  `((div (@ (class ,(->css '(mt-3 font-sans bg-stone-200))))
 
          (div (@ (class ,(->css '(flex flex-row justify-between px-3 py-3))))
               (em (@ (class ,(->css '(text-xs text-stone-600))))
@@ -57,9 +57,9 @@
                                        py-3))))
               (p (@ (class ,(->css '(text-xs text-stone-600))))
                  ,(G_ "find the source code here") ":")
-              (a (@ (class ,(->css '(text-blue-900 hover:text-blue-700
-                                                   font-bold cursor-pointer
-                                                   text-xs)))
+              (a (@ (class ,(->css '(text-stone-600 hover:text-blue-600
+                                                    font-bold cursor-pointer
+                                                    text-xs)))
                     (href "https://codeberg.org/jjba23/wikimusic"))
                  "https://codeberg.org/jjba23/wikimusic")))))
 
@@ -111,8 +111,9 @@
                                     (script ,(assoc-ref asset-library
                                               "pub/js/tailwind.config.js")))
                               (body (@ (class "bg-stone-200/50"))
-                                    (div (@ (class
-                                             "flex flex-col h-screen justify-between"))
+                                    (div (@ (class ,(->css '(flex flex-col
+                                                             h-screen
+                                                             justify-between))))
                                          (div ,nav
                                               (div (@ (class "py-8"))
                                                    ,body))
@@ -137,9 +138,10 @@
                                               (assoc-ref o "is_dislike")))
                                     opinions))))
       `((div (@ (class ,(->css '(bg-stone-200 rounded-2xl))))
-             (div (@ (class "flex flex-col py-3 px-2"))
+             (div (@ (class ,(->css '(flex flex-col py-3 px-2))))
                   ,(cond-render (lambda (art)
-                                  `(figure (@ (class "py-3 sm:w-48"))
+                                  `(figure (@ (class ,(->css '(py-3 sm:w-48
+                                                               self-center))))
                                            (a (@ (href ,item-link))
                                               (img (@ (loading "lazy")
                                                       (class "rounded-xl")
@@ -155,14 +157,16 @@
                                                        max-w-prose break-all)))
                         (href ,item-link))
                      (span ,(assoc-ref x "display_name")))
-                  (div (@ (class "flex flex-row gap-2"))
+                  (div (@ (class ,(->css '(flex flex-row gap-2))))
                        (span ,(G_ "views"))
                        (span ,(format #f "~a"
                                       (assoc-ref x "views"))))
-                  (div (@ (class "flex flex-row gap-2"))
-                       (span (@ (class "font-black text-green-800 text-xs"))
+                  (div (@ (class ,(->css '(flex flex-row gap-2))))
+                       (span (@ (class ,(->css '(font-black text-green-800
+                                                            text-xs))))
                              ,(format #f "~a" likes))
-                       (span (@ (class "font-black text-red-800 text-xs"))
+                       (span (@ (class ,(->css '(font-black text-red-800
+                                                            text-xs))))
                              ,(format #f "~a" dislikes)))
                   (div (@ (class "flex flex-row gap-2"))
                        (span (@ (class "text-xs"))
