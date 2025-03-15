@@ -297,9 +297,6 @@
                      (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity
                                           (assoc-ref x "identifier"))))
                         ,(action-button #:content (G_ "edit")))
-                     ,(cond-render (lambda(is-song)
-                                     `(a (@(href ,(format #f "/~a/uuid/~a/new-version" entity (assoc-ref x "identifier"))))
-                                         ,(action-button #:content (G_ "new version")))) (eq? entity 'song))
                      )
                 ,maybe-description
                 (dl (dt (@ (class "text-stone-700 font-bold"))

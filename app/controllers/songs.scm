@@ -31,6 +31,7 @@
         (app models song_comments)
         (app models song_opinions)
         (uuid generate)
+        (app views song-contents)
         (wikimusic query-escape)
         (app models users)
         (app views songs))
@@ -124,7 +125,14 @@
      #:i18n '(cookie "lang")
      (lambda (rc)
        (response-emit (:mime rc
-                             (song-new-page (:i18n rc))))))
+                       (song-new-page (:i18n rc))))))
+
+(get "/songs/uuid/:uuid/contents/new"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     (lambda (rc)
+       (response-emit (:mime rc
+                       (song-contents-new-page (:i18n rc) (params rc "uuid"))))))
 
 (get "/songs/uuid/:uuid"
      #:mime 'xml
@@ -160,8 +168,8 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                                #:song_identifier
-                                                                uuid))))
+                                                          #:song_identifier
+                                                          uuid))))
          
          ;; do views update
          (DB-query (DB-open rc)
@@ -172,13 +180,13 @@
 
          ;; return rendered view
          (response-emit (:mime rc
-                               (songs-detail-page (:i18n rc)
-                                                  song
-                                                  artworks
-                                                  song-contents
-                                                  opinions
-                                                  comments
-                                                  user-alist))))))
+                         (songs-detail-page (:i18n rc)
+                                            song
+                                            artworks
+                                            song-contents
+                                            opinions
+                                            comments
+                                            user-alist))))))
 
 (get "/songs/uuid/:uuid/edit"
      #:mime 'xml

@@ -27,6 +27,7 @@
   #:use-module (hygguile components button)
   #:use-module (ice-9 i18n)
   #:use-module (wikimusic query-escape)
+  #:use-module (app views song-contents)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
@@ -104,67 +105,6 @@
                                                            user-alist)))))
                           (div ,(render-song-contents G_ song song-contents)))))
 
-(define-public (render-song-contents G_ song song-contents)
-  `(div (@ (class "flex flex-col gap-6"))
-        ,(map (lambda(version) (render-version G_ version)) song-contents)))
-
-(define-public (render-version G_ version)
-  `((hr)
-    (details (@ (open "true"))
-             (summary (@ (class ,(->css '(p-6 cursor-pointer))))
-                      ,(cond-render (lambda (version-name)
-                                      `(div (@ (class ,(->css '(flex flex-row
-                                                                     flex-wrap
-                                                                     gap-4))))
-                                            (span (@ (class ,(->css '(text-xl
-                                                                      font-bold
-                                                                      text-stone-700))))
-                                                  ,(G_ "version"))
-                                            (span (@ (class ,(->css '(text-xl
-                                                                      font-bold
-                                                                      text-stone-700))))
-                                                  ,version-name)
-                                            ,(cond-render (lambda (instrument-type)
-                                                            `(span (@ (class ,
-                                                                        (->css '
-                                                                         (text-xl
-                                                                          font-bold
-                                                                          text-stone-700))))
-                                                                   ,instrument-type))
-                                                          (assoc-ref version
-                                                                     "instrument_type"))))
-                                    (assoc-ref version "version_name")))
-             (div (@ (class "p-4"))
-
-                  ,(cond-render (lambda (ascii-legend)
-                                  `(div (span (@ (class ,(->css '(text-xl
-                                                                  font-bold
-                                                                  text-stone-700))))
-                                              ,(G_ "ascii legend"))
-                                        (pre (@ (class ,(->css '(p-6 m-4
-                                                                     bg-stone-200/75
-                                                                     text-black
-                                                                     rounded-xl
-                                                                     white-space-pre
-                                                                     overflow-x-scroll
-                                                                     text-sm))))
-                                             ,ascii-legend)))
-                                (assoc-ref version "ascii_legend"))
-                  ,(cond-render (lambda (ascii-contents)
-                                  `(div (span (@ (class ,(->css '(text-xl
-                                                                  font-bold
-                                                                  text-stone-700))))
-                                              ,(G_ "ascii contents"))
-                                        (pre (@ (class ,(->css '(p-6 m-4
-                                                                     bg-stone-200/75
-                                                                     text-black
-                                                                     rounded-xl
-                                                                     white-space-pre
-                                                                     overflow-x-scroll
-                                                                     text-sm))))
-                                             ,ascii-contents)))
-                                (assoc-ref version "ascii_contents"))))))
-
 (begin
   (define* (song-edit-page G_ song song-contents artworks)
     (let* ((html `(div (@ (class "container mx-auto"))
@@ -179,7 +119,7 @@
                                                                           sm:w-36))))
                                                       (img (@ (loading "lazy")
                                                               (class
-                                                               "rounded-xl")
+                                                                "rounded-xl")
                                                               (src ,(assoc-ref
                                                                      a
                                                                      "content_url")))))
@@ -187,10 +127,10 @@
                                                              #:entity 'song
                                                              #:entity-identifier
                                                              (assoc-ref song
-                                                              "identifier")
+                                                                        "identifier")
                                                              #:artwork-identifier
                                                              (assoc-ref a
-                                                              "identifier")
+                                                                        "identifier")
                                                              #:content-url (assoc-ref
                                                                             a
                                                                             "content_url")
@@ -223,9 +163,9 @@
                                          ,(G_ "editing song"))
                                 ,(song-form G_
                                             #:identifier (assoc-ref song
-                                                          "identifier")
+                                                                    "identifier")
                                             #:display-name (assoc-ref song
-                                                            "display_name")
+                                                                      "display_name")
                                             #:music-key (assoc-ref-or-empty-str
                                                          song "music_key")
                                             #:music-tuning (assoc-ref-or-empty-str
