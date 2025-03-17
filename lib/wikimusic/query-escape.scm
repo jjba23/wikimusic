@@ -36,11 +36,13 @@
   result)
 
 (define-public (unescape-str str)
-  (define result
-    str)
-  (for-each (lambda (p)
-              (set! result
-                    (string-replace-substring result
-                                              (car (cdr p))
-                                              (car p)))) escape-alist) result)
+  (define result str)
+  (if (not str) result
+      (begin
+        (for-each (lambda (p)
+                    (set! result
+                          (string-replace-substring result
+                                                    (car (cdr p))
+                                                    (car p)))) escape-alist)
+        result)))
 

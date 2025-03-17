@@ -54,11 +54,15 @@
                                               (assoc-ref version
                                                          "instrument_type")))
                                     (assoc-ref version "version_name")))
-             
+
              (div (@ (class ,(->css '(my-4))))
-                  (div (@(class ,(->css '(py-3))))
-                       (a (@(href ,(format #f "/songs/uuid/~a/contents/~a/edit" (assoc-ref song "identifier") (assoc-ref version "identifier"))))
-                          ,(hyg-icon-button #:icon 'pencil #:content (G_ "edit version"))))
+                  (div (@ (class ,(->css '(py-3))))
+                       (a (@ (href ,(format #f
+                                            "/songs/uuid/~a/contents/~a/edit"
+                                            (assoc-ref song "identifier")
+                                            (assoc-ref version "identifier"))))
+                          ,(hyg-icon-button #:icon 'pencil
+                                            #:content (G_ "edit version"))))
                   ,(cond-render (lambda (ascii-legend)
                                   `(details (@ (open true))
                                             (summary (@ (class ,(->css '(text-xl
@@ -95,30 +99,38 @@
                                 (assoc-ref version "ascii_contents"))))))
 
 (begin
-  (define* (song-content-edit-page G_ song song-contents artworks)
+  (define* (song-content-edit-page G_ song song-contents)
     (let* ((body `(div (@ (class "container mx-auto"))
 
-                       (map (lambda (c)
-                              `((div (hr (@ (class "my-6")))
-                                     ,(song-content-form G_
-                                                         #:song-identifier (assoc-ref
-                                                                            song
+                       ((div (hr (@ (class "my-6")))
+                             ,(song-content-form G_
+                                                 #:song-identifier (assoc-ref
+                                                                    song
+                                                                    "identifier")
+                                                 #:song-content-identifier (assoc-ref
+                                                                            song-contents
                                                                             "identifier")
-                                                         #:song-content-identifier
-                                                         (assoc-ref c
-                                                          "identifier")
-                                                         #:ascii-legend (assoc-ref
-                                                                         c
-                                                                         "ascii_legend")
-                                                         #:ascii-contents (assoc-ref
-                                                                           c
-                                                                           "ascii_contents")
-                                                         #:guitarpro-contents (assoc-ref
-                                                                               c
-                                                                               "guitarpro_contents")
-                                                         #:pdf-contents (assoc-ref
-                                                                         c
-                                                                         "pdf_contents")))))))))
+                                                 #:instrument-type (unescape-str
+                                                                    (assoc-ref
+                                                                     song-contents
+                                                                     "instrument_type"))
+                                                 #:version-name (unescape-str (assoc-ref
+                                                                               song-contents
+                                                                               "version_name"))
+                                                 #:ascii-legend (unescape-str (assoc-ref
+                                                                               song-contents
+                                                                               "ascii_legend"))
+                                                 #:ascii-contents (unescape-str
+                                                                   (assoc-ref
+                                                                    song-contents
+                                                                    "ascii_contents"))
+                                                 #:guitarpro-contents (unescape-str
+                                                                       (assoc-ref
+                                                                        song-contents
+                                                                        "guitarpro_contents"))
+                                                 #:pdf-contents (unescape-str (assoc-ref
+                                                                               song-contents
+                                                                               "pdf_contents"))))))))
       (html-template G_
                      #:body body)))
   (export song-content-edit-page))
