@@ -37,13 +37,13 @@
                                                   py-6))))
                    ,(G_ "musical contents"))
              (div ,(map (lambda (version)
-                          (render-version G_ version)) song-contents))
+                          (render-version G_ song version)) song-contents))
              (a (@ (href ,(format #f "/songs/uuid/~a/contents/new"
                                   (assoc-ref song "identifier"))))
                 ,(hyg-icon-button #:icon 'plus
                                   #:content (G_ "new version"))))))
 
-(define-public (render-version G_ version)
+(define-public (render-version G_ song version)
   `((hr)
     (details (@ (open true))
              (summary (@ (class ,(->css '(text-xl font-bold text-stone-700
@@ -54,8 +54,11 @@
                                               (assoc-ref version
                                                          "instrument_type")))
                                     (assoc-ref version "version_name")))
+             
              (div (@ (class ,(->css '(my-4))))
-
+                  (div (@(class ,(->css '(py-3))))
+                       (a (@(href ,(format #f "/songs/uuid/~a/contents/~a/edit" (assoc-ref song "identifier") (assoc-ref version "identifier"))))
+                          ,(hyg-icon-button #:icon 'pencil #:content (G_ "edit version"))))
                   ,(cond-render (lambda (ascii-legend)
                                   `(details (@ (open true))
                                             (summary (@ (class ,(->css '(text-xl
