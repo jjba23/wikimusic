@@ -109,10 +109,10 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
-                                                        "pub/js/tailwind.config.js")))
-                              (body (@(class ,(->css '(bg-stone-200/50 flex
-                                                                       flex-col h-screen
-                                                                       justify-between))))
+                                              "pub/js/tailwind.config.js")))
+                              (body (@ (class ,(->css '(bg-stone-200/50 flex
+                                                        flex-col h-screen
+                                                        justify-between))))
                                     (div ((div ,nav
                                                (div (@ (class "pt-8"))
                                                     ,body))))
@@ -167,11 +167,11 @@
                        (span (@ (class ,(->css '(font-black text-red-800
                                                             text-xs))))
                              ,(format #f "~a" dislikes)))
-                  (div (@ (class "flex flex-row gap-2"))
-                       (span (@ (class "text-xs"))
+                  (div (@ (class ,(->css '(flex flex-row gap-2))))
+                       (span (@ (class ,(->css '(text-xs text-stone-700))))
                              ,(format #f "~a"
                                       (length comments)))
-                       (span (@ (class "text-xs"))
+                       (span (@ (class ,(->css '(text-xs text-stone-700))))
                              ,(G_ "comments")))
                   ,extra-info)))))
   (export item-tile))

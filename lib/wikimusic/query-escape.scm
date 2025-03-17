@@ -36,7 +36,8 @@
   result)
 
 (define-public (unescape-str str)
-  (define result str)
+  (define result
+    str)
   (if (not str) result
       (begin
         (for-each (lambda (p)

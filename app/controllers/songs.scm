@@ -60,10 +60,23 @@
                             (:cookies-value rc "wikimusic-song-sort"))
                            (else "display-name-asc")))
               (query-sort (entity-sort-from-query user-sort))
-              (user-limit (get-from-qstr rc "limit"))
-              (user-offset (get-from-qstr rc "offset"))
-              (songs ($songs 'get
-                             #:order-by query-sort))
+              (query-offset (cond
+                              ((not (nil? (get-from-qstr rc "offset")))
+                               (string->number (get-from-qstr rc "offset")))
+                              (else 0)))
+              (query-limit (cond
+                             ((not (nil? (get-from-qstr rc "limit")))
+                              (string->number (get-from-qstr rc "limit")))
+                             (else 18)))
+              (songs (DB-get-all-rows (DB-query (get-conn-from-pool!)
+                                                (->sql select * from
+                                                       'songs
+                                                       (format #f
+                                                        " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
+                                                        (car query-sort)
+                                                        (cadr query-sort)
+                                                        query-limit
+                                                        query-offset)))))
               (song-ids (map (lambda (s)
                                (assoc-ref s "identifier")) songs))
               (artworks (cond
@@ -114,11 +127,14 @@
                                              songs)))
          (response-emit (:mime rc
                                (songs-list-page (:i18n rc)
-                                                songs
-                                                artworks
+                                                #:songs songs
+                                                #:artworks artworks
+                                                #:song-version-count-alist
                                                 song-version-count-alist
-                                                opinions
-                                                comments))))))
+                                                #:opinions opinions
+                                                #:comments comments
+                                                #:limit query-limit
+                                                #:offset query-offset))))))
 
 (get "/songs/new"
      #:mime 'xml
@@ -205,12 +221,12 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                          #:song_identifier
-                                                          uuid))))
+                                                                #:song_identifier
+                                                                uuid))))
          
          (response-emit (:mime rc
-                         (song-edit-page (:i18n rc) song song-contents
-                                         artworks))))))
+                               (song-edit-page (:i18n rc) song song-contents
+                                               artworks))))))
 
 (get "/songs/uuid/:uuid/contents/:version-uuid/edit"
      #:mime 'xml
@@ -228,8 +244,8 @@
                                                                version-uuid)))))
          
          (response-emit (:mime rc
-                         (song-content-edit-page (:i18n rc) song song-contents
-                                                 ))))))
+                               (song-content-edit-page (:i18n rc) song
+                                                       song-contents))))))
 
 (define (do-edit rc)
   (let* ((body (rc-body rc))
@@ -338,18 +354,21 @@
                     #:song_identifier (params rc "uuid")
                     #:created_by user-identifier
                     #:visibility_status 0
-                    #:instrument_type (escape-str (uri-decode (car (assoc-ref kv
-                                                                              "instrument-type"))))
+                    #:instrument_type (escape-str (uri-decode (car (assoc-ref
+                                                                    kv
+                                                                    "instrument-type"))))
                     #:version_name (escape-str (uri-decode (car (assoc-ref kv
-                                                                           "version-name"))))
+                                                                 "version-name"))))
                     #:ascii_legend (escape-str (uri-decode (car (assoc-ref kv
-                                                                           "ascii-legend"))))
-                    #:ascii_contents (escape-str (uri-decode (car (assoc-ref kv
-                                                                             "ascii-contents"))))
+                                                                 "ascii-legend"))))
+                    #:ascii_contents (escape-str (uri-decode (car (assoc-ref
+                                                                   kv
+                                                                   "ascii-contents"))))
                     #:pdf_contents (escape-str (uri-decode (car (assoc-ref kv
-                                                                           "pdf-contents"))))
-                    #:guitarpro_contents (escape-str (uri-decode (car (assoc-ref kv
-                                                                                 "guitarpro-contents"))))
+                                                                 "pdf-contents"))))
+                    #:guitarpro_contents (escape-str (uri-decode (car (assoc-ref
+                                                                       kv
+                                                                       "guitarpro-contents"))))
                     #:created_at (current-time))
 
     (redirect-to rc
@@ -377,12 +396,12 @@
                     #:created_by user-identifier
                     #:visibility_status 0
                     #:content_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                          "content-url"))))
+                                                                "content-url"))))
                     #:content_caption (escape-str (uri-decode (car (assoc-ref
                                                                     kv
                                                                     "content-caption"))))
                     #:order_value (escape-str (uri-decode (car (assoc-ref kv
-                                                                          "order-value"))))
+                                                                "order-value"))))
                     #:created_at (current-time))
 
     (redirect-to rc
@@ -494,7 +513,7 @@
                           #:conn (get-conn-from-pool!)
                           #:entity 'song
                           #:delete-condition (where #:identifier (params rc
-                                                                         "artwork-uuid"))
+                                                                  "artwork-uuid"))
                           #:redirect-url (format #f "~a/songs/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))
@@ -506,6 +525,7 @@
       (lambda (rc)
         (define (do-delete)
           (DB-query (get-conn-from-pool!)
-                    (->sql delete from 'song_contents
+                    (->sql delete from
+                           'song_contents
                            (where #:identifier (params rc "version-uuid")))))
         (protected-endpoint rc do-delete)))

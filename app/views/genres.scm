@@ -30,36 +30,64 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define-public (genres-list-page G_ genres artworks opinions comments)
-  (let ((body `(div (@ (class ,(->css '(container mx-auto))))
-                    ((h2 (@ (class ,(->css '(font-black text-stone-800
-                                                        text-2xl py-4))))
-                         ,(G_ "viewing genres"))
-                     (details (summary (@ (class ,(->css '(cursor-pointer))))
-                                       ,(G_ "options"))
-                              (div (@ (class ,(->css '(flex flex-row flex-wrap
-                                                            gap-3 items-center
-                                                            my-4))))
-                                   ,(sort-select G_
-                                                 #:entity 'genre)
-                                   (a (@ (href "/genres/new"))
-                                      ,(hyg-button #:content (G_ "new genre")))))
-                     (div (div (@ (class ,(->css '(flex flex-row flex-wrap
-                                                        gap-3 items-center
-                                                        justify-center))))
-                               ,(map (lambda (x)
-                                       `(div ,(item-tile G_
-                                                         'genre
-                                                         x
-                                                         (relevant-entities 'genre
-                                                          artworks x)
-                                                         (relevant-entities 'genre
-                                                          opinions x)
-                                                         (relevant-entities 'genre
-                                                          comments x))))
-                                     genres)))))))
-    (html-template G_
-                   #:body body)))
+(begin
+  (define* (genres-list-page G_
+                             #:key genres
+                             artworks
+                             opinions
+                             comments
+                             limit
+                             offset)
+    (let* ((page-buttons `((div (@ (class "flex flex-row flex-wrap gap-3 my-4"))
+                                ,(if (> offset 0)
+                                     `((a (@ (href ,(format #f
+                                                     "/genres?offset=~a&limit=~a"
+                                                     (- offset limit) limit)))
+                                          ,(hyg-icon-button #:icon 'arrow-left
+                                                            #:content (G_
+                                                                       "previous"))))
+                                     '())
+                                ,(if (= (length genres) limit)
+                                     `((a (@ (href ,(format #f
+                                                     "/genres?offset=~a&limit=~a"
+                                                     (+ offset limit) limit)))
+                                          ,(hyg-icon-button #:icon 'arrow-right
+                                                            #:content (G_
+                                                                       "next"))))
+                                     '()))))
+           (body `(div (@ (class ,(->css '(container mx-auto))))
+                       ((h2 (@ (class ,(->css '(font-black text-stone-800
+                                                           text-2xl py-4))))
+                            ,(G_ "viewing genres"))
+                        (details (summary (@ (class ,(->css '(cursor-pointer))))
+                                          ,(G_ "options"))
+                                 (div (@ (class ,(->css '(flex flex-row
+                                                               flex-wrap gap-3
+                                                               items-center
+                                                               my-4))))
+                                      ,(sort-select G_
+                                                    #:entity 'genre)
+                                      (a (@ (href "/genres/new"))
+                                         ,(hyg-button #:content (G_
+                                                                 "new genre")))))
+                        (div (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                           gap-3 items-center
+                                                           justify-center))))
+                                  ,(map (lambda (x)
+                                          `(div ,(item-tile G_
+                                                            'genre
+                                                            x
+                                                            (relevant-entities 'genre
+                                                             artworks x)
+                                                            (relevant-entities 'genre
+                                                             opinions x)
+                                                            (relevant-entities 'genre
+                                                             comments x))))
+                                        genres))
+                             ,page-buttons)))))
+      (html-template G_
+                     #:body body)))
+  (export genres-list-page))
 
 (define-public (genres-detail-page G_
                                    genre

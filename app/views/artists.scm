@@ -30,36 +30,64 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define-public (artists-list-page G_ artists artworks opinions comments)
-  (let ((body `(div (@ (class ,(->css '(container mx-auto))))
-                    ((h2 (@ (class ,(->css '(font-black text-stone-800
-                                                        text-2xl py-4))))
-                         ,(G_ "viewing artists"))
-                     (details (summary (@ (class ,(->css '(cursor-pointer))))
-                                       ,(G_ "options"))
-                              (div (@ (class ,(->css '(flex flex-row flex-wrap
-                                                            gap-3 items-center
-                                                            my-4))))
-                                   ,(sort-select G_
-                                                 #:entity 'artist)
-                                   (a (@ (href "/artists/new"))
-                                      ,(hyg-button #:content (G_ "new artist")))))
-                     (div (div (@ (class ,(->css '(flex flex-row flex-wrap
-                                                        gap-3 items-center
-                                                        justify-center))))
-                               ,(map (lambda (x)
-                                       `(div ,(item-tile G_
-                                                         'artist
-                                                         x
-                                                         (relevant-entities 'artist
-                                                          artworks x)
-                                                         (relevant-entities 'artist
-                                                          opinions x)
-                                                         (relevant-entities 'artist
-                                                          comments x))))
-                                     artists)))))))
-    (html-template G_
-                   #:body body)))
+(begin
+  (define* (artists-list-page G_
+                              #:key artists
+                              artworks
+                              opinions
+                              comments
+                              limit
+                              offset)
+    (let* ((page-buttons `((div (@ (class "flex flex-row flex-wrap gap-3 my-4"))
+                                ,(if (> offset 0)
+                                     `((a (@ (href ,(format #f
+                                                     "/artists?offset=~a&limit=~a"
+                                                     (- offset limit) limit)))
+                                          ,(hyg-icon-button #:icon 'arrow-left
+                                                            #:content (G_
+                                                                       "previous"))))
+                                     '())
+                                ,(if (= (length artists) limit)
+                                     `((a (@ (href ,(format #f
+                                                     "/artists?offset=~a&limit=~a"
+                                                     (+ offset limit) limit)))
+                                          ,(hyg-icon-button #:icon 'arrow-right
+                                                            #:content (G_
+                                                                       "next"))))
+                                     '()))))
+           (body `(div (@ (class ,(->css '(container mx-auto))))
+                       ((h2 (@ (class ,(->css '(font-black text-stone-800
+                                                           text-2xl py-4))))
+                            ,(G_ "viewing artists"))
+                        (details (summary (@ (class ,(->css '(cursor-pointer))))
+                                          ,(G_ "options"))
+                                 (div (@ (class ,(->css '(flex flex-row
+                                                               flex-wrap gap-3
+                                                               items-center
+                                                               my-4))))
+                                      ,(sort-select G_
+                                                    #:entity 'artist)
+                                      (a (@ (href "/artists/new"))
+                                         ,(hyg-button #:content (G_
+                                                                 "new artist")))))
+                        (div (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                           gap-3 items-center
+                                                           justify-center))))
+                                  ,(map (lambda (x)
+                                          `(div ,(item-tile G_
+                                                            'artist
+                                                            x
+                                                            (relevant-entities 'artist
+                                                             artworks x)
+                                                            (relevant-entities 'artist
+                                                             opinions x)
+                                                            (relevant-entities 'artist
+                                                             comments x))))
+                                        artists))
+                             ,page-buttons)))))
+      (html-template G_
+                     #:body body)))
+  (export artists-list-page))
 
 (define-public (artists-detail-page G_
                                     artist

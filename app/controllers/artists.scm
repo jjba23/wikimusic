@@ -59,10 +59,24 @@
                             (:cookies-value rc "wikimusic-artist-sort"))
                            (else "display-name-asc")))
               (query-sort (entity-sort-from-query user-sort))
-              (user-limit (get-from-qstr rc "limit"))
-              (user-offset (get-from-qstr rc "offset"))
-              (artists ($artists 'get
-                                 #:order-by query-sort))
+              (_ (write query-sort))
+              (query-offset (cond
+                              ((not (nil? (get-from-qstr rc "offset")))
+                               (string->number (get-from-qstr rc "offset")))
+                              (else 0)))
+              (query-limit (cond
+                             ((not (nil? (get-from-qstr rc "limit")))
+                              (string->number (get-from-qstr rc "limit")))
+                             (else 18)))
+              (artists (DB-get-all-rows (DB-query (get-conn-from-pool!)
+                                                  (->sql select * from
+                                                         'artists
+                                                         (format #f
+                                                          " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
+                                                          (car query-sort)
+                                                          (cadr query-sort)
+                                                          query-limit
+                                                          query-offset)))))
               (artist-ids (map (lambda (s)
                                  (assoc-ref s "identifier")) artists))
               (artworks (cond
@@ -91,8 +105,13 @@
                                                                #:artist_identifier
                                                                artist-ids))))))
          (response-emit (:mime rc
-                               (artists-list-page (:i18n rc) artists artworks
-                                                  opinions comments))))))
+                               (artists-list-page (:i18n rc)
+                                                  #:artists artists
+                                                  #:artworks artworks
+                                                  #:opinions opinions
+                                                  #:comments comments
+                                                  #:limit query-limit
+                                                  #:offset query-offset))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
