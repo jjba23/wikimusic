@@ -259,6 +259,40 @@
                             (lambda ()
                               (do-edit rc)))))
 
+(define (do-contents-edit rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body)))
+    (DB-query (get-conn-from-pool!)
+              (->sql update
+                     'song_contents set
+                     `((instrument_type ,(escape-str (uri-decode (car (assoc-ref
+                                                                       kv
+                                                                       "instrument-type")))))
+                       (version_name ,(escape-str (uri-decode (car (assoc-ref
+                                                                    kv
+                                                                    "version-name")))))
+                       (ascii_legend ,(escape-str (uri-decode (car (assoc-ref
+                                                                    kv
+                                                                    "ascii-legend")))))
+                       (ascii_contents ,(escape-str (uri-decode (car (assoc-ref
+                                                                      kv
+                                                                      "ascii-contents")))))
+                       (last_edited_at ,(current-time)))
+                     (where #:identifier (params rc "version-uuid"))))
+    (redirect-to rc
+                 (string->uri (format #f "~a/songs/uuid/~a"
+                                      (current-myhost)
+                                      (params rc "uuid")))
+                 #:status 302)))
+
+(post "/songs/uuid/:uuid/contents/:version-uuid/edit"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-contents-edit rc)))))
+
 (define (do-edit-artwork rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))
