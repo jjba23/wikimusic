@@ -32,7 +32,8 @@
   (html-template G_
                  #:body `(div (@ (class ,(->css '(container mx-auto))))
                               ((h2 (@ (class ,(->css '(font-black
-                                                       text-stone-800 text-2xl))))
+                                                       text-stone-800 text-2xl
+                                                       px-1))))
                                    ,(G_ "login to wikimusic"))
                                (div (form (@ (action "/login")
                                              (class ,(->css '(w-full

@@ -78,43 +78,39 @@
                        gap-1
                        px-2)))
     (define nav
-      `(div (@ (class ,(->css '(flex flex-row
-                                     flex-wrap
-                                     gap-3
-                                     p-3
-                                     items-center
-                                     justify-left
-                                     w-full
-                                     hover:text-blue-700
-                                     bg-stone-200))))
-            (a (@ (href "/"))
-               (div (@ (class ,(->css '(flex flex-row
-                                             gap-2
-                                             items-center
-                                             px-4
-                                             py-1
-                                             ))))
-                    (span ,(hyg-icon #:type 'music-note))
-                    (span (@ (class ,(->css '(text-md text-stone-700
-                                                      hover:text-blue-700
-                                                      font-sans font-bold))))
-                          ,(G_ "Wikimusic"))))
-            (a (@ (class ,nav-css)
-                  (href "/songs"))
-               ,(hyg-icon #:type 'music-notes-simple)
-               ,(G_ "Songs"))
-            (a (@ (class ,nav-css)
-                  (href "/genres"))
-               ,(hyg-icon #:type 'disc)
-               ,(G_ "Genres"))
-            (a (@ (class ,nav-css)
-                  (href "/artists"))
-               ,(hyg-icon #:type 'guitar)
-               ,(G_ "Artists"))
-            (a (@ (class ,nav-css)
-                  (href "/login"))
-               ,(hyg-icon #:type 'sign-in)
-               ,(G_ "Login"))))
+      `((div (@ (class ,(->css '(flex flex-row
+                                      flex-wrap
+                                      gap-3
+                                      p-3
+                                      items-center
+                                      justify-left
+                                      w-full
+                                      hover:text-blue-700
+                                      bg-stone-200))))
+             (a (@ (href "/"))
+                (div (@ (class ,(->css '(flex flex-row gap-2 items-center px-4
+                                              py-1))))
+                     (span ,(hyg-icon #:type 'music-note))
+                     (span (@ (class ,(->css '(text-md text-stone-700
+                                                       hover:text-blue-700
+                                                       font-sans font-bold))))
+                           ,(G_ "Wikimusic"))))
+             (a (@ (class ,nav-css)
+                   (href "/songs"))
+                ,(hyg-icon #:type 'music-notes-simple)
+                ,(G_ "Songs"))
+             (a (@ (class ,nav-css)
+                   (href "/genres"))
+                ,(hyg-icon #:type 'disc)
+                ,(G_ "Genres"))
+             (a (@ (class ,nav-css)
+                   (href "/artists"))
+                ,(hyg-icon #:type 'guitar)
+                ,(G_ "Artists"))
+             (a (@ (class ,nav-css)
+                   (href "/login"))
+                ,(hyg-icon #:type 'sign-in)
+                ,(G_ "Login")))))
     `("<!DOCTYPE html>" (html (head (title "Wikimusic")
                                     (style ,(assoc-ref asset-library
                                                        "pub/css/fonts.css"))
@@ -126,13 +122,13 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
-                                                        "pub/js/tailwind.config.js")))
+                                              "pub/js/tailwind.config.js")))
                               (body (@ (class ,(->css '(bg-stone-200/50 flex
-                                                                        flex-col h-screen
-                                                                        justify-between))))
-                                    (div ((div ,nav
-                                               (div (@ (class "pt-8"))
-                                                    ,body))))
+                                                        flex-col h-screen
+                                                        justify-between))))
+                                    (div ,nav
+                                         (div (@ (class "pt-8"))
+                                              ,body))
                                     (footer ,(page-footer G_))))))
   (export html-template))
 
