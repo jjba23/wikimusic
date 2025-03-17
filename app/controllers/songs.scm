@@ -275,6 +275,44 @@
 ;; ====== Data create POST routes ======
 ;; 
 
+(define (do-new-content rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body))
+         (new-uuid (generate-string-uuid))
+         (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
+    ($song_contents 'set
+                    #:identifier new-uuid
+                    #:song_identifier (params rc "uuid")
+                    #:created_by user-identifier
+                    #:visibility_status 0
+                    #:instrument_type (escape-str (uri-decode (car (assoc-ref kv
+                                                                              "instrument-type"))))
+                    #:version_name (escape-str (uri-decode (car (assoc-ref kv
+                                                                           "version-name"))))
+                    #:ascii_legend (escape-str (uri-decode (car (assoc-ref kv
+                                                                           "ascii-legend"))))
+                    #:ascii_contents (escape-str (uri-decode (car (assoc-ref kv
+                                                                             "ascii-contents"))))
+                    #:pdf_contents (escape-str (uri-decode (car (assoc-ref kv
+                                                                           "pdf-contents"))))
+                    #:guitarpro_contents (escape-str (uri-decode (car (assoc-ref kv
+                                                                                 "guitarpro-contents"))))
+                    #:created_at (current-time))
+
+    (redirect-to rc
+                 (string->uri (format #f "~a/songs/uuid/~a"
+                                      (current-myhost)
+                                      (params rc "uuid")))
+                 #:status 302)))
+
+(post "/songs/uuid/:uuid/contents/new"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-new-content rc)))))
+
 (define (do-new-artwork rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body))
@@ -286,12 +324,12 @@
                     #:created_by user-identifier
                     #:visibility_status 0
                     #:content_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                "content-url"))))
+                                                                          "content-url"))))
                     #:content_caption (escape-str (uri-decode (car (assoc-ref
                                                                     kv
                                                                     "content-caption"))))
                     #:order_value (escape-str (uri-decode (car (assoc-ref kv
-                                                                "order-value"))))
+                                                                          "order-value"))))
                     #:created_at (current-time))
 
     (redirect-to rc

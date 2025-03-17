@@ -133,6 +133,8 @@
   (define* (song-content-form G_
                               #:key song-identifier
                               song-content-identifier
+                              (instrument-type "")
+                              (version-name "")
                               (ascii-legend "")
                               (ascii-contents "")
                               (guitarpro-contents "")
@@ -144,14 +146,30 @@
                             (format #f "/songs/uuid/~a/contents/new"
                                     song-identifier)))
                (content-type application/x-www-form-urlencoded))
-            (div ,(mk-textarea #:label (G_ "ascii legend")
-                               #:name "ascii-legend"
-                               #:value (unescape-str ascii-legend)
-                               #:required #f)
-                 ,(mk-textarea #:label (G_ "ascii contents")
-                               #:name "ascii-contents"
-                               #:value (unescape-str ascii-contents)
-                               #:required #f)))
+            (div ,(hyg-input #:label (G_ "instrument type")
+                             #:name 'instrument-type
+                             #:value (unescape-str instrument-type)
+                             #:required #t)
+                 ,(hyg-input #:label (G_ "version name")
+                             #:name 'version-name
+                             #:value (unescape-str version-name)
+                             #:required #t)
+                 ,(hyg-textarea #:label (G_ "ascii legend")
+                                #:name 'ascii-legend
+                                #:value (unescape-str ascii-legend)
+                                #:required #f)
+                 ,(hyg-textarea #:label (G_ "ascii contents")
+                                #:name 'ascii-contents
+                                #:value (unescape-str ascii-contents)
+                                #:required #f)
+                 (input (@ (type file)
+                           (hidden true)
+                           (name pdf-contents)
+                           (value "")) "")
+                 (input (@ (type file)
+                           (hidden true)
+                           (name guitarpro-contents)
+                           (value "")) "")))
       (div ,(hyg-submit-button #:content (if song-content-identifier
                                              (G_ "edit")
                                              (G_ "create"))))))

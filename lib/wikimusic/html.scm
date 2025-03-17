@@ -109,15 +109,14 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
-                                              "pub/js/tailwind.config.js")))
-                              (body (@ (class "bg-stone-200/50"))
-                                    (div (@ (class ,(->css '(flex flex-col
-                                                             h-screen
-                                                             justify-between))))
-                                         (div ,nav
-                                              (div (@ (class "py-8"))
-                                                   ,body))
-                                         (footer ,(page-footer G_)))))))
+                                                        "pub/js/tailwind.config.js")))
+                              (body (@(class ,(->css '(bg-stone-200/50 flex
+                                                                       flex-col h-screen
+                                                                       justify-between))))
+                                    (div ((div ,nav
+                                               (div (@ (class "pt-8"))
+                                                    ,body))))
+                                    (footer ,(page-footer G_))))))
   (export html-template))
 
 (begin
