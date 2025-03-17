@@ -57,12 +57,26 @@
 
              (div (@ (class ,(->css '(my-4))))
                   (div (@ (class ,(->css '(py-3))))
-                       (a (@ (href ,(format #f
-                                            "/songs/uuid/~a/contents/~a/edit"
-                                            (assoc-ref song "identifier")
-                                            (assoc-ref version "identifier"))))
-                          ,(hyg-icon-button #:icon 'pencil
-                                            #:content (G_ "edit version"))))
+                       (details
+                        (summary (@(class ,(->css '(cursor-pointer)))) ,(G_ "manage version"))
+                        (div (@(class ,(->css '(flex flex-wrap flex-row gap-2))))
+                             (a (@ (href ,(format #f
+                                                  "/songs/uuid/~a/contents/~a/edit"
+                                                  (assoc-ref song "identifier")
+                                                  (assoc-ref version "identifier"))))
+                                ,(hyg-icon-button #:icon 'pencil
+                                                  #:content (G_ "edit version")))
+                             (form (@ (method POST)
+                                      (action ,(format #f
+                                                       "/songs/uuid/~a/contents/~a/delete"
+                                                       (assoc-ref song "identifier")
+                                                       (assoc-ref version "identifier"))))
+                                   ,(hyg-icon-button #:icon 'trash
+                                                     #:background 'bg-red-700
+                                                     #:hover-background 'hover:bg-red-800
+                                                     #:border-color 'border-stone-700
+                                                     #:type 'submit
+                                                     #:content (G_ "delete version"))))))
                   ,(cond-render (lambda (ascii-legend)
                                   `(details (@ (open true))
                                             (summary (@ (class ,(->css '(text-xl

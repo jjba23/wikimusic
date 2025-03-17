@@ -494,8 +494,18 @@
                           #:conn (get-conn-from-pool!)
                           #:entity 'song
                           #:delete-condition (where #:identifier (params rc
-                                                                  "artwork-uuid"))
+                                                                         "artwork-uuid"))
                           #:redirect-url (format #f "~a/songs/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))
+        (protected-endpoint rc do-delete)))
+
+(post "/songs/uuid/:uuid/contents/:version-uuid/delete"
+      #:auth '(table user "username" "password")
+      #:session #t
+      (lambda (rc)
+        (define (do-delete)
+          (DB-query (get-conn-from-pool!)
+                    (->sql delete from 'song_contents
+                           (where #:identifier (params rc "version-uuid")))))
         (protected-endpoint rc do-delete)))
