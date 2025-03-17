@@ -27,6 +27,7 @@
   #:use-module (hygguile abstraction)
   #:use-module (hygguile components button)
   #:use-module (hygguile components input)
+  #:use-module (hygguile components icon)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
@@ -41,25 +42,27 @@
     (let* ((page-buttons `((div (@ (class "flex flex-row flex-wrap gap-3 my-4"))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                     "/artists?offset=~a&limit=~a"
-                                                     (- offset limit) limit)))
+                                                            "/artists?offset=~a&limit=~a"
+                                                            (- offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-left
                                                             #:content (G_
                                                                        "previous"))))
                                      '())
                                 ,(if (= (length artists) limit)
                                      `((a (@ (href ,(format #f
-                                                     "/artists?offset=~a&limit=~a"
-                                                     (+ offset limit) limit)))
+                                                            "/artists?offset=~a&limit=~a"
+                                                            (+ offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-right
                                                             #:content (G_
                                                                        "next"))))
                                      '()))))
            (body `(div (@ (class ,(->css '(container mx-auto))))
                        ((h2 (@ (class ,(->css '(font-black text-stone-800
-                                                           text-2xl py-4))))
+                                                           text-2xl py-4 px-1
+                                                           flex flex-row items-center gap-1))))
+                            ,(hyg-icon #:type 'guitar)
                             ,(G_ "viewing artists"))
-                        (details (summary (@ (class ,(->css '(cursor-pointer))))
+                        (details (summary (@ (class ,(->css '(cursor-pointer px-1))))
                                           ,(G_ "options"))
                                  (div (@ (class ,(->css '(flex flex-row
                                                                flex-wrap gap-3
@@ -78,11 +81,11 @@
                                                             'artist
                                                             x
                                                             (relevant-entities 'artist
-                                                             artworks x)
+                                                                               artworks x)
                                                             (relevant-entities 'artist
-                                                             opinions x)
+                                                                               opinions x)
                                                             (relevant-entities 'artist
-                                                             comments x))))
+                                                                               comments x))))
                                         artists))
                              ,page-buttons)))))
       (html-template G_
