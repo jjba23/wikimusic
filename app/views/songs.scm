@@ -127,13 +127,15 @@
                                   song-contents
                                   opinions
                                   comments
-                                  user-alist)
+                                  user-alist
+                                  ascii-size)
   (html-template G_
                  #:body `((div (@ (class ,(->css '(container mx-auto))))
                                ((h2 (@ (class ,(->css '(font-black
                                                         text-stone-800
                                                         text-3xl))))
                                     ,(assoc-ref song "display_name"))
+
                                 (div (div ,(entity-details G_
                                                            'song
                                                            song
@@ -141,7 +143,8 @@
                                                            opinions
                                                            comments
                                                            user-alist)))))
-                          (div ,(render-song-contents G_ song song-contents)))))
+
+                          (div ,(render-song-contents G_ song song-contents ascii-size)))))
 
 (begin
   (define* (song-edit-page G_ song song-contents artworks)
