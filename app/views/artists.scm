@@ -125,7 +125,7 @@
                                                (img (@ (loading "lazy")
                                                        (class "rounded-xl")
                                                        (src ,(assoc-ref a
-                                                              "content_url")))))
+                                                                        "content_url")))))
                                        ,(artwork-form G_
                                                       #:entity 'artist
                                                       #:entity-identifier (assoc-ref
@@ -145,6 +145,12 @@
                                                                      "order_value"))))
                                artworks))
            (body `(div (@ (class ,(->css '(container mx-auto))))
+                       ,(if  (assoc-ref artist "identifier")
+                             `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold text-stone-800))))
+                                  ,(format #f "~a: ~a"
+                                           (G_ "editing artist") (assoc-ref artist "display_name")))
+                             `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold text-stone-800))))
+                                  (G_ "new artist")))
                        (details (@ (open true))
                                 (summary (@ (class ,(->css '(font-black
                                                              text-stone-800
@@ -173,9 +179,9 @@
                                          ,(G_ "editing artist"))
                                 ,(artist-form G_
                                               #:identifier (assoc-ref artist
-                                                            "identifier")
+                                                                      "identifier")
                                               #:display-name (assoc-ref artist
-                                                              "display_name")
+                                                                        "display_name")
                                               #:description (assoc-ref-or-empty-str
                                                              artist
                                                              "description"))))))
