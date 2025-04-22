@@ -67,8 +67,8 @@
               (query-limit (cond
                             ((not (nil? (get-from-qstr rc "limit")))
                              (string->number (get-from-qstr rc "limit")))
-                            (else 18)))
-              (songs (DB-get-all-rows (DB-query (get-conn-from-pool!)
+                            (else 20)))
+              (songs (DB-get-all-rows (DB-query (DB-open rc) 
                                                 (->sql select * from
                                                        'songs
                                                        (format #f
@@ -270,7 +270,7 @@
 (define (do-edit rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))
-    (DB-query (get-conn-from-pool!)
+    (DB-query (DB-open rc) 
               (->sql update
                      'songs set
                      `((display_name ,(escape-str (uri-decode (car (assoc-ref
@@ -298,7 +298,7 @@
 (define (do-contents-edit rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))
-    (DB-query (get-conn-from-pool!)
+    (DB-query (DB-open rc) 
               (->sql update
                      'song_contents set
                      `((instrument_type ,(escape-str (uri-decode (car (assoc-ref
@@ -332,7 +332,7 @@
 (define (do-edit-artwork rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))
-    (DB-query (get-conn-from-pool!)
+    (DB-query (DB-open rc) 
               (->sql update
                      'song_artworks set
                      `((content_url ,(escape-str (uri-decode (car (assoc-ref
@@ -530,10 +530,10 @@
       (lambda (rc)
         (define (do-delete)
           (delete-artwork #:rc rc
-                          #:conn (get-conn-from-pool!)
+                          #:conn (DB-open rc) 
                           #:entity 'song
                           #:delete-condition (where #:identifier (params rc
-                                                                  "artwork-uuid"))
+                                                                         "artwork-uuid"))
                           #:redirect-url (format #f "~a/songs/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))
@@ -544,7 +544,7 @@
       #:session #t
       (lambda (rc)
         (define (do-delete)
-          (DB-query (get-conn-from-pool!)
+          (DB-query (DB-open rc) 
                     (->sql delete from
                            'song_contents
                            (where #:identifier (params rc "version-uuid")))))
