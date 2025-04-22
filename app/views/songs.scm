@@ -70,16 +70,16 @@
                                                          gap-3 my-4))))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                     "/songs?offset=~a&limit=~a"
-                                                     (- offset limit) limit)))
+                                                            "/songs?offset=~a&limit=~a"
+                                                            (- offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-left
                                                             #:content (G_
                                                                        "previous"))))
                                      '())
                                 ,(if (= (length songs) limit)
                                      `((a (@ (href ,(format #f
-                                                     "/songs?offset=~a&limit=~a"
-                                                     (+ offset limit) limit)))
+                                                            "/songs?offset=~a&limit=~a"
+                                                            (+ offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-right
                                                             #:content (G_
                                                                        "next"))))
@@ -106,16 +106,14 @@
                                                     #:entity 'song)
                                       (a (@ (href "/songs/new"))
                                          ,(hyg-button #:content (G_ "new song")))))
-                        (div (div (@ (class ,(->css '(flex flex-row flex-wrap
-                                                           gap-3 items-center
-                                                           justify-center))))
+                        (div (div (@ (class ,(->css '(grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           (render-song-tile G_
-                                           artworks
-                                           song-version-count-alist
-                                           opinions
-                                           comments
-                                           x)) songs))
+                                                            artworks
+                                                            song-version-count-alist
+                                                            opinions
+                                                            comments
+                                                            x)) songs))
                              ,page-buttons)))))
       (html-template G_
                      #:body body)))

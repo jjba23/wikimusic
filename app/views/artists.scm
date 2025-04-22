@@ -42,16 +42,16 @@
     (let* ((page-buttons `((div (@ (class "flex flex-row flex-wrap gap-3 my-4"))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                     "/artists?offset=~a&limit=~a"
-                                                     (- offset limit) limit)))
+                                                            "/artists?offset=~a&limit=~a"
+                                                            (- offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-left
                                                             #:content (G_
                                                                        "previous"))))
                                      '())
                                 ,(if (= (length artists) limit)
                                      `((a (@ (href ,(format #f
-                                                     "/artists?offset=~a&limit=~a"
-                                                     (+ offset limit) limit)))
+                                                            "/artists?offset=~a&limit=~a"
+                                                            (+ offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-right
                                                             #:content (G_
                                                                        "next"))))
@@ -79,19 +79,17 @@
                                       (a (@ (href "/artists/new"))
                                          ,(hyg-button #:content (G_
                                                                  "new artist")))))
-                        (div (div (@ (class ,(->css '(flex flex-row flex-wrap
-                                                           gap-3 items-center
-                                                           justify-center))))
+                        (div (div (@ (class ,(->css '(grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           `(div ,(item-tile G_
                                                             'artist
                                                             x
                                                             (relevant-entities 'artist
-                                                             artworks x)
+                                                                               artworks x)
                                                             (relevant-entities 'artist
-                                                             opinions x)
+                                                                               opinions x)
                                                             (relevant-entities 'artist
-                                                             comments x))))
+                                                                               comments x))))
                                         artists))
                              ,page-buttons)))))
       (html-template G_
