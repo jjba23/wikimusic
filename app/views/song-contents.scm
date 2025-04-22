@@ -175,36 +175,77 @@
                               (ascii-contents "")
                               (guitarpro-contents "")
                               (pdf-contents ""))
-    `((form (@ (method POST)
-               (action ,(if (and song-identifier song-content-identifier)
-                            (format #f "/songs/uuid/~a/contents/~a/edit"
-                                    song-identifier song-content-identifier)
-                            (format #f "/songs/uuid/~a/contents/new"
+    `(,(if (and song-identifier song-content-identifier)
+           `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold text-stone-800))))
+                ,(format #f "~a: ~a ~a"
+                         (G_ "editing version") version-name instrument-type))
+           `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold text-stone-800))))
+                (G_ "new version")))
+      (form (@ (method POST)
+               (action ,(if (and
+                             song-identifier
+                             song-content-identifier)
+                            (format #f
+                                    "/songs/uuid/~a/contents/~a/edit"
+                                    song-identifier
+                                    song-content-identifier)
+                            (format #f
+                                    "/songs/uuid/~a/contents/new"
                                     song-identifier)))
-               (content-type application/x-www-form-urlencoded))
-            (div ,(hyg-input #:label (G_ "instrument type")
+               (content-type
+                application/x-www-form-urlencoded))
+            (div ,(hyg-input #:label (G_
+                                      "instrument type")
                              #:name 'instrument-type
-                             #:value (unescape-str instrument-type)
+                             #:value (unescape-str
+                                      instrument-type)
                              #:required #t)
-                 ,(hyg-input #:label (G_ "version name")
+                 ,(hyg-input #:label (G_
+                                      "version name")
                              #:name 'version-name
-                             #:value (unescape-str version-name)
+                             #:value (unescape-str
+                                      version-name)
                              #:required #t)
-                 ,(hyg-textarea #:label (G_ "ascii legend")
+                 ,(hyg-textarea #:label (G_
+                                         "ascii legend")
                                 #:name 'ascii-legend
-                                #:value (unescape-str ascii-legend)
-                                #:required #f)
-                 ,(hyg-textarea #:label (G_ "ascii contents")
+                                #:value (unescape-str
+                                         ascii-legend)
+                                #:required #f
+                                #:textarea-css '
+                                (p-3
+                                 max-w-prose
+                                 rounded-xl
+                                 border-stone-200
+                                 border-2
+                                 min-h-80
+                                 text-sm
+                                 min-w-full
+                                 font-mono))
+                 ,(hyg-textarea #:label (G_
+                                         "ascii contents")
                                 #:name 'ascii-contents
-                                #:value (unescape-str ascii-contents)
-                                #:required #f)
+                                #:value (unescape-str
+                                         ascii-contents)
+                                #:required #f
+                                #:textarea-css '
+                                (p-3
+                                 max-w-prose
+                                 rounded-xl
+                                 border-stone-200
+                                 border-2
+                                 min-h-96
+                                 text-sm
+                                 min-w-full
+                                 font-mono))
                  (input (@ (type file)
                            (hidden true)
                            (name pdf-contents)
                            (value "")) "")
                  (input (@ (type file)
                            (hidden true)
-                           (name guitarpro-contents)
+                           (name
+                            guitarpro-contents)
                            (value "")) "")))
       (div ,(hyg-submit-button #:content (if song-content-identifier
                                              (G_ "edit")
