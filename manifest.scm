@@ -97,13 +97,13 @@
      (license license:lgpl3+))))
 
 (define-public guile-kracht
-  (let ((commit "e8b893aec72b4e768b2ef7fbcad926f4cac0bebb")
+  (let ((commit "3dfdd58742383b800e74be6a69d6a80e1222581c")
         (base32-sha-signature
          "0p3z2mqy885pxq4bip6jmspikvc3ghbqhzr86z6h3m1a2x9h3p6h")
         (revision "0"))
     (package
      (name "guile-kracht")
-     (version (git-version "0.0.1" revision commit))
+     (version (git-version "0.0.2" revision commit))
      (source
       (origin
        (method git-fetch)

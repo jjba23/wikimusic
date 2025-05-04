@@ -17,7 +17,7 @@
 
 (define-module (app views song-contents)
   #:use-module (wikimusic html)
-  #:use-module (wikimusic abstraction)
+  #:use-module (wikimusic domain)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)

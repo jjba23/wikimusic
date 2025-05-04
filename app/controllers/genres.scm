@@ -22,7 +22,7 @@
         (wikimusic url)
         (wikimusic auth)
         (wikimusic controller)
-        (wikimusic abstraction)
+        (wikimusic domain)
         (ice-9 string-fun)
         (app models genres)
         (app models genre_artworks)

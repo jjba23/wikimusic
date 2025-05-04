@@ -20,7 +20,7 @@
 (import (app views songs))
 (import (wikimusic html)
         (wikimusic url)
-        (wikimusic abstraction)
+        (wikimusic domain)
         (wikimusic controller)
         (web uri)
         (ice-9 string-fun)

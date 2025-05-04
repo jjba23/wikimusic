@@ -23,7 +23,7 @@
         (wikimusic url)
         (ice-9 string-fun)
         (wikimusic auth)
-        (wikimusic abstraction)
+        (wikimusic domain)
         (app models artists)
         (app models artist_artworks)
         (app models artist_opinions)

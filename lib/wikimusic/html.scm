@@ -29,7 +29,7 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
-  #:use-module (wikimusic prelude)
+  #:use-module (kracht prelude)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
@@ -40,6 +40,10 @@
   #:use-module (srfi srfi-19)
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route))
+
+(define-public asset-library
+  (build-asset-library '("pub/css/fonts.css" "pub/css/phosphor.css"
+                         "pub/js/tailwind.js" "pub/js/tailwind.config.js")))
 
 (define-public (page-footer G_)
   `((div (@ (class ,(->css '(mt-3 font-sans bg-stone-200))))

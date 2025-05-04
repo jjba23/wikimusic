@@ -17,7 +17,7 @@
 
 (define-module (app views genres)
   #:use-module (wikimusic html)
-  #:use-module (wikimusic abstraction)
+  #:use-module (wikimusic domain)
   #:use-module (wikimusic query-escape)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
