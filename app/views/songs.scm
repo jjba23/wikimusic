@@ -26,6 +26,7 @@
   #:use-module (hygguile components input)
   #:use-module (hygguile components button)
   #:use-module (hygguile components icon)
+  #:use-module (kracht prelude)
   #:use-module (ice-9 i18n)
   #:use-module (wikimusic query-escape)
   #:use-module (app views song-contents)
@@ -105,7 +106,7 @@
                                       ,(sort-select G_
                                                     #:entity 'song)
                                       (a (@ (href "/songs/new"))
-                                         ,(hyg-button #:content (G_ "new song")))))
+                                         ,(hyg-button (G_ "new song")))))
                         (div (div (@ (class ,(->css '(grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           (render-song-tile G_
@@ -276,8 +277,8 @@
                  ,(hyg-textarea #:label (G_ "description")
                                 #:name "description"
                                 #:value (unescape-str description))))
-      (div ,(hyg-submit-button #:content (if identifier
-                                             (G_ "edit")
-                                             (G_ "create"))))))
+      (div ,(hyg-submit-button  (if identifier
+                                    (G_ "edit")
+                                    (G_ "create"))))))
   (export song-form))
 

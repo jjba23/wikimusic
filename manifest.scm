@@ -66,35 +66,31 @@
      (license license:gpl3+))))
 
 (define-public guile-hygguile
-  (let ((commit "a5e617a6e37d54ad83c480045f9791a0e0f1f334")
-        (base32-sha-signature
-         "14pha7pn5p22gchkf4f2krgwkszizl9vyblwxwn8g5k97mmw8faq")
-        (revision "0"))
-    (package
-     (name "guile-hygguile")
-     (version (git-version "0.0.0" revision commit))
-     (source
-      (origin
+  (package
+    (name "guile-hygguile")
+    (version "0.0.10")
+    (source
+     (origin
        (method git-fetch)
        (uri (git-reference
              (url "https://codeberg.org/jjba23/hygguile.git")
-             (commit commit)))
+             (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 base32-sha-signature))))
-     (build-system guile-build-system)
-     (native-inputs (list guile-3.0))
-     (arguments
-      (list
-       #:source-directory "src"))
-     (home-page "https://codeberg.org/jjba23/hygguile")
-     (synopsis
-      "SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects")
-     (description
-      "Cozy and professional user-interfaces for everyone.
+        (base32 "1vbf97i8fyvz154zv8yw5yddw38w9qg4v6rfsk6cszjwwl464b19"))))
+    (build-system guile-build-system)
+    (native-inputs (list guile-3.0))
+    (arguments
+     (list
+      #:source-directory "src"))
+    (home-page "https://codeberg.org/jjba23/hygguile")
+    (synopsis
+     "SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects")
+    (description
+     "Cozy and professional user-interfaces for everyone.
         SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects.
         hygge + guile = hygguile")
-     (license license:lgpl3+))))
+    (license license:lgpl3+)))
 
 (define-public guile-kracht
   (let ((commit "3dfdd58742383b800e74be6a69d6a80e1222581c")
@@ -102,28 +98,28 @@
          "1zhzncrn8n5c08yr7q9kfcx91ck9c7r6z214mgina29l1kln4mzm")
         (revision "0"))
     (package
-     (name "guile-kracht")
-     (version (git-version "0.0.2" revision commit))
-     (source
-      (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://codeberg.org/jjba23/kracht.git")
-             (commit commit)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 base32-sha-signature))))
-     (build-system guile-build-system)
-     (native-inputs (list guile-3.0))
-     (arguments
-      (list
-       #:source-directory "src"))
-     (home-page "https://codeberg.org/jjba23/kracht")
-     (synopsis
-      "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
-     (description
-      "Good prelude for Guile Scheme, an opt-in enhancement to the standard library. kracht means power/strength in the Dutch language, and is also a recursive acronym which stands for: KRACHT Reliable And Consistent Helper Tools")
-     (license license:lgpl3+))))
+      (name "guile-kracht")
+      (version (git-version "0.0.2" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://codeberg.org/jjba23/kracht.git")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 base32-sha-signature))))
+      (build-system guile-build-system)
+      (native-inputs (list guile-3.0))
+      (arguments
+       (list
+        #:source-directory "src"))
+      (home-page "https://codeberg.org/jjba23/kracht")
+      (synopsis
+       "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
+      (description
+       "Good prelude for Guile Scheme, an opt-in enhancement to the standard library. kracht means power/strength in the Dutch language, and is also a recursive acronym which stands for: KRACHT Reliable And Consistent Helper Tools")
+      (license license:lgpl3+))))
 
 (packages->manifest (list (specification->package "make")
                           (specification->package "gettext")

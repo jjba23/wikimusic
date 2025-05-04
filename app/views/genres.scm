@@ -23,6 +23,7 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
+  #:use-module (kracht prelude)
   #:use-module (ice-9 i18n)
   #:use-module (hygguile abstraction)
   #:use-module (hygguile components button)
@@ -78,8 +79,8 @@
                                       ,(sort-select G_
                                                     #:entity 'genre)
                                       (a (@ (href "/genres/new"))
-                                         ,(hyg-button #:content (G_
-                                                                 "new genre")))))
+                                         ,(hyg-button (G_
+                                                       "new genre")))))
                         (div (div (@ (class ,(->css '(grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           `(div ,(item-tile G_
@@ -207,8 +208,8 @@
                  ,(hyg-textarea #:label (G_ "description")
                                 #:name "description"
                                 #:value (unescape-str description))))
-      (div ,(hyg-submit-button #:content (if identifier
-                                             (G_ "edit")
-                                             (G_ "create"))))))
+      (div ,(hyg-submit-button (if identifier
+                                   (G_ "edit")
+                                   (G_ "create"))))))
   (export genre-form))
 

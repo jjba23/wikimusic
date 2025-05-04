@@ -24,6 +24,7 @@
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
+  #:use-module (kracht prelude)
   #:use-module (hygguile abstraction)
   #:use-module (hygguile components button)
   #:use-module (hygguile components input)
@@ -77,8 +78,8 @@
                                       ,(sort-select G_
                                                     #:entity 'artist)
                                       (a (@ (href "/artists/new"))
-                                         ,(hyg-button #:content (G_
-                                                                 "new artist")))))
+                                         ,(hyg-button (G_
+                                                       "new artist")))))
                         (div (div (@ (class ,(->css '(grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           `(div ,(item-tile G_
@@ -211,8 +212,8 @@
                  ,(hyg-textarea #:label (G_ "description")
                                 #:name "description"
                                 #:value (unescape-str description))))
-      (div ,(hyg-submit-button #:content (if identifier
-                                             (G_ "edit")
-                                             (G_ "create"))))))
+      (div ,(hyg-submit-button (if identifier
+                                   (G_ "edit")
+                                   (G_ "create"))))))
   (export artist-form))
 

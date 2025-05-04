@@ -419,20 +419,20 @@
                                     #:type 'number
                                     #:name "order-value"
                                     #:value order-value)
-                        (div ,(hyg-submit-button #:content (if
-                                                            artwork-identifier
-                                                            (G_ "edit")
-                                                            (G_ "create"))))))
+                        (div ,(hyg-submit-button (if
+                                                  artwork-identifier
+                                                  (G_ "edit")
+                                                  (G_ "create"))))))
              ,(cond-render (lambda (artwork-id)
                              `(form (@ (method POST)
                                        (content-type
                                         application/x-www-form-urlencoded)
                                        (action ,(format #f
-                                                 "/~as/uuid/~a/artworks/~a/delete"
-                                                 entity entity-identifier
-                                                 artwork-identifier)))
-                                    ,(hyg-danger-submit-button #:content (G_
-                                                                          "delete"))))
+                                                        "/~as/uuid/~a/artworks/~a/delete"
+                                                        entity entity-identifier
+                                                        artwork-identifier)))
+                                    ,(hyg-danger-submit-button (G_
+                                                                "delete"))))
                            artwork-identifier)))))
   (export artwork-form))
 
