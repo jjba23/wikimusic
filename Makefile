@@ -122,7 +122,7 @@ fmt:
 init-db:
 	$(call wikimusic-log-info,"initializing a new database")
 	-rm -v $(WIKIMUSIC_DB) $(WIKIMUSIC_DB)-shm $(WIKIMUSIC_DB)-wal
-	sqlite3 wikimusic.db 'PRAGMA journal_mode=WAL;'
+	guix shell -m manifest.scm -- sqlite3 wikimusic.db 'PRAGMA journal_mode=WAL;'
 
 # Compile translation files to .mo files
 compile-i18n:
