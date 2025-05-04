@@ -43,16 +43,16 @@
     (let* ((page-buttons `((div (@ (class "flex flex-row flex-wrap gap-3 my-4"))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                            "/artists?offset=~a&limit=~a"
-                                                            (- offset limit) limit)))
+                                                     "/artists?offset=~a&limit=~a"
+                                                     (- offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-left
                                                             #:content (G_
                                                                        "previous"))))
                                      '())
                                 ,(if (= (length artists) limit)
                                      `((a (@ (href ,(format #f
-                                                            "/artists?offset=~a&limit=~a"
-                                                            (+ offset limit) limit)))
+                                                     "/artists?offset=~a&limit=~a"
+                                                     (+ offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-right
                                                             #:content (G_
                                                                        "next"))))
@@ -78,19 +78,21 @@
                                       ,(sort-select G_
                                                     #:entity 'artist)
                                       (a (@ (href "/artists/new"))
-                                         ,(hyg-button (G_
-                                                       "new artist")))))
-                        (div (div (@ (class ,(->css '(grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5))))
+                                         ,(hyg-button (G_ "new artist")))))
+                        (div (div (@ (class ,(->css '(grid gap-4
+                                                           sm:grid-cols-3
+                                                           md:grid-cols-4
+                                                           lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           `(div ,(item-tile G_
                                                             'artist
                                                             x
                                                             (relevant-entities 'artist
-                                                                               artworks x)
+                                                             artworks x)
                                                             (relevant-entities 'artist
-                                                                               opinions x)
+                                                             opinions x)
                                                             (relevant-entities 'artist
-                                                                               comments x))))
+                                                             comments x))))
                                         artists))
                              ,page-buttons)))))
       (html-template G_
@@ -124,7 +126,7 @@
                                                (img (@ (loading "lazy")
                                                        (class "rounded-xl")
                                                        (src ,(assoc-ref a
-                                                                        "content_url")))))
+                                                              "content_url")))))
                                        ,(artwork-form G_
                                                       #:entity 'artist
                                                       #:entity-identifier (assoc-ref
@@ -144,12 +146,15 @@
                                                                      "order_value"))))
                                artworks))
            (body `(div (@ (class ,(->css '(container mx-auto))))
-                       ,(if  (assoc-ref artist "identifier")
-                             `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold text-stone-800))))
-                                  ,(format #f "~a: ~a"
-                                           (G_ "editing artist") (assoc-ref artist "display_name")))
-                             `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold text-stone-800))))
-                                  (G_ "new artist")))
+                       ,(if (assoc-ref artist "identifier")
+                            `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold
+                                                              text-stone-800))))
+                                 ,(format #f "~a: ~a"
+                                          (G_ "editing artist")
+                                          (assoc-ref artist "display_name")))
+                            `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold
+                                                              text-stone-800))))
+                                 (G_ "new artist")))
                        (details (@ (open true))
                                 (summary (@ (class ,(->css '(font-black
                                                              text-stone-800
@@ -178,9 +183,9 @@
                                          ,(G_ "editing artist"))
                                 ,(artist-form G_
                                               #:identifier (assoc-ref artist
-                                                                      "identifier")
+                                                            "identifier")
                                               #:display-name (assoc-ref artist
-                                                                        "display_name")
+                                                              "display_name")
                                               #:description (assoc-ref-or-empty-str
                                                              artist
                                                              "description"))))))

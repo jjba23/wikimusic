@@ -419,20 +419,18 @@
                                     #:type 'number
                                     #:name "order-value"
                                     #:value order-value)
-                        (div ,(hyg-submit-button (if
-                                                  artwork-identifier
-                                                  (G_ "edit")
-                                                  (G_ "create"))))))
+                        (div ,(hyg-submit-button (if artwork-identifier
+                                                     (G_ "edit")
+                                                     (G_ "create"))))))
              ,(cond-render (lambda (artwork-id)
                              `(form (@ (method POST)
                                        (content-type
                                         application/x-www-form-urlencoded)
                                        (action ,(format #f
-                                                        "/~as/uuid/~a/artworks/~a/delete"
-                                                        entity entity-identifier
-                                                        artwork-identifier)))
-                                    ,(hyg-danger-submit-button (G_
-                                                                "delete"))))
+                                                 "/~as/uuid/~a/artworks/~a/delete"
+                                                 entity entity-identifier
+                                                 artwork-identifier)))
+                                    ,(hyg-danger-submit-button (G_ "delete"))))
                            artwork-identifier)))))
   (export artwork-form))
 
@@ -474,7 +472,8 @@
   (export sort-select))
 
 (begin
-  (define* (ascii-size-select G_ #:key route)
+  (define* (ascii-size-select G_
+                              #:key route)
     `((div (@ (class ,(->css '(flex flex-col gap-2 w-min))))
            (select (@ (onchange "window.location.href=this.value;")
                       (name "ascii-size-select")
@@ -486,8 +485,7 @@
                                                         route
                                                         (car s))))
                                      ,(cdr s))))
-                         `(("text-xs" . "text-xs")
-                           ("text-sm" . "text-sm")
+                         `(("text-xs" . "text-xs") ("text-sm" . "text-sm")
                            ("text-md" . "text-md")
                            ("text-lg" . "text-lg")
                            ("text-xl" . "text-xl")))))))

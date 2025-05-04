@@ -35,7 +35,6 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route))
 
-
 (define-public (relevant-entities entity related-entities x)
   "Filters a list of related entities based on a matching identifier.
 
@@ -51,16 +50,16 @@
   For 'genre', it compares against the 'genre_identifier'.
   For 'song' (or any other ENTITY), it compares against the 'song_identifier'."
   (let* ((k (cond
-             ((eq? entity
-                   'artist)
-              "artist_identifier")
-             ((eq? entity
-                   'genre)
-              "genre_identifier")
-             ((eq? entity
-                   'song)
-              "song_identifier")
-             (else "song_identifier"))))
+              ((eq? entity
+                    'artist)
+               "artist_identifier")
+              ((eq? entity
+                    'genre)
+               "genre_identifier")
+              ((eq? entity
+                    'song)
+               "song_identifier")
+              (else "song_identifier"))))
     (filter (lambda (related-entity)
               (equal? (assoc-ref x "identifier")
                       (assoc-ref related-entity k))) related-entities)))
@@ -83,20 +82,20 @@
   Returns a list containing two elements: the field to sort by (a symbol)
   and the sort order (the symbol 'asc' for ascending or 'desc' for descending)."
   (cond
-   ((equal? "created-at-desc" user-sort)
-    '(created_at desc))
-   ((equal? "created-at-asc" user-sort)
-    '(created_at asc))
-   ((equal? "last-edited-at-desc" user-sort)
-    '(last_edited_at desc))
-   ((equal? "last-edited-at-asc" user-sort)
-    '(last_edited_at asc))
-   ((equal? "display-name-desc" user-sort)
-    '(display_name desc))
-   ((equal? "display-name-asc" user-sort)
-    '(display_name asc))
-   ((equal? "views-desc" user-sort)
-    '(views desc))
-   ((equal? "views-asc" user-sort)
-    '(views asc))
-   (else '(last_edited_at desc))))
+    ((equal? "created-at-desc" user-sort)
+     '(created_at desc))
+    ((equal? "created-at-asc" user-sort)
+     '(created_at asc))
+    ((equal? "last-edited-at-desc" user-sort)
+     '(last_edited_at desc))
+    ((equal? "last-edited-at-asc" user-sort)
+     '(last_edited_at asc))
+    ((equal? "display-name-desc" user-sort)
+     '(display_name desc))
+    ((equal? "display-name-asc" user-sort)
+     '(display_name asc))
+    ((equal? "views-desc" user-sort)
+     '(views desc))
+    ((equal? "views-asc" user-sort)
+     '(views asc))
+    (else '(last_edited_at desc))))

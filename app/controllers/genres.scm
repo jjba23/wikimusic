@@ -39,76 +39,76 @@
      #:cookies '(names wikimusic-genre-sort)
      (lambda (rc)
        (let* ((user-sort (cond
-                          ((not (equal? #f
-                                        (get-from-qstr rc "sort")))
-                           (:cookies-set! rc
-                            'wikimusic-genre-sort
-                            "wikimusic-genre-sort"
+                           ((not (equal? #f
+                                         (get-from-qstr rc "sort")))
+                            (:cookies-set! rc
+                                           'wikimusic-genre-sort
+                                           "wikimusic-genre-sort"
+                                           (get-from-qstr rc "sort"))
+                            (:cookies-setattr! rc
+                                               'wikimusic-genre-sort
+                                               #:expires 12000000
+                                               #:path "/"
+                                               #:http-only #t)
                             (get-from-qstr rc "sort"))
-                           (:cookies-setattr! rc
-                            'wikimusic-genre-sort
-                            #:expires 12000000
-                            #:path "/"
-                            #:http-only #t)
-                           (get-from-qstr rc "sort"))
-                          ((not (equal? #f
-                                        (:cookies-value rc
-                                         "wikimusic-genre-sort")))
-                           (:cookies-value rc "wikimusic-genre-sort"))
-                          (else "display-name-asc")))
+                           ((not (equal? #f
+                                         (:cookies-value rc
+                                          "wikimusic-genre-sort")))
+                            (:cookies-value rc "wikimusic-genre-sort"))
+                           (else "display-name-asc")))
               (query-sort (entity-sort-from-query user-sort))
               (query-offset (cond
-                             ((not (nil? (get-from-qstr rc "offset")))
-                              (string->number (get-from-qstr rc "offset")))
-                             (else 0)))
+                              ((not (nil? (get-from-qstr rc "offset")))
+                               (string->number (get-from-qstr rc "offset")))
+                              (else 0)))
               (query-limit (cond
-                            ((not (nil? (get-from-qstr rc "limit")))
-                             (string->number (get-from-qstr rc "limit")))
-                            (else 20)))
-              (genres (DB-get-all-rows (DB-query (DB-open rc) 
+                             ((not (nil? (get-from-qstr rc "limit")))
+                              (string->number (get-from-qstr rc "limit")))
+                             (else 20)))
+              (genres (DB-get-all-rows (DB-query (DB-open rc)
                                                  (->sql select * from
                                                         'genres
                                                         (format #f
-                                                                " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
-                                                                (car query-sort)
-                                                                (cadr query-sort)
-                                                                query-limit
-                                                                query-offset)))))
+                                                         " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
+                                                         (car query-sort)
+                                                         (cadr query-sort)
+                                                         query-limit
+                                                         query-offset)))))
               (genre-ids (map (lambda (s)
                                 (assoc-ref s "identifier")) genres))
               (artworks (cond
-                         ((nil? genre-ids)
-                          '())
-                         (else ($genre_artworks 'get
-                                                #:ret 'all
-                                                #:order-by '(order_value asc)
-                                                #:condition (where
-                                                             #:genre_identifier
-                                                             genre-ids)))))
+                          ((nil? genre-ids)
+                           '())
+                          (else ($genre_artworks 'get
+                                                 #:ret 'all
+                                                 #:order-by '(order_value asc)
+                                                 #:condition (where
+                                                                    #:genre_identifier
+                                                                    genre-ids)))))
               (opinions (cond
-                         ((nil? genre-ids)
-                          '())
-                         (else ($genre_opinions 'get
-                                                #:ret 'all
-                                                #:condition (where
-                                                             #:genre_identifier
-                                                             genre-ids)))))
+                          ((nil? genre-ids)
+                           '())
+                          (else ($genre_opinions 'get
+                                                 #:ret 'all
+                                                 #:condition (where
+                                                                    #:genre_identifier
+                                                                    genre-ids)))))
               (comments (cond
-                         ((nil? genre-ids)
-                          '())
-                         (else ($genre_comments 'get
-                                                #:ret 'all
-                                                #:condition (where
-                                                             #:genre_identifier
-                                                             genre-ids))))))
+                          ((nil? genre-ids)
+                           '())
+                          (else ($genre_comments 'get
+                                                 #:ret 'all
+                                                 #:condition (where
+                                                                    #:genre_identifier
+                                                                    genre-ids))))))
          (response-emit (:mime rc
-                         (genres-list-page (:i18n rc)
-                                           #:genres genres
-                                           #:artworks artworks
-                                           #:opinions opinions
-                                           #:comments comments
-                                           #:limit query-limit
-                                           #:offset query-offset))))))
+                               (genres-list-page (:i18n rc)
+                                                 #:genres genres
+                                                 #:artworks artworks
+                                                 #:opinions opinions
+                                                 #:comments comments
+                                                 #:limit query-limit
+                                                 #:offset query-offset))))))
 
 (get "/genres/new"
      #:mime 'xml
@@ -182,7 +182,7 @@
 (define (do-edit rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))
-    (DB-query (DB-open rc) 
+    (DB-query (DB-open rc)
               (->sql update
                      'genres set
                      `((display_name ,(escape-str (uri-decode (car (assoc-ref
@@ -210,7 +210,7 @@
 (define (do-edit-artwork rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))
-    (DB-query (DB-open rc) 
+    (DB-query (DB-open rc)
               (->sql update
                      'genre_artworks set
                      `((content_url ,(escape-str (uri-decode (car (assoc-ref
@@ -358,10 +358,10 @@
       (lambda (rc)
         (define (do-delete)
           (delete-artwork #:rc rc
-                          #:conn (DB-open rc) 
+                          #:conn (DB-open rc)
                           #:entity 'genre
                           #:delete-condition (where #:identifier (params rc
-                                                                         "artwork-uuid"))
+                                                                  "artwork-uuid"))
                           #:redirect-url (format #f "~a/genres/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))

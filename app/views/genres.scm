@@ -44,16 +44,16 @@
                                                          gap-3 my-4))))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                            "/genres?offset=~a&limit=~a"
-                                                            (- offset limit) limit)))
+                                                     "/genres?offset=~a&limit=~a"
+                                                     (- offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-left
                                                             #:content (G_
                                                                        "previous"))))
                                      '())
                                 ,(if (= (length genres) limit)
                                      `((a (@ (href ,(format #f
-                                                            "/genres?offset=~a&limit=~a"
-                                                            (+ offset limit) limit)))
+                                                     "/genres?offset=~a&limit=~a"
+                                                     (+ offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-right
                                                             #:content (G_
                                                                        "next"))))
@@ -79,19 +79,21 @@
                                       ,(sort-select G_
                                                     #:entity 'genre)
                                       (a (@ (href "/genres/new"))
-                                         ,(hyg-button (G_
-                                                       "new genre")))))
-                        (div (div (@ (class ,(->css '(grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5))))
+                                         ,(hyg-button (G_ "new genre")))))
+                        (div (div (@ (class ,(->css '(grid gap-4
+                                                           sm:grid-cols-3
+                                                           md:grid-cols-4
+                                                           lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           `(div ,(item-tile G_
                                                             'genre
                                                             x
                                                             (relevant-entities 'genre
-                                                                               artworks x)
+                                                             artworks x)
                                                             (relevant-entities 'genre
-                                                                               opinions x)
+                                                             opinions x)
                                                             (relevant-entities 'genre
-                                                                               comments x))))
+                                                             comments x))))
                                         genres))
                              ,page-buttons)))))
       (html-template G_
@@ -130,22 +132,25 @@
                                                                   genre
                                                                   "identifier")
                                              #:artwork-identifier (assoc-ref a
-                                                                             "identifier")
+                                                                   "identifier")
                                              #:content-url (assoc-ref a
-                                                                      "content_url")
+                                                            "content_url")
                                              #:content-caption (assoc-ref-or-empty-str
                                                                 a
                                                                 "content_caption")
                                              #:order-value (assoc-ref a
-                                                                      "order_value"))))
+                                                            "order_value"))))
                       artworks))
            (body `(div (@ (class ,(->css '(container mx-auto))))
-                       ,(if  (assoc-ref genre "identifier")
-                             `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold text-stone-800))))
-                                  ,(format #f "~a: ~a"
-                                           (G_ "editing genre") (assoc-ref genre "display_name")))
-                             `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold text-stone-800))))
-                                  (G_ "new genre")))
+                       ,(if (assoc-ref genre "identifier")
+                            `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold
+                                                              text-stone-800))))
+                                 ,(format #f "~a: ~a"
+                                          (G_ "editing genre")
+                                          (assoc-ref genre "display_name")))
+                            `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold
+                                                              text-stone-800))))
+                                 (G_ "new genre")))
                        (details (@ (open true))
                                 (summary (@ (class ,(->css '(font-black
                                                              text-stone-800
@@ -174,9 +179,9 @@
                                          ,(G_ "editing genre"))
                                 ,(genre-form G_
                                              #:identifier (assoc-ref genre
-                                                                     "identifier")
+                                                           "identifier")
                                              #:display-name (assoc-ref genre
-                                                                       "display_name")
+                                                             "display_name")
                                              #:description (assoc-ref-or-empty-str
                                                             genre
                                                             "description"))))))

@@ -56,6 +56,5 @@
                                                       #:value ""
                                                       #:type 'password
                                                       #:required #t)
-                                          (div ,(hyg-submit-button (G_
-                                                                    "login")))))))))
+                                          (div ,(hyg-submit-button (G_ "login")))))))))
 

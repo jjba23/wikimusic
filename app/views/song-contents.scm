@@ -194,12 +194,12 @@
                                                             song-identifier
                                                             song-content-identifier)
                                                            (format #f
-                                                                   "/songs/uuid/~a/contents/~a/edit"
-                                                                   song-identifier
-                                                                   song-content-identifier)
+                                                            "/songs/uuid/~a/contents/~a/edit"
+                                                            song-identifier
+                                                            song-content-identifier)
                                                            (format #f
-                                                                   "/songs/uuid/~a/contents/new"
-                                                                   song-identifier)))
+                                                            "/songs/uuid/~a/contents/new"
+                                                            song-identifier)))
                                               (content-type
                                                application/x-www-form-urlencoded))
                                            (div ,(hyg-input #:label (G_
@@ -255,8 +255,8 @@
                                                           (name
                                                            guitarpro-contents)
                                                           (value "")) "")))
-                (div ,(hyg-submit-button (if song-content-identifier
-                                             (G_ "edit")
-                                             (G_ "create"))))))
+      (div ,(hyg-submit-button (if song-content-identifier
+                                   (G_ "edit")
+                                   (G_ "create"))))))
   (export song-content-form))
 

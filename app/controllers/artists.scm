@@ -41,77 +41,77 @@
      #:cookies '(names wikimusic-artist-sort)
      (lambda (rc)
        (let* ((user-sort (cond
-                          ((not (equal? #f
-                                        (get-from-qstr rc "sort")))
-                           (:cookies-set! rc
-                            'wikimusic-artist-sort
-                            "wikimusic-artist-sort"
+                           ((not (equal? #f
+                                         (get-from-qstr rc "sort")))
+                            (:cookies-set! rc
+                                           'wikimusic-artist-sort
+                                           "wikimusic-artist-sort"
+                                           (get-from-qstr rc "sort"))
+                            (:cookies-setattr! rc
+                                               'wikimusic-artist-sort
+                                               #:expires 12000000
+                                               #:path "/"
+                                               #:http-only #t)
                             (get-from-qstr rc "sort"))
-                           (:cookies-setattr! rc
-                            'wikimusic-artist-sort
-                            #:expires 12000000
-                            #:path "/"
-                            #:http-only #t)
-                           (get-from-qstr rc "sort"))
-                          ((not (equal? #f
-                                        (:cookies-value rc
-                                         "wikimusic-artist-sort")))
-                           (:cookies-value rc "wikimusic-artist-sort"))
-                          (else "display-name-asc")))
+                           ((not (equal? #f
+                                         (:cookies-value rc
+                                          "wikimusic-artist-sort")))
+                            (:cookies-value rc "wikimusic-artist-sort"))
+                           (else "display-name-asc")))
               (query-sort (entity-sort-from-query user-sort))
               (_ (write query-sort))
               (query-offset (cond
-                             ((not (nil? (get-from-qstr rc "offset")))
-                              (string->number (get-from-qstr rc "offset")))
-                             (else 0)))
+                              ((not (nil? (get-from-qstr rc "offset")))
+                               (string->number (get-from-qstr rc "offset")))
+                              (else 0)))
               (query-limit (cond
-                            ((not (nil? (get-from-qstr rc "limit")))
-                             (string->number (get-from-qstr rc "limit")))
-                            (else 20)))
-              (artists (DB-get-all-rows (DB-query (DB-open rc) 
+                             ((not (nil? (get-from-qstr rc "limit")))
+                              (string->number (get-from-qstr rc "limit")))
+                             (else 20)))
+              (artists (DB-get-all-rows (DB-query (DB-open rc)
                                                   (->sql select * from
                                                          'artists
                                                          (format #f
-                                                                 " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
-                                                                 (car query-sort)
-                                                                 (cadr query-sort)
-                                                                 query-limit
-                                                                 query-offset)))))
+                                                          " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
+                                                          (car query-sort)
+                                                          (cadr query-sort)
+                                                          query-limit
+                                                          query-offset)))))
               (artist-ids (map (lambda (s)
                                  (assoc-ref s "identifier")) artists))
               (artworks (cond
-                         ((nil? artist-ids)
-                          '())
-                         (else ($artist_artworks 'get
-                                                 #:ret 'all
-                                                 #:order-by '(order_value asc)
-                                                 #:condition (where
-                                                              #:artist_identifier
-                                                              artist-ids)))))
+                          ((nil? artist-ids)
+                           '())
+                          (else ($artist_artworks 'get
+                                                  #:ret 'all
+                                                  #:order-by '(order_value asc)
+                                                  #:condition (where
+                                                               #:artist_identifier
+                                                               artist-ids)))))
               (opinions (cond
-                         ((nil? artist-ids)
-                          '())
-                         (else ($artist_opinions 'get
-                                                 #:ret 'all
-                                                 #:condition (where
-                                                              #:artist_identifier
-                                                              artist-ids)))))
+                          ((nil? artist-ids)
+                           '())
+                          (else ($artist_opinions 'get
+                                                  #:ret 'all
+                                                  #:condition (where
+                                                               #:artist_identifier
+                                                               artist-ids)))))
               (comments (cond
-                         ((nil? artist-ids)
-                          '())
-                         (else ($artist_comments 'get
-                                                 #:ret 'all
-                                                 #:condition (where
-                                                              #:artist_identifier
-                                                              artist-ids))))))
+                          ((nil? artist-ids)
+                           '())
+                          (else ($artist_comments 'get
+                                                  #:ret 'all
+                                                  #:condition (where
+                                                               #:artist_identifier
+                                                               artist-ids))))))
          (response-emit (:mime rc
-                         (artists-list-page (:i18n rc)
-                                            #:artists artists
-                                            #:artworks artworks
-                                            #:opinions opinions
-                                            #:comments comments
-                                            #:limit query-limit
-                                            #:offset query-offset))))))
+                               (artists-list-page (:i18n rc)
+                                                  #:artists artists
+                                                  #:artworks artworks
+                                                  #:opinions opinions
+                                                  #:comments comments
+                                                  #:limit query-limit
+                                                  #:offset query-offset))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
@@ -194,7 +194,7 @@
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))
     (write kv)
-    (DB-query (DB-open rc) 
+    (DB-query (DB-open rc)
               (->sql update
                      'artists set
                      `((display_name ,(escape-str (uri-decode (car (assoc-ref
@@ -222,7 +222,7 @@
 (define (do-edit-artwork rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))
-    (DB-query (DB-open rc) 
+    (DB-query (DB-open rc)
               (->sql update
                      'artist_artworks set
                      `((content_url ,(escape-str (uri-decode (car (assoc-ref
@@ -371,10 +371,10 @@
       (lambda (rc)
         (define (do-delete)
           (delete-artwork #:rc rc
-                          #:conn (DB-open rc) 
+                          #:conn (DB-open rc)
                           #:entity 'artist
                           #:delete-condition (where #:identifier (params rc
-                                                                         "artwork-uuid"))
+                                                                  "artwork-uuid"))
                           #:redirect-url (format #f "~a/artists/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))
