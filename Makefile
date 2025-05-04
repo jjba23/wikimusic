@@ -1,7 +1,6 @@
-# wikimusic - the CI/CD orchestrator written in Guile Scheme
+# wikimusic - the free music knowledge encyclopaedia
 
-# Copyright © 2024 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
-# Copyright © 2024 "Mu Lei" known as "NalaGinrut" <NalaGinrut@gmail.com>
+# Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 # wikimusic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
