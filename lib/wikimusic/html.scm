@@ -468,3 +468,23 @@
 
                            ))))))
   (export sort-select))
+
+(begin
+  (define* (ascii-size-select G_ #:key route)
+    `((div (@ (class ,(->css '(flex flex-col gap-2 w-min))))
+           (select (@ (onchange "window.location.href=this.value;")
+                      (name "ascii-size-select")
+                      (id "ascii-size-select")
+                      (class (->css '(p-2 rounded-xl bg-stone-200))))
+                   (option ,(G_ "ascii size"))
+                   ,(map (lambda (s)
+                           `((option (@ (value ,(format #f "~a?ascii-size=~a"
+                                                        route
+                                                        (car s))))
+                                     ,(cdr s))))
+                         `(("text-xs" . "text-xs")
+                           ("text-sm" . "text-sm")
+                           ("text-md" . "text-md")
+                           ("text-lg" . "text-lg")
+                           ("text-xl" . "text-xl")))))))
+  (export ascii-size-select))
