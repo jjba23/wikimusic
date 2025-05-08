@@ -39,20 +39,21 @@
                               opinions
                               comments
                               limit
-                              offset)
+                              offset
+                              search-query)
     (let* ((page-buttons `((div (@ (class "flex flex-row flex-wrap gap-3 my-4"))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                     "/artists?offset=~a&limit=~a"
-                                                     (- offset limit) limit)))
+                                                            "/artists?offset=~a&limit=~a"
+                                                            (- offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-left
                                                             #:content (G_
                                                                        "previous"))))
                                      '())
                                 ,(if (= (length artists) limit)
                                      `((a (@ (href ,(format #f
-                                                     "/artists?offset=~a&limit=~a"
-                                                     (+ offset limit) limit)))
+                                                            "/artists?offset=~a&limit=~a"
+                                                            (+ offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-right
                                                             #:content (G_
                                                                        "next"))))
@@ -68,17 +69,16 @@
                                                            gap-1))))
                             ,(hyg-icon #:type 'guitar)
                             ,(G_ "viewing artists"))
-                        (details (summary (@ (class ,(->css '(cursor-pointer
-                                                              px-1))))
-                                          ,(G_ "options"))
-                                 (div (@ (class ,(->css '(flex flex-row
-                                                               flex-wrap gap-3
-                                                               items-center
-                                                               my-4))))
-                                      ,(sort-select G_
-                                                    #:entity 'artist)
-                                      (a (@ (href "/artists/new"))
-                                         ,(hyg-button (G_ "new artist")))))
+                        (div (@(class ,(->css '(flex flex-wrap flex-row justify-between))))
+                             (div (@ (class ,(->css '(flex flex-wrap flex-row justify-start items-center))))
+                                  ,(sort-select G_
+                                                #:entity 'artist))
+                             (div (@ (class ,(->css '(flex flex-wrap flex-row gap-3
+                                                           justify-right
+                                                           items-center))))
+
+                                  ,(search-box G_
+                                               #:search-query search-query)))
                         (div (div (@ (class ,(->css '(grid gap-4
                                                            sm:grid-cols-3
                                                            md:grid-cols-4
@@ -88,13 +88,17 @@
                                                             'artist
                                                             x
                                                             (relevant-entities 'artist
-                                                             artworks x)
+                                                                               artworks x)
                                                             (relevant-entities 'artist
-                                                             opinions x)
+                                                                               opinions x)
                                                             (relevant-entities 'artist
-                                                             comments x))))
+                                                                               comments x))))
                                         artists))
-                             ,page-buttons)))))
+                             ,page-buttons
+                             (hr (@(class ,(->css '(my-6)))))
+                             (div (@(class ,(->css '(flex flex-row flex-wrap gap-2 justify-end))))
+                                  (a (@ (href "/artists/new"))
+                                     ,(hyg-button (G_ "new artist")))))))))
       (html-template G_
                      #:body body)))
   (export artists-list-page))
