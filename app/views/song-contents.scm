@@ -67,21 +67,21 @@
                                 (div (@ (class ,(->css '(flex flex-wrap
                                                               flex-row gap-2))))
                                      (a (@ (href ,(format #f
-                                                          "/songs/uuid/~a/contents/~a/edit"
-                                                          (assoc-ref song
-                                                                     "identifier")
-                                                          (assoc-ref version
-                                                                     "identifier"))))
+                                                   "/songs/uuid/~a/contents/~a/edit"
+                                                   (assoc-ref song
+                                                              "identifier")
+                                                   (assoc-ref version
+                                                              "identifier"))))
                                         ,(hyg-icon-button #:icon 'pencil
                                                           #:content (G_
                                                                      "edit version")))
                                      (form (@ (method POST)
                                               (action ,(format #f
-                                                               "/songs/uuid/~a/contents/~a/delete"
-                                                               (assoc-ref song
-                                                                          "identifier")
-                                                               (assoc-ref version
-                                                                          "identifier"))))
+                                                        "/songs/uuid/~a/contents/~a/delete"
+                                                        (assoc-ref song
+                                                         "identifier")
+                                                        (assoc-ref version
+                                                         "identifier"))))
                                            ,(hyg-icon-button #:icon 'trash
                                                              #:background 'bg-red-700
                                                              #:hover-background 'hover:bg-red-800

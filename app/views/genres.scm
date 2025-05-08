@@ -40,21 +40,22 @@
                              comments
                              limit
                              offset
-                             search-query)
+                             search-query
+                             user-sort)
     (let* ((page-buttons `((div (@ (class ,(->css '(flex flex-row flex-wrap
                                                          gap-3 my-4))))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                            "/genres?offset=~a&limit=~a"
-                                                            (- offset limit) limit)))
+                                                     "/genres?offset=~a&limit=~a"
+                                                     (- offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-left
                                                             #:content (G_
                                                                        "previous"))))
                                      '())
                                 ,(if (= (length genres) limit)
                                      `((a (@ (href ,(format #f
-                                                            "/genres?offset=~a&limit=~a"
-                                                            (+ offset limit) limit)))
+                                                     "/genres?offset=~a&limit=~a"
+                                                     (+ offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-right
                                                             #:content (G_
                                                                        "next"))))
@@ -70,12 +71,16 @@
                                                            gap-1))))
                             ,(hyg-icon #:type 'disc)
                             ,(G_ "viewing genres"))
-                        (div (@(class ,(->css '(flex flex-wrap flex-row justify-between))))
-                             (div (@ (class ,(->css '(flex flex-wrap flex-row justify-start items-center))))
+                        (div (@ (class ,(->css '(flex flex-wrap flex-row
+                                                      justify-between))))
+                             (div (@ (class ,(->css '(flex flex-wrap flex-row
+                                                           justify-start
+                                                           items-center))))
                                   ,(sort-select G_
-                                                #:entity 'genre))
-                             (div (@ (class ,(->css '(flex flex-wrap flex-row gap-3
-                                                           justify-right
+                                                #:entity 'genre
+                                                #:user-sort user-sort))
+                             (div (@ (class ,(->css '(flex flex-wrap flex-row
+                                                           gap-3 justify-right
                                                            items-center))))
 
                                   ,(search-box G_
@@ -89,15 +94,16 @@
                                                             'genre
                                                             x
                                                             (relevant-entities 'genre
-                                                                               artworks x)
+                                                             artworks x)
                                                             (relevant-entities 'genre
-                                                                               opinions x)
+                                                             opinions x)
                                                             (relevant-entities 'genre
-                                                                               comments x))))
+                                                             comments x))))
                                         genres))
                              ,page-buttons
-                             (hr (@(class ,(->css '(my-6)))))
-                             (div (@(class ,(->css '(flex flex-row flex-wrap gap-2 justify-end))))
+                             (hr (@ (class ,(->css '(my-6)))))
+                             (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                           gap-2 justify-end))))
                                   (a (@ (href "/genres/new"))
                                      ,(hyg-button (G_ "new genre")))))))))
       (html-template G_

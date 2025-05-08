@@ -40,20 +40,21 @@
                               comments
                               limit
                               offset
-                              search-query)
+                              search-query
+                              user-sort)
     (let* ((page-buttons `((div (@ (class "flex flex-row flex-wrap gap-3 my-4"))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                            "/artists?offset=~a&limit=~a"
-                                                            (- offset limit) limit)))
+                                                     "/artists?offset=~a&limit=~a"
+                                                     (- offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-left
                                                             #:content (G_
                                                                        "previous"))))
                                      '())
                                 ,(if (= (length artists) limit)
                                      `((a (@ (href ,(format #f
-                                                            "/artists?offset=~a&limit=~a"
-                                                            (+ offset limit) limit)))
+                                                     "/artists?offset=~a&limit=~a"
+                                                     (+ offset limit) limit)))
                                           ,(hyg-icon-button #:icon 'arrow-right
                                                             #:content (G_
                                                                        "next"))))
@@ -69,12 +70,16 @@
                                                            gap-1))))
                             ,(hyg-icon #:type 'guitar)
                             ,(G_ "viewing artists"))
-                        (div (@(class ,(->css '(flex flex-wrap flex-row justify-between))))
-                             (div (@ (class ,(->css '(flex flex-wrap flex-row justify-start items-center))))
+                        (div (@ (class ,(->css '(flex flex-wrap flex-row
+                                                      justify-between))))
+                             (div (@ (class ,(->css '(flex flex-wrap flex-row
+                                                           justify-start
+                                                           items-center))))
                                   ,(sort-select G_
-                                                #:entity 'artist))
-                             (div (@ (class ,(->css '(flex flex-wrap flex-row gap-3
-                                                           justify-right
+                                                #:entity 'artist
+                                                #:user-sort user-sort))
+                             (div (@ (class ,(->css '(flex flex-wrap flex-row
+                                                           gap-3 justify-right
                                                            items-center))))
 
                                   ,(search-box G_
@@ -88,15 +93,16 @@
                                                             'artist
                                                             x
                                                             (relevant-entities 'artist
-                                                                               artworks x)
+                                                             artworks x)
                                                             (relevant-entities 'artist
-                                                                               opinions x)
+                                                             opinions x)
                                                             (relevant-entities 'artist
-                                                                               comments x))))
+                                                             comments x))))
                                         artists))
                              ,page-buttons
-                             (hr (@(class ,(->css '(my-6)))))
-                             (div (@(class ,(->css '(flex flex-row flex-wrap gap-2 justify-end))))
+                             (hr (@ (class ,(->css '(my-6)))))
+                             (div (@ (class ,(->css '(flex flex-row flex-wrap
+                                                           gap-2 justify-end))))
                                   (a (@ (href "/artists/new"))
                                      ,(hyg-button (G_ "new artist")))))))))
       (html-template G_
