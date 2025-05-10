@@ -24,7 +24,9 @@
              (gnu packages guile)
              (gnu packages curl)
              (gnu packages bash)
+             (gnu packages gnupg) 
              (gnu packages nss)
+             (gnu packages rust-apps)
              (gnu packages guile-xyz)
              (gnu packages pkg-config)
              (guix build-system guile)
@@ -130,6 +132,8 @@
                           guile-hygguile
                           guile-kracht
                           sqlite
+                          guile-gcrypt
+                          watchexec
                           guile-dbi
                           guile-dbd-sqlite3))
 

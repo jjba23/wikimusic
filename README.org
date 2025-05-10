@@ -8,6 +8,8 @@
 
 The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms.
 
+If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
+
 At its core, WikiMusic leverages the expressive power of Lisp (Guile Scheme) to build a dynamic interactive Music Gallery and Content Management System (CMS).
 
 Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:
@@ -20,17 +22,23 @@ You can host your own version and database of WikiMusic, or visit the biggest on
 
 [[https://wikimusic.jointhefreeworld.org][https://wikimusic.jointhefreeworld.org]]
 
-This is 100% free software, licensed under the GNU General Public License v3 or later.
-
-[[https://www.gnu.org/licenses/gpl-3.0.en.html][Refer to the full license, on GNU's website]]
-
 WikiMusic leverages a database-backed architecture to ensure all content is easily searchable, linkable, and reusable. The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively.
 
 Join us in building an ever-growing library of musical knowledge — where every note tells a story.
 
-[[https://www.buymeacoffee.com/jjbigorra][Please donate by clicking here]]. This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong.
-
 -----
+
+* Wikimusic Manuals
+
+I strive to provide proper and extensive documentation on Wikimusic, available at your convenience.
+
+- Org format [[file:docs/manual/en-GB.org]]
+
+
+[[https://wikimusic.jointhefreeworld.org/img/wikimusic.png]]
+
+
+------
 
 * Code of conduct
 
@@ -40,6 +48,7 @@ https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-code-of-con
 
 In summary, we foster an inclusive, respectful, and cooperative environment for all contributors and users of this free software project. Inspired by the ideals of the GNU Project, we strive to uphold freedom, equality, and community as guiding principles. We believe that collaboration in a community of mutual respect is essential to creating excellent free software.
 
+-------
 
 * Wikimusic Project
 
@@ -50,10 +59,3 @@ We welcome everyone to feel invited to the wikimusic Project, and encourage acti
 Find here the Backlog and Kanban boards for wikimusic: https://lucidplan.jointhefreeworld.org/tickets/wikimusic
 
 -----
-
-* Tips
-
-It's recommended to run your SQLite database in WAL mode for concurrent writes.
-
-sqlite3 lucidplan.db 'PRAGMA journal_mode=WAL;'
-
