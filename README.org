@@ -26,7 +26,13 @@ WikiMusic leverages a database-backed architecture to ensure all content is easi
 
 Join us in building an ever-growing library of musical knowledge — where every note tells a story.
 
------
+--------
+
+* Licensing
+
+wikimusic is licensed under the GNU GPL v3 License or newer and is  built using the GNU Artanis web-framework.
+
+-------
 
 * Wikimusic Manuals
 

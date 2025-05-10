@@ -31,6 +31,12 @@ Wikimusic and Artanis are written using GNU Guile, one of the best implementatio
   
 [[https://wikimusic.jointhefreeworld.org/img/wikimusic.png]]
 
+-------
+
+* Licensing
+
+wikimusic is licensed under the GNU GPL v3 License or newer and is  built using the GNU Artanis web-framework.
+
 ---------
 
 * Code of conduct
