@@ -25,10 +25,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
   #:use-module (kracht prelude)
-  #:use-module (hygguile abstraction)
-  #:use-module (hygguile components button)
-  #:use-module (hygguile components input)
-  #:use-module (hygguile components icon)
+  #:use-module (hygguile hygguile)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
@@ -47,47 +44,48 @@
                                      `((a (@ (href ,(format #f
                                                      "/artists?offset=~a&limit=~a"
                                                      (- offset limit) limit)))
-                                          ,(hyg-icon-button #:icon 'arrow-left
-                                                            #:content (G_
-                                                                       "previous"))))
+                                          ,(icon-button #:icon 'arrow-left
+                                                        #:content (G_
+                                                                   "previous"))))
                                      '())
                                 ,(if (= (length artists) limit)
                                      `((a (@ (href ,(format #f
                                                      "/artists?offset=~a&limit=~a"
                                                      (+ offset limit) limit)))
-                                          ,(hyg-icon-button #:icon 'arrow-right
-                                                            #:content (G_
-                                                                       "next"))))
+                                          ,(icon-button #:icon 'arrow-right
+                                                        #:content (G_ "next"))))
                                      '()))))
-           (body `(div (@ (class ,(->css '(container mx-auto))))
-                       ((h2 (@ (class ,(->css '(font-black text-stone-800
-                                                           text-2xl
-                                                           py-4
-                                                           px-1
-                                                           flex
-                                                           flex-row
-                                                           items-center
-                                                           gap-1))))
-                            ,(hyg-icon #:type 'guitar)
+           (body `(div (@ (class ,(mk-class '(container mx-auto))))
+                       ((h2 (@ (class ,(mk-class '(font-black text-stone-800
+                                                              text-2xl
+                                                              py-4
+                                                              px-1
+                                                              flex
+                                                              flex-row
+                                                              items-center
+                                                              gap-1))))
+                            ,(icon #:type 'guitar)
                             ,(G_ "viewing artists"))
-                        (div (@ (class ,(->css '(flex flex-wrap flex-row
-                                                      justify-between))))
-                             (div (@ (class ,(->css '(flex flex-wrap flex-row
-                                                           justify-start
-                                                           items-center))))
+                        (div (@ (class ,(mk-class '(flex flex-wrap flex-row
+                                                         justify-between))))
+                             (div (@ (class ,(mk-class '(flex flex-wrap
+                                                              flex-row
+                                                              justify-start
+                                                              items-center))))
                                   ,(sort-select G_
                                                 #:entity 'artist
                                                 #:user-sort user-sort))
-                             (div (@ (class ,(->css '(flex flex-wrap flex-row
-                                                           gap-3 justify-right
-                                                           items-center))))
+                             (div (@ (class ,(mk-class '(flex flex-wrap
+                                                              flex-row gap-3
+                                                              justify-right
+                                                              items-center))))
 
                                   ,(search-box G_
                                                #:search-query search-query)))
-                        (div (div (@ (class ,(->css '(grid gap-4
-                                                           sm:grid-cols-3
-                                                           md:grid-cols-4
-                                                           lg:grid-cols-5))))
+                        (div (div (@ (class ,(mk-class '(grid gap-4
+                                                              sm:grid-cols-3
+                                                              md:grid-cols-4
+                                                              lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           `(div ,(item-tile G_
                                                             'artist
@@ -100,11 +98,12 @@
                                                              comments x))))
                                         artists))
                              ,page-buttons
-                             (hr (@ (class ,(->css '(my-6)))))
-                             (div (@ (class ,(->css '(flex flex-row flex-wrap
-                                                           gap-2 justify-end))))
+                             (hr (@ (class ,(mk-class '(my-6)))))
+                             (div (@ (class ,(mk-class '(flex flex-row
+                                                              flex-wrap gap-2
+                                                              justify-end))))
                                   (a (@ (href "/artists/new"))
-                                     ,(hyg-button (G_ "new artist")))))))))
+                                     ,(button (G_ "new artist")))))))))
       (html-template G_
                      #:body body)))
   (export artists-list-page))
@@ -116,9 +115,10 @@
                                     comments
                                     user-alist)
   (html-template G_
-                 #:body `(div (@ (class ,(->css '(container mx-auto))))
-                              ((h2 (@ (class ,(->css '(font-black
-                                                       text-stone-800 text-3xl))))
+                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                              ((h2 (@ (class ,(mk-class '(font-black
+                                                          text-stone-800
+                                                          text-3xl))))
                                    ,(assoc-ref artist "display_name"))
                                (div (div ,(entity-details G_
                                                           'artist
@@ -131,8 +131,8 @@
 (begin
   (define* (artist-edit-page G_ artist artworks)
     (let* ((artwork-forms (map (lambda (a)
-                                 `(div (figure (@ (class ,(->css '(py-3
-                                                                   sm:w-36))))
+                                 `(div (figure (@ (class ,(mk-class '(py-3
+                                                                      sm:w-36))))
                                                (img (@ (loading "lazy")
                                                        (class "rounded-xl")
                                                        (src ,(assoc-ref a
@@ -155,29 +155,31 @@
                                                                      a
                                                                      "order_value"))))
                                artworks))
-           (body `(div (@ (class ,(->css '(container mx-auto))))
+           (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ,(if (assoc-ref artist "identifier")
-                            `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold
-                                                              text-stone-800))))
+                            `(h2 (@ (class ,(mk-class '(text-2xl my-6
+                                                        font-bold
+                                                        text-stone-800))))
                                  ,(format #f "~a: ~a"
                                           (G_ "editing artist")
                                           (assoc-ref artist "display_name")))
-                            `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold
-                                                              text-stone-800))))
+                            `(h2 (@ (class ,(mk-class '(text-2xl my-6
+                                                        font-bold
+                                                        text-stone-800))))
                                  (G_ "new artist")))
                        (details (@ (open true))
-                                (summary (@ (class ,(->css '(font-black
-                                                             text-stone-800
-                                                             text-md
-                                                             cursor-pointer))))
+                                (summary (@ (class ,(mk-class '(font-black
+                                                                text-stone-800
+                                                                text-md
+                                                                cursor-pointer))))
                                          ,(G_ "edit artworks"))
                                 ,artwork-forms)
                        (hr (@ (class "my-6")))
                        (details (@ (open true))
-                                (summary (@ (class ,(->css '(font-black
-                                                             text-stone-800
-                                                             text-md
-                                                             cursor-pointer))))
+                                (summary (@ (class ,(mk-class '(font-black
+                                                                text-stone-800
+                                                                text-md
+                                                                cursor-pointer))))
                                          ,(G_ "new artwork"))
                                 ,(artwork-form G_
                                                #:entity 'artist
@@ -186,10 +188,10 @@
                                                                     "identifier")))
                        (hr (@ (class "my-6")))
                        (details (@ (open true))
-                                (summary (@ (class ,(->css '(font-black
-                                                             text-stone-800
-                                                             text-md
-                                                             cursor-pointer))))
+                                (summary (@ (class ,(mk-class '(font-black
+                                                                text-stone-800
+                                                                text-md
+                                                                cursor-pointer))))
                                          ,(G_ "editing artist"))
                                 ,(artist-form G_
                                               #:identifier (assoc-ref artist
@@ -220,15 +222,15 @@
                             (format #f "/artists/uuid/~a/edit" identifier)
                             (format #f "/artists/new" identifier)))
                (content-type application/x-www-form-urlencoded))
-            (div ,(hyg-input #:label (G_ "display name")
-                             #:name "display-name"
-                             #:value (unescape-str display-name)
-                             #:required #t)
-                 ,(hyg-textarea #:label (G_ "description")
-                                #:name "description"
-                                #:value (unescape-str description))))
-      (div ,(hyg-submit-button (if identifier
-                                   (G_ "edit")
-                                   (G_ "create"))))))
+            (div ,(input #:label (G_ "display name")
+                         #:name "display-name"
+                         #:value (unescape-str display-name)
+                         #:required #t)
+                 ,(textarea #:label (G_ "description")
+                            #:name "description"
+                            #:value (unescape-str description))))
+      (div ,(submit-button (if identifier
+                               (G_ "edit")
+                               (G_ "create"))))))
   (export artist-form))
 

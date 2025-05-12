@@ -21,9 +21,7 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
-  #:use-module (hygguile abstraction)
-  #:use-module (hygguile components icon)
-  #:use-module (hygguile components typography)
+  #:use-module (hygguile hygguile)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
@@ -32,25 +30,26 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               (div (@ (class "p-2"))
-                                   ,(hyg-h2 (G_ "Welcome to Wikimusic"))
-                                   ,(hyg-sub-h3 (G_
-                                                 "the free music knowledge encyclopaedia"))
-                                   (div (@ (class ,(->css '(flex flex-row
-                                                            flex-wrap
-                                                            justify-between))))
+                                   ,(h2 (G_ "Welcome to Wikimusic"))
+                                   ,(sub-h3 (G_
+                                             "the free music knowledge encyclopaedia"))
+                                   (div (@ (class ,(mk-class '(flex flex-row
+                                                               flex-wrap
+                                                               justify-between))))
                                         ,(wikimusic-explain G_)
                                         ,(wikimusic-img))))))
 
 (define (wikimusic-img)
-  `((div
-     (div (@ (class ,(->css '(bg-stone-300/50 max-w-56 sm:max-w-90 p-4 rounded-xl shadow-md))))
-          (figure (img (@ (class ,(->css '(rounded-2xl h-auto)))(loading lazy)
-                          (src "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg")))))
-     )))
+  `((div (div (@ (class ,(mk-class '(bg-stone-300/50 max-w-56 sm:max-w-90 p-4
+                                                     rounded-xl shadow-md))))
+              (figure (img (@ (class ,(mk-class '(rounded-2xl h-auto)))
+                              (loading lazy)
+                              (src
+                               "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg"))))))))
 
 (define (wikimusic-explain G_)
-  `((div (@ (class ,(->css '(max-w-prose my-8 p-4 bg-stone-300/50 rounded-2xl
-                                         shadow-md))))
+  `((div (@ (class ,(mk-class '(max-w-prose my-8 p-4 bg-stone-300/50
+                                            rounded-2xl shadow-md))))
          (p ,(G_
               "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."))
 

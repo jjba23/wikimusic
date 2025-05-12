@@ -22,39 +22,37 @@
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
-  #:use-module (hygguile abstraction)
-  #:use-module (hygguile components input)
-  #:use-module (hygguile components button)
+  #:use-module (hygguile hygguile)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
 (define-public (login-page G_)
   (html-template G_
-                 #:body `(div (@ (class ,(->css '(container mx-auto))))
-                              ((h2 (@ (class ,(->css '(font-black
-                                                       text-stone-800 text-2xl
-                                                       px-1))))
+                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                              ((h2 (@ (class ,(mk-class '(font-black
+                                                          text-stone-800
+                                                          text-2xl px-1))))
                                    ,(G_ "login to wikimusic"))
                                (div (form (@ (action "/login")
-                                             (class ,(->css '(w-full
-                                                              rounded-xl
-                                                              bg-stone-200/75
-                                                              p-4
-                                                              flex
-                                                              flex-row
-                                                              flex-wrap
-                                                              items-center
-                                                              gap-4
-                                                              align-center)))
+                                             (class ,(mk-class '(w-full
+                                                                 rounded-xl
+                                                                 bg-stone-200/75
+                                                                 p-4
+                                                                 flex
+                                                                 flex-row
+                                                                 flex-wrap
+                                                                 items-center
+                                                                 gap-4
+                                                                 align-center)))
                                              (method POST))
-                                          ,(hyg-input #:label (G_ "username")
-                                                      #:name "username"
-                                                      #:value "jjba23"
-                                                      #:required #t)
-                                          ,(hyg-input #:label (G_ "password")
-                                                      #:name "password_hash"
-                                                      #:value ""
-                                                      #:type 'password
-                                                      #:required #t)
-                                          (div ,(hyg-submit-button (G_ "login")))))))))
+                                          ,(input #:label (G_ "username")
+                                                  #:name "username"
+                                                  #:value "jjba23"
+                                                  #:required #t)
+                                          ,(input #:label (G_ "password")
+                                                  #:name "password_hash"
+                                                  #:value ""
+                                                  #:type 'password
+                                                  #:required #t)
+                                          (div ,(submit-button (G_ "login")))))))))
 

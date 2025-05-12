@@ -22,10 +22,7 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
-  #:use-module (hygguile abstraction)
-  #:use-module (hygguile components input)
-  #:use-module (hygguile components button)
-  #:use-module (hygguile components icon)
+  #:use-module (hygguile hygguile)
   #:use-module (kracht prelude)
   #:use-module (ice-9 i18n)
   #:use-module (wikimusic query-escape)
@@ -39,17 +36,19 @@
                           opinions
                           comments
                           x)
-  (let* ((extra-info (cond-render (lambda (vc)
-                                    `(div (@ (class ,(->css '(flex flex-row
-                                                              gap-2 text-xs
-                                                              text-stone-700))))
+  (let* ((extra-info (render-if-nempty (lambda (vc)
+                                         `(div (@ (class ,(mk-class '(flex
+                                                                      flex-row
+                                                                      gap-2
+                                                                      text-xs
+                                                                      text-stone-700))))
 
-                                          (span ,(format #f "~a"
+                                               (span ,(format #f "~a"
 
-                                                         (car vc)))
-                                          (span ,(G_ "versions"))))
-                                  (assoc-ref song-version-count-alist
-                                             (assoc-ref x "identifier")))))
+                                                              (car vc)))
+                                               (span ,(G_ "versions"))))
+                                       (assoc-ref song-version-count-alist
+                                                  (assoc-ref x "identifier")))))
     `((div ,(item-tile G_
                        'song
                        x
@@ -69,53 +68,54 @@
                             offset
                             search-query
                             user-sort)
-    (let* ((page-buttons `((div (@ (class ,(->css '(flex flex-row flex-wrap
-                                                         gap-3 my-4))))
+    (let* ((page-buttons `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                            gap-3 my-4))))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
                                                      "/songs?offset=~a&limit=~a"
                                                      (- offset limit) limit)))
-                                          ,(hyg-icon-button #:icon 'arrow-left
-                                                            #:content (G_
-                                                                       "previous"))))
+                                          ,(icon-button #:icon 'arrow-left
+                                                        #:content (G_
+                                                                   "previous"))))
                                      '())
                                 ,(if (= (length songs) limit)
                                      `((a (@ (href ,(format #f
                                                      "/songs?offset=~a&limit=~a"
                                                      (+ offset limit) limit)))
-                                          ,(hyg-icon-button #:icon 'arrow-right
-                                                            #:content (G_
-                                                                       "next"))))
+                                          ,(icon-button #:icon 'arrow-right
+                                                        #:content (G_ "next"))))
                                      '()))))
-           (body `(div (@ (class ,(->css '(container mx-auto))))
-                       ((h2 (@ (class ,(->css '(font-black text-stone-800
-                                                           text-2xl
-                                                           py-4
-                                                           px-1
-                                                           flex
-                                                           flex-row
-                                                           items-center
-                                                           gap-1))))
-                            ,(hyg-icon #:type 'music-notes-simple)
+           (body `(div (@ (class ,(mk-class '(container mx-auto))))
+                       ((h2 (@ (class ,(mk-class '(font-black text-stone-800
+                                                              text-2xl
+                                                              py-4
+                                                              px-1
+                                                              flex
+                                                              flex-row
+                                                              items-center
+                                                              gap-1))))
+                            ,(icon #:type 'music-notes-simple)
                             ,(G_ "viewing songs"))
-                        (div (@ (class ,(->css '(flex flex-wrap flex-row
-                                                      justify-between))))
-                             (div (@ (class ,(->css '(flex flex-wrap flex-row
-                                                           justify-start
-                                                           items-center))))
+                        (div (@ (class ,(mk-class '(flex flex-wrap flex-row
+                                                         justify-between))))
+                             (div (@ (class ,(mk-class '(flex flex-wrap
+                                                              flex-row
+                                                              justify-start
+                                                              items-center))))
                                   ,(sort-select G_
                                                 #:entity 'song
                                                 #:user-sort user-sort))
-                             (div (@ (class ,(->css '(flex flex-wrap flex-row
-                                                           gap-3 justify-right
-                                                           items-center))))
+                             (div (@ (class ,(mk-class '(flex flex-wrap
+                                                              flex-row gap-3
+                                                              justify-right
+                                                              items-center))))
 
                                   ,(search-box G_
                                                #:search-query search-query)))
-                        (div (div (@ (class ,(->css '(grid gap-4
-                                                           sm:grid-cols-3
-                                                           md:grid-cols-4
-                                                           lg:grid-cols-5))))
+                        (div (div (@ (class ,(mk-class '(grid gap-4
+                                                              sm:grid-cols-3
+                                                              md:grid-cols-4
+                                                              lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           (render-song-tile G_
                                            artworks
@@ -124,11 +124,12 @@
                                            comments
                                            x)) songs))
                              ,page-buttons
-                             (hr (@ (class ,(->css '(my-6)))))
-                             (div (@ (class ,(->css '(flex flex-row flex-wrap
-                                                           gap-2 justify-end))))
+                             (hr (@ (class ,(mk-class '(my-6)))))
+                             (div (@ (class ,(mk-class '(flex flex-row
+                                                              flex-wrap gap-2
+                                                              justify-end))))
                                   (a (@ (href "/songs/new"))
-                                     ,(hyg-button (G_ "new song")))))))))
+                                     ,(button (G_ "new song")))))))))
       (html-template G_
                      #:body body)))
   (export songs-list-page))
@@ -142,10 +143,10 @@
                                   user-alist
                                   ascii-size)
   (html-template G_
-                 #:body `((div (@ (class ,(->css '(container mx-auto))))
-                               ((h2 (@ (class ,(->css '(font-black
-                                                        text-stone-800
-                                                        text-3xl))))
+                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                               ((h2 (@ (class ,(mk-class '(font-black
+                                                           text-stone-800
+                                                           text-3xl))))
                                     ,(assoc-ref song "display_name"))
                                 
                                 (div (div ,(entity-details G_
@@ -163,23 +164,25 @@
   (define* (song-edit-page G_ song song-contents artworks)
     (let* ((html `(div (@ (class "container mx-auto"))
                        ,(if (assoc-ref song "identifier")
-                            `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold
-                                                              text-stone-800))))
+                            `(h2 (@ (class ,(mk-class '(text-2xl my-6
+                                                        font-bold
+                                                        text-stone-800))))
                                  ,(format #f "~a: ~a"
                                           (G_ "editing song")
                                           (assoc-ref song "display_name")))
-                            `(h2 (@ (class ,(->css '(text-2xl my-6 font-bold
-                                                              text-stone-800))))
+                            `(h2 (@ (class ,(mk-class '(text-2xl my-6
+                                                        font-bold
+                                                        text-stone-800))))
                                  (G_ "new song")))
                        (details (@ (open true))
-                                (summary (@ (class ,(->css '(font-black
-                                                             text-stone-800
-                                                             text-md
-                                                             cursor-pointer))))
+                                (summary (@ (class ,(mk-class '(font-black
+                                                                text-stone-800
+                                                                text-md
+                                                                cursor-pointer))))
                                          ,(G_ "edit artworks"))
                                 ,(map (lambda (a)
-                                        `(div (figure (@ (class ,(->css '(py-3
-                                                                          sm:w-36))))
+                                        `(div (figure (@ (class ,(mk-class '(py-3
+                                                                             sm:w-36))))
                                                       (img (@ (loading "lazy")
                                                               (class
                                                                "rounded-xl")
@@ -208,9 +211,9 @@
                        (hr (@ (class "my-6")))
                        (details (@ (open true)
                                    (class "cursor-pointer"))
-                                (summary (@ (class ,(->css '(font-black
-                                                             text-stone-800
-                                                             text-md))))
+                                (summary (@ (class ,(mk-class '(font-black
+                                                                text-stone-800
+                                                                text-md))))
                                          ,(G_ "new artwork"))
                                 ,(artwork-form G_
                                                #:entity 'song
@@ -219,10 +222,10 @@
                                                                     "identifier")))
                        (hr (@ (class "my-6")))
                        (details (@ (open true))
-                                (summary (@ (class ,(->css '(font-black
-                                                             text-stone-800
-                                                             text-md
-                                                             cursor-pointer))))
+                                (summary (@ (class ,(mk-class '(font-black
+                                                                text-stone-800
+                                                                text-md
+                                                                cursor-pointer))))
                                          ,(G_ "editing song"))
                                 ,(song-form G_
                                             #:identifier (assoc-ref song
@@ -251,7 +254,7 @@
 (begin
   (define* (song-new-page G_)
     (html-template G_
-                   #:body `(div (@ (class ,(->css '(container mx-auto))))
+                   #:body `(div (@ (class ,(mk-class '(container mx-auto))))
                                 ,(song-form G_))))
   (export song-new-page))
 
@@ -270,31 +273,31 @@
                             (format #f "/songs/uuid/~a/edit" identifier)
                             (format #f "/songs/new" identifier)))
                (content-type application/x-www-form-urlencoded))
-            (div ,(hyg-input #:label (G_ "display name")
-                             #:name "display-name"
-                             #:value (unescape-str display-name)
-                             #:required #t)
+            (div ,(input #:label (G_ "display name")
+                         #:name "display-name"
+                         #:value (unescape-str display-name)
+                         #:required #t)
 
-                 ,(hyg-input #:label (G_ "music key")
-                             #:name "music-key"
-                             #:value (unescape-str music-key))
-                 ,(hyg-input #:label (G_ "music tuning")
-                             #:name "music-tuning"
-                             #:value (unescape-str music-tuning))
-                 ,(hyg-input #:label (G_ "music creation date")
-                             #:name "music-creation-date"
-                             #:value (unescape-str music-creation-date))
-                 ,(hyg-input #:label (G_ "album name")
-                             #:name "album-name"
-                             #:value (unescape-str album-name))
-                 ,(hyg-input #:label (G_ "album info url")
-                             #:name "album-info-link"
-                             #:value (unescape-str album-info-link))
-                 ,(hyg-textarea #:label (G_ "description")
-                                #:name "description"
-                                #:value (unescape-str description))))
-      (div ,(hyg-submit-button (if identifier
-                                   (G_ "edit")
-                                   (G_ "create"))))))
+                 ,(input #:label (G_ "music key")
+                         #:name "music-key"
+                         #:value (unescape-str music-key))
+                 ,(input #:label (G_ "music tuning")
+                         #:name "music-tuning"
+                         #:value (unescape-str music-tuning))
+                 ,(input #:label (G_ "music creation date")
+                         #:name "music-creation-date"
+                         #:value (unescape-str music-creation-date))
+                 ,(input #:label (G_ "album name")
+                         #:name "album-name"
+                         #:value (unescape-str album-name))
+                 ,(input #:label (G_ "album info url")
+                         #:name "album-info-link"
+                         #:value (unescape-str album-info-link))
+                 ,(textarea #:label (G_ "description")
+                            #:name "description"
+                            #:value (unescape-str description))))
+      (div ,(submit-button (if identifier
+                               (G_ "edit")
+                               (G_ "create"))))))
   (export song-form))
 
