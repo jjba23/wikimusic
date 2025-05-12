@@ -42,9 +42,11 @@
                                         ,(wikimusic-img))))))
 
 (define (wikimusic-img)
-  `((div (@ (class ,(->css '(bg-stone-300/50 max-w-56 p-4 rounded-xl shadow-md))))
-         (figure (img (@ (class "rounded-2xl h-auto")
-                         (src "/img/wikimusic.png")))))))
+  `((div
+     (div (@ (class ,(->css '(bg-stone-300/50 max-w-56 sm:max-w-90 p-4 rounded-xl shadow-md))))
+          (figure (img (@ (class ,(->css '(rounded-2xl h-auto)))(loading lazy)
+                          (src "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg")))))
+     )))
 
 (define (wikimusic-explain G_)
   `((div (@ (class ,(->css '(max-w-prose my-8 p-4 bg-stone-300/50 rounded-2xl

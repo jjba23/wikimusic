@@ -124,13 +124,21 @@
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
                                               "pub/js/tailwind.config.js")))
-                              (body (@ (class ,(->css '(bg-stone-200/50 flex
-                                                        flex-col h-screen
-                                                        justify-between))))
-                                    (div ,nav
-                                         (div (@ (class "pt-8"))
-                                              ,body))
-                                    (footer ,(page-footer G_))))))
+                              (body ,(hyg-with-footer #:main `((div (@ (class ,
+                                                                              (->css '
+                                                                               (flex
+                                                                                flex-col
+                                                                                justify-between
+                                                                                h-screen))))
+                                                                    (div (@ (class ,
+                                                                             (->css '
+                                                                              (flex
+                                                                               flex-col
+                                                                               gap-8
+                                                                               justify-start))))
+                                                                         ,nav
+                                                                         ,body)))
+                                                      #:footer (page-footer G_))))))
   (export html-template))
 
 (begin
