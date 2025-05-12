@@ -123,19 +123,19 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
-                                              "pub/js/tailwind.config.js")))
+                                                        "pub/js/tailwind.config.js")))
                               (body ,(hyg-with-footer #:main `((div (@ (class ,
+                                                                         (->css '
+                                                                          (flex
+                                                                           flex-col
+                                                                           justify-between
+                                                                           min-h-screen))))
+                                                                    (div (@ (class ,
                                                                               (->css '
                                                                                (flex
                                                                                 flex-col
-                                                                                justify-between
-                                                                                h-screen))))
-                                                                    (div (@ (class ,
-                                                                             (->css '
-                                                                              (flex
-                                                                               flex-col
-                                                                               gap-8
-                                                                               justify-start))))
+                                                                                gap-8
+                                                                                justify-start))))
                                                                          ,nav
                                                                          ,body)))
                                                       #:footer (page-footer G_))))))
