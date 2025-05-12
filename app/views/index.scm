@@ -23,6 +23,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (hygguile abstraction)
   #:use-module (hygguile components icon)
+  #:use-module (hygguile components typography)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
@@ -31,28 +32,23 @@
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               (div (@ (class "p-2"))
-                                   (h2 (@ (id welcome-page-title)
-                                          (class ,(->css '(font-black
-                                                           text-stone-800
-                                                           text-2xl))))
-                                       ,(G_ "Welcome to Wikimusic"))
-                                   (em (@ (id welcome-page-subtitle)
-                                          (class ,(->css '(text-lg
-                                                           text-stone-600))))
-                                       ,(G_
-                                         "the free music knowledge encyclopaedia"))
-                                   (div (@ (class
-                                            "flex flex-row flex-wrap justify-between"))
+                                   ,(hyg-h2 (G_ "Welcome to Wikimusic"))
+                                   ,(hyg-sub-h3 (G_
+                                                 "the free music knowledge encyclopaedia"))
+                                   (div (@ (class ,(->css '(flex flex-row
+                                                            flex-wrap
+                                                            justify-between))))
                                         ,(wikimusic-explain G_)
                                         ,(wikimusic-img))))))
 
 (define (wikimusic-img)
-  `((div (div (@ (class "bg-stone-300/50 max-w-56 p-4 rounded-xl"))
-              (figure (img (@ (class "rounded-2xl h-auto")
-                              (src "/img/wikimusic.png"))))))))
+  `((div (@ (class ,(->css '(bg-stone-300/50 max-w-56 p-4 rounded-xl shadow-md))))
+         (figure (img (@ (class "rounded-2xl h-auto")
+                         (src "/img/wikimusic.png")))))))
 
 (define (wikimusic-explain G_)
-  `((div (@ (class "max-w-prose my-8 p-4 bg-stone-300/50 rounded-2xl"))
+  `((div (@ (class ,(->css '(max-w-prose my-8 p-4 bg-stone-300/50 rounded-2xl
+                                         shadow-md))))
          (p ,(G_
               "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."))
 

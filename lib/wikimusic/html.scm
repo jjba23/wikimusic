@@ -35,8 +35,10 @@
   #:use-module (artanis i18n locale)
   #:use-module (hygguile abstraction)
   #:use-module (hygguile components input)
+  #:use-module (hygguile components container)
   #:use-module (hygguile components icon)
   #:use-module (hygguile components button)
+  #:use-module (hygguile components typography)
   #:use-module (srfi srfi-19)
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route))
@@ -46,26 +48,18 @@
                          "pub/js/tailwind.js" "pub/js/tailwind.config.js")))
 
 (define-public (page-footer G_)
-  `((div (@ (class ,(->css '(mt-3 font-sans bg-stone-200))))
-
-         (div (@ (class ,(->css '(flex flex-row justify-between px-3 py-3))))
-              (em (@ (class ,(->css '(text-xs text-stone-600))))
-                  ,(G_ "Copyright 2025 © Josep Bigorra"))
-              (em (@ (class ,(->css '(text-sm text-stone-600))))
-                  ,(G_ "the free music knowledge encyclopaedia")))
-         (div (@ (class ,(->css '(flex flex-row
-                                       flex-wrap
-                                       gap-2
-                                       justify-start
-                                       px-3
-                                       py-3))))
-              (p (@ (class ,(->css '(text-xs text-stone-600))))
-                 ,(G_ "find the source code here") ":")
-              (a (@ (class ,(->css '(text-stone-600 hover:text-blue-600
-                                                    font-bold cursor-pointer
-                                                    text-xs)))
-                    (href "https://codeberg.org/jjba23/wikimusic"))
-                 "https://codeberg.org/jjba23/wikimusic")))))
+  `(,(hyg-footer `((div (@ (class ,(->css '(flex flex-row justify-between px-3
+                                                 py-3))))
+                        (hyg-sub-h4 (G_ "Copyright 2025 © Josep Bigorra"))
+                        ,(hyg-em (G_ "the free music knowledge encyclopaedia")))
+                   (div (@ (class ,(->css '(flex flex-row
+                                                 flex-wrap
+                                                 gap-2
+                                                 justify-start
+                                                 px-3
+                                                 py-3))))
+                        ,(hyg-p (G_ "find the source code here"))
+                        ,(hyg-a "https://codeberg.org/jjba23/wikimusic"))))))
 
 (begin
   (define* (html-template G_
