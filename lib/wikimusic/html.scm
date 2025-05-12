@@ -48,18 +48,21 @@
                          "pub/js/tailwind.js" "pub/js/tailwind.config.js")))
 
 (define-public (page-footer G_)
-  `(,(hyg-footer `((div (@ (class ,(->css '(flex flex-row justify-between px-3
-                                                 py-3))))
-                        (hyg-sub-h4 (G_ "Copyright 2025 © Josep Bigorra"))
-                        ,(hyg-em (G_ "the free music knowledge encyclopaedia")))
-                   (div (@ (class ,(->css '(flex flex-row
-                                                 flex-wrap
-                                                 gap-2
-                                                 justify-start
-                                                 px-3
-                                                 py-3))))
+  `(,(hyg-footer `((div (@ (class ,(->css '(flex flex-row flex-wrap gap-2
+                                                 justify-start))))
                         ,(hyg-p (G_ "find the source code here"))
-                        ,(hyg-a "https://codeberg.org/jjba23/wikimusic"))))))
+                        ,(hyg-a "https://codeberg.org/jjba23/wikimusic"))
+                   ,(hyg-em (G_
+                             "Copyright 2025 © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"))
+                   ,(hyg-em (G_ "the free music knowledge encyclopaedia"))
+
+                   (div (@ (class ,(->css '(flex flex-row flex-wrap gap-2
+                                                 align-center items-center))))
+                        ,(hyg-p "version:")
+                        ,(hyg-mono (format #f "~a"
+                                           (get-short-commit-sha))
+                                   #:color 'text-stone-600
+                                   #:size 'text-md))))))
 
 (begin
   (define* (html-template G_
