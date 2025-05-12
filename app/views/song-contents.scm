@@ -101,6 +101,7 @@
                                                                              ascii-size))
                                                                            '(p-4
                                                                              md:p-6
+                                                                             shadow-md
                                                                              bg-stone-200/75
                                                                              text-black
                                                                              rounded-xl
@@ -120,6 +121,7 @@
                                                                              ascii-size))
                                                                            '(p-4
                                                                              md:p-6
+                                                                             shadow-md
                                                                              bg-stone-200/75
                                                                              text-black
                                                                              rounded-xl

@@ -1,0 +1,175 @@
+#+title: Wikimusic - Manual & Documentation
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: num:nil html-style:nil
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://jointhefreeworld.org/static/css/jointhefreeworld.css" />
+
+[[https://jointhefreeworld.org/static-assets/badges/GNU-Guix-c48702.png]] [[https://jointhefreeworld.org/static-assets/badges/Scheme-Guile-d0730f.png]]
+
+You are reading the manual for Wikimusic.
+
+The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms.
+
+At its core, WikiMusic leverages the expressive power of Lisp (Guile Scheme) to build a dynamic interactive Music Gallery and Content Management System (CMS).
+
+This manual documents the Wikimusic project, its functionalities and how to use it, host it yourself, and do related system administration tasks.
+
+If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
+
+This is free software (free as in freedom), licensed under the GNU General Public License v3 or newer.
+
+------
+
+Wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Tailwind CSS, GNU Make, Emacs
+
+Wikimusic and Artanis are written using GNU Guile, one of the best implementations of Scheme language.
+
+- *Fully Customizable:* Hack the behavior and content of each UI element with Scheme code.
+- *Cross-platform:* Runs anywhere that Guile Scheme can run, and exposes web endpoints, and is thus accessible from computers, phones, etc.
+- *Free Software*: Contribute to its development or extend it with your own custom features.
+  
+[[https://wikimusic.jointhefreeworld.org/img/wikimusic.png]]
+
+-------
+
+* Licensing
+
+wikimusic is licensed under the GNU GPL v3 License or newer and is  built using the GNU Artanis web-framework.
+
+---------
+
+* Code of conduct
+
+This project adheres to the jointhefreeworld code of conduct. Find it here:
+
+https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-code-of-conduct/index.html
+
+In summary, we foster an inclusive, respectful, and cooperative environment for all contributors and users of this free software project. Inspired by the ideals of the GNU Project, we strive to uphold freedom, equality, and community as guiding principles. We believe that collaboration in a community of mutual respect is essential to creating excellent free software.
+
+-------
+
+* Wikimusic Project
+
+Contributing to free software is a uniquely beautiful act because it embodies principles of generosity, collaboration, and empowerment.
+
+We welcome everyone to feel invited to the wikimusic Project, and encourage active contribution in all forms, to improve it and/or suggest improvements, brainstorm with me, make it more modular/flexible, etc, feel free to contact me <jjbigorra@gmail.com> to chat, discuss or report feedback.
+
+Find here the Backlog and Kanban boards for wikimusic: https://lucidplan.jointhefreeworld.org/tickets/wikimusic
+
+
+--------
+
+* Authentication
+
+Wikimusic requires an authenticated session for performing administrative tasks such as creating/deleting jobs and profiles.
+
+Upon starting a blank new wikimusic deployment you will have no users in the database.
+
+Check in ~db/migration~ and edit the password field, or add more users. An important note is that currently authentication works by using the username (NOT email) and the passwords should NOT contain any special characters.
+
+Then do a ~guix shell -m manifest.scm -- art migrate up user~ to add your users.
+
+
+----
+
+* Running Wikimusic
+
+If you are thinking of running Wikimusic yourself and hosting it on your own here follow some tips.
+
+Firstly, make sure you use the Guix package manager, whether as a standalone distro (Guix system) or on top of any other GNU/Linux distribution.
+
+I include a ~manifest.scm~ in the repo so that it's easy to run the project if you use the Guix package manager.
+
+If you want to run without Guix you should check that ~manifest.scm~ anyway since it will give you exactly the packages that you need.
+
+Then, you will need a database to be present in the root folder of the project (alongside ~app~, ~lib~, etc.).
+
+Wikimusic uses SQLite by default but is also compatible with PostgreSQL and MySQL.
+
+You can automate the creation of the database and the enabling of WAL mode for concurrent writes with ~make init-db~.
+
+You should then look at ~db/migration~ folder and edit the migration for the ~user~ table to your liking.
+
+Then do a ~guix shell -m manifest.scm -- art migrate up user~ to add your users.
+
+If you are hacking away at the project, I would suggest using ~make dev~ since this will effectively run the project with hot-reloading capabilities and it will use the default ~artanis.conf~ where we configure hostname, db path, etc.
+
+If you are hosting this for production, I would suggest running Wikimusic as a Shepherd service/daemon.
+You can alternatively just feel free to do this any other way, I recommend using the ~manifest.scm~ . Check the ~Makefile~ for more.
+
+Here follows an example of a Guix (Shepherd service):
+
+#+begin_src scheme
+(define-module (wolk-jjba wikimusic)
+  #:use-module (gnu)
+  #:use-module (guix))
+
+(use-service-modules shepherd)
+
+(define-public (wolk-jjba-wikimusic-service config)
+  (list (shepherd-service (documentation "Run wikimusic as a daemon")
+                          (provision '(wikimusic))
+                          (requirement '())
+                          (start #~(make-forkexec-constructor '("make"
+                                                                "production-server")
+                                    #:directory
+                                    "/etc/wikimusic/job-clone/wikimusic/trunk"
+                                    #:environment-variables '("GUILE_LOAD_PATH=/run/current-system/profile/share/guile/site/3.0"
+                                                              "GUILE_DBD_PATH=/run/current-system/profile/lib"
+                                                              "C_INCLUDE_PATH=/run/current-system/profile/include"
+                                                              "GUILE_LOAD_COMPILED_PATH=/run/current-system/profile/lib/guile/3.0/site-ccache:/run/current-system/profile/share/guile/site/3.0"
+                                                              "LIBRARY_PATH=/run/current-system/profile/lib"
+                                                              "GIT_SSL_NO_VERIFY=1"
+                                                              "PATH=/run/privileged/bin:/run/current-system/profile/bin:/run/current-system/profile/sbin")))
+                          (stop #~(make-kill-destructor))
+                          (auto-start? #t)
+                          (respawn? #t))))
+
+(define-public wolk-jjba-wikimusic-service-type
+  (service-type (name 'wikimusic)
+                (description "Run wikimusic as a daemon")
+                (extensions (list (service-extension
+                                   shepherd-root-service-type
+                                   wolk-jjba-wikimusic-service)))
+                (default-value '())))
+
+
+#+end_src
+
+--------
+
+* On accessibility
+
+We believe creating accessible websites for everyone, including people with disabilities, is crucial for equality, helps provide a good user experience.
+
+Wikimusic chooses lots of its UI to appeal to the widest public possible by default, but is very configurable to allow extensibility.
+
+-------
+
+* On GNU Artanis
+
+Find the documentation for Artanis here: https://www.gnu.org/software/artanis/manual/
+
+GNU Artanis is the first production-level modern Web framework of Scheme programming language.
+
+It is designed and maintained to be robust, fast, and easy to use for professional web development.
+
+Here lies not just a framework, but a canvas where your ideas take flight with remarkable speed and grace. Artanis isn't about wrestling with complexity; it's about the joy of creation.
+
+It's about harnessing the power of a robust and mature language to build something truly your own, something beautiful, nimble, flexible, powerful, efficient, understandable and maintainable. GNU Artanis was Certificated as Awesome Project at 2013 Lisp in summer projects.
+
+One day, the folks at GNU were discussing what language they would write the GNU website in - and many chose Python. But I found that strange, because the official extension language of GNU is GNU Guile. And I wondered aloud - why not start a brand new project to provide a web framework written with GNU Guile? To which RMS said, "It's cool, I like this idea."
+
+But at that time, it was just an idea without a plan.
+
+Fortunately, a few months later, the Guile community held a hack-potluck to celebrate Guile2 turning two - which is a contest to write a cool program in a few weeks. And so, Artanis was born.
+History
+
+    February 2013 - Artanis born at the GNU Guile hack-potluck.
+    2013 - Artanis submitted to "Lisp In Summer Projects" contest. Received "Certificated awesome project award" in 2014.
+    1st January, 2015 - the first stable version Artanis-0.0.1 was released.
+    19th January, 2015 - offers Artanis to FSF/GNU, and RMS inducts it as an official GNU project. Artanis becomes GNU Artanis.
+    29 December 2021 - GNU Artanis donates to HardenedLinux community to connect with product environment more tightly.
+
+-----

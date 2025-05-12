@@ -41,7 +41,12 @@
      #:i18n '(cookie "lang")
      #:cookies '(names wikimusic-song-sort)
      (lambda (rc)
-       (let* ((user-sort (cond
+       (let* ((user-search (cond
+                             ((equal? #f
+                                      (get-from-qstr rc "search"))
+                              #f)
+                             (else (escape-str (get-from-qstr rc "search")))))
+              (user-sort (cond
                            ((not (equal? #f
                                          (get-from-qstr rc "sort")))
                             (:cookies-set! rc
@@ -69,14 +74,33 @@
                               (string->number (get-from-qstr rc "limit")))
                              (else 20)))
               (songs (DB-get-all-rows (DB-query (DB-open rc)
-                                                (->sql select * from
-                                                       'songs
-                                                       (format #f
-                                                        " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
-                                                        (car query-sort)
-                                                        (cadr query-sort)
-                                                        query-limit
-                                                        query-offset)))))
+                                                (cond
+                                                  ((equal? #f user-search)
+                                                   (->sql select * from
+                                                          'songs
+                                                          (format #f
+                                                           " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
+                                                           (car query-sort)
+                                                           (cadr query-sort)
+                                                           query-limit
+                                                           query-offset)))
+                                                  (else (->sql select * from
+                                                               'songs
+                                                               (format #f
+                                                                (string-join '
+                                                                 (" WHERE (display_name LIKE '%~a%' OR description LIKE '%~a%') "
+                                                                  " ORDER BY ~a ~a LIMIT ~a OFFSET ~a ")
+                                                                 " ")
+                                                                (escape-str
+                                                                 user-search)
+                                                                (escape-str
+                                                                 user-search)
+                                                                (car
+                                                                 query-sort)
+                                                                (cadr
+                                                                 query-sort)
+                                                                query-limit
+                                                                query-offset)))))))
               (song-ids (map (lambda (s)
                                (assoc-ref s "identifier")) songs))
               (artworks (cond
@@ -134,7 +158,9 @@
                                                 #:opinions opinions
                                                 #:comments comments
                                                 #:limit query-limit
-                                                #:offset query-offset))))))
+                                                #:offset query-offset
+                                                #:search-query user-search
+                                                #:user-sort user-sort))))))
 
 (get "/songs/new"
      #:mime 'xml

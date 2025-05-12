@@ -56,7 +56,7 @@
          (div (@ (class ,(->css '(flex flex-row
                                        flex-wrap
                                        gap-2
-                                       justify-left
+                                       justify-start
                                        px-3
                                        py-3))))
               (p (@ (class ,(->css '(text-xs text-stone-600))))
@@ -87,7 +87,7 @@
                                       gap-3
                                       p-3
                                       items-center
-                                      justify-left
+                                      justify-start
                                       w-full
                                       hover:text-blue-700
                                       bg-stone-200))))
@@ -153,14 +153,17 @@
                                       (equal? 1
                                               (assoc-ref o "is_dislike")))
                                     opinions))))
-      `((div (@ (class ,(->css '(bg-stone-200 rounded-2xl))))
-             (div (@ (class ,(->css '(flex flex-col py-3 px-2))))
+      `((div (@ (class ,(->css '(bg-stone-200 rounded-2xl shadow-md))))
+             (div (@ (class ,(->css '(flex flex-col py-3 px-3))))
                   ,(cond-render (lambda (art)
-                                  `(figure (@ (class ,(->css '(py-3 sm:w-48
+                                  `(figure (@ (class ,(->css '(py-3
                                                                self-center))))
                                            (a (@ (href ,item-link))
                                               (img (@ (loading "lazy")
-                                                      (class "rounded-xl")
+                                                      (class ,(->css '(rounded-xl
+                                                                       w-40
+                                                                       sm:w-48
+                                                                       shadow-md)))
                                                       (src ,(assoc-ref art
                                                              "content_url")))))))
                                 (cond
@@ -209,9 +212,9 @@
                                      (assoc-ref u "email_address"))))
                       (car (assoc-ref user-alist
                                       (assoc-ref comment "created_by"))))
-        (p (@ (class "text-sm text-stone-900"))
+        (p (@ (class ,(->css '(text-sm text-stone-900))))
            ,(assoc-ref comment "contents"))
-        (p (@ (class "text-xs text-stone-400"))
+        (p (@ (class ,(->css '(text-xs text-stone-400))))
            ,(assoc-ref comment "created_at"))))
 
 (define-public (render-comments G_ user-alist parent-identifier comments)
@@ -222,7 +225,7 @@
     (map (lambda (comment)
            `((div (@ (class "max-w-prose"))
                   ,(render-comment G_ user-alist comment))
-             (div (@ (class "max-w-prose pl-3"))
+             (div (@ (class ,(->css '(max-w-prose pl-3))))
                   ,(render-comments G_ user-alist
                                     (assoc-ref comment "identifier") comments))))
          top-nodes)))
@@ -235,9 +238,10 @@
                                comments
                                user-alist)
   (let* ((rendered-artworks (map (lambda (art)
-                                   `(figure (@ (class "py-3 sm:w-48"))
-                                            (img (@ (loading "lazy")
-                                                    (class "rounded-xl")
+                                   `(figure (@ (class ,(->css '(py-3 sm:w-48))))
+                                            (img (@ (loading lazy)
+                                                    (class ,(->css '(rounded-xl
+                                                                     shadow-md)))
                                                     (src ,(assoc-ref art
                                                            "content_url"))))
                                             ,(cond-render (lambda (fc)
@@ -436,18 +440,25 @@
 
 (begin
   (define* (sort-select G_
-                        #:key entity)
+                        #:key entity user-sort)
     `((div (@ (class ,(->css '(flex flex-col gap-2 w-min))))
            (select (@ (onchange "window.location.href=this.value;")
                       (name "sort-select")
                       (id "sort-select")
-                      (class (->css '(p-2 rounded-xl bg-stone-200))))
+                      (class ,(->css '(p-3 border-2 border-stone-200
+                                           rounded-xl bg-white shadow-md))))
                    (option ,(G_ "sort order"))
                    ,(map (lambda (s)
                            `((option (@ (value ,(format #f "/~as?sort=~a"
                                                         entity
-                                                        (car s))))
+                                                        (car s)))
+                                        ,(cond
+                                           ((equal? user-sort
+                                                    (car s))
+                                            '(selected ""))
+                                           (else '(not-selected ""))))
                                      ,(cdr s))))
+
                          `(("display-name-asc" unquote
                             (G_ "Name - Ascending"))
                            ("display-name-desc" unquote
@@ -478,7 +489,8 @@
            (select (@ (onchange "window.location.href=this.value;")
                       (name "ascii-size-select")
                       (id "ascii-size-select")
-                      (class (->css '(p-2 rounded-xl bg-stone-200))))
+                      (class ,(->css '(p-3 border-2 border-stone-200
+                                           rounded-xl bg-white shadow-md))))
                    (option ,(G_ "ascii size"))
                    ,(map (lambda (s)
                            `((option (@ (value ,(format #f "~a?ascii-size=~a"
@@ -490,3 +502,48 @@
                            ("text-lg" . "text-lg")
                            ("text-xl" . "text-xl")))))))
   (export ascii-size-select))
+
+(begin
+  (define* (search-box G_
+                       #:key search-query)
+    `((script
+       "
+function addSearchQueryParam(form) {
+  const searchInput = document.getElementsByName('search')[0];
+
+  if (searchInput.value) {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    var params = Object.fromEntries(urlSearchParams.entries());
+
+    params.search = encodeURIComponent(searchInput.value);
+
+    const q = Object.entries(params).map((k,_)=>`${k[0]}=${k[1]}`).reduce((a,b) => `${a}&${b}`);
+
+    console.log(q);
+    console.log(`${window.location.pathname}?${q}`);
+
+    window.location.href = `${window.location.pathname}?${q}`;
+    return false; // Prevent the default form submission
+  }
+  return true; // Allow default submission if the input is empty
+}
+")
+      (div (@ (class ,(->css '(my-3))))
+           (form (@ (onsubmit "addSearchQueryParam(this)"))
+                 (div (@ (class ,(->css '(flex flex-row align-center
+                                               items-center justify-start
+                                               gap-2))))
+                      ,(hyg-input #:label ""
+                                  #:name "search"
+                                  #:value (cond
+                                            ((equal? #f search-query)
+                                             "")
+                                            (else search-query))
+                                  #:placeholder (G_ "Search...")
+                                  #:input-css '(p-2 max-w-prose rounded-xl
+                                                    border-stone-200 border-2
+                                                    shadow-md)
+                                  #:input-flex-css #f)
+                      ,(hyg-submit-button (G_ "search")))))))
+  (export search-box))
+
