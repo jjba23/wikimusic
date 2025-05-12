@@ -43,8 +43,6 @@ I strive to provide proper and extensive documentation on Wikimusic, available a
 - Org format [[file:docs/manual/en-GB.org]]
 
 
-[[https://wikimusic.jointhefreeworld.org/img/wikimusic.png]]
-
 
 ------
 
