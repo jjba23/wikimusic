@@ -17,6 +17,24 @@ This manual documents the Wikimusic project, its functionalities and how to use 
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
+At its core, WikiMusic leverages the expressive power of Lisp (Guile Scheme) to build a dynamic interactive Music Gallery and Content Management System (CMS).
+
+Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:
+- Discover music from diverse genres and traditions.
+- Organize information with structured metadata and multimedia content.
+- Contribute by adding new compositions, analyses, or educational materials.
+- Learn through curated resources that connect music theory, history, and practice.
+
+You can host your own version and database of WikiMusic, or visit the biggest one, mine over at:
+
+[[https://wikimusic.jointhefreeworld.org][https://wikimusic.jointhefreeworld.org]]
+
+WikiMusic leverages a database-backed architecture to ensure all content is easily searchable, linkable, and reusable. The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively.
+
+Join us in building an ever-growing library of musical knowledge — where every note tells a story.
+
+[[https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic-small.jpg]]
+
 This is free software (free as in freedom), licensed under the GNU General Public License v3 or newer.
 
 ------
@@ -28,8 +46,7 @@ Wikimusic and Artanis are written using GNU Guile, one of the best implementatio
 - *Fully Customizable:* Hack the behavior and content of each UI element with Scheme code.
 - *Cross-platform:* Runs anywhere that Guile Scheme can run, and exposes web endpoints, and is thus accessible from computers, phones, etc.
 - *Free Software*: Contribute to its development or extend it with your own custom features.
-  
-[[https://wikimusic.jointhefreeworld.org/img/wikimusic.png]]
+ 
 
 -------
 

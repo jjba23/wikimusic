@@ -26,6 +26,8 @@ WikiMusic leverages a database-backed architecture to ensure all content is easi
 
 Join us in building an ever-growing library of musical knowledge — where every note tells a story.
 
+[[https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic-small.jpg]]
+
 --------
 
 * Licensing
