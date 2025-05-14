@@ -29,10 +29,11 @@
   #:use-module (ice-9 string-fun))
 
 (define-public (render-song-contents G_ song song-contents ascii-size)
-  `(div (hr (@ (class ,(mk-class '(my-4)))))
+  `(div ,(hr)
         (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))
              (span (@ (class ,(mk-class '(font-black text-2xl text-stone-700
-                                                     px-2 py-6))))
+                                                     dark:text-stone-300 px-2
+                                                     py-6))))
                    ,(G_ "musical contents"))
              ,(ascii-size-select G_
                                  #:route (format #f "/~as/uuid/~a"
@@ -50,6 +51,7 @@
   `((hr)
     (details (@ (open true))
              (summary (@ (class ,(mk-class '(text-xl font-bold text-stone-700
+                                                     dark:text-stone-300
                                                      cursor-pointer))))
                       ,(render-if-nempty (lambda (version-name)
                                            (format #f "~a ~a ~a"
@@ -60,7 +62,9 @@
 
              (div (@ (class ,(mk-class '(my-4))))
                   (div (@ (class ,(mk-class '(py-3))))
-                       (details (summary (@ (class ,(mk-class '(cursor-pointer))))
+                       (details (summary (@ (class ,(mk-class '(cursor-pointer
+                                                                dark:text-stone-300
+                                                                text-stone-700))))
                                          ,(G_ "manage version"))
                                 (div (@ (class ,(mk-class '(flex flex-wrap
                                                                  flex-row
@@ -82,9 +86,10 @@
                                                         (assoc-ref version
                                                          "identifier"))))
                                            ,(icon-button #:icon 'trash
-                                                         #:background 'bg-red-700
-                                                         #:hover-background 'hover:bg-red-800
-                                                         #:border-color 'border-stone-700
+                                                         #:background '(bg-red-700)
+                                                         #:hover-background '(hover:bg-red-800)
+                                                         #:border-color '(border-stone-700
+                                                                          dark:border-stone-400)
                                                          #:type 'submit
                                                          #:content (G_
                                                                     "delete version"))))))
@@ -94,6 +99,7 @@
                                                                       (text-xl
                                                                        font-bold
                                                                        text-stone-700
+                                                                       dark:text-stone-300
                                                                        cursor-pointer))))
                                                           ,(G_ "ascii legend"))
                                                  (pre (@ (class ,(mk-class (append
@@ -104,7 +110,9 @@
                                                                               md:p-6
                                                                               shadow-md
                                                                               bg-stone-200/75
+                                                                              dark:bg-stone-900
                                                                               text-black
+                                                                              dark:text-white
                                                                               rounded-xl
                                                                               white-space-pre
                                                                               overflow-x-scroll)))))
@@ -116,6 +124,7 @@
                                                                       (text-xl
                                                                        font-bold
                                                                        text-stone-700
+                                                                       dark:text-stone-300
                                                                        cursor-pointer))))
                                                           ,(G_
                                                             "ascii contents"))
@@ -127,7 +136,9 @@
                                                                               md:p-6
                                                                               shadow-md
                                                                               bg-stone-200/75
+                                                                              dark:bg-stone-900
                                                                               text-black
+                                                                              dark:text-white
                                                                               rounded-xl
                                                                               white-space-pre
                                                                               overflow-x-scroll)))))
@@ -191,74 +202,77 @@
                               (guitarpro-contents "")
                               (pdf-contents ""))
     `(,(if (and song-identifier song-content-identifier)
-           `(h2 (@ (class ,(mk-class '(text-2xl my-6 font-bold text-stone-800))))
-                ,(format #f "~a: ~a ~a"
-                         (G_ "editing version") version-name instrument-type))
-           `(h2 (@ (class ,(mk-class '(text-2xl my-6 font-bold text-stone-800))))
-                (G_ "new version"))) (form (@ (method POST)
-                                              (action ,(if (and
-                                                            song-identifier
-                                                            song-content-identifier)
-                                                           (format #f
-                                                            "/songs/uuid/~a/contents/~a/edit"
-                                                            song-identifier
-                                                            song-content-identifier)
-                                                           (format #f
-                                                            "/songs/uuid/~a/contents/new"
-                                                            song-identifier)))
-                                              (content-type
-                                               application/x-www-form-urlencoded))
-                                           (div ,(input #:label (G_
-                                                                 "instrument type")
-                                                        #:name 'instrument-type
-                                                        #:value (unescape-str
-                                                                 instrument-type)
-                                                        #:required #t)
-                                                ,(input #:label (G_
-                                                                 "version name")
-                                                        #:name 'version-name
-                                                        #:value (unescape-str
-                                                                 version-name)
-                                                        #:required #t)
-                                                ,(textarea #:label (G_
-                                                                    "ascii legend")
-                                                           #:name 'ascii-legend
-                                                           #:value (unescape-str
-                                                                    ascii-legend)
-                                                           #:required #f
-                                                           #:textarea-css '(p-3
-                                                                            max-w-prose
-                                                                            rounded-xl
-                                                                            border-stone-200
-                                                                            border-2
-                                                                            min-h-80
-                                                                            text-sm
-                                                                            min-w-full
-                                                                            font-mono))
-                                                ,(textarea #:label (G_
-                                                                    "ascii contents")
-                                                           #:name 'ascii-contents
-                                                           #:value (unescape-str
-                                                                    ascii-contents)
-                                                           #:required #f
-                                                           #:textarea-css '(p-3
-                                                                            max-w-prose
-                                                                            rounded-xl
-                                                                            border-stone-200
-                                                                            border-2
-                                                                            min-h-96
-                                                                            text-sm
-                                                                            min-w-full
-                                                                            font-mono))
-                                                (input (@ (type file)
-                                                          (hidden true)
-                                                          (name pdf-contents)
-                                                          (value "")) "")
-                                                (input (@ (type file)
-                                                          (hidden true)
-                                                          (name
-                                                           guitarpro-contents)
-                                                          (value "")) "")))
+           (h2 (format #f "~a: ~a ~a"
+                       (G_ "editing version") version-name instrument-type))
+           (h2 (G_ "new version"))) (form (@ (method POST)
+                                             (action ,(if (and song-identifier
+                                                           song-content-identifier)
+                                                          (format #f
+                                                           "/songs/uuid/~a/contents/~a/edit"
+                                                           song-identifier
+                                                           song-content-identifier)
+                                                          (format #f
+                                                           "/songs/uuid/~a/contents/new"
+                                                           song-identifier)))
+                                             (content-type
+                                              application/x-www-form-urlencoded))
+                                          (div ,(input #:label (G_
+                                                                "instrument type")
+                                                       #:name 'instrument-type
+                                                       #:value (unescape-str
+                                                                instrument-type)
+                                                       #:required #t)
+                                               ,(input #:label (G_
+                                                                "version name")
+                                                       #:name 'version-name
+                                                       #:value (unescape-str
+                                                                version-name)
+                                                       #:required #t)
+                                               ,(textarea #:label (G_
+                                                                   "ascii legend")
+                                                          #:name 'ascii-legend
+                                                          #:value (unescape-str
+                                                                   ascii-legend)
+                                                          #:required #f
+                                                          #:textarea-css '(p-3
+                                                                           rounded-xl
+                                                                           border-stone-200
+                                                                           dark:border-stone-700
+                                                                           dark:text-stone-300
+                                                                           dark:bg-stone-700/75
+                                                                           border-2
+                                                                           min-h-72
+                                                                           shadow-md
+                                                                           font-mono
+                                                                           text-sm
+                                                                           min-w-prose))
+                                               ,(textarea #:label (G_
+                                                                   "ascii contents")
+                                                          #:name 'ascii-contents
+                                                          #:value (unescape-str
+                                                                   ascii-contents)
+                                                          #:required #f
+                                                          #:textarea-css '(p-3
+                                                                           rounded-xl
+                                                                           border-stone-200
+                                                                           dark:border-stone-700
+                                                                           dark:text-stone-300
+                                                                           dark:bg-stone-700/75
+                                                                           border-2
+                                                                           min-h-240
+                                                                           text-sm
+                                                                           shadow-md
+                                                                           font-mono
+                                                                           min-w-prose))
+                                               (input (@ (type file)
+                                                         (hidden true)
+                                                         (name pdf-contents)
+                                                         (value "")) "")
+                                               (input (@ (type file)
+                                                         (hidden true)
+                                                         (name
+                                                          guitarpro-contents)
+                                                         (value "")) "")))
       (div ,(submit-button (if song-content-identifier
                                (G_ "edit")
                                (G_ "create"))))))

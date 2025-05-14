@@ -72,7 +72,7 @@
               (query-limit (cond
                              ((not (nil? (get-from-qstr rc "limit")))
                               (string->number (get-from-qstr rc "limit")))
-                             (else 20)))
+                             (else 40)))
               (artists (DB-get-all-rows (DB-query (DB-open rc)
                                                   (cond
                                                     ((equal? #f user-search)

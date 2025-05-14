@@ -40,7 +40,7 @@
 
 (define-public asset-library
   (build-asset-library '("pub/css/fonts.css" "pub/css/phosphor.css"
-                         "pub/js/tailwind.js" "pub/js/tailwind.config.js")))
+                         "pub/js/tailwind.js")))
 
 (define-public (page-footer G_)
   `(,(footer `((div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
@@ -56,7 +56,6 @@
                     ,(p "version:")
                     ,(mono (format #f "~a"
                                    (get-short-commit-sha))
-                           #:color 'text-stone-600
                            #:size 'text-md))))))
 
 (begin
@@ -82,44 +81,52 @@
                                          justify-start
                                          w-full
                                          hover:text-blue-700
-                                         bg-stone-200))))
+                                         bg-stone-200
+                                         dark:bg-stone-900))))
              (a (@ (href "/"))
                 (div (@ (class ,(mk-class '(flex flex-row gap-2 items-center
                                                  px-4 py-1))))
-                     (span ,(icon #:type 'music-note))
-                     (span (@ (class ,(mk-class '(text-md text-stone-700
-                                                          hover:text-blue-700
-                                                          font-sans font-bold))))
-                           ,(G_ "Wikimusic"))))
-             (a (@ (class ,nav-css)
-                   (href "/songs"))
-                ,(icon #:type 'music-notes-simple)
-                ,(G_ "Songs"))
-             (a (@ (class ,nav-css)
-                   (href "/genres"))
-                ,(icon #:type 'disc)
-                ,(G_ "Genres"))
-             (a (@ (class ,nav-css)
-                   (href "/artists"))
-                ,(icon #:type 'guitar)
-                ,(G_ "Artists"))
-             (a (@ (class ,nav-css)
-                   (href "/login"))
-                ,(icon #:type 'sign-in)
-                ,(G_ "Login")))))
+                     (span ,(icon #:type 'music-note
+                                  #:icon-css '(text-xl text-stone-800
+                                                       dark:text-stone-200)))
+                     ,(h4 (G_ "Wikimusic"))))
+             (a (@ (href "/songs"))
+                ,(icon-button #:icon 'music-notes-simple
+                              #:content (G_ "songs")))
+             (a (@ (href "/genres"))
+                ,(icon-button #:icon 'disc
+                              #:content (G_ "genres")))
+             (a (@ (href "/artists"))
+                ,(icon-button #:icon 'guitar
+                              #:content (G_ "artists")))
+             (a (@ (href "/login"))
+                ,(icon-button #:icon 'sign-in
+                              #:content (G_ "login")))
+             ,(ui-mode-button))))
     `("<!DOCTYPE html>" (html (head (title "Wikimusic")
                                     (style ,(assoc-ref asset-library
                                                        "pub/css/fonts.css"))
                                     (style ,(assoc-ref asset-library
                                                        "pub/css/phosphor.css"))
+                                    (style (@ (type "text/tailwindcss"))
+                                     "
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme {
+  --font-sans: \"Adwaita Sans\", sans-serif;
+  --font-mono: \"Adwaita Mono\", monospace;
+}
+")
                                     (meta (@ (name "viewport")
                                              (content
                                               "width=device-width, initial-scale=1.0")))
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
-                                    (script ,(assoc-ref asset-library
-                                              "pub/js/tailwind.config.js")))
-                              (body ,(with-footer #:main `((div (@ (class ,(mk-class '
+                                    (script ,toggle-dark-theme-js)
+                                    (script ,remember-dark-theme-js))
+                              (body (@ (class ,(mk-class '(bg-stone-100
+                                                           dark:bg-stone-800))))
+                                    ,(with-footer #:main `((div (@ (class ,(mk-class '
                                                                             (flex
                                                                              flex-col
                                                                              justify-between
@@ -152,8 +159,15 @@
                                       (equal? 1
                                               (assoc-ref o "is_dislike")))
                                     opinions))))
-      `((div (@ (class ,(mk-class '(bg-stone-200 rounded-2xl shadow-md))))
-             (div (@ (class ,(mk-class '(flex flex-col py-3 px-3))))
+      `((div (@ (class ,(mk-class '(bg-stone-200 dark:bg-stone-900 rounded-2xl
+                                                 shadow-md h-full))))
+             (div (@ (class ,(mk-class '(flex flex-col
+                                              py-3
+                                              px-3
+                                              justify-center
+                                              align-center
+                                              items-start
+                                              h-full))))
                   ,(render-if-nempty (lambda (art)
                                        `(figure (@ (class ,(mk-class '(py-3
                                                                        self-center))))
@@ -173,27 +187,37 @@
                                         '())
                                        (else (car artworks))))
                   (a (@ (class ,(mk-class '(text-blue-900 hover:text-blue-700
-                                                          text-xl font-bold
-                                                          max-w-prose
-                                                          break-all)))
+                                            dark:text-blue-400
+                                            dark:hover:text-blue-300
+                                            text-xl
+                                            font-bold
+                                            max-w-prose
+                                            break-all)))
                         (href ,item-link))
                      (span ,(assoc-ref x "display_name")))
                   (div (@ (class ,(mk-class '(flex flex-row gap-2))))
-                       (span ,(G_ "views"))
-                       (span ,(format #f "~a"
+                       (span (@ (class ,(mk-class '(text-stone-800
+                                                    dark:text-stone-200))))
+                             ,(G_ "views"))
+                       (span (@ (class ,(mk-class '(text-stone-800
+                                                    dark:text-stone-200))))
+                             ,(format #f "~a"
                                       (assoc-ref x "views"))))
                   (div (@ (class ,(mk-class '(flex flex-row gap-2))))
                        (span (@ (class ,(mk-class '(font-black text-green-800
-                                                               text-xs))))
+                                                    dark:text-green-600
+                                                    text-xs))))
                              ,(format #f "~a" likes))
                        (span (@ (class ,(mk-class '(font-black text-red-800
-                                                               text-xs))))
+                                                    dark:text-red-600 text-xs))))
                              ,(format #f "~a" dislikes)))
                   (div (@ (class ,(mk-class '(flex flex-row gap-2))))
-                       (span (@ (class ,(mk-class '(text-xs text-stone-700))))
+                       (span (@ (class ,(mk-class '(text-xs text-stone-700
+                                                    dark:text-stone-300))))
                              ,(format #f "~a"
                                       (length comments)))
-                       (span (@ (class ,(mk-class '(text-xs text-stone-700))))
+                       (span (@ (class ,(mk-class '(text-xs text-stone-700
+                                                    dark:text-stone-300))))
                              ,(G_ "comments")))
                   ,extra-info)))))
   (export item-tile))
@@ -216,7 +240,7 @@
                                            (assoc-ref comment "created_by"))))
         (p (@ (class ,(mk-class '(text-sm text-stone-900))))
            ,(assoc-ref comment "contents"))
-        (p (@ (class ,(mk-class '(text-xs text-stone-400))))
+        (p (@ (class ,(mk-class '(text-xs text-stone-400 dark:text-stone-300))))
            ,(assoc-ref comment "created_at"))))
 
 (define-public (render-comments G_ user-alist parent-identifier comments)
@@ -280,9 +304,11 @@
                                                     "/~as/uuid/~a/like" entity
                                                     (assoc-ref x "identifier"))))
                                        ,(icon-button #:icon 'thumbs-up
-                                                     #:background 'bg-green-700
-                                                     #:hover-background 'hover:bg-green-800
-                                                     #:border-color 'border-stone-700
+                                                     #:color '(text-stone-100)
+                                                     #:background '(bg-green-700)
+                                                     #:hover-background '(hover:bg-green-800)
+                                                     #:border-color '(border-stone-700
+                                                                      dark:border-stone-400)
                                                      #:type 'submit
                                                      #:content `(div ,(G_
                                                                        "like")
@@ -298,9 +324,11 @@
                                                     entity
                                                     (assoc-ref x "identifier"))))
                                        ,(icon-button #:icon 'thumbs-down
-                                                     #:background 'bg-red-700
-                                                     #:hover-background 'hover:bg-red-800
-                                                     #:border-color 'border-stone-700
+                                                     #:color '(text-stone-100)
+                                                     #:background '(bg-red-700)
+                                                     #:hover-background '(hover:bg-red-800)
+                                                     #:border-color '(border-stone-700
+                                                                      dark:border-stone-400)
                                                      #:type 'submit
                                                      #:content `(div ,(G_
                                                                        "dislike")
@@ -316,21 +344,26 @@
          (maybe-description (render-if-nempty (lambda (description)
                                                 `(div (p (@ (class ,(mk-class '
                                                                               (text-stone-700
+                                                                               dark:text-stone-400
                                                                                font-bold))))
                                                          ,(G_ "description"))
                                                       (p (@ (class ,(mk-class '
                                                                               (pl-3
                                                                                text-stone-800
+                                                                               dark:text-stone-300
                                                                                max-w-prose))))
                                                          ,description)))
                                               (assoc-ref x "description")))
          (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
                                                    `((dt (@ (class ,(mk-class '
                                                                               (text-stone-700
+                                                                               dark:text-stone-400
                                                                                font-bold))))
                                                          ,(G_ "last edited"))
-                                                     (dd (@ (class
-                                                             "pl-3 text-stone-800"))
+                                                     (dd (@ (class ,(mk-class '
+                                                                              (pl-3
+                                                                               text-stone-800
+                                                                               dark:text-stone-300))))
                                                          ,(strftime "%c"
                                                                     (localtime
                                                                      (string->number
@@ -338,10 +371,12 @@
                                                  (assoc-ref x "last_edited_at")))
          (maybe-approved-by (render-if-nempty (lambda (approved-by)
                                                 `((dt (@ (class ,(mk-class '(text-stone-700
+                                                                             dark:text-stone-400
                                                                              font-bold))))
                                                       ,(G_ "approved by"))
                                                   (dd (@ (class ,(mk-class '(pl-3
-                                                                             text-stone-800))))
+                                                                             text-stone-800
+                                                                             dark:text-stone-300))))
                                                       ,approved-by)))
                                               (assoc-ref x "approved_by"))))
     
@@ -354,21 +389,27 @@
                         ,(icon-button #:icon 'pencil
                                       #:content (G_ "edit"))))
                 ,maybe-description
-                (dl (dt (@ (class ,(mk-class '(text-stone-700 font-bold))))
+                (dl (dt (@ (class ,(mk-class '(text-stone-700
+                                               dark:text-stone-400 font-bold))))
                         ,(G_ "views"))
-                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800))))
+                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800
+                                                    dark:text-stone-300))))
                         ,(format #f "~a"
                                  (assoc-ref x "views")))
-                    (dt (@ (class ,(mk-class '(text-stone-700 font-bold))))
+                    (dt (@ (class ,(mk-class '(text-stone-700
+                                               dark:text-stone-400 font-bold))))
                         ,(G_ "created"))
-                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800))))
+                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800
+                                                    dark:text-stone-300))))
                         ,(strftime "%c"
                                    (localtime (string->number (assoc-ref x
                                                                "created_at")))))
                     ,maybe-last-edited-at
-                    (dt (@ (class ,(mk-class '(text-stone-700 font-bold))))
+                    (dt (@ (class ,(mk-class '(text-stone-700
+                                               dark:text-stone-400 font-bold))))
                         ,(G_ "contributor"))
-                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800))))
+                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800
+                                                    dark:text-stone-300))))
                         ,(render-if-nempty (lambda (u)
                                              `(div (@ (class ,(mk-class '(flex
                                                                           flex-wrap
@@ -385,17 +426,23 @@
                                            (car (assoc-ref user-alist
                                                            (assoc-ref x
                                                             "created_by")))))
-                    (dt (@ (class ,(mk-class '(text-stone-700 font-bold))))
+                    (dt (@ (class ,(mk-class '(text-stone-700
+                                               dark:text-stone-400 font-bold))))
                         ,(G_ "visibility"))
-                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800))))
+                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800
+                                                    dark:text-stone-300))))
                         ,(render-visibility-status (assoc-ref x
                                                     "visibility_status")))
                     ,maybe-approved-by
-                    (dt (@ (class ,(mk-class '(text-stone-700 font-bold))))
+                    (dt (@ (class ,(mk-class '(text-stone-700
+                                               dark:text-stone-400 font-bold))))
                         ,(G_ "uuid"))
-                    (dd (@ (class ,(mk-class '(pl-3 text-sm text-stone-600))))
+                    (dd (@ (class ,(mk-class '(pl-3 text-sm text-stone-600
+                                                    dark:text-stone-300))))
                         ,(assoc-ref x "identifier")))))
-      (details (summary (@ (class "cursor-pointer"))
+      (details (summary (@ (class ,(mk-class '(text-stone-800
+                                               dark:text-stone-200
+                                               cursor-pointer))))
                         ,(format #f "~a ~a"
                                  (length comments)
                                  (G_ "comments")))
@@ -546,8 +593,13 @@ function addSearchQueryParam(form) {
                                          "")
                                         (else search-query))
                               #:placeholder (G_ "Search...")
-                              #:input-css '(p-2 max-w-prose rounded-xl
-                                                border-stone-200 border-2
+                              #:input-css '(p-3 max-w-prose
+                                                rounded-xl
+                                                border-stone-200
+                                                dark:border-stone-700
+                                                dark:text-stone-300
+                                                dark:bg-stone-700/75
+                                                border-2
                                                 shadow-md)
                               #:input-flex-css #f)
                       ,(submit-button (G_ "search")))))))

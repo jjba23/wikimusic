@@ -40,16 +40,26 @@
                                         ,(wikimusic-img))))))
 
 (define (wikimusic-img)
-  `((div (div (@ (class ,(mk-class '(bg-stone-300/50 max-w-56 sm:max-w-90 p-4
-                                                     rounded-xl shadow-md))))
+  `((div (div (@ (class ,(mk-class '(bg-stone-300/50 dark:bg-stone-900
+                                                     max-w-56
+                                                     sm:max-w-90
+                                                     p-4
+                                                     rounded-xl
+                                                     shadow-md))))
               (figure (img (@ (class ,(mk-class '(rounded-2xl h-auto)))
                               (loading lazy)
                               (src
                                "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg"))))))))
 
 (define (wikimusic-explain G_)
-  `((div (@ (class ,(mk-class '(max-w-prose my-8 p-4 bg-stone-300/50
-                                            rounded-2xl shadow-md))))
+  `((div (@ (class ,(mk-class '(max-w-prose my-8
+                                            p-4
+                                            bg-stone-300/50
+                                            dark:bg-stone-900
+                                            text-stone-800
+                                            dark:text-stone-200
+                                            rounded-2xl
+                                            shadow-md))))
          (p ,(G_
               "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."))
 

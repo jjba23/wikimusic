@@ -157,16 +157,10 @@
                                artworks))
            (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ,(if (assoc-ref artist "identifier")
-                            `(h2 (@ (class ,(mk-class '(text-2xl my-6
-                                                        font-bold
-                                                        text-stone-800))))
-                                 ,(format #f "~a: ~a"
-                                          (G_ "editing artist")
-                                          (assoc-ref artist "display_name")))
-                            `(h2 (@ (class ,(mk-class '(text-2xl my-6
-                                                        font-bold
-                                                        text-stone-800))))
-                                 (G_ "new artist")))
+                            (h2 (format #f "~a: ~a"
+                                        (G_ "editing artist")
+                                        (assoc-ref artist "display_name")))
+                            (h2 (G_ "new artist")))
                        (details (@ (open true))
                                 (summary (@ (class ,(mk-class '(font-black
                                                                 text-stone-800

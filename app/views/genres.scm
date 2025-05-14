@@ -153,16 +153,10 @@
                       artworks))
            (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ,(if (assoc-ref genre "identifier")
-                            `(h2 (@ (class ,(mk-class '(text-2xl my-6
-                                                        font-bold
-                                                        text-stone-800))))
-                                 ,(format #f "~a: ~a"
-                                          (G_ "editing genre")
-                                          (assoc-ref genre "display_name")))
-                            `(h2 (@ (class ,(mk-class '(text-2xl my-6
-                                                        font-bold
-                                                        text-stone-800))))
-                                 (G_ "new genre")))
+                            (h2 (format #f "~a: ~a"
+                                        (G_ "editing genre")
+                                        (assoc-ref genre "display_name")))
+                            (h2 (G_ "new genre")))
                        (details (@ (open true))
                                 (summary (@ (class ,(mk-class '(font-black
                                                                 text-stone-800

@@ -43,10 +43,14 @@
                                                                       text-xs
                                                                       text-stone-700))))
 
-                                               (span ,(format #f "~a"
+                                               (span (@ (class ,(mk-class '(text-stone-700
+                                                                            dark:text-stone-300))))
+                                                     ,(format #f "~a"
 
                                                               (car vc)))
-                                               (span ,(G_ "versions"))))
+                                               (span (@ (class ,(mk-class '(text-stone-700
+                                                                            dark:text-stone-300))))
+                                                     ,(G_ "versions"))))
                                        (assoc-ref song-version-count-alist
                                                   (assoc-ref x "identifier")))))
     `((div ,(item-tile G_
@@ -144,11 +148,8 @@
                                   ascii-size)
   (html-template G_
                  #:body `((div (@ (class ,(mk-class '(container mx-auto))))
-                               ((h2 (@ (class ,(mk-class '(font-black
-                                                           text-stone-800
-                                                           text-3xl))))
-                                    ,(assoc-ref song "display_name"))
-                                
+                               (,(h2 (assoc-ref song "display_name"))
+
                                 (div (div ,(entity-details G_
                                                            'song
                                                            song
@@ -164,16 +165,10 @@
   (define* (song-edit-page G_ song song-contents artworks)
     (let* ((html `(div (@ (class "container mx-auto"))
                        ,(if (assoc-ref song "identifier")
-                            `(h2 (@ (class ,(mk-class '(text-2xl my-6
-                                                        font-bold
-                                                        text-stone-800))))
-                                 ,(format #f "~a: ~a"
-                                          (G_ "editing song")
-                                          (assoc-ref song "display_name")))
-                            `(h2 (@ (class ,(mk-class '(text-2xl my-6
-                                                        font-bold
-                                                        text-stone-800))))
-                                 (G_ "new song")))
+                            (h2 (format #f "~a: ~a"
+                                        (G_ "editing song")
+                                        (assoc-ref song "display_name")))
+                            (h2 (G_ "new song")))
                        (details (@ (open true))
                                 (summary (@ (class ,(mk-class '(font-black
                                                                 text-stone-800
