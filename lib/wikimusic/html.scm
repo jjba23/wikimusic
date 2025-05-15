@@ -458,7 +458,7 @@
                                     entity-identifier)
                             (format #f "/~as/uuid/~a/artworks/edit/~a" entity
                                     entity-identifier artwork-identifier))))
-      `((div (@ (class "flex flex-col gap-2"))
+      `((div (@ (class ,(mk-class '(flex flex-col gap-2))))
              (form (@ (method POST)
                       (content-type application/x-www-form-urlencoded)
                       (action ,form-action))
@@ -481,9 +481,9 @@
                                             (content-type
                                              application/x-www-form-urlencoded)
                                             (action ,(format #f
-                                                      "/~as/uuid/~a/artworks/~a/delete"
-                                                      entity entity-identifier
-                                                      artwork-identifier)))
+                                                             "/~as/uuid/~a/artworks/~a/delete"
+                                                             entity entity-identifier
+                                                             artwork-identifier)))
                                          ,(danger-submit-button (G_ "delete"))))
                                 artwork-identifier)))))
   (export artwork-form))

@@ -57,14 +57,14 @@
                                                                        dark:text-stone-300))))
                                                           ,(G_ "versions")))))
                                            (assoc-ref song-version-count-alist
-                                                      (assoc-ref x "identifier"))))
+                                            (assoc-ref x "identifier"))))
          (this-song-artists-relations (map (lambda (aa)
                                              (assoc-ref aa "artist_identifier"))
                                            (filter (lambda (a)
                                                      (equal? (assoc-ref x
-                                                                        "identifier")
+                                                              "identifier")
                                                              (assoc-ref a
-                                                                        "song_identifier")))
+                                                              "song_identifier")))
                                                    song-artists)))
 
          (art (filter (lambda (aaa)
@@ -72,14 +72,14 @@
                                 (equal? s
                                         (assoc-ref aaa "identifier")))
                               this-song-artists-relations)) artists))
-         
 
          (extra-top-info (map (lambda (ar)
                                 `((div ,(a (em (assoc-ref ar "display_name"))
                                            #:size 'text-lg
-                                           #:href (format #f "/artists/uuid/~a"
+                                           #:href (format #f
+                                                          "/artists/uuid/~a"
                                                           (assoc-ref ar
-                                                                     "identifier"))))))
+                                                           "identifier"))))))
                               art))
 
          )
@@ -189,15 +189,28 @@
     
     (html-template G_
                    #:body `((div (@ (class ,(mk-class '(container mx-auto))))
-                                 (,(h2 (assoc-ref song "display_name"))
-                                  ,(map (lambda (ar)
-                                          `((div ,(a (em (assoc-ref ar "display_name"))
-                                                     #:size 'text-lg
-                                                     #:href (format #f "/artists/uuid/~a"
-                                                                    (assoc-ref ar
-                                                                               "identifier"))))))
-                                        artists)
-                                  
+                                 (,(h2 (assoc-ref song "display_name")) ,(map (lambda 
+                                                                                      (ar)
+                                                                                `
+                                                                                (
+                                                                                 (div ,
+                                                                                  (a
+                                                                                   (em
+                                                                                    (assoc-ref
+                                                                                     ar
+                                                                                     "display_name"))
+                                                                                   #:size 'text-lg
+                                                                                   #:href
+                                                                                   (format
+                                                                                    #f
+                                                                                    "/artists/uuid/~a"
+
+                                                                                    
+                                                                                    (assoc-ref
+                                                                                     ar
+                                                                                     "identifier"))))))
+                                                                          artists)
+
                                   (div (div ,(entity-details G_
                                                              'song
                                                              song
@@ -211,7 +224,11 @@
   (export songs-detail-page))
 
 (begin
-  (define* (song-edit-page G_ song song-contents artworks)
+  (define* (song-edit-page G_
+                           #:key song
+                           song-contents
+                           artworks
+                           artists)
     (let* ((html `(div (@ (class "container mx-auto"))
                        ,(if (assoc-ref song "identifier")
                             (h2 (format #f "~a: ~a"
@@ -230,7 +247,7 @@
                                                                              sm:w-36))))
                                                       (img (@ (loading "lazy")
                                                               (class
-                                                               "rounded-xl")
+                                                                "rounded-xl")
                                                               (src ,(assoc-ref
                                                                      a
                                                                      "content_url")))))
@@ -238,10 +255,10 @@
                                                              #:entity 'song
                                                              #:entity-identifier
                                                              (assoc-ref song
-                                                              "identifier")
+                                                                        "identifier")
                                                              #:artwork-identifier
                                                              (assoc-ref a
-                                                              "identifier")
+                                                                        "identifier")
                                                              #:content-url (assoc-ref
                                                                             a
                                                                             "content_url")
@@ -276,9 +293,9 @@
                                          ,(G_ "editing song"))
                                 ,(song-form G_
                                             #:identifier (assoc-ref song
-                                                          "identifier")
+                                                                    "identifier")
                                             #:display-name (assoc-ref song
-                                                            "display_name")
+                                                                      "display_name")
                                             #:music-key (assoc-ref-or-empty-str
                                                          song "music_key")
                                             #:music-tuning (assoc-ref-or-empty-str
@@ -293,7 +310,63 @@
                                                                song
                                                                "album_info_link")
                                             #:description (assoc-ref-or-empty-str
-                                                           song "description"))))))
+                                                           song "description")))
+                       ,(hr)
+                       (details (@ (open true)
+                                   (class ,(mk-class '(py-6))))
+                                (summary (@ (class ,(mk-class '(font-black
+                                                                text-stone-800
+                                                                dark:text-stone-200
+                                                                text-md
+                                                                cursor-pointer))))
+                                         ,(G_ "song's artists"))
+                                (div (@ (class ,(mk-class '(flex flex-col
+                                                                 gap-2))))
+                                     ,(h4 (G_ "add artist relation"))
+                                     (form (@ (method POST)
+                                              (content-type
+                                               application/x-www-form-urlencoded)
+                                              (action "/song-artists"))
+                                           (input (@ (value ,(assoc-ref song
+                                                                        "identifier"))
+                                                     (hidden "")) "")
+                                           (div ,(input #:label "artist UUID"
+                                                        #:value ""
+                                                        #:required #t))
+                                           (div ,(submit-button (G_ "submit")))))
+                                (div (@ (class ,(mk-class '(flex flex-row
+                                                                 flex-wrap
+                                                                 gap-10 py-6))))
+                                     ,(map (lambda (a)
+                                             `((form (@ (method POST)
+                                                        (content-type
+                                                         application/x-www-form-urlencoded)
+                                                        (action ,(format #f
+                                                                         "/songs/uuid/~a/artists/~a/delete"
+                                                                         (assoc-ref
+                                                                          song
+                                                                          "identifier")
+                                                                         (assoc-ref a
+                                                                                    "identifier"))))
+                                                     (div (@ (class ,(mk-class '
+                                                                      (flex
+                                                                       flex-row
+                                                                       flex-wrap
+                                                                       gap-2
+                                                                       items-center))))
+                                                          ,(h4 (assoc-ref a
+                                                                          "display_name"))
+                                                          ,(icon-button #:icon 'trash
+                                                                        #:content
+                                                                        ""
+                                                                        #:type 'submit
+                                                                        #:background '
+                                                                        (bg-red-700)
+                                                                        #:color '
+                                                                        (text-stone-200)
+                                                                        #:hover-background '
+                                                                        (hover:bg-red-900))))))
+                                           artists))))))
       (html-template G_
                      #:body html)))
   (export song-edit-page))
