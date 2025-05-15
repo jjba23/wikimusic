@@ -25,41 +25,72 @@
   #:use-module (hygguile hygguile)
   #:use-module (kracht prelude)
   #:use-module (ice-9 i18n)
+  #:use-module (srfi srfi-1)
   #:use-module (wikimusic query-escape)
   #:use-module (app views song-contents)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
-(define (render-song-tile G_
-                          artworks
-                          song-version-count-alist
-                          opinions
-                          comments
-                          x)
-  (let* ((extra-info (render-if-nempty (lambda (vc)
-                                         `(div (@ (class ,(mk-class '(flex
-                                                                      flex-row
-                                                                      gap-2
-                                                                      text-xs
-                                                                      text-stone-700))))
+(define* (render-song-tile G_
+                           #:key artworks
+                           song-version-count-alist
+                           opinions
+                           comments
+                           artists
+                           song-artists
+                           x)
+  (let* ((extra-bot-info (render-if-nempty (lambda (vc)
+                                             `((div (@ (class ,(mk-class '(flex
+                                                                           flex-row
+                                                                           gap-2
+                                                                           text-xs
+                                                                           text-stone-700))))
 
-                                               (span (@ (class ,(mk-class '(text-stone-700
-                                                                            dark:text-stone-300))))
-                                                     ,(format #f "~a"
+                                                    (span (@ (class ,(mk-class '
+                                                                      (text-stone-700
+                                                                       dark:text-stone-300))))
+                                                          ,(format #f "~a"
 
-                                                              (car vc)))
-                                               (span (@ (class ,(mk-class '(text-stone-700
-                                                                            dark:text-stone-300))))
-                                                     ,(G_ "versions"))))
-                                       (assoc-ref song-version-count-alist
-                                                  (assoc-ref x "identifier")))))
+                                                                   (car vc)))
+                                                    (span (@ (class ,(mk-class '
+                                                                      (text-stone-700
+                                                                       dark:text-stone-300))))
+                                                          ,(G_ "versions")))))
+                                           (assoc-ref song-version-count-alist
+                                                      (assoc-ref x "identifier"))))
+         (this-song-artists-relations (map (lambda (aa)
+                                             (assoc-ref aa "artist_identifier"))
+                                           (filter (lambda (a)
+                                                     (equal? (assoc-ref x
+                                                                        "identifier")
+                                                             (assoc-ref a
+                                                                        "song_identifier")))
+                                                   song-artists)))
+
+         (art (filter (lambda (aaa)
+                        (find (lambda (s)
+                                (equal? s
+                                        (assoc-ref aaa "identifier")))
+                              this-song-artists-relations)) artists))
+         
+
+         (extra-top-info (map (lambda (ar)
+                                `((div ,(a (em (assoc-ref ar "display_name"))
+                                           #:size 'text-lg
+                                           #:href (format #f "/artists/uuid/~a"
+                                                          (assoc-ref ar
+                                                                     "identifier"))))))
+                              art))
+
+         )
     `((div ,(item-tile G_
                        'song
                        x
                        (relevant-entities 'song artworks x)
                        (relevant-entities 'song opinions x)
                        (relevant-entities 'song comments x)
-                       #:extra-info extra-info)))))
+                       #:extra-top-info extra-top-info
+                       #:extra-bot-info extra-bot-info)))))
 
 (begin
   (define* (songs-list-page G_
@@ -68,6 +99,8 @@
                             song-version-count-alist
                             opinions
                             comments
+                            artists
+                            song-artists
                             limit
                             offset
                             search-query
@@ -76,29 +109,29 @@
                                                             gap-3 my-4))))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                            "/songs?offset=~a&limit=~a"
-                                                            (- offset limit) limit)))
+                                                     "/songs?offset=~a&limit=~a"
+                                                     (- offset limit) limit)))
                                           ,(icon-button #:icon 'arrow-left
                                                         #:content (G_
                                                                    "previous"))))
                                      '())
                                 ,(if (= (length songs) limit)
                                      `((a (@ (href ,(format #f
-                                                            "/songs?offset=~a&limit=~a"
-                                                            (+ offset limit) limit)))
+                                                     "/songs?offset=~a&limit=~a"
+                                                     (+ offset limit) limit)))
                                           ,(icon-button #:icon 'arrow-right
                                                         #:content (G_ "next"))))
                                      '()))))
            (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ((h2 (@ (class ,(mk-class '(font-black text-stone-800
-                                                              dark:text-stone-200
-                                                              text-2xl
-                                                              py-4
-                                                              px-1
-                                                              flex
-                                                              flex-row
-                                                              items-center
-                                                              gap-1))))
+                                                   dark:text-stone-200
+                                                   text-2xl
+                                                   py-4
+                                                   px-1
+                                                   flex
+                                                   flex-row
+                                                   items-center
+                                                   gap-1))))
                             ,(icon #:type 'music-notes-simple)
                             ,(G_ "viewing songs"))
                         (div (@ (class ,(mk-class '(flex flex-wrap flex-row
@@ -123,11 +156,14 @@
                                                               lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           (render-song-tile G_
-                                                            artworks
-                                                            song-version-count-alist
-                                                            opinions
-                                                            comments
-                                                            x)) songs))
+                                           #:artworks artworks
+                                           #:song-version-count-alist
+                                           song-version-count-alist
+                                           #:opinions opinions
+                                           #:comments comments
+                                           #:artists artists
+                                           #:song-artists song-artists
+                                           #:x x)) songs))
                              ,page-buttons
                              ,(hr)
                              (div (@ (class ,(mk-class '(flex flex-row
@@ -139,28 +175,40 @@
                      #:body body)))
   (export songs-list-page))
 
-(define-public (songs-detail-page G_
-                                  song
-                                  artworks
-                                  song-contents
-                                  opinions
-                                  comments
-                                  user-alist
-                                  ascii-size)
-  (html-template G_
-                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
-                               (,(h2 (assoc-ref song "display_name"))
-
-                                (div (div ,(entity-details G_
-                                                           'song
-                                                           song
-                                                           artworks
-                                                           opinions
-                                                           comments
-                                                           user-alist)))))
-                          
-                          (div ,(render-song-contents G_ song song-contents
-                                                      ascii-size)))))
+(begin
+  (define* (songs-detail-page G_
+                              #:key song
+                              artworks
+                              song-contents
+                              song-artists
+                              artists
+                              opinions
+                              comments
+                              user-alist
+                              (ascii-size 'text-md))
+    
+    (html-template G_
+                   #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                                 (,(h2 (assoc-ref song "display_name"))
+                                  ,(map (lambda (ar)
+                                          `((div ,(a (em (assoc-ref ar "display_name"))
+                                                     #:size 'text-lg
+                                                     #:href (format #f "/artists/uuid/~a"
+                                                                    (assoc-ref ar
+                                                                               "identifier"))))))
+                                        artists)
+                                  
+                                  (div (div ,(entity-details G_
+                                                             'song
+                                                             song
+                                                             artworks
+                                                             opinions
+                                                             comments
+                                                             user-alist)))))
+                            
+                            (div ,(render-song-contents G_ song song-contents
+                                                        ascii-size)))))
+  (export songs-detail-page))
 
 (begin
   (define* (song-edit-page G_ song song-contents artworks)
@@ -182,7 +230,7 @@
                                                                              sm:w-36))))
                                                       (img (@ (loading "lazy")
                                                               (class
-                                                                "rounded-xl")
+                                                               "rounded-xl")
                                                               (src ,(assoc-ref
                                                                      a
                                                                      "content_url")))))
@@ -190,10 +238,10 @@
                                                              #:entity 'song
                                                              #:entity-identifier
                                                              (assoc-ref song
-                                                                        "identifier")
+                                                              "identifier")
                                                              #:artwork-identifier
                                                              (assoc-ref a
-                                                                        "identifier")
+                                                              "identifier")
                                                              #:content-url (assoc-ref
                                                                             a
                                                                             "content_url")
@@ -228,9 +276,9 @@
                                          ,(G_ "editing song"))
                                 ,(song-form G_
                                             #:identifier (assoc-ref song
-                                                                    "identifier")
+                                                          "identifier")
                                             #:display-name (assoc-ref song
-                                                                      "display_name")
+                                                            "display_name")
                                             #:music-key (assoc-ref-or-empty-str
                                                          song "music_key")
                                             #:music-tuning (assoc-ref-or-empty-str

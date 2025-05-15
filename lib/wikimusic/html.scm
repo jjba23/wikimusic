@@ -149,7 +149,8 @@
                       artworks
                       opinions
                       comments
-                      #:key (extra-info '()))
+                      #:key (extra-bot-info '())
+                      (extra-top-info '()))
     (let ((item-link (format #f "/~as/uuid/~a" entity
                              (assoc-ref x "identifier")))
           (likes (length (filter (lambda (o)
@@ -174,27 +175,23 @@
                                                 (a (@ (href ,item-link))
                                                    (img (@ (loading "lazy")
                                                            (class ,(mk-class '
-                                                                             (rounded-xl
-                                                                              w-40
-                                                                              sm:w-48
-                                                                              shadow-md)))
+                                                                    (rounded-xl
+                                                                     w-40
+                                                                     sm:w-48
+                                                                     shadow-md)))
                                                            (src ,(assoc-ref
                                                                   art
                                                                   "content_url")))))))
                                      (cond
-                                       ((equal? 0
-                                                (length artworks))
-                                        '())
-                                       (else (car artworks))))
-                  (a (@ (class ,(mk-class '(text-blue-900 hover:text-blue-700
-                                            dark:text-blue-400
-                                            dark:hover:text-blue-300
-                                            text-xl
-                                            font-bold
-                                            max-w-prose
-                                            break-all)))
-                        (href ,item-link))
-                     (span ,(assoc-ref x "display_name")))
+                                      ((equal? 0
+                                               (length artworks))
+                                       '())
+                                      (else (car artworks))))
+                  ,(a (assoc-ref x "display_name")
+                      #:size 'text-2xl
+                      #:href item-link)
+                  (div (@(class ,(mk-class '(py-2))))
+                       ,extra-top-info)
                   (div (@ (class ,(mk-class '(flex flex-row gap-2))))
                        (span (@ (class ,(mk-class '(text-stone-800
                                                     dark:text-stone-200))))
@@ -205,21 +202,21 @@
                                       (assoc-ref x "views"))))
                   (div (@ (class ,(mk-class '(flex flex-row gap-2))))
                        (span (@ (class ,(mk-class '(font-black text-green-800
-                                                    dark:text-green-600
-                                                    text-xs))))
+                                                               dark:text-green-600
+                                                               text-xs))))
                              ,(format #f "~a" likes))
                        (span (@ (class ,(mk-class '(font-black text-red-800
-                                                    dark:text-red-600 text-xs))))
+                                                               dark:text-red-600 text-xs))))
                              ,(format #f "~a" dislikes)))
                   (div (@ (class ,(mk-class '(flex flex-row gap-2))))
                        (span (@ (class ,(mk-class '(text-xs text-stone-700
-                                                    dark:text-stone-300))))
+                                                            dark:text-stone-300))))
                              ,(format #f "~a"
                                       (length comments)))
                        (span (@ (class ,(mk-class '(text-xs text-stone-700
-                                                    dark:text-stone-300))))
+                                                            dark:text-stone-300))))
                              ,(G_ "comments")))
-                  ,extra-info)))))
+                  ,extra-bot-info)))))
   (export item-tile))
 
 (define-public (render-visibility-status status)
