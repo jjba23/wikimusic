@@ -42,29 +42,29 @@
     (let* ((page-buttons `((div (@ (class "flex flex-row flex-wrap gap-3 my-4"))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                            "/artists?offset=~a&limit=~a"
-                                                            (- offset limit) limit)))
+                                                     "/artists?offset=~a&limit=~a"
+                                                     (- offset limit) limit)))
                                           ,(icon-button #:icon 'arrow-left
                                                         #:content (G_
                                                                    "previous"))))
                                      '())
                                 ,(if (= (length artists) limit)
                                      `((a (@ (href ,(format #f
-                                                            "/artists?offset=~a&limit=~a"
-                                                            (+ offset limit) limit)))
+                                                     "/artists?offset=~a&limit=~a"
+                                                     (+ offset limit) limit)))
                                           ,(icon-button #:icon 'arrow-right
                                                         #:content (G_ "next"))))
                                      '()))))
            (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ((h2 (@ (class ,(mk-class '(font-black text-stone-800
-                                                              dark:text-stone-200
-                                                              text-2xl
-                                                              py-4
-                                                              px-1
-                                                              flex
-                                                              flex-row
-                                                              items-center
-                                                              gap-1))))
+                                                   dark:text-stone-200
+                                                   text-2xl
+                                                   py-4
+                                                   px-1
+                                                   flex
+                                                   flex-row
+                                                   items-center
+                                                   gap-1))))
                             ,(icon #:type 'guitar)
                             ,(G_ "viewing artists"))
                         (div (@ (class ,(mk-class '(flex flex-wrap flex-row
@@ -92,11 +92,11 @@
                                                             'artist
                                                             x
                                                             (relevant-entities 'artist
-                                                                               artworks x)
+                                                             artworks x)
                                                             (relevant-entities 'artist
-                                                                               opinions x)
+                                                             opinions x)
                                                             (relevant-entities 'artist
-                                                                               comments x))))
+                                                             comments x))))
                                         artists))
                              ,page-buttons
                              ,(hr)
@@ -114,18 +114,20 @@
                                     artworks
                                     opinions
                                     comments
-                                    user-alist)
+                                    user-alist
+                                    song-fragment)
   (html-template G_
-                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
-                              (,(h2
-                                 (assoc-ref artist "display_name"))
-                               (div (div ,(entity-details G_
-                                                          'artist
-                                                          artist
-                                                          artworks
-                                                          opinions
-                                                          comments
-                                                          user-alist)))))))
+                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                               (,(h2 (assoc-ref artist "display_name")) (div (div ,
+                                                                              (entity-details
+                                                                               G_
+                                                                               'artist
+                                                                               artist
+                                                                               artworks
+                                                                               opinions
+                                                                               comments
+                                                                               user-alist)))))
+                          (div ,song-fragment))))
 
 (begin
   (define* (artist-edit-page G_ artist artworks)
@@ -135,7 +137,7 @@
                                                (img (@ (loading "lazy")
                                                        (class "rounded-xl")
                                                        (src ,(assoc-ref a
-                                                                        "content_url")))))
+                                                              "content_url")))))
                                        ,(artwork-form G_
                                                       #:entity 'artist
                                                       #:entity-identifier (assoc-ref
@@ -190,9 +192,9 @@
                                          ,(G_ "editing artist"))
                                 ,(artist-form G_
                                               #:identifier (assoc-ref artist
-                                                                      "identifier")
+                                                            "identifier")
                                               #:display-name (assoc-ref artist
-                                                                        "display_name")
+                                                              "display_name")
                                               #:description (assoc-ref-or-empty-str
                                                              artist
                                                              "description"))))))

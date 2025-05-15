@@ -17,7 +17,6 @@
 
 (import (artanis mvc model))
 
-
 (create-artanis-model artist_genres
                       (:deps)
                       (identifier char-field

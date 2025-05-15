@@ -533,13 +533,14 @@
                                                                              kv
                                                                              "artist-identifier")))))))
     (when (not (nil? artist))
-      (log-info "creating song-artist relation: song ~a artist ~a" (params rc "uuid") (uri-decode (car (assoc-ref kv
-                                                                                                                  "artist-identifier"))))
+      (log-info "creating song-artist relation: song ~a artist ~a"
+                (params rc "uuid")
+                (uri-decode (car (assoc-ref kv "artist-identifier"))))
       ($song_artists 'set
                      #:identifier new-uuid
                      #:song_identifier (params rc "uuid")
                      #:artist_identifier (uri-decode (car (assoc-ref kv
-                                                                     "artist-identifier")))
+                                                           "artist-identifier")))
                      #:created_by user-identifier
                      #:created_at (current-time)))
 
