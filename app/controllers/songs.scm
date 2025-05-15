@@ -31,6 +31,8 @@
         (app models song_contents)
         (app models song_comments)
         (app models song_opinions)
+        (app models artists)
+        (kracht prelude)
         (app models song_artists)
         (uuid generate)
         (app views song-contents)
@@ -306,13 +308,13 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                          #:song_identifier
-                                                          uuid)))
+                                                                #:song_identifier
+                                                                uuid)))
               (song-artists ($song_artists 'get
                                            #:ret 'all
                                            #:condition (where
-                                                        #:song_identifier
-                                                        uuid)))
+                                                              #:song_identifier
+                                                              uuid)))
               (artist-uuids (map (lambda (a)
                                    (assoc-ref a "artist_identifier"))
                                  song-artists))
@@ -324,11 +326,11 @@
                                                         artist-uuids)))))
          
          (response-emit (:mime rc
-                         (song-edit-page (:i18n rc)
-                                         #:song song
-                                         #:song-contents song-contents
-                                         #:artworks artworks
-                                         #:artists artists))))))
+                               (song-edit-page (:i18n rc)
+                                               #:song song
+                                               #:song-contents song-contents
+                                               #:artworks artworks
+                                               #:artists artists))))))
 
 (get "/songs/uuid/:uuid/contents/:version-uuid/edit"
      #:mime 'xml
@@ -520,6 +522,41 @@
                             (lambda ()
                               (do-new-artwork rc)))))
 
+(define (do-new-song-artist rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body))
+         (new-uuid (generate-string-uuid))
+         (user-identifier (:cookies-value rc "wikimusic-user-identifier"))
+         (artist ($artists 'get
+                           #:ret 'top
+                           #:condition (where #:identifier (uri-decode (car (assoc-ref
+                                                                             kv
+                                                                             "artist-identifier")))))))
+    (when (not (nil? artist))
+      (log-info "creating song-artist relation: song ~a artist ~a" (params rc "uuid") (uri-decode (car (assoc-ref kv
+                                                                                                                  "artist-identifier"))))
+      ($song_artists 'set
+                     #:identifier new-uuid
+                     #:song_identifier (params rc "uuid")
+                     #:artist_identifier (uri-decode (car (assoc-ref kv
+                                                                     "artist-identifier")))
+                     #:created_by user-identifier
+                     #:created_at (current-time)))
+
+    (redirect-to rc
+                 (string->uri (format #f "~a/songs/uuid/~a/edit"
+                                      (current-myhost)
+                                      (params rc "uuid")))
+                 #:status 302)))
+
+(post "/songs/uuid/:uuid/artists"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-new-song-artist rc)))))
+
 (define (do-new rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body))
@@ -615,7 +652,7 @@
                           #:conn (DB-open rc)
                           #:entity 'song
                           #:delete-condition (where #:identifier (params rc
-                                                                         "artwork-uuid"))
+                                                                  "artwork-uuid"))
                           #:redirect-url (format #f "~a/songs/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))
@@ -632,7 +669,8 @@
                            (where #:identifier (params rc "version-uuid"))))
           (redirect-to rc
                        (string->uri (format #f "~a/songs/uuid/~a"
-                                            (current-myhost) (params rc "uuid")))
+                                            (current-myhost)
+                                            (params rc "uuid")))
                        #:status 302))
         (protected-endpoint rc do-delete)))
 
@@ -648,6 +686,7 @@
                                   #:song_identifier (params rc "uuid"))))
           (redirect-to rc
                        (string->uri (format #f "~a/songs/uuid/~a/edit"
-                                            (current-myhost) (params rc "uuid")))
+                                            (current-myhost)
+                                            (params rc "uuid")))
                        #:status 302))
         (protected-endpoint rc do-delete)))

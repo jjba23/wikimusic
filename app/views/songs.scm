@@ -326,11 +326,9 @@
                                      (form (@ (method POST)
                                               (content-type
                                                application/x-www-form-urlencoded)
-                                              (action "/song-artists"))
-                                           (input (@ (value ,(assoc-ref song
-                                                                        "identifier"))
-                                                     (hidden "")) "")
+                                              (action ,(format #f "/songs/uuid/~a/artists" (assoc-ref song "identifier"))))
                                            (div ,(input #:label "artist UUID"
+                                                        #:name 'artist-identifier
                                                         #:value ""
                                                         #:required #t))
                                            (div ,(submit-button (G_ "submit")))))
