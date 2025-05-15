@@ -33,6 +33,7 @@
         (app models song_comments)
         (app models song_opinions)
         (app models artists)
+        (app models genres)
         (kracht prelude)
         (app models song_artists)
         (app models song_genres)
@@ -738,6 +739,23 @@
                     (->sql delete from
                            'song_artists
                            (where #:artist_identifier (params rc "artist-uuid")
+                                  #:song_identifier (params rc "uuid"))))
+          (redirect-to rc
+                       (string->uri (format #f "~a/songs/uuid/~a/edit"
+                                            (current-myhost)
+                                            (params rc "uuid")))
+                       #:status 302))
+        (protected-endpoint rc do-delete)))
+
+(post "/songs/uuid/:uuid/genres/:genre-uuid/delete"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (define (do-delete)
+          (DB-query (DB-open rc)
+                    (->sql delete from
+                           'song_genres
+                           (where #:genre_identifier (params rc "genre-uuid")
                                   #:song_identifier (params rc "uuid"))))
           (redirect-to rc
                        (string->uri (format #f "~a/songs/uuid/~a/edit"
