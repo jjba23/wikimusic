@@ -26,6 +26,7 @@
         (ice-9 string-fun)
         (wikimusic auth)
         (app models songs)
+        (app models genres)
         (app models artists)
         (app models song_artworks)
         (app models song_contents)
@@ -34,6 +35,7 @@
         (app models artists)
         (kracht prelude)
         (app models song_artists)
+        (app models song_genres)
         (uuid generate)
         (app views song-contents)
         (wikimusic query-escape)
@@ -308,13 +310,27 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                                #:song_identifier
-                                                                uuid)))
+                                                          #:song_identifier
+                                                          uuid)))
+              (song-genres ($song_genres 'get
+                                         #:ret 'all
+                                         #:condition (where
+                                                      #:song_identifier
+                                                      uuid)))
+              (genre-uuids (map (lambda (a)
+                                  (assoc-ref a "genre_identifier"))
+                                song-genres))
+              (genres (if (nil? genre-uuids)
+                          '()
+                          ($genres 'get
+                                   #:ret 'all
+                                   #:condition (where #:identifier
+                                                      genre-uuids))))
               (song-artists ($song_artists 'get
                                            #:ret 'all
                                            #:condition (where
-                                                              #:song_identifier
-                                                              uuid)))
+                                                        #:song_identifier
+                                                        uuid)))
               (artist-uuids (map (lambda (a)
                                    (assoc-ref a "artist_identifier"))
                                  song-artists))
@@ -326,11 +342,12 @@
                                                         artist-uuids)))))
          
          (response-emit (:mime rc
-                               (song-edit-page (:i18n rc)
-                                               #:song song
-                                               #:song-contents song-contents
-                                               #:artworks artworks
-                                               #:artists artists))))))
+                         (song-edit-page (:i18n rc)
+                                         #:song song
+                                         #:song-contents song-contents
+                                         #:artworks artworks
+                                         #:artists artists
+                                         #:genres genres))))))
 
 (get "/songs/uuid/:uuid/contents/:version-uuid/edit"
      #:mime 'xml
@@ -348,8 +365,8 @@
                                                                version-uuid)))))
          
          (response-emit (:mime rc
-                               (song-content-edit-page (:i18n rc) song
-                                                       song-contents))))))
+                         (song-content-edit-page (:i18n rc) song
+                                                 song-contents))))))
 
 (define (do-edit rc)
   (let* ((body (rc-body rc))
@@ -558,6 +575,43 @@
                             (lambda ()
                               (do-new-song-artist rc)))))
 
+(define (do-new-song-genre rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body))
+         (new-uuid (generate-string-uuid))
+         (user-identifier (:cookies-value rc "wikimusic-user-identifier"))
+         (genre ($genres 'get
+                         #:ret 'top
+                         #:condition (where #:identifier (uri-decode (car (assoc-ref
+                                                                           kv
+                                                                           "genre-identifier")))))))
+    (when (not (nil? genre))
+      (log-info "creating song-genre relation: song ~a genre ~a"
+                (params rc "uuid")
+                (uri-decode (car (assoc-ref kv "genre-identifier"))))
+      ($song_genres 'set
+                    #:identifier new-uuid
+                    #:song_identifier (params rc "uuid")
+                    #:genre_identifier (uri-decode (car (assoc-ref kv
+                                                                   "genre-identifier")))
+                    #:created_by user-identifier
+                    #:created_at (current-time)))
+
+    (redirect-to rc
+                 (string->uri (format #f "~a/songs/uuid/~a/edit"
+                                      (current-myhost)
+                                      (params rc "uuid")))
+                 #:status 302)))
+
+(post "/songs/uuid/:uuid/genres"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-new-song-genre rc)))))
+
+
 (define (do-new rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body))
@@ -566,18 +620,18 @@
     ($songs 'set
             #:identifier new-uuid
             #:display_name (escape-str (uri-decode (car (assoc-ref kv
-                                                         "display-name"))))
+                                                                   "display-name"))))
             #:music_key (escape-str (uri-decode (car (assoc-ref kv "music-key"))))
             #:music_tuning (escape-str (uri-decode (car (assoc-ref kv
-                                                         "music-tuning"))))
+                                                                   "music-tuning"))))
             #:music_creation_date (escape-str (uri-decode (car (assoc-ref kv
-                                                                "music-creation-date"))))
+                                                                          "music-creation-date"))))
             #:album_name (escape-str (uri-decode (car (assoc-ref kv
                                                                  "album-name"))))
             #:album_info_link (escape-str (uri-decode (car (assoc-ref kv
-                                                            "album-info-link"))))
+                                                                      "album-info-link"))))
             #:description (escape-str (uri-decode (car (assoc-ref kv
-                                                        "description"))))
+                                                                  "description"))))
             #:created_by user-identifier
             #:visibility_status 0
             #:views 0
