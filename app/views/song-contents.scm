@@ -48,108 +48,116 @@
                               #:content (G_ "new version"))))))
 
 (define-public (render-version G_ song version ascii-size)
-  `((hr)
-    (details (@ (open true))
-             (summary (@ (class ,(mk-class '(text-xl font-bold text-stone-700
-                                                     dark:text-stone-300
-                                                     cursor-pointer))))
-                      ,(render-if-nempty (lambda (version-name)
-                                           (format #f "~a ~a ~a"
-                                                   (G_ "version") version-name
-                                                   (assoc-ref version
-                                                    "instrument_type")))
-                                         (assoc-ref version "version_name")))
+  `(,(hr) (details (@ (open true))
+                   (summary (@ (class ,(mk-class '(text-xl font-bold
+                                                   text-stone-700
+                                                   dark:text-stone-300
+                                                   cursor-pointer))))
+                            ,(render-if-nempty (lambda (version-name)
+                                                 (format #f "~a ~a ~a"
+                                                         (G_ "version")
+                                                         version-name
+                                                         (assoc-ref version
+                                                          "instrument_type")))
+                                               (assoc-ref version
+                                                          "version_name")))
 
-             (div (@ (class ,(mk-class '(my-4))))
-                  (div (@ (class ,(mk-class '(py-3))))
-                       (details (summary (@ (class ,(mk-class '(cursor-pointer
-                                                                dark:text-stone-300
-                                                                text-stone-700))))
-                                         ,(G_ "manage version"))
-                                (div (@ (class ,(mk-class '(flex flex-wrap
-                                                                 flex-row
-                                                                 gap-2))))
-                                     (a (@ (href ,(format #f
-                                                   "/songs/uuid/~a/contents/~a/edit"
-                                                   (assoc-ref song
-                                                              "identifier")
-                                                   (assoc-ref version
-                                                              "identifier"))))
-                                        ,(icon-button #:icon 'pencil
-                                                      #:content (G_
-                                                                 "edit version")))
-                                     (form (@ (method POST)
-                                              (action ,(format #f
-                                                        "/songs/uuid/~a/contents/~a/delete"
-                                                        (assoc-ref song
-                                                         "identifier")
-                                                        (assoc-ref version
-                                                         "identifier"))))
-                                           ,(icon-button #:icon 'trash
-                                                         #:background '(bg-red-700)
-                                                         #:hover-background '(hover:bg-red-800)
-                                                         #:border-color '(border-stone-700
-                                                                          dark:border-stone-400)
-                                                         #:type 'submit
-                                                         #:content (G_
-                                                                    "delete version"))))))
-                  ,(render-if-nempty (lambda (ascii-legend)
-                                       `(details (@ (open true))
-                                                 (summary (@ (class ,(mk-class '
-                                                                      (text-xl
-                                                                       font-bold
-                                                                       text-stone-700
-                                                                       dark:text-stone-300
-                                                                       cursor-pointer))))
-                                                          ,(G_ "ascii legend"))
-                                                 (pre (@ (class ,(mk-class (append
-                                                                            (list
-                                                                             (string->symbol
-                                                                              ascii-size))
-                                                                            '(p-4
-                                                                              md:p-6
-                                                                              shadow-md
-                                                                              bg-stone-200/75
-                                                                              dark:bg-stone-900
-                                                                              text-black
-                                                                              dark:text-white
-                                                                              rounded-xl
-                                                                              white-space-pre
-                                                                              overflow-x-scroll)))))
-                                                      ,ascii-legend)))
-                                     (assoc-ref version "ascii_legend"))
-                  ,(render-if-nempty (lambda (ascii-contents)
-                                       `(details (@ (open "true"))
-                                                 (summary (@ (class ,(mk-class '
-                                                                      (text-xl
-                                                                       font-bold
-                                                                       text-stone-700
-                                                                       dark:text-stone-300
-                                                                       cursor-pointer))))
-                                                          ,(G_
-                                                            "ascii contents"))
-                                                 (pre (@ (class ,(mk-class (append
-                                                                            (list
-                                                                             (string->symbol
-                                                                              ascii-size))
-                                                                            '(p-4
-                                                                              md:p-6
-                                                                              shadow-md
-                                                                              bg-stone-200/75
-                                                                              dark:bg-stone-900
-                                                                              text-black
-                                                                              dark:text-white
-                                                                              rounded-xl
-                                                                              white-space-pre
-                                                                              overflow-x-scroll)))))
-                                                      ,ascii-contents)))
-                                     (assoc-ref version "ascii_contents"))))))
+                   (div (@ (class ,(mk-class '(my-4))))
+                        (div (@ (class ,(mk-class '(py-3))))
+                             (details (summary (@ (class ,(mk-class '(cursor-pointer
+                                                                      dark:text-stone-300
+                                                                      text-stone-700))))
+                                               ,(G_ "manage version"))
+                                      (div (@ (class ,(mk-class '(flex
+                                                                  flex-wrap
+                                                                  flex-row
+                                                                  gap-2))))
+                                           (a (@ (href ,(format #f
+                                                         "/songs/uuid/~a/contents/~a/edit"
+                                                         (assoc-ref song
+                                                          "identifier")
+                                                         (assoc-ref version
+                                                          "identifier"))))
+                                              ,(icon-button #:icon 'pencil
+                                                            #:content (G_
+                                                                       "edit version")))
+                                           (form (@ (method POST)
+                                                    (action ,(format #f
+                                                              "/songs/uuid/~a/contents/~a/delete"
+                                                              (assoc-ref song
+                                                               "identifier")
+                                                              (assoc-ref
+                                                               version
+                                                               "identifier"))))
+                                                 ,(icon-button #:icon 'trash
+                                                               #:background '(bg-red-700)
+                                                               #:hover-background '
+                                                               (hover:bg-red-800)
+                                                               #:border-color '
+                                                               (border-stone-700
+                                                                dark:border-stone-400)
+                                                               #:type 'submit
+                                                               #:content (G_
+                                                                          "delete version"))))))
+                        ,(render-if-nempty (lambda (ascii-legend)
+                                             `(details (@ (open true))
+                                                       (summary (@ (class ,(mk-class '
+                                                                            (text-xl
+                                                                             font-bold
+                                                                             text-stone-700
+                                                                             dark:text-stone-300
+                                                                             cursor-pointer))))
+                                                                ,(G_
+                                                                  "ascii legend"))
+                                                       (pre (@ (class ,(mk-class
+                                                                        (append
+                                                                         (list
+                                                                          (string->symbol
+                                                                           ascii-size))
+                                                                         '(p-4
+                                                                           md:p-6
+                                                                           shadow-md
+                                                                           bg-stone-200/75
+                                                                           dark:bg-stone-900
+                                                                           text-black
+                                                                           dark:text-white
+                                                                           rounded-xl
+                                                                           white-space-pre
+                                                                           overflow-x-scroll)))))
+                                                            ,ascii-legend)))
+                                           (assoc-ref version "ascii_legend"))
+                        ,(render-if-nempty (lambda (ascii-contents)
+                                             `(details (@ (open "true"))
+                                                       (summary (@ (class ,(mk-class '
+                                                                            (text-xl
+                                                                             font-bold
+                                                                             text-stone-700
+                                                                             dark:text-stone-300
+                                                                             cursor-pointer))))
+                                                                ,(G_
+                                                                  "ascii contents"))
+                                                       (pre (@ (class ,(mk-class
+                                                                        (append
+                                                                         (list
+                                                                          (string->symbol
+                                                                           ascii-size))
+                                                                         '(p-4
+                                                                           md:p-6
+                                                                           shadow-md
+                                                                           bg-stone-200/75
+                                                                           dark:bg-stone-900
+                                                                           text-black
+                                                                           dark:text-white
+                                                                           rounded-xl
+                                                                           white-space-pre
+                                                                           overflow-x-scroll)))))
+                                                            ,ascii-contents)))
+                                           (assoc-ref version "ascii_contents"))))))
 
 (begin
   (define* (song-content-edit-page G_ song song-contents)
-    (let* ((body `(div (@ (class "container mx-auto"))
-
-                       ((div (hr (@ (class "my-6")))
+    (let* ((body `(div (@ (class ,(mk-class '(container mx-auto))))
+                       ((div ,(hr)
                              ,(song-content-form G_
                                                  #:song-identifier (assoc-ref
                                                                     song

@@ -76,21 +76,22 @@
                                                             gap-3 my-4))))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                     "/songs?offset=~a&limit=~a"
-                                                     (- offset limit) limit)))
+                                                            "/songs?offset=~a&limit=~a"
+                                                            (- offset limit) limit)))
                                           ,(icon-button #:icon 'arrow-left
                                                         #:content (G_
                                                                    "previous"))))
                                      '())
                                 ,(if (= (length songs) limit)
                                      `((a (@ (href ,(format #f
-                                                     "/songs?offset=~a&limit=~a"
-                                                     (+ offset limit) limit)))
+                                                            "/songs?offset=~a&limit=~a"
+                                                            (+ offset limit) limit)))
                                           ,(icon-button #:icon 'arrow-right
                                                         #:content (G_ "next"))))
                                      '()))))
            (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ((h2 (@ (class ,(mk-class '(font-black text-stone-800
+                                                              dark:text-stone-200
                                                               text-2xl
                                                               py-4
                                                               px-1
@@ -122,13 +123,13 @@
                                                               lg:grid-cols-5))))
                                   ,(map (lambda (x)
                                           (render-song-tile G_
-                                           artworks
-                                           song-version-count-alist
-                                           opinions
-                                           comments
-                                           x)) songs))
+                                                            artworks
+                                                            song-version-count-alist
+                                                            opinions
+                                                            comments
+                                                            x)) songs))
                              ,page-buttons
-                             (hr (@ (class ,(mk-class '(my-6)))))
+                             ,(hr)
                              (div (@ (class ,(mk-class '(flex flex-row
                                                               flex-wrap gap-2
                                                               justify-end))))
@@ -172,6 +173,7 @@
                        (details (@ (open true))
                                 (summary (@ (class ,(mk-class '(font-black
                                                                 text-stone-800
+                                                                dark:text-stone-200
                                                                 text-md
                                                                 cursor-pointer))))
                                          ,(G_ "edit artworks"))
@@ -180,7 +182,7 @@
                                                                              sm:w-36))))
                                                       (img (@ (loading "lazy")
                                                               (class
-                                                               "rounded-xl")
+                                                                "rounded-xl")
                                                               (src ,(assoc-ref
                                                                      a
                                                                      "content_url")))))
@@ -188,10 +190,10 @@
                                                              #:entity 'song
                                                              #:entity-identifier
                                                              (assoc-ref song
-                                                              "identifier")
+                                                                        "identifier")
                                                              #:artwork-identifier
                                                              (assoc-ref a
-                                                              "identifier")
+                                                                        "identifier")
                                                              #:content-url (assoc-ref
                                                                             a
                                                                             "content_url")
@@ -203,11 +205,12 @@
                                                                             a
                                                                             "order_value"))))
                                       artworks))
-                       (hr (@ (class "my-6")))
+                       ,(hr)
                        (details (@ (open true)
                                    (class "cursor-pointer"))
                                 (summary (@ (class ,(mk-class '(font-black
                                                                 text-stone-800
+                                                                dark:text-stone-200
                                                                 text-md))))
                                          ,(G_ "new artwork"))
                                 ,(artwork-form G_
@@ -215,18 +218,19 @@
                                                #:entity-identifier (assoc-ref
                                                                     song
                                                                     "identifier")))
-                       (hr (@ (class "my-6")))
+                       ,(hr)
                        (details (@ (open true))
                                 (summary (@ (class ,(mk-class '(font-black
                                                                 text-stone-800
+                                                                dark:text-stone-200
                                                                 text-md
                                                                 cursor-pointer))))
                                          ,(G_ "editing song"))
                                 ,(song-form G_
                                             #:identifier (assoc-ref song
-                                                          "identifier")
+                                                                    "identifier")
                                             #:display-name (assoc-ref song
-                                                            "display_name")
+                                                                      "display_name")
                                             #:music-key (assoc-ref-or-empty-str
                                                          song "music_key")
                                             #:music-tuning (assoc-ref-or-empty-str
