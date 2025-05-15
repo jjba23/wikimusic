@@ -210,23 +210,23 @@
      #:cookies '(names wikimusic-ascii-size)
      (lambda (rc)
        (let* ((ascii-size (cond
-                           ((not (equal? #f
-                                         (get-from-qstr rc "ascii-size")))
-                            (:cookies-set! rc
-                             'wikimusic-ascii-size
-                             "wikimusic-ascii-size"
+                            ((not (equal? #f
+                                          (get-from-qstr rc "ascii-size")))
+                             (:cookies-set! rc
+                                            'wikimusic-ascii-size
+                                            "wikimusic-ascii-size"
+                                            (get-from-qstr rc "ascii-size"))
+                             (:cookies-setattr! rc
+                                                'wikimusic-ascii-size
+                                                #:expires 12000000
+                                                #:path "/"
+                                                #:http-only #t)
                              (get-from-qstr rc "ascii-size"))
-                            (:cookies-setattr! rc
-                             'wikimusic-ascii-size
-                             #:expires 12000000
-                             #:path "/"
-                             #:http-only #t)
-                            (get-from-qstr rc "ascii-size"))
-                           ((not (equal? #f
-                                         (:cookies-value rc
-                                          "wikimusic-ascii-size")))
-                            (:cookies-value rc "wikimusic-ascii-size"))
-                           (else "text-sm")))
+                            ((not (equal? #f
+                                          (:cookies-value rc
+                                           "wikimusic-ascii-size")))
+                             (:cookies-value rc "wikimusic-ascii-size"))
+                            (else "text-sm")))
               (uuid (params rc "uuid"))
               (song (car ($songs 'get
                                  #:ret 'top
@@ -257,13 +257,12 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                          #:song_identifier
-                                                          uuid)))
+                                                                #:song_identifier
+                                                                uuid)))
               (song-genres ($song_genres 'get
                                          #:ret 'all
-                                         #:condition (where
-                                                      #:song_identifier
-                                                      uuid)))
+                                         #:condition (where #:song_identifier
+                                                            uuid)))
               (genre-uuids (map (lambda (a)
                                   (assoc-ref a "genre_identifier"))
                                 song-genres))
@@ -271,13 +270,12 @@
                           '()
                           ($genres 'get
                                    #:ret 'all
-                                   #:condition (where #:identifier
-                                                      genre-uuids))))
+                                   #:condition (where #:identifier genre-uuids))))
               (song-artists ($song_artists 'get
                                            #:ret 'all
                                            #:condition (where
-                                                        #:song_identifier
-                                                        uuid)))
+                                                              #:song_identifier
+                                                              uuid)))
               (artist-uuids (map (lambda (a)
                                    (assoc-ref a "artist_identifier"))
                                  song-artists))
@@ -297,19 +295,19 @@
 
          ;; return rendered view
          (response-emit (:mime rc
-                         (songs-detail-page (:i18n rc)
-                                            #:song song
-                                            #:artworks artworks
-                                            #:song-contents
-                                            song-contents
-                                            #:song-artists song-artists
-                                            #:artists artists
-                                            #:song-genres song-genres
-                                            #:genres genres
-                                            #:opinions opinions
-                                            #:comments comments
-                                            #:user-alist user-alist
-                                            #:ascii-size ascii-size))))))
+                               (songs-detail-page (:i18n rc)
+                                                  #:song song
+                                                  #:artworks artworks
+                                                  #:song-contents
+                                                  song-contents
+                                                  #:song-artists song-artists
+                                                  #:artists artists
+                                                  #:song-genres song-genres
+                                                  #:genres genres
+                                                  #:opinions opinions
+                                                  #:comments comments
+                                                  #:user-alist user-alist
+                                                  #:ascii-size ascii-size))))))
 
 (get "/songs/uuid/:uuid/edit"
      #:mime 'xml
@@ -327,13 +325,12 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                          #:song_identifier
-                                                          uuid)))
+                                                                #:song_identifier
+                                                                uuid)))
               (song-genres ($song_genres 'get
                                          #:ret 'all
-                                         #:condition (where
-                                                      #:song_identifier
-                                                      uuid)))
+                                         #:condition (where #:song_identifier
+                                                            uuid)))
               (genre-uuids (map (lambda (a)
                                   (assoc-ref a "genre_identifier"))
                                 song-genres))
@@ -341,13 +338,12 @@
                           '()
                           ($genres 'get
                                    #:ret 'all
-                                   #:condition (where #:identifier
-                                                      genre-uuids))))
+                                   #:condition (where #:identifier genre-uuids))))
               (song-artists ($song_artists 'get
                                            #:ret 'all
                                            #:condition (where
-                                                        #:song_identifier
-                                                        uuid)))
+                                                              #:song_identifier
+                                                              uuid)))
               (artist-uuids (map (lambda (a)
                                    (assoc-ref a "artist_identifier"))
                                  song-artists))
@@ -359,12 +355,12 @@
                                                         artist-uuids)))))
          
          (response-emit (:mime rc
-                         (song-edit-page (:i18n rc)
-                                         #:song song
-                                         #:song-contents song-contents
-                                         #:artworks artworks
-                                         #:artists artists
-                                         #:genres genres))))))
+                               (song-edit-page (:i18n rc)
+                                               #:song song
+                                               #:song-contents song-contents
+                                               #:artworks artworks
+                                               #:artists artists
+                                               #:genres genres))))))
 
 (get "/songs/uuid/:uuid/contents/:version-uuid/edit"
      #:mime 'xml
@@ -382,8 +378,8 @@
                                                                version-uuid)))))
          
          (response-emit (:mime rc
-                         (song-content-edit-page (:i18n rc) song
-                                                 song-contents))))))
+                               (song-content-edit-page (:i18n rc) song
+                                                       song-contents))))))
 
 (define (do-edit rc)
   (let* ((body (rc-body rc))
@@ -610,7 +606,7 @@
                     #:identifier new-uuid
                     #:song_identifier (params rc "uuid")
                     #:genre_identifier (uri-decode (car (assoc-ref kv
-                                                                   "genre-identifier")))
+                                                         "genre-identifier")))
                     #:created_by user-identifier
                     #:created_at (current-time)))
 
@@ -628,7 +624,6 @@
                             (lambda ()
                               (do-new-song-genre rc)))))
 
-
 (define (do-new rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body))
@@ -637,18 +632,18 @@
     ($songs 'set
             #:identifier new-uuid
             #:display_name (escape-str (uri-decode (car (assoc-ref kv
-                                                                   "display-name"))))
+                                                         "display-name"))))
             #:music_key (escape-str (uri-decode (car (assoc-ref kv "music-key"))))
             #:music_tuning (escape-str (uri-decode (car (assoc-ref kv
-                                                                   "music-tuning"))))
+                                                         "music-tuning"))))
             #:music_creation_date (escape-str (uri-decode (car (assoc-ref kv
-                                                                          "music-creation-date"))))
+                                                                "music-creation-date"))))
             #:album_name (escape-str (uri-decode (car (assoc-ref kv
                                                                  "album-name"))))
             #:album_info_link (escape-str (uri-decode (car (assoc-ref kv
-                                                                      "album-info-link"))))
+                                                            "album-info-link"))))
             #:description (escape-str (uri-decode (car (assoc-ref kv
-                                                                  "description"))))
+                                                        "description"))))
             #:created_by user-identifier
             #:visibility_status 0
             #:views 0

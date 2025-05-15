@@ -210,37 +210,50 @@
     
     (let* ((artist-name-titles (map (lambda (ar)
                                       `((div ,(a (em (assoc-ref ar
-                                                                "display_name"))
+                                                      "display_name"))
                                                  #:size 'text-lg
                                                  #:href (format #f
-                                                                "/artists/uuid/~a"
+                                                         "/artists/uuid/~a"
 
-                                                                (assoc-ref ar
-                                                                           "identifier"))))))
+                                                         (assoc-ref ar
+                                                          "identifier"))))))
                                     artists))
            (genre-name-titles (map (lambda (ar)
                                      `((div ,(a (em (assoc-ref ar
                                                                "display_name"))
                                                 #:size 'text-lg
                                                 #:href (format #f
-                                                               "/genres/uuid/~a"
+                                                        "/genres/uuid/~a"
 
-                                                               (assoc-ref ar
-                                                                          "identifier"))))))
+                                                        (assoc-ref ar
+                                                         "identifier"))))))
                                    genres)))
       (html-template G_
                      #:body `((div (@ (class ,(mk-class '(container mx-auto))))
-                                   ((div (@(class ,(mk-class '(flex flex-col gap-4))))
+                                   ((div (@ (class ,(mk-class '(flex flex-col
+                                                                     gap-4))))
                                          ,(h2 (assoc-ref song "display_name"))
                                          ,(when (not (nil? artists))
-                                            `((div (@(class ,(mk-class '(flex flex-row flex-wrap gap-4 items-center align-center justify-start))))
+                                            `((div (@ (class ,(mk-class '(flex
+                                                                          flex-row
+                                                                          flex-wrap
+                                                                          gap-4
+                                                                          items-center
+                                                                          align-center
+                                                                          justify-start))))
                                                    ,(em "by:")
                                                    ,artist-name-titles)))
                                          ,(when (not (nil? genres))
-                                            `((div (@(class ,(mk-class '(flex flex-row flex-wrap gap-4 items-center align-center justify-start))))
+                                            `((div (@ (class ,(mk-class '(flex
+                                                                          flex-row
+                                                                          flex-wrap
+                                                                          gap-4
+                                                                          items-center
+                                                                          align-center
+                                                                          justify-start))))
                                                    ,(em "genres:")
                                                    ,genre-name-titles))))
-
+                                    
                                     (div (div ,(entity-details G_
                                                                'song
                                                                song
