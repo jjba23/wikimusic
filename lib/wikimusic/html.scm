@@ -665,7 +665,7 @@ function addSearchQueryParam(form) {
   (export search-box))
 
 (define-public (render-external-sources G_ external-sources)
-  `((div (@ (class ,(mk-class '(flex flex-col
+  `((div (@ (class ,(mk-class '(flex flex-row
                                      gap-6
                                      py-12
                                      px-6
@@ -676,33 +676,30 @@ function addSearchQueryParam(form) {
                                      items-end
                                      align-end))))
          ,(render-if-nestring (lambda (s)
-                                `((div (@ (class ,(mk-class '(flex flex-wrap
-                                                              flex-row
-                                                              gap-3
-                                                              max-w-64
-                                                              md:max-w-80
-                                                              overflow-x-scroll))))
+                                `((div (@ (class ,(mk-class '(flex flex-col
+                                                                   gap-3
+                                                                   max-w-64
+                                                                   md:max-w-80
+                                                                   overflow-x-scroll))))
                                        ,(p (G_ "Wikipedia URL"))
                                        ,(a s))))
                               (assoc-ref external-sources "wikipedia_url"))
 
          ,(render-if-nestring (lambda (s)
-                                `((div (@ (class ,(mk-class '(flex flex-wrap
-                                                              flex-row
-                                                              gap-3
-                                                              max-w-64
-                                                              md:max-w-80
-                                                              overflow-x-scroll))))
+                                `((div (@ (class ,(mk-class '(flex flex-col
+                                                                   gap-3
+                                                                   max-w-64
+                                                                   md:max-w-80
+                                                                   overflow-x-scroll))))
                                        ,(p (G_ "Spotify URL"))
                                        ,(a s))))
                               (assoc-ref external-sources "spotify_url"))
          ,(render-if-nestring (lambda (s)
-                                `((div (@ (class ,(mk-class '(flex flex-wrap
-                                                              flex-row
-                                                              gap-3
-                                                              max-w-64
-                                                              md:max-w-80
-                                                              overflow-x-scroll))))
+                                `((div (@ (class ,(mk-class '(flex flex-col
+                                                                   gap-3
+                                                                   max-w-64
+                                                                   md:max-w-80
+                                                                   overflow-x-scroll))))
                                        ,(p (G_ "Youtube URL"))
                                        ,(a s))))
                               (assoc-ref external-sources "youtube_url"))
