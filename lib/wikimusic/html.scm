@@ -109,7 +109,7 @@
                                     (style ,(assoc-ref asset-library
                                                        "pub/css/phosphor.css"))
                                     (style (@ (type "text/tailwindcss"))
-                                     "
+                                      "
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
@@ -120,6 +120,7 @@
                                     (meta (@ (name "viewport")
                                              (content
                                               "width=device-width, initial-scale=1.0")))
+                                    (meta (@(charset "UTF-8")))
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,toggle-dark-theme-js)
@@ -132,11 +133,11 @@
                                                                              justify-between
                                                                              min-h-96))))
                                                                 (div (@ (class ,
-                                                                         (mk-class '
-                                                                          (flex
-                                                                           flex-col
-                                                                           gap-8
-                                                                           justify-start))))
+                                                                          (mk-class '
+                                                                           (flex
+                                                                            flex-col
+                                                                            gap-8
+                                                                            justify-start))))
                                                                      ,nav
                                                                      ,body)))
                                                   #:footer (page-footer G_))))))
