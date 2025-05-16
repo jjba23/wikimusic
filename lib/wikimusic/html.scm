@@ -666,6 +666,7 @@ function addSearchQueryParam(form) {
 
 (define-public (render-external-sources G_ external-sources)
   `((div (@ (class ,(mk-class '(flex flex-row
+                                     flex-wrap
                                      gap-6
                                      py-12
                                      px-6
