@@ -152,7 +152,12 @@
                                                                            white-space-pre
                                                                            overflow-x-scroll)))))
                                                             ,ascii-contents)))
-                                           (assoc-ref version "ascii_contents"))))))
+                                           (assoc-ref version "ascii_contents"))
+                        ,(render-if-nempty (lambda (pdf-contents)
+                                             `((iframe (@ (src ,pdf-contents)
+                                                          (width "100%")
+                                                          (class ,(mk-class '(min-h-screen)))))))
+                                           (assoc-ref version "pdf_contents"))))))
 
 (begin
   (define* (song-content-edit-page G_ song song-contents)
