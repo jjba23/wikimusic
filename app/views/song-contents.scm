@@ -50,15 +50,15 @@
 (define-public (render-version G_ song version ascii-size)
   `(,(hr) (details (@ (open true))
                    (summary (@ (class ,(mk-class '(text-xl font-bold
-                                                   text-stone-700
-                                                   dark:text-stone-300
-                                                   cursor-pointer))))
+                                                           text-stone-700
+                                                           dark:text-stone-300
+                                                           cursor-pointer))))
                             ,(render-if-nempty (lambda (version-name)
                                                  (format #f "~a ~a ~a"
                                                          (G_ "version")
                                                          version-name
                                                          (assoc-ref version
-                                                          "instrument_type")))
+                                                                    "instrument_type")))
                                                (assoc-ref version
                                                           "version_name")))
 
@@ -73,22 +73,22 @@
                                                                   flex-row
                                                                   gap-2))))
                                            (a (@ (href ,(format #f
-                                                         "/songs/uuid/~a/contents/~a/edit"
-                                                         (assoc-ref song
-                                                          "identifier")
-                                                         (assoc-ref version
-                                                          "identifier"))))
+                                                                "/songs/uuid/~a/contents/~a/edit"
+                                                                (assoc-ref song
+                                                                           "identifier")
+                                                                (assoc-ref version
+                                                                           "identifier"))))
                                               ,(icon-button #:icon 'pencil
                                                             #:content (G_
                                                                        "edit version")))
                                            (form (@ (method POST)
                                                     (action ,(format #f
-                                                              "/songs/uuid/~a/contents/~a/delete"
-                                                              (assoc-ref song
-                                                               "identifier")
-                                                              (assoc-ref
-                                                               version
-                                                               "identifier"))))
+                                                                     "/songs/uuid/~a/contents/~a/delete"
+                                                                     (assoc-ref song
+                                                                                "identifier")
+                                                                     (assoc-ref
+                                                                      version
+                                                                      "identifier"))))
                                                  ,(icon-button #:icon 'trash
                                                                #:background '(bg-red-700)
                                                                #:hover-background '
@@ -102,7 +102,7 @@
                         ,(render-if-nestring (lambda (ascii-legend)
                                                `(details (@ (open true)
                                                             (class ,(mk-class '
-                                                                              (my-6))))
+                                                                     (my-6))))
                                                          (summary (@ (class ,(mk-class '
                                                                               (text-xl
                                                                                font-bold
@@ -132,7 +132,7 @@
                         ,(render-if-nestring (lambda (ascii-contents)
                                                `(details (@ (open "true")
                                                             (class ,(mk-class '
-                                                                              (my-6))))
+                                                                     (my-6))))
                                                          (summary (@ (class ,(mk-class '
                                                                               (text-xl
                                                                                font-bold
@@ -160,24 +160,24 @@
                                                               ,ascii-contents)))
                                              (assoc-ref version
                                                         "ascii_contents"))
-                        ,(render-if-nempty (lambda (pdf-contents)
-                                             `((details (@ (open true)
-                                                           (class ,(mk-class '
-                                                                             (my-6))))
-                                                        (summary (@ (class ,(mk-class '
-                                                                             (text-xl
-                                                                              font-bold
-                                                                              text-stone-700
-                                                                              dark:text-stone-300
-                                                                              cursor-pointer))))
-                                                                 ,(G_
-                                                                   "PDF contents"))
-                                                        (iframe (@ (src ,pdf-contents)
-                                                                   (width
-                                                                    "100%")
-                                                                   (class ,(mk-class '
-                                                                            (min-h-screen))))))))
-                                           (assoc-ref version "pdf_contents"))))))
+                        ,(render-if-nestring (lambda (pdf-contents)
+                                               `((details (@ (open true)
+                                                             (class ,(mk-class '
+                                                                      (my-6))))
+                                                          (summary (@ (class ,(mk-class '
+                                                                               (text-xl
+                                                                                font-bold
+                                                                                text-stone-700
+                                                                                dark:text-stone-300
+                                                                                cursor-pointer))))
+                                                                   ,(G_
+                                                                     "PDF contents"))
+                                                          (iframe (@ (src ,pdf-contents)
+                                                                     (width
+                                                                      "100%")
+                                                                     (class ,(mk-class '
+                                                                              (min-h-screen))))))))
+                                             (assoc-ref version "pdf_contents"))))))
 
 (begin
   (define* (song-content-edit-page G_ song song-contents)
