@@ -184,11 +184,13 @@
                                            #:x x)) songs))
                              ,page-buttons
                              ,(hr)
-                             (div (@ (class ,(mk-class '(flex flex-row
-                                                              flex-wrap gap-2
-                                                              justify-end))))
-                                  (a (@ (href "/songs/new"))
-                                     ,(button (G_ "new song")))))))))
+                             (unless only-tiles
+                               `(div (@ (class ,(mk-class '(flex flex-row
+                                                                 flex-wrap
+                                                                 gap-2
+                                                                 justify-end))))
+                                     (a (@ (href "/songs/new"))
+                                        ,(button (G_ "new song"))))))))))
       (if only-tiles body
           (html-template G_
                          #:body body))))
