@@ -677,23 +677,32 @@ function addSearchQueryParam(form) {
                                      align-end))))
          ,(render-if-nestring (lambda (s)
                                 `((div (@ (class ,(mk-class '(flex flex-wrap
-                                                                   flex-row gap-3
-                                                                   max-w-64 md:max-w-80 overflow-x-scroll))))
+                                                              flex-row
+                                                              gap-3
+                                                              max-w-64
+                                                              md:max-w-80
+                                                              overflow-x-scroll))))
                                        ,(p (G_ "Wikipedia URL"))
                                        ,(a s))))
                               (assoc-ref external-sources "wikipedia_url"))
 
          ,(render-if-nestring (lambda (s)
                                 `((div (@ (class ,(mk-class '(flex flex-wrap
-                                                                   flex-row gap-3
-                                                                   max-w-64 md:max-w-80 overflow-x-scroll))))
+                                                              flex-row
+                                                              gap-3
+                                                              max-w-64
+                                                              md:max-w-80
+                                                              overflow-x-scroll))))
                                        ,(p (G_ "Spotify URL"))
                                        ,(a s))))
                               (assoc-ref external-sources "spotify_url"))
          ,(render-if-nestring (lambda (s)
                                 `((div (@ (class ,(mk-class '(flex flex-wrap
-                                                                   flex-row gap-3
-                                                                   max-w-64 md:max-w-80 overflow-x-scroll))))
+                                                              flex-row
+                                                              gap-3
+                                                              max-w-64
+                                                              md:max-w-80
+                                                              overflow-x-scroll))))
                                        ,(p (G_ "Youtube URL"))
                                        ,(a s))))
                               (assoc-ref external-sources "youtube_url"))

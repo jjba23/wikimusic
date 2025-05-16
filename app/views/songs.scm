@@ -213,23 +213,23 @@
     
     (let* ((artist-name-titles (map (lambda (ar)
                                       `((div ,(a (em (assoc-ref ar
-                                                                "display_name"))
+                                                      "display_name"))
                                                  #:size 'text-lg
                                                  #:href (format #f
-                                                                "/artists/uuid/~a"
+                                                         "/artists/uuid/~a"
 
-                                                                (assoc-ref ar
-                                                                           "identifier"))))))
+                                                         (assoc-ref ar
+                                                          "identifier"))))))
                                     artists))
            (genre-name-titles (map (lambda (ar)
                                      `((div ,(a (em (assoc-ref ar
                                                                "display_name"))
                                                 #:size 'text-lg
                                                 #:href (format #f
-                                                               "/genres/uuid/~a"
+                                                        "/genres/uuid/~a"
 
-                                                               (assoc-ref ar
-                                                                          "identifier"))))))
+                                                        (assoc-ref ar
+                                                         "identifier"))))))
                                    genres)))
       (html-template G_
                      #:body `((div (@ (class ,(mk-class '(container mx-auto))))
