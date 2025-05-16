@@ -427,6 +427,9 @@
                        (ascii_contents ,(escape-str (uri-decode (car (assoc-ref
                                                                       kv
                                                                       "ascii-contents")))))
+                       (pdf_contents ,(escape-str (uri-decode (car (assoc-ref
+                                                                    kv
+                                                                    "pdf-contents")))))
                        (last_edited_at ,(current-time)))
                      (where #:identifier (params rc "version-uuid"))))
     (redirect-to rc

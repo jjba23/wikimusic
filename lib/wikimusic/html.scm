@@ -109,7 +109,7 @@
                                     (style ,(assoc-ref asset-library
                                                        "pub/css/phosphor.css"))
                                     (style (@ (type "text/tailwindcss"))
-                                      "
+                                     "
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
@@ -120,11 +120,34 @@
                                     (meta (@ (name "viewport")
                                              (content
                                               "width=device-width, initial-scale=1.0")))
-                                    (meta (@(charset "UTF-8")))
+                                    (meta (@ (charset "UTF-8")))
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,toggle-dark-theme-js)
-                                    (script ,remember-dark-theme-js))
+                                    (script ,remember-dark-theme-js)
+                                    (script
+                                     "
+const fileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(file);
+
+    fileReader.onload = () => {
+      resolve(fileReader.result);
+    };
+
+    fileReader.onerror = (error) => {
+      reject(error);
+    };
+  });
+};
+
+async function translateFileToBase64AddToInput(sourceInput, targetInput) {
+  const file = sourceInput.files[0];
+  const base64 = await fileToBase64(file);
+  targetInput.setAttribute('value', base64);
+};
+"))
                               (body (@ (class ,(mk-class '(bg-stone-100
                                                            dark:bg-stone-800))))
                                     ,(with-footer #:main `((div (@ (class ,(mk-class '
@@ -133,11 +156,11 @@
                                                                              justify-between
                                                                              min-h-96))))
                                                                 (div (@ (class ,
-                                                                          (mk-class '
-                                                                           (flex
-                                                                            flex-col
-                                                                            gap-8
-                                                                            justify-start))))
+                                                                         (mk-class '
+                                                                          (flex
+                                                                           flex-col
+                                                                           gap-8
+                                                                           justify-start))))
                                                                      ,nav
                                                                      ,body)))
                                                   #:footer (page-footer G_))))))
@@ -264,7 +287,7 @@
   (let* ((rendered-artworks (map (lambda (art)
                                    `(figure (@ (class ,(mk-class '(py-3
 
-                                                                   ))))
+                                                                        ))))
                                             (img (@ (loading lazy)
                                                     (class ,(mk-class '(rounded-xl
                                                                         shadow-md
@@ -273,39 +296,39 @@
                                                                         md:w-72
                                                                         h-auto)))
                                                     (src ,(assoc-ref art
-                                                                     "content_url"))))
+                                                           "content_url"))))
                                             ,(render-if-nempty (lambda (fc)
                                                                  `(figcaption ,fc))
                                                                (assoc-ref art
-                                                                          "content_caption"))))
+                                                                "content_caption"))))
                                  artworks))
          (rendered-comments (render-comments G_ user-alist #f comments))
          (like-count (length (filter (lambda (o)
                                        (and (equal? (assoc-ref x "identifier")
                                                     (assoc-ref o
                                                                (format #f
-                                                                       "~a_identifier"
-                                                                       entity)))
+                                                                "~a_identifier"
+                                                                entity)))
                                             (equal? 1
                                                     (assoc-ref o "is_like"))))
                                      opinions)))
          (dislike-count (length (filter (lambda (o)
                                           (and (equal? (assoc-ref x
-                                                                  "identifier")
+                                                        "identifier")
                                                        (assoc-ref o
                                                                   (format #f
-                                                                          "~a_identifier"
-                                                                          entity)))
+                                                                   "~a_identifier"
+                                                                   entity)))
                                                (equal? 1
                                                        (assoc-ref o
-                                                                  "is_dislike"))))
+                                                        "is_dislike"))))
                                         opinions)))
          (opinion-buttons `((div (@ (class ,(mk-class '(flex flex-row
                                                              flex-wrap gap-3))))
                                  (form (@ (method POST)
                                           (action ,(format #f
-                                                           "/~as/uuid/~a/like" entity
-                                                           (assoc-ref x "identifier"))))
+                                                    "/~as/uuid/~a/like" entity
+                                                    (assoc-ref x "identifier"))))
                                        ,(icon-button #:icon 'thumbs-up
                                                      #:color '(text-stone-100)
                                                      #:background '(bg-green-700)
@@ -316,16 +339,16 @@
                                                      #:content `(div ,(G_
                                                                        "like")
                                                                      (span (@ (class
-                                                                                "font-light text-xs"))
+                                                                               "font-light text-xs"))
                                                                            ,(format
                                                                              #f
                                                                              " ( ~a ) "
                                                                              like-count)))))
                                  (form (@ (method POST)
                                           (action ,(format #f
-                                                           "/~as/uuid/~a/dislike"
-                                                           entity
-                                                           (assoc-ref x "identifier"))))
+                                                    "/~as/uuid/~a/dislike"
+                                                    entity
+                                                    (assoc-ref x "identifier"))))
                                        ,(icon-button #:icon 'thumbs-down
                                                      #:color '(text-stone-100)
                                                      #:background '(bg-red-700)
@@ -337,38 +360,38 @@
                                                                        "dislike")
 
                                                                      (span (@ (class ,
-                                                                                (mk-class '
-                                                                                 (font-light
-                                                                                  text-xs))))
+                                                                               (mk-class '
+                                                                                (font-light
+                                                                                 text-xs))))
                                                                            ,(format
                                                                              #f
                                                                              " ( ~a ) "
                                                                              dislike-count))))))))
          (maybe-description (render-if-nempty (lambda (description)
                                                 `(div (p (@ (class ,(mk-class '
-                                                                     (text-stone-700
-                                                                      dark:text-stone-400
-                                                                      font-bold))))
+                                                                              (text-stone-700
+                                                                               dark:text-stone-400
+                                                                               font-bold))))
                                                          ,(G_ "description"))
                                                       (p (@ (class ,(mk-class '
-                                                                     (pl-3
-                                                                      whitespace-break-spaces
-                                                                      text-stone-800
-                                                                      dark:text-stone-300
-                                                                      max-w-prose))))
+                                                                              (pl-3
+                                                                               whitespace-break-spaces
+                                                                               text-stone-800
+                                                                               dark:text-stone-300
+                                                                               max-w-prose))))
                                                          ,description)))
                                               (assoc-ref x "description")))
          (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
                                                    `((dt (@ (class ,(mk-class '
-                                                                     (pt-3
-                                                                      pb-1text-stone-700
-                                                                      dark:text-stone-400
-                                                                      font-bold))))
+                                                                              (pt-3
+                                                                               pb-1text-stone-700
+                                                                               dark:text-stone-400
+                                                                               font-bold))))
                                                          ,(G_ "last edited"))
                                                      (dd (@ (class ,(mk-class '
-                                                                     (pl-3
-                                                                      text-stone-800
-                                                                      dark:text-stone-300))))
+                                                                              (pl-3
+                                                                               text-stone-800
+                                                                               dark:text-stone-300))))
                                                          ,(strftime "%c"
                                                                     (localtime
                                                                      (string->number
@@ -412,7 +435,7 @@
                                                     dark:text-stone-300))))
                         ,(strftime "%c"
                                    (localtime (string->number (assoc-ref x
-                                                                         "created_at")))))
+                                                               "created_at")))))
                     ,maybe-last-edited-at
                     (dt (@ (class ,(mk-class '(pt-3 pb-1 text-stone-700
                                                     dark:text-stone-400
@@ -426,16 +449,16 @@
                                                                           flex-row
                                                                           gap-2))))
                                                    (span ,(format #f
-                                                                  "~a (~a) &lt;~a&gt;"
-                                                                  (assoc-ref u
-                                                                             "display_name")
-                                                                  (assoc-ref u
-                                                                             "username")
-                                                                  (assoc-ref u
-                                                                             "email_address")))))
+                                                           "~a (~a) &lt;~a&gt;"
+                                                           (assoc-ref u
+                                                            "display_name")
+                                                           (assoc-ref u
+                                                            "username")
+                                                           (assoc-ref u
+                                                            "email_address")))))
                                            (car (assoc-ref user-alist
                                                            (assoc-ref x
-                                                                      "created_by")))))
+                                                            "created_by")))))
                     (dt (@ (class ,(mk-class '(pt-3 pb-1 text-stone-700
                                                     dark:text-stone-400
                                                     font-bold))))
@@ -443,7 +466,7 @@
                     (dd (@ (class ,(mk-class '(pl-3 text-stone-800
                                                     dark:text-stone-300))))
                         ,(render-visibility-status (assoc-ref x
-                                                              "visibility_status")))
+                                                    "visibility_status")))
                     ,maybe-approved-by
                     (dt (@ (class ,(mk-class '(pt-3 pb-1 pb-1 text-stone-700
                                                     dark:text-stone-400
@@ -459,9 +482,9 @@
                                            #:content "copy"
 
                                            #:on-click (format #f
-                                                              "navigator.clipboard.writeText('~a')"
-                                                              (assoc-ref x
-                                                                         "identifier"))))))))
+                                                       "navigator.clipboard.writeText('~a')"
+                                                       (assoc-ref x
+                                                        "identifier"))))))))
       (details (summary (@ (class ,(mk-class '(text-stone-800
                                                dark:text-stone-200
                                                cursor-pointer))))

@@ -110,8 +110,8 @@
                                                             gap-3 my-4))))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                            "/songs?offset=~a&limit=~a"
-                                                            (- offset limit) limit)))
+                                                     "/songs?offset=~a&limit=~a"
+                                                     (- offset limit) limit)))
                                           ,(icon-button #:icon 'arrow-left
                                                         #:content (G_
                                                                    "previous"))))
@@ -119,8 +119,8 @@
                                 ,(if (and (> limit 0)
                                           (= (length songs) limit))
                                      `((a (@ (href ,(format #f
-                                                            "/songs?offset=~a&limit=~a"
-                                                            (+ offset limit) limit)))
+                                                     "/songs?offset=~a&limit=~a"
+                                                     (+ offset limit) limit)))
                                           ,(icon-button #:icon 'arrow-right
                                                         #:content (G_ "next"))))
                                      '()))))
@@ -144,53 +144,53 @@
                                                                               flex-row
                                                                               justify-between))))
                                                                  (div (@ (class ,
-                                                                           (mk-class '
-                                                                            (flex
-                                                                             flex-wrap
-                                                                             flex-row
-                                                                             justify-start
-                                                                             items-center))))
+                                                                          (mk-class '
+                                                                           (flex
+                                                                            flex-wrap
+                                                                            flex-row
+                                                                            justify-start
+                                                                            items-center))))
                                                                       ,(sort-select
                                                                         G_
                                                                         #:entity 'song
                                                                         #:user-sort
                                                                         user-sort))
                                                                  (div (@ (class ,
-                                                                           (mk-class '
-                                                                            (flex
-                                                                             flex-wrap
-                                                                             flex-row
-                                                                             gap-3
-                                                                             justify-right
-                                                                             items-center))))
+                                                                          (mk-class '
+                                                                           (flex
+                                                                            flex-wrap
+                                                                            flex-row
+                                                                            gap-3
+                                                                            justify-right
+                                                                            items-center))))
 
                                                                       ,(search-box
                                                                         G_
                                                                         #:search-query
                                                                         search-query))))
-                                (div (div (@ (class ,(mk-class '(grid gap-4
-                                                                      sm:grid-cols-3
-                                                                      md:grid-cols-4
-                                                                      lg:grid-cols-5))))
-                                          ,(map (lambda (x)
-                                                  (render-song-tile G_
-                                                                    #:artworks artworks
-                                                                    #:song-version-count-alist
-                                                                    song-version-count-alist
-                                                                    #:opinions opinions
-                                                                    #:comments comments
-                                                                    #:artists artists
-                                                                    #:song-artists song-artists
-                                                                    #:x x)) songs))
-                                     ,page-buttons
-                                     ,(hr)
-                                     ,(unless only-tiles
-                                        `(div (@ (class ,(mk-class '(flex flex-row
-                                                                          flex-wrap
-                                                                          gap-2
-                                                                          justify-end))))
-                                              (a (@ (href "/songs/new"))
-                                                 ,(button (G_ "new song"))))))))))
+                        (div (div (@ (class ,(mk-class '(grid gap-4
+                                                              sm:grid-cols-3
+                                                              md:grid-cols-4
+                                                              lg:grid-cols-5))))
+                                  ,(map (lambda (x)
+                                          (render-song-tile G_
+                                           #:artworks artworks
+                                           #:song-version-count-alist
+                                           song-version-count-alist
+                                           #:opinions opinions
+                                           #:comments comments
+                                           #:artists artists
+                                           #:song-artists song-artists
+                                           #:x x)) songs))
+                             ,page-buttons
+                             ,(hr)
+                             ,(unless only-tiles
+                                `(div (@ (class ,(mk-class '(flex flex-row
+                                                                  flex-wrap
+                                                                  gap-2
+                                                                  justify-end))))
+                                      (a (@ (href "/songs/new"))
+                                         ,(button (G_ "new song"))))))))))
       (if only-tiles body
           (html-template G_
                          #:body body))))

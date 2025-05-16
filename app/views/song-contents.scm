@@ -99,64 +99,84 @@
                                                                #:type 'submit
                                                                #:content (G_
                                                                           "delete version"))))))
-                        ,(render-if-nempty (lambda (ascii-legend)
-                                             `(details (@ (open true))
-                                                       (summary (@ (class ,(mk-class '
-                                                                            (text-xl
-                                                                             font-bold
-                                                                             text-stone-700
-                                                                             dark:text-stone-300
-                                                                             cursor-pointer))))
-                                                                ,(G_
-                                                                  "ascii legend"))
-                                                       (pre (@ (class ,(mk-class
-                                                                        (append
-                                                                         (list
-                                                                          (string->symbol
-                                                                           ascii-size))
-                                                                         '(p-4
-                                                                           md:p-6
-                                                                           shadow-md
-                                                                           bg-stone-200/75
-                                                                           dark:bg-stone-900
-                                                                           text-black
-                                                                           dark:text-white
-                                                                           rounded-xl
-                                                                           white-space-pre
-                                                                           overflow-x-scroll)))))
-                                                            ,ascii-legend)))
-                                           (assoc-ref version "ascii_legend"))
-                        ,(render-if-nempty (lambda (ascii-contents)
-                                             `(details (@ (open "true"))
-                                                       (summary (@ (class ,(mk-class '
-                                                                            (text-xl
-                                                                             font-bold
-                                                                             text-stone-700
-                                                                             dark:text-stone-300
-                                                                             cursor-pointer))))
-                                                                ,(G_
-                                                                  "ascii contents"))
-                                                       (pre (@ (class ,(mk-class
-                                                                        (append
-                                                                         (list
-                                                                          (string->symbol
-                                                                           ascii-size))
-                                                                         '(p-4
-                                                                           md:p-6
-                                                                           shadow-md
-                                                                           bg-stone-200/75
-                                                                           dark:bg-stone-900
-                                                                           text-black
-                                                                           dark:text-white
-                                                                           rounded-xl
-                                                                           white-space-pre
-                                                                           overflow-x-scroll)))))
-                                                            ,ascii-contents)))
-                                           (assoc-ref version "ascii_contents"))
+                        ,(render-if-nestring (lambda (ascii-legend)
+                                               `(details (@ (open true)
+                                                            (class ,(mk-class '
+                                                                              (my-6))))
+                                                         (summary (@ (class ,(mk-class '
+                                                                              (text-xl
+                                                                               font-bold
+                                                                               text-stone-700
+                                                                               dark:text-stone-300
+                                                                               cursor-pointer))))
+                                                                  ,(G_
+                                                                    "ascii legend"))
+                                                         (pre (@ (class ,(mk-class
+                                                                          (append
+                                                                           (list
+                                                                            (string->symbol
+                                                                             ascii-size))
+                                                                           '(p-4
+                                                                             font-mono
+                                                                             md:p-6
+                                                                             shadow-md
+                                                                             bg-stone-200/75
+                                                                             dark:bg-stone-900
+                                                                             text-black
+                                                                             dark:text-white
+                                                                             rounded-xl
+                                                                             white-space-pre
+                                                                             overflow-x-scroll)))))
+                                                              ,ascii-legend)))
+                                             (assoc-ref version "ascii_legend"))
+                        ,(render-if-nestring (lambda (ascii-contents)
+                                               `(details (@ (open "true")
+                                                            (class ,(mk-class '
+                                                                              (my-6))))
+                                                         (summary (@ (class ,(mk-class '
+                                                                              (text-xl
+                                                                               font-bold
+                                                                               text-stone-700
+                                                                               dark:text-stone-300
+                                                                               cursor-pointer))))
+                                                                  ,(G_
+                                                                    "ascii contents"))
+                                                         (pre (@ (class ,(mk-class
+                                                                          (append
+                                                                           (list
+                                                                            (string->symbol
+                                                                             ascii-size))
+                                                                           '(p-4
+                                                                             md:p-6
+                                                                             shadow-md
+                                                                             font-mono
+                                                                             bg-stone-200/75
+                                                                             dark:bg-stone-900
+                                                                             text-black
+                                                                             dark:text-white
+                                                                             rounded-xl
+                                                                             white-space-pre
+                                                                             overflow-x-scroll)))))
+                                                              ,ascii-contents)))
+                                             (assoc-ref version
+                                                        "ascii_contents"))
                         ,(render-if-nempty (lambda (pdf-contents)
-                                             `((iframe (@ (src ,pdf-contents)
-                                                          (width "100%")
-                                                          (class ,(mk-class '(min-h-screen)))))))
+                                             `((details (@ (open true)
+                                                           (class ,(mk-class '
+                                                                             (my-6))))
+                                                        (summary (@ (class ,(mk-class '
+                                                                             (text-xl
+                                                                              font-bold
+                                                                              text-stone-700
+                                                                              dark:text-stone-300
+                                                                              cursor-pointer))))
+                                                                 ,(G_
+                                                                   "PDF contents"))
+                                                        (iframe (@ (src ,pdf-contents)
+                                                                   (width
+                                                                    "100%")
+                                                                   (class ,(mk-class '
+                                                                            (min-h-screen))))))))
                                            (assoc-ref version "pdf_contents"))))))
 
 (begin
@@ -241,6 +261,31 @@
                                                        #:value (unescape-str
                                                                 version-name)
                                                        #:required #t)
+                                               (label (@ (class ,(mk-class '(dark:text-stone-300
+                                                                             text-stone-600
+                                                                             font-bold
+                                                                             text-sm
+                                                                             mt-3))))
+                                                      ,(G_ "PDF contents"))
+                                               (input (@ (type file)
+                                                         (id pdf-upload)
+                                                         (onchange
+                                                          "translateFileToBase64AddToInput(
+                                                                      document.getElementById('pdf-upload'),
+                                                                      document.getElementById('pdf-contents')
+                                                           )")
+                                                         (class ,(mk-class '(bg-stone-200
+                                                                             dark:bg-stone-900
+                                                                             my-2
+                                                                             px-3
+                                                                             py-2
+                                                                             text-stone-800
+                                                                             dark:text-stone-200
+                                                                             rounded-xl)))
+                                                         (value "")) "")
+                                               (input (@ (id pdf-contents)
+                                                         (name pdf-contents)
+                                                         (hidden "")) "")
                                                ,(textarea #:label (G_
                                                                    "ascii legend")
                                                           #:name 'ascii-legend
@@ -252,6 +297,7 @@
                                                                            border-stone-200
                                                                            dark:border-stone-700
                                                                            dark:text-stone-300
+                                                                           bg-stone-200
                                                                            dark:bg-stone-700/75
                                                                            border-2
                                                                            min-h-72
@@ -270,6 +316,7 @@
                                                                            border-stone-200
                                                                            dark:border-stone-700
                                                                            dark:text-stone-300
+                                                                           bg-stone-200
                                                                            dark:bg-stone-700/75
                                                                            border-2
                                                                            min-h-240
@@ -277,10 +324,7 @@
                                                                            shadow-md
                                                                            font-mono
                                                                            min-w-prose))
-                                               (input (@ (type file)
-                                                         (hidden true)
-                                                         (name pdf-contents)
-                                                         (value "")) "")
+
                                                (input (@ (type file)
                                                          (hidden true)
                                                          (name
