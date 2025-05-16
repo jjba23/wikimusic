@@ -673,7 +673,7 @@ function addSearchQueryParam(form) {
                                      md:px-18
                                      w-full
                                      justify-end
-                                     items-end
+                                     items-start
                                      align-end))))
          ,(render-if-nestring (lambda (s)
                                 `((div (@ (class ,(mk-class '(flex flex-col
