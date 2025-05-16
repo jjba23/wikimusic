@@ -50,15 +50,15 @@
 (define-public (render-version G_ song version ascii-size)
   `(,(hr) (details (@ (open true))
                    (summary (@ (class ,(mk-class '(text-xl font-bold
-                                                           text-stone-700
-                                                           dark:text-stone-300
-                                                           cursor-pointer))))
+                                                   text-stone-700
+                                                   dark:text-stone-300
+                                                   cursor-pointer))))
                             ,(render-if-nempty (lambda (version-name)
                                                  (format #f "~a ~a ~a"
                                                          (G_ "version")
                                                          version-name
                                                          (assoc-ref version
-                                                                    "instrument_type")))
+                                                          "instrument_type")))
                                                (assoc-ref version
                                                           "version_name")))
 
@@ -73,22 +73,22 @@
                                                                   flex-row
                                                                   gap-2))))
                                            (a (@ (href ,(format #f
-                                                                "/songs/uuid/~a/contents/~a/edit"
-                                                                (assoc-ref song
-                                                                           "identifier")
-                                                                (assoc-ref version
-                                                                           "identifier"))))
+                                                         "/songs/uuid/~a/contents/~a/edit"
+                                                         (assoc-ref song
+                                                          "identifier")
+                                                         (assoc-ref version
+                                                          "identifier"))))
                                               ,(icon-button #:icon 'pencil
                                                             #:content (G_
                                                                        "edit version")))
                                            (form (@ (method POST)
                                                     (action ,(format #f
-                                                                     "/songs/uuid/~a/contents/~a/delete"
-                                                                     (assoc-ref song
-                                                                                "identifier")
-                                                                     (assoc-ref
-                                                                      version
-                                                                      "identifier"))))
+                                                              "/songs/uuid/~a/contents/~a/delete"
+                                                              (assoc-ref song
+                                                               "identifier")
+                                                              (assoc-ref
+                                                               version
+                                                               "identifier"))))
                                                  ,(icon-button #:icon 'trash
                                                                #:background '(bg-red-700)
                                                                #:hover-background '
@@ -102,7 +102,7 @@
                         ,(render-if-nestring (lambda (ascii-legend)
                                                `(details (@ (open true)
                                                             (class ,(mk-class '
-                                                                     (my-6))))
+                                                                              (my-6))))
                                                          (summary (@ (class ,(mk-class '
                                                                               (text-xl
                                                                                font-bold
@@ -132,7 +132,7 @@
                         ,(render-if-nestring (lambda (ascii-contents)
                                                `(details (@ (open "true")
                                                             (class ,(mk-class '
-                                                                     (my-6))))
+                                                                              (my-6))))
                                                          (summary (@ (class ,(mk-class '
                                                                               (text-xl
                                                                                font-bold
@@ -164,12 +164,13 @@
                                                `((details (@ (open true)
                                                              (class ,(mk-class '
                                                                       (my-6))))
-                                                          (summary (@ (class ,(mk-class '
-                                                                               (text-xl
-                                                                                font-bold
-                                                                                text-stone-700
-                                                                                dark:text-stone-300
-                                                                                cursor-pointer))))
+                                                          (summary (@ (class ,
+                                                                             (mk-class '
+                                                                              (text-xl
+                                                                               font-bold
+                                                                               text-stone-700
+                                                                               dark:text-stone-300
+                                                                               cursor-pointer))))
                                                                    ,(G_
                                                                      "PDF contents"))
                                                           (iframe (@ (src ,pdf-contents)
@@ -177,11 +178,22 @@
                                                                       "100%")
                                                                      (class ,(mk-class '
                                                                               (min-h-screen))))))))
-                                             (assoc-ref version "pdf_contents"))))))
+                                             (if (equal? (assoc-ref version
+                                                          "pdf_contents")
+                                                  "data:application/octet-stream;base64,")
+                                                 ""
+                                                 (assoc-ref version
+                                                            "pdf_contents")))))))
 
 (begin
   (define* (song-content-edit-page G_ song song-contents)
-    (let* ((body `(div (@ (class ,(mk-class '(container mx-auto))))
+    (let* ((clean-pdf-contents (lambda (x)
+                                 (if (equal? x
+                                      "data:application/octet-stream;base64,")
+                                     ""
+                                     (unescape-str (assoc-ref song-contents
+                                                              "pdf_contents")))))
+           (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ((div ,(hr)
                              ,(song-content-form G_
                                                  #:song-identifier (assoc-ref
@@ -208,9 +220,8 @@
                                                                        (assoc-ref
                                                                         song-contents
                                                                         "guitarpro_contents"))
-                                                 #:pdf-contents (unescape-str (assoc-ref
-                                                                               song-contents
-                                                                               "pdf_contents"))))))))
+                                                 #:pdf-contents
+                                                 clean-pdf-contents))))))
       (html-template G_
                      #:body body)))
   (export song-content-edit-page))

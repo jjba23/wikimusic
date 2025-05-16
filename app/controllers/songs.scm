@@ -37,6 +37,7 @@
         (kracht prelude)
         (app models song_artists)
         (app models song_genres)
+        (app models song_external_sources)
         (uuid generate)
         (app views song-contents)
         (wikimusic query-escape)
@@ -210,23 +211,23 @@
      #:cookies '(names wikimusic-ascii-size)
      (lambda (rc)
        (let* ((ascii-size (cond
-                            ((not (equal? #f
-                                          (get-from-qstr rc "ascii-size")))
-                             (:cookies-set! rc
-                                            'wikimusic-ascii-size
-                                            "wikimusic-ascii-size"
-                                            (get-from-qstr rc "ascii-size"))
-                             (:cookies-setattr! rc
-                                                'wikimusic-ascii-size
-                                                #:expires 12000000
-                                                #:path "/"
-                                                #:http-only #t)
+                           ((not (equal? #f
+                                         (get-from-qstr rc "ascii-size")))
+                            (:cookies-set! rc
+                             'wikimusic-ascii-size
+                             "wikimusic-ascii-size"
                              (get-from-qstr rc "ascii-size"))
-                            ((not (equal? #f
-                                          (:cookies-value rc
-                                           "wikimusic-ascii-size")))
-                             (:cookies-value rc "wikimusic-ascii-size"))
-                            (else "text-sm")))
+                            (:cookies-setattr! rc
+                             'wikimusic-ascii-size
+                             #:expires 12000000
+                             #:path "/"
+                             #:http-only #t)
+                            (get-from-qstr rc "ascii-size"))
+                           ((not (equal? #f
+                                         (:cookies-value rc
+                                          "wikimusic-ascii-size")))
+                            (:cookies-value rc "wikimusic-ascii-size"))
+                           (else "text-sm")))
               (uuid (params rc "uuid"))
               (song (car ($songs 'get
                                  #:ret 'top
@@ -247,6 +248,14 @@
                                         #:order-by '(created_at asc)
                                         #:condition (where #:song_identifier
                                                            uuid)))
+              (raw-external-sources ($song_external_sources 'get
+                                                            #:ret 'top
+                                                            #:condition (where
+                                                                         #:song_identifier
+                                                                         uuid)))
+              (external-sources (if (nil? raw-external-sources)
+                                    '()
+                                    (car raw-external-sources)))
               (users ($users 'get
                              #:ret 'all
                              #:order-by '(display_name asc)
@@ -257,8 +266,8 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                                #:song_identifier
-                                                                uuid)))
+                                                          #:song_identifier
+                                                          uuid)))
               (song-genres ($song_genres 'get
                                          #:ret 'all
                                          #:condition (where #:song_identifier
@@ -274,8 +283,8 @@
               (song-artists ($song_artists 'get
                                            #:ret 'all
                                            #:condition (where
-                                                              #:song_identifier
-                                                              uuid)))
+                                                        #:song_identifier
+                                                        uuid)))
               (artist-uuids (map (lambda (a)
                                    (assoc-ref a "artist_identifier"))
                                  song-artists))
@@ -295,19 +304,21 @@
 
          ;; return rendered view
          (response-emit (:mime rc
-                               (songs-detail-page (:i18n rc)
-                                                  #:song song
-                                                  #:artworks artworks
-                                                  #:song-contents
-                                                  song-contents
-                                                  #:song-artists song-artists
-                                                  #:artists artists
-                                                  #:song-genres song-genres
-                                                  #:genres genres
-                                                  #:opinions opinions
-                                                  #:comments comments
-                                                  #:user-alist user-alist
-                                                  #:ascii-size ascii-size))))))
+                         (songs-detail-page (:i18n rc)
+                                            #:song song
+                                            #:artworks artworks
+                                            #:song-contents
+                                            song-contents
+                                            #:song-artists song-artists
+                                            #:artists artists
+                                            #:song-genres song-genres
+                                            #:genres genres
+                                            #:opinions opinions
+                                            #:comments comments
+                                            #:user-alist user-alist
+                                            #:ascii-size ascii-size
+                                            #:external-sources
+                                            external-sources))))))
 
 (get "/songs/uuid/:uuid/edit"
      #:mime 'xml

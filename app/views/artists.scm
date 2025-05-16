@@ -109,25 +109,35 @@
                      #:body body)))
   (export artists-list-page))
 
-(define-public (artists-detail-page G_
-                                    artist
-                                    artworks
-                                    opinions
-                                    comments
-                                    user-alist
-                                    song-fragment)
-  (html-template G_
-                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
-                               (,(h2 (assoc-ref artist "display_name")) (div (div ,
-                                                                              (entity-details
-                                                                               G_
-                                                                               'artist
-                                                                               artist
-                                                                               artworks
-                                                                               opinions
-                                                                               comments
-                                                                               user-alist)))))
-                          (div ,song-fragment))))
+(begin
+  (define* (artists-detail-page G_
+                                #:key artist
+                                artworks
+                                opinions
+                                comments
+                                user-alist
+                                song-fragment
+                                external-sources)
+    (html-template G_
+                   #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                                 (,(h2 (assoc-ref artist "display_name")) (div
+                                                                           (div ,
+                                                                            (entity-details
+                                                                             G_
+                                                                             #:entity 'artist
+                                                                             #:x
+                                                                             artist
+                                                                             #:artworks
+                                                                             artworks
+                                                                             #:opinions
+                                                                             opinions
+                                                                             #:comments
+                                                                             comments
+                                                                             #:user-alist
+                                                                             user-alist)))))
+                            ,(render-external-sources G_ external-sources)
+                            (div ,song-fragment))))
+  (export artists-detail-page))
 
 (begin
   (define* (artist-edit-page G_ artist artworks)

@@ -208,27 +208,28 @@
                               opinions
                               comments
                               user-alist
-                              (ascii-size 'text-md))
+                              (ascii-size 'text-md)
+                              external-sources)
     
     (let* ((artist-name-titles (map (lambda (ar)
                                       `((div ,(a (em (assoc-ref ar
-                                                      "display_name"))
+                                                                "display_name"))
                                                  #:size 'text-lg
                                                  #:href (format #f
-                                                         "/artists/uuid/~a"
+                                                                "/artists/uuid/~a"
 
-                                                         (assoc-ref ar
-                                                          "identifier"))))))
+                                                                (assoc-ref ar
+                                                                           "identifier"))))))
                                     artists))
            (genre-name-titles (map (lambda (ar)
                                      `((div ,(a (em (assoc-ref ar
                                                                "display_name"))
                                                 #:size 'text-lg
                                                 #:href (format #f
-                                                        "/genres/uuid/~a"
+                                                               "/genres/uuid/~a"
 
-                                                        (assoc-ref ar
-                                                         "identifier"))))))
+                                                               (assoc-ref ar
+                                                                          "identifier"))))))
                                    genres)))
       (html-template G_
                      #:body `((div (@ (class ,(mk-class '(container mx-auto))))
@@ -257,13 +258,18 @@
                                                    ,genre-name-titles))))
                                     
                                     (div (div ,(entity-details G_
-                                                               'song
-                                                               song
+                                                               #:entity 'song
+                                                               #:x song
+                                                               #:artworks
                                                                artworks
+                                                               #:opinions
                                                                opinions
+                                                               #:comments
                                                                comments
+                                                               #:user-alist
                                                                user-alist)))))
-                              
+                              ,(render-external-sources G_ external-sources)
+
                               (div ,(render-song-contents G_ song
                                                           song-contents
                                                           ascii-size))))))

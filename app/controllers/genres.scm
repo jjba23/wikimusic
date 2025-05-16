@@ -30,6 +30,7 @@
         (app models song_artworks)
         (app models song_contents)
         (app models song_opinions)
+        (app models genre_external_sources)
         (app models song_comments)
         (app models genres)
         (app models genre_artworks)
@@ -175,6 +176,14 @@
                                          #:order-by '(created_at asc)
                                          #:condition (where #:genre_identifier
                                                             uuid)))
+              (raw-external-sources ($genre_external_sources 'get
+                                                             #:ret 'top
+                                                             #:condition (where
+                                                                          #:genre_identifier
+                                                                          uuid)))
+              (external-sources (if (nil? raw-external-sources)
+                                    '()
+                                    (car raw-external-sources)))
               (users ($users 'get
                              #:ret 'all
                              #:order-by '(display_name asc)
@@ -184,70 +193,70 @@
                                  `(,(assoc-ref u "identifier") ,u)) users))
               ;; song-specific
               (song-user-sort (cond
-                                ((not (equal? #f
-                                              (get-from-qstr rc "sort")))
-                                 (:cookies-set! rc
-                                                'wikimusic-song-sort
-                                                "wikimusic-song-sort"
-                                                (get-from-qstr rc "sort"))
-                                 (:cookies-setattr! rc
-                                                    'wikimusic-song-sort
-                                                    #:expires 12000000
-                                                    #:path "/"
-                                                    #:http-only #t)
+                               ((not (equal? #f
+                                             (get-from-qstr rc "sort")))
+                                (:cookies-set! rc
+                                 'wikimusic-song-sort
+                                 "wikimusic-song-sort"
                                  (get-from-qstr rc "sort"))
-                                ((not (equal? #f
-                                              (:cookies-value rc
-                                               "wikimusic-song-sort")))
-                                 (:cookies-value rc "wikimusic-song-sort"))
-                                (else "display-name-asc")))
+                                (:cookies-setattr! rc
+                                 'wikimusic-song-sort
+                                 #:expires 12000000
+                                 #:path "/"
+                                 #:http-only #t)
+                                (get-from-qstr rc "sort"))
+                               ((not (equal? #f
+                                             (:cookies-value rc
+                                              "wikimusic-song-sort")))
+                                (:cookies-value rc "wikimusic-song-sort"))
+                               (else "display-name-asc")))
               (song-query-sort (entity-sort-from-query song-user-sort))
 
               (songs (DB-get-all-rows (DB-query (DB-open rc)
                                                 (format #f
-                                                 "SELECT * FROM songs WHERE identifier IN
+                                                        "SELECT * FROM songs WHERE identifier IN
                                                              (SELECT song_identifier FROM song_genres WHERE genre_identifier = '~a') ORDER BY ~a ~a"
-                                                 uuid
-                                                 (car song-query-sort)
-                                                 (cadr song-query-sort)))))
+                                                        uuid
+                                                        (car song-query-sort)
+                                                        (cadr song-query-sort)))))
               (song-ids (map (lambda (s)
                                (assoc-ref s "identifier")) songs))
               (song-artworks (cond
-                               ((nil? song-ids)
-                                '())
-                               (else ($song_artworks 'get
-                                                     #:ret 'all
-                                                     #:order-by '(order_value
-                                                                  asc)
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
+                              ((nil? song-ids)
+                               '())
+                              (else ($song_artworks 'get
+                                                    #:ret 'all
+                                                    #:order-by '(order_value
+                                                                 asc)
+                                                    #:condition (where
+                                                                 #:song_identifier
+                                                                 song-ids)))))
               (song-opinions (cond
-                               ((nil? song-ids)
-                                '())
-                               (else ($song_opinions 'get
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
+                              ((nil? song-ids)
+                               '())
+                              (else ($song_opinions 'get
+                                                    #:ret 'all
+                                                    #:condition (where
+                                                                 #:song_identifier
+                                                                 song-ids)))))
               (song-comments (cond
-                               ((nil? song-ids)
-                                '())
-                               (else ($song_comments 'get
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
+                              ((nil? song-ids)
+                               '())
+                              (else ($song_comments 'get
+                                                    #:ret 'all
+                                                    #:condition (where
+                                                                 #:song_identifier
+                                                                 song-ids)))))
               (song-contents (cond
-                               ((nil? song-ids)
-                                '())
-                               (else ($song_contents 'get
-                                                     #:columns '(identifier
-                                                                 song_identifier)
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
+                              ((nil? song-ids)
+                               '())
+                              (else ($song_contents 'get
+                                                    #:columns '(identifier
+                                                                song_identifier)
+                                                    #:ret 'all
+                                                    #:condition (where
+                                                                 #:song_identifier
+                                                                 song-ids)))))
 
               (song-version-count-alist (map (lambda (song)
                                                `(,(assoc-ref song "identifier") ,
@@ -258,16 +267,16 @@
                                                                            (assoc-ref
                                                                             song
                                                                             "identifier")))
-                                                          song-contents))))
+                                                                 song-contents))))
                                              songs))
               (song-artists (cond
-                              ((nil? song-ids)
-                               '())
-                              (else ($song_artists 'get
-                                                   #:ret 'all
-                                                   #:condition (where
-                                                                #:song_identifier
-                                                                song-ids)))))
+                             ((nil? song-ids)
+                              '())
+                             (else ($song_artists 'get
+                                                  #:ret 'all
+                                                  #:condition (where
+                                                               #:song_identifier
+                                                               song-ids)))))
               (artist-uuids (map (lambda (a)
                                    (assoc-ref a "artist_identifier"))
                                  song-artists))
@@ -298,13 +307,16 @@
                           `((views ,inc-v))
                           (where #:identifier uuid)))
          (response-emit (:mime rc
-                               (genres-detail-page (:i18n rc)
-                                                   genre
-                                                   artworks
-                                                   opinions
-                                                   comments
-                                                   user-alist
-                                                   song-fragment))))))
+                         (genres-detail-page (:i18n rc)
+                                             #:genre genre
+                                             #:artworks artworks
+                                             #:opinions opinions
+                                             #:comments comments
+                                             #:user-alist user-alist
+                                             #:song-fragment
+                                             song-fragment
+                                             #:external-sources
+                                             external-sources))))))
 
 (get "/genres/uuid/:uuid/edit"
      #:mime 'xml
