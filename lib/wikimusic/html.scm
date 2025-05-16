@@ -351,6 +351,7 @@
                                                          ,(G_ "description"))
                                                       (p (@ (class ,(mk-class '
                                                                      (pl-3
+                                                                      whitespace-break-spaces
                                                                       text-stone-800
                                                                       dark:text-stone-300
                                                                       max-w-prose))))
