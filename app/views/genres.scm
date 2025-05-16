@@ -43,29 +43,29 @@
                                                             gap-3 my-4))))
                                 ,(if (> offset 0)
                                      `((a (@ (href ,(format #f
-                                                            "/genres?offset=~a&limit=~a"
-                                                            (- offset limit) limit)))
+                                                     "/genres?offset=~a&limit=~a"
+                                                     (- offset limit) limit)))
                                           ,(icon-button #:icon 'arrow-left
                                                         #:content (G_
                                                                    "previous"))))
                                      '())
                                 ,(if (= (length genres) limit)
                                      `((a (@ (href ,(format #f
-                                                            "/genres?offset=~a&limit=~a"
-                                                            (+ offset limit) limit)))
+                                                     "/genres?offset=~a&limit=~a"
+                                                     (+ offset limit) limit)))
                                           ,(icon-button #:icon 'arrow-right
                                                         #:content (G_ "next"))))
                                      '()))))
            (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ((h2 (@ (class ,(mk-class '(font-black text-stone-800
-                                                              dark:text-stone-200
-                                                              text-2xl
-                                                              py-4
-                                                              px-1
-                                                              flex
-                                                              flex-row
-                                                              items-center
-                                                              gap-1))))
+                                                   dark:text-stone-200
+                                                   text-2xl
+                                                   py-4
+                                                   px-1
+                                                   flex
+                                                   flex-row
+                                                   items-center
+                                                   gap-1))))
                             ,(icon #:type 'disc)
                             ,(G_ "viewing genres"))
                         (div (@ (class ,(mk-class '(flex flex-wrap flex-row
@@ -93,11 +93,11 @@
                                                             'genre
                                                             x
                                                             (relevant-entities 'genre
-                                                                               artworks x)
+                                                             artworks x)
                                                             (relevant-entities 'genre
-                                                                               opinions x)
+                                                             opinions x)
                                                             (relevant-entities 'genre
-                                                                               comments x))))
+                                                             comments x))))
                                         genres))
                              ,page-buttons
                              ,(hr)
@@ -115,18 +115,20 @@
                                    artworks
                                    opinions
                                    comments
-                                   user-alist)
+                                   user-alist
+                                   song-fragment)
   (html-template G_
-                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
-                              (,(h2 
-                                 (assoc-ref genre "display_name"))
-                               (div (div ,(entity-details G_
-                                                          'genre
-                                                          genre
-                                                          artworks
-                                                          opinions
-                                                          comments
-                                                          user-alist)))))))
+                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                               (,(h2 (assoc-ref genre "display_name")) (div (div ,
+                                                                             (entity-details
+                                                                              G_
+                                                                              'genre
+                                                                              genre
+                                                                              artworks
+                                                                              opinions
+                                                                              comments
+                                                                              user-alist)))))
+                          ,song-fragment)))
 
 (begin
   (define* (genre-edit-page G_ genre artworks)
@@ -141,14 +143,14 @@
                                                                   genre
                                                                   "identifier")
                                              #:artwork-identifier (assoc-ref a
-                                                                             "identifier")
+                                                                   "identifier")
                                              #:content-url (assoc-ref a
-                                                                      "content_url")
+                                                            "content_url")
                                              #:content-caption (assoc-ref-or-empty-str
                                                                 a
                                                                 "content_caption")
                                              #:order-value (assoc-ref a
-                                                                      "order_value"))))
+                                                            "order_value"))))
                       artworks))
            (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ,(if (assoc-ref genre "identifier")
@@ -187,9 +189,9 @@
                                          ,(G_ "editing genre"))
                                 ,(genre-form G_
                                              #:identifier (assoc-ref genre
-                                                                     "identifier")
+                                                           "identifier")
                                              #:display-name (assoc-ref genre
-                                                                       "display_name")
+                                                             "display_name")
                                              #:description (assoc-ref-or-empty-str
                                                             genre
                                                             "description"))))))

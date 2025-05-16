@@ -57,14 +57,14 @@
                                                                        dark:text-stone-300))))
                                                           ,(G_ "versions")))))
                                            (assoc-ref song-version-count-alist
-                                                      (assoc-ref x "identifier"))))
+                                            (assoc-ref x "identifier"))))
          (this-song-artists-relations (map (lambda (aa)
                                              (assoc-ref aa "artist_identifier"))
                                            (filter (lambda (a)
                                                      (equal? (assoc-ref x
-                                                                        "identifier")
+                                                              "identifier")
                                                              (assoc-ref a
-                                                                        "song_identifier")))
+                                                              "song_identifier")))
                                                    song-artists)))
 
          (art (filter (lambda (aaa)
@@ -72,14 +72,14 @@
                                 (equal? s
                                         (assoc-ref aaa "identifier")))
                               this-song-artists-relations)) artists))
-         
 
          (extra-top-info (map (lambda (ar)
                                 `((div ,(a (em (assoc-ref ar "display_name"))
                                            #:size 'text-lg
-                                           #:href (format #f "/artists/uuid/~a"
+                                           #:href (format #f
+                                                          "/artists/uuid/~a"
                                                           (assoc-ref ar
-                                                                     "identifier"))))))
+                                                           "identifier"))))))
                               art))
 
          )
@@ -94,7 +94,8 @@
 
 (begin
   (define* (songs-list-page G_
-                            #:key songs
+                            #:key (only-tiles #f)
+                            songs
                             artworks
                             song-version-count-alist
                             opinions
@@ -115,7 +116,8 @@
                                                         #:content (G_
                                                                    "previous"))))
                                      '())
-                                ,(if (= (length songs) limit)
+                                ,(if (and (> limit 0)
+                                          (= (length songs) limit))
                                      `((a (@ (href ,(format #f
                                                      "/songs?offset=~a&limit=~a"
                                                      (+ offset limit) limit)))
@@ -123,33 +125,49 @@
                                                         #:content (G_ "next"))))
                                      '()))))
            (body `(div (@ (class ,(mk-class '(container mx-auto))))
-                       ((h2 (@ (class ,(mk-class '(font-black text-stone-800
-                                                   dark:text-stone-200
-                                                   text-2xl
-                                                   py-4
-                                                   px-1
-                                                   flex
-                                                   flex-row
-                                                   items-center
-                                                   gap-1))))
-                            ,(icon #:type 'music-notes-simple)
-                            ,(G_ "viewing songs"))
-                        (div (@ (class ,(mk-class '(flex flex-wrap flex-row
-                                                         justify-between))))
-                             (div (@ (class ,(mk-class '(flex flex-wrap
-                                                              flex-row
-                                                              justify-start
-                                                              items-center))))
-                                  ,(sort-select G_
-                                                #:entity 'song
-                                                #:user-sort user-sort))
-                             (div (@ (class ,(mk-class '(flex flex-wrap
-                                                              flex-row gap-3
-                                                              justify-right
-                                                              items-center))))
+                       (,(unless only-tiles
+                           `(h2 (@ (class ,(mk-class '(font-black
+                                                       text-stone-800
+                                                       dark:text-stone-200
+                                                       text-2xl
+                                                       py-4
+                                                       px-1
+                                                       flex
+                                                       flex-row
+                                                       items-center
+                                                       gap-1))))
+                                ,(icon #:type 'music-notes-simple)
+                                ,(G_ "viewing songs"))) ,(unless only-tiles
+                                                           `(div (@ (class ,(mk-class '
+                                                                             (flex
+                                                                              flex-wrap
+                                                                              flex-row
+                                                                              justify-between))))
+                                                                 (div (@ (class ,
+                                                                          (mk-class '
+                                                                           (flex
+                                                                            flex-wrap
+                                                                            flex-row
+                                                                            justify-start
+                                                                            items-center))))
+                                                                      ,(sort-select
+                                                                        G_
+                                                                        #:entity 'song
+                                                                        #:user-sort
+                                                                        user-sort))
+                                                                 (div (@ (class ,
+                                                                          (mk-class '
+                                                                           (flex
+                                                                            flex-wrap
+                                                                            flex-row
+                                                                            gap-3
+                                                                            justify-right
+                                                                            items-center))))
 
-                                  ,(search-box G_
-                                               #:search-query search-query)))
+                                                                      ,(search-box
+                                                                        G_
+                                                                        #:search-query
+                                                                        search-query))))
                         (div (div (@ (class ,(mk-class '(grid gap-4
                                                               sm:grid-cols-3
                                                               md:grid-cols-4
@@ -171,8 +189,9 @@
                                                               justify-end))))
                                   (a (@ (href "/songs/new"))
                                      ,(button (G_ "new song")))))))))
-      (html-template G_
-                     #:body body)))
+      (if only-tiles body
+          (html-template G_
+                         #:body body))))
   (export songs-list-page))
 
 (begin
@@ -182,37 +201,80 @@
                               song-contents
                               song-artists
                               artists
+                              song-genres
+                              genres
                               opinions
                               comments
                               user-alist
                               (ascii-size 'text-md))
     
-    (html-template G_
-                   #:body `((div (@ (class ,(mk-class '(container mx-auto))))
-                                 (,(h2 (assoc-ref song "display_name"))
-                                  ,(map (lambda (ar)
-                                          `((div ,(a (em (assoc-ref ar "display_name"))
-                                                     #:size 'text-lg
-                                                     #:href (format #f "/artists/uuid/~a"
-                                                                    (assoc-ref ar
-                                                                               "identifier"))))))
-                                        artists)
-                                  
-                                  (div (div ,(entity-details G_
-                                                             'song
-                                                             song
-                                                             artworks
-                                                             opinions
-                                                             comments
-                                                             user-alist)))))
-                            
-                            (div ,(render-song-contents G_ song song-contents
-                                                        ascii-size)))))
+    (let* ((artist-name-titles (map (lambda (ar)
+                                      `((div ,(a (em (assoc-ref ar
+                                                      "display_name"))
+                                                 #:size 'text-lg
+                                                 #:href (format #f
+                                                         "/artists/uuid/~a"
+
+                                                         (assoc-ref ar
+                                                          "identifier"))))))
+                                    artists))
+           (genre-name-titles (map (lambda (ar)
+                                     `((div ,(a (em (assoc-ref ar
+                                                               "display_name"))
+                                                #:size 'text-lg
+                                                #:href (format #f
+                                                        "/genres/uuid/~a"
+
+                                                        (assoc-ref ar
+                                                         "identifier"))))))
+                                   genres)))
+      (html-template G_
+                     #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                                   ((div (@ (class ,(mk-class '(flex flex-col
+                                                                     gap-4))))
+                                         ,(h2 (assoc-ref song "display_name"))
+                                         ,(when (not (nil? artists))
+                                            `((div (@ (class ,(mk-class '(flex
+                                                                          flex-row
+                                                                          flex-wrap
+                                                                          gap-4
+                                                                          items-center
+                                                                          align-center
+                                                                          justify-start))))
+                                                   ,(em "by:")
+                                                   ,artist-name-titles)))
+                                         ,(when (not (nil? genres))
+                                            `((div (@ (class ,(mk-class '(flex
+                                                                          flex-row
+                                                                          flex-wrap
+                                                                          gap-4
+                                                                          items-center
+                                                                          align-center
+                                                                          justify-start))))
+                                                   ,(em "genres:")
+                                                   ,genre-name-titles))))
+                                    
+                                    (div (div ,(entity-details G_
+                                                               'song
+                                                               song
+                                                               artworks
+                                                               opinions
+                                                               comments
+                                                               user-alist)))))
+                              
+                              (div ,(render-song-contents G_ song
+                                                          song-contents
+                                                          ascii-size))))))
   (export songs-detail-page))
 
 (begin
-  (define* (song-edit-page G_ song song-contents artworks)
-    (let* ((html `(div (@ (class "container mx-auto"))
+  (define* (song-edit-page G_
+                           #:key song
+                           song-contents
+                           artworks
+                           artists
+                           genres)
+    (let* ((html `(div (@ (class ,(mk-class '(container mx-auto))))
                        ,(if (assoc-ref song "identifier")
                             (h2 (format #f "~a: ~a"
                                         (G_ "editing song")
@@ -293,7 +355,121 @@
                                                                song
                                                                "album_info_link")
                                             #:description (assoc-ref-or-empty-str
-                                                           song "description"))))))
+                                                           song "description")))
+                       ,(hr)
+                       (details (@ (open true)
+                                   (class ,(mk-class '(py-6))))
+                                (summary (@ (class ,(mk-class '(font-black
+                                                                text-stone-800
+                                                                dark:text-stone-200
+                                                                text-md
+                                                                cursor-pointer))))
+                                         ,(G_ "song's artists"))
+                                (div (@ (class ,(mk-class '(flex flex-col
+                                                                 gap-2))))
+                                     ,(h4 (G_ "add artist relation"))
+                                     (form (@ (method POST)
+                                              (content-type
+                                               application/x-www-form-urlencoded)
+                                              (action ,(format #f
+                                                        "/songs/uuid/~a/artists"
+                                                        (assoc-ref song
+                                                         "identifier"))))
+                                           (div ,(input #:label "artist UUID"
+                                                        #:name 'artist-identifier
+                                                        #:value ""
+                                                        #:required #t))
+                                           (div ,(submit-button (G_ "submit")))))
+                                (div (@ (class ,(mk-class '(flex flex-row
+                                                                 flex-wrap
+                                                                 gap-10 py-6))))
+                                     ,(map (lambda (a)
+                                             `((form (@ (method POST)
+                                                        (content-type
+                                                         application/x-www-form-urlencoded)
+                                                        (action ,(format #f
+                                                                  "/songs/uuid/~a/artists/~a/delete"
+                                                                  (assoc-ref
+                                                                   song
+                                                                   "identifier")
+                                                                  (assoc-ref a
+                                                                   "identifier"))))
+                                                     (div (@ (class ,(mk-class '
+                                                                      (flex
+                                                                       flex-row
+                                                                       flex-wrap
+                                                                       gap-2
+                                                                       items-center))))
+                                                          ,(h4 (assoc-ref a
+                                                                "display_name"))
+                                                          ,(icon-button #:icon 'trash
+                                                                        #:content
+                                                                        ""
+                                                                        #:type 'submit
+                                                                        #:background '
+                                                                        (bg-red-700)
+                                                                        #:color '
+                                                                        (text-stone-200)
+                                                                        #:hover-background '
+                                                                        (hover:bg-red-900))))))
+                                           artists)))
+                       ,(hr)
+                       (details (@ (open true)
+                                   (class ,(mk-class '(py-6))))
+                                (summary (@ (class ,(mk-class '(font-black
+                                                                text-stone-800
+                                                                dark:text-stone-200
+                                                                text-md
+                                                                cursor-pointer))))
+                                         ,(G_ "song's genres"))
+                                (div (@ (class ,(mk-class '(flex flex-col
+                                                                 gap-2))))
+                                     ,(h4 (G_ "add genre relation"))
+                                     (form (@ (method POST)
+                                              (content-type
+                                               application/x-www-form-urlencoded)
+                                              (action ,(format #f
+                                                        "/songs/uuid/~a/genres"
+                                                        (assoc-ref song
+                                                         "identifier"))))
+                                           (div ,(input #:label "genre UUID"
+                                                        #:name 'genre-identifier
+                                                        #:value ""
+                                                        #:required #t))
+                                           (div ,(submit-button (G_ "submit")))))
+                                (div (@ (class ,(mk-class '(flex flex-row
+                                                                 flex-wrap
+                                                                 gap-10 py-6))))
+                                     ,(map (lambda (a)
+                                             `((form (@ (method POST)
+                                                        (content-type
+                                                         application/x-www-form-urlencoded)
+                                                        (action ,(format #f
+                                                                  "/songs/uuid/~a/genres/~a/delete"
+                                                                  (assoc-ref
+                                                                   song
+                                                                   "identifier")
+                                                                  (assoc-ref a
+                                                                   "identifier"))))
+                                                     (div (@ (class ,(mk-class '
+                                                                      (flex
+                                                                       flex-row
+                                                                       flex-wrap
+                                                                       gap-2
+                                                                       items-center))))
+                                                          ,(h4 (assoc-ref a
+                                                                "display_name"))
+                                                          ,(icon-button #:icon 'trash
+                                                                        #:content
+                                                                        ""
+                                                                        #:type 'submit
+                                                                        #:background '
+                                                                        (bg-red-700)
+                                                                        #:color '
+                                                                        (text-stone-200)
+                                                                        #:hover-background '
+                                                                        (hover:bg-red-900))))))
+                                           genres))))))
       (html-template G_
                      #:body html)))
   (export song-edit-page))
