@@ -53,7 +53,7 @@
                                                                             #:name
                                                                             "username"
                                                                             #:value
-                                                                            "jjba23"
+                                                                            ""
                                                                             #:required
                                                                             #t)
                                                                           ,(input
