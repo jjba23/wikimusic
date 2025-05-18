@@ -45,7 +45,7 @@
 (define-public (page-footer G_)
   `(,(footer `((div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                                 justify-start))))
-                    ,(p (G_ "find the source code here"))
+                    ,(em (G_ "find the source code here"))
                     ,(a "https://codeberg.org/jjba23/wikimusic"))
                ,(em (G_
                      "Copyright 2025 © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"))
@@ -53,7 +53,7 @@
 
                (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                                 align-center items-center))))
-                    ,(p "version:")
+                    ,(em "version:")
                     ,(mono (format #f "~a"
                                    (get-short-commit-sha))
                            #:size 'text-md))))))
