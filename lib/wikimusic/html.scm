@@ -43,11 +43,11 @@
                          "pub/js/tailwind.js")))
 
 (define-public (page-footer G_)
-  `(,(footer `((div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+  `(,(footer `(,(em (G_ "the free music knowledge encyclopaedia"))
+               ,(em (G_
+                     "wikimusic is free software, available under the GNU AGPL v3 or newer"))
+               (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                                 justify-start))))
-                    ,(em (G_ "the free music knowledge encyclopaedia"))
-                    ,(em (G_
-                          "wikimusic is free software, available under the GNU AGPL v3 or newer"))
                     ,(em (G_ "find the source code here"))
                     ,(a "https://codeberg.org/jjba23/wikimusic"))
                ,(em (G_
