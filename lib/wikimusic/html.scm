@@ -198,7 +198,7 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                             px-3
                                             justify-center
                                             align-center
-                                            items-start
+                                            
                                             h-full))))
                 ,(render-if-nempty (lambda (art)
                                      `(figure (@ (class ,(mk-class '(py-3
@@ -215,11 +215,12 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                     ((nil? artworks)
                                      '())
                                     (else (car artworks))))
-                ,(a (assoc-ref x "display_name")
-                    #:size 'text-xl
-                    #:href item-link
-                    #:color '(text-stone-900 dark:text-stone-100)
-                    #:hover '(hover:text-purple-500 dark:hover:text-purple-300))
+                (div (@(class ,(mk-class '(text-center))))
+                     ,(a (assoc-ref x "display_name")
+                         #:size 'text-xl
+                         #:href item-link
+                         #:color '(text-stone-900 dark:text-stone-100)
+                         #:hover '(hover:text-purple-500 dark:hover:text-purple-300)))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,extra-top-info)
                 (div (@ (class ,(mk-class '(pt-2 flex flex-row gap-2))))
@@ -582,8 +583,9 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                     (id "sort-select")
                     (class ,(mk-class '(p-3 border-2
                                             border-stone-200
+                                            dark:border-stone-700
                                             bg-stone-300
-                                            dark:bg-stone-800
+                                            dark:bg-stone-900
                                             text-stone-800
                                             dark:text-stone-300
                                             rounded-xl
@@ -593,10 +595,10 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                          `((option (@ (value ,(format #f "/~as?sort=~a" entity
                                                       (car s)))
                                       ,(cond
-                                         ((equal? user-sort
-                                                  (car s))
-                                          '(selected ""))
-                                         (else '(not-selected ""))))
+                                        ((equal? user-sort
+                                                 (car s))
+                                         '(selected ""))
+                                        (else '(not-selected ""))))
                                    ,(cdr s))))
 
                        `(("display-name-asc" unquote
@@ -629,8 +631,9 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                     (id "ascii-size-select")
                     (class ,(mk-class '(p-3 border-2
                                             border-stone-200
+                                            dark:border-stone-700
                                             bg-stone-300
-                                            dark:bg-stone-800
+                                            dark:bg-stone-900
                                             text-stone-800
                                             dark:text-stone-300
                                             rounded-xl

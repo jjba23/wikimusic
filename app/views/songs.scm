@@ -44,12 +44,8 @@
   (let* ((extra-bot-info (render-if-nempty (lambda (vc)
                                              `((div (@ (class ,(mk-class '(flex
                                                                            flex-row
-                                                                           gap-2
-
-                                                                           text-stone-700))))
-
+                                                                           gap-2))))
                                                     ,(em (format #f "~a"
-
                                                                  (car vc))
                                                          #:size 'text-xs)
                                                     ,(em (G_ "versions")
@@ -71,10 +67,11 @@
                                         (assoc-ref aaa "identifier")))
                               this-song-artists-relations)) artists))
 
-         (extra-top-info (map (lambda (ar)
-                                `((div ,(a (assoc-ref ar "display_name")
+         (extra-top-info `((div (@(class ,(mk-class '(text-center flex flex-col gap-2 align-center))))
+                                ,(map (lambda (ar)
+                                        (a (assoc-ref ar "display_name")
                                            #:weight 'font-light
-                                           #:size 'text-lg
+                                           #:size 'text-md
                                            #:href (format #f
                                                           "/artists/uuid/~a"
                                                           (assoc-ref ar
@@ -82,8 +79,8 @@
                                            #:color '(text-stone-900
                                                      dark:text-stone-100)
                                            #:hover '(hover:text-purple-500
-                                                     dark:hover:text-purple-300)))))
-                              art))
+                                                     dark:hover:text-purple-300)))
+                                      art))))
 
          )
     `((div ,(item-tile G_
