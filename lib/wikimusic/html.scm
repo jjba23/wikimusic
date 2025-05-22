@@ -492,7 +492,8 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
 
                           (div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                            gap-4))))
-                               ,(mono (assoc-ref x "identifier") #:size 'text-sm)
+                               ,(mono (assoc-ref x "identifier") #:size 'text-sm
+                                      #:color '(text-stone-600 dark:text-stone-400))
                                ,(icon-button #:icon 'copy
                                              #:content "copy"
 
