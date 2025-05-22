@@ -336,8 +336,8 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                                #:song_identifier
-                                                                uuid)))
+                                                          #:song_identifier
+                                                          uuid)))
               (song-genres ($song_genres 'get
                                          #:ret 'all
                                          #:condition (where #:song_identifier
@@ -353,8 +353,8 @@
               (song-artists ($song_artists 'get
                                            #:ret 'all
                                            #:condition (where
-                                                              #:song_identifier
-                                                              uuid)))
+                                                        #:song_identifier
+                                                        uuid)))
               (artist-uuids (map (lambda (a)
                                    (assoc-ref a "artist_identifier"))
                                  song-artists))
@@ -363,15 +363,17 @@
                            ($artists 'get
                                      #:ret 'all
                                      #:condition (where #:identifier
-                                                        artist-uuids)))))
+                                                        artist-uuids))))
+              (external-sources '()))
          
          (response-emit (:mime rc
-                               (song-edit-page (:i18n rc)
-                                               #:song song
-                                               #:song-contents song-contents
-                                               #:artworks artworks
-                                               #:artists artists
-                                               #:genres genres))))))
+                         (song-edit-page (:i18n rc)
+                                         #:song song
+                                         #:song-contents song-contents
+                                         #:artworks artworks
+                                         #:artists artists
+                                         #:genres genres
+                                         #:external-sources external-sources))))))
 
 (get "/songs/uuid/:uuid/contents/:version-uuid/edit"
      #:mime 'xml
@@ -389,8 +391,8 @@
                                                                version-uuid)))))
          
          (response-emit (:mime rc
-                               (song-content-edit-page (:i18n rc) song
-                                                       song-contents))))))
+                         (song-content-edit-page (:i18n rc) song
+                                                 song-contents))))))
 
 (define (do-edit rc)
   (let* ((body (rc-body rc))

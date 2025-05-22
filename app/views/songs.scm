@@ -280,8 +280,9 @@
                            #:key song
                            song-contents
                            artworks
-                           artists
-                           genres)
+                           (artists '())
+                           (genres '())
+                           (external-sources '()))
     (let* ((html `(div (@ (class ,(mk-class '(container mx-auto))))
                        ,(if (assoc-ref song "identifier")
                             (h2 (format #f "~a: ~a"
@@ -300,7 +301,7 @@
                                                                              sm:w-36))))
                                                       (img (@ (loading "lazy")
                                                               (class
-                                                               "rounded-xl")
+                                                                "rounded-xl")
                                                               (src ,(assoc-ref
                                                                      a
                                                                      "content_url")))))
@@ -308,10 +309,10 @@
                                                              #:entity 'song
                                                              #:entity-identifier
                                                              (assoc-ref song
-                                                              "identifier")
+                                                                        "identifier")
                                                              #:artwork-identifier
                                                              (assoc-ref a
-                                                              "identifier")
+                                                                        "identifier")
                                                              #:content-url (assoc-ref
                                                                             a
                                                                             "content_url")
@@ -346,9 +347,9 @@
                                          ,(G_ "editing song"))
                                 ,(song-form G_
                                             #:identifier (assoc-ref song
-                                                          "identifier")
+                                                                    "identifier")
                                             #:display-name (assoc-ref song
-                                                            "display_name")
+                                                                      "display_name")
                                             #:music-key (assoc-ref-or-empty-str
                                                          song "music_key")
                                             #:music-tuning (assoc-ref-or-empty-str
@@ -365,6 +366,32 @@
                                             #:description (assoc-ref-or-empty-str
                                                            song "description")))
                        ,(hr)
+                       (details (@ (open true))
+                                (summary (@ (class ,(mk-class '(font-black
+                                                                text-stone-800
+                                                                dark:text-stone-200
+                                                                text-md
+                                                                cursor-pointer))))
+                                         ,(G_
+                                           "editing external sources"))
+                                ,(external-sources-form G_
+                                                        #:entity 'song
+                                                        #:entity-identifier (assoc-ref
+                                                                             song
+                                                                             "identifier")
+                                                        #:wikipedia-url (assoc-ref
+                                                                         external-sources
+                                                                         "wikipedia_url")
+                                                        #:spotify-url (assoc-ref-or-empty-str
+                                                                       external-sources
+                                                                       "spotify_url")
+                                                        #:youtube-url (assoc-ref-or-empty-str
+                                                                       external-sources
+                                                                       "youtube_url")
+                                                        #:soundcloud-url (assoc-ref-or-empty-str
+                                                                          external-sources
+                                                                          "soundcloud_url")))
+                       ,(hr)
                        (details (@ (open true)
                                    (class ,(mk-class '(py-6))))
                                 (summary (@ (class ,(mk-class '(font-black
@@ -380,9 +407,9 @@
                                               (content-type
                                                application/x-www-form-urlencoded)
                                               (action ,(format #f
-                                                        "/songs/uuid/~a/artists"
-                                                        (assoc-ref song
-                                                         "identifier"))))
+                                                               "/songs/uuid/~a/artists"
+                                                               (assoc-ref song
+                                                                          "identifier"))))
                                            (div ,(input #:label "artist UUID"
                                                         #:name 'artist-identifier
                                                         #:value ""
@@ -396,12 +423,12 @@
                                                         (content-type
                                                          application/x-www-form-urlencoded)
                                                         (action ,(format #f
-                                                                  "/songs/uuid/~a/artists/~a/delete"
-                                                                  (assoc-ref
-                                                                   song
-                                                                   "identifier")
-                                                                  (assoc-ref a
-                                                                   "identifier"))))
+                                                                         "/songs/uuid/~a/artists/~a/delete"
+                                                                         (assoc-ref
+                                                                          song
+                                                                          "identifier")
+                                                                         (assoc-ref a
+                                                                                    "identifier"))))
                                                      (div (@ (class ,(mk-class '
                                                                       (flex
                                                                        flex-row
@@ -409,7 +436,7 @@
                                                                        gap-2
                                                                        items-center))))
                                                           ,(h4 (assoc-ref a
-                                                                "display_name"))
+                                                                          "display_name"))
                                                           ,(icon-button #:icon 'trash
                                                                         #:content
                                                                         ""
@@ -437,9 +464,9 @@
                                               (content-type
                                                application/x-www-form-urlencoded)
                                               (action ,(format #f
-                                                        "/songs/uuid/~a/genres"
-                                                        (assoc-ref song
-                                                         "identifier"))))
+                                                               "/songs/uuid/~a/genres"
+                                                               (assoc-ref song
+                                                                          "identifier"))))
                                            (div ,(input #:label "genre UUID"
                                                         #:name 'genre-identifier
                                                         #:value ""
@@ -453,12 +480,12 @@
                                                         (content-type
                                                          application/x-www-form-urlencoded)
                                                         (action ,(format #f
-                                                                  "/songs/uuid/~a/genres/~a/delete"
-                                                                  (assoc-ref
-                                                                   song
-                                                                   "identifier")
-                                                                  (assoc-ref a
-                                                                   "identifier"))))
+                                                                         "/songs/uuid/~a/genres/~a/delete"
+                                                                         (assoc-ref
+                                                                          song
+                                                                          "identifier")
+                                                                         (assoc-ref a
+                                                                                    "identifier"))))
                                                      (div (@ (class ,(mk-class '
                                                                       (flex
                                                                        flex-row
@@ -466,7 +493,7 @@
                                                                        gap-2
                                                                        items-center))))
                                                           ,(h4 (assoc-ref a
-                                                                "display_name"))
+                                                                          "display_name"))
                                                           ,(icon-button #:icon 'trash
                                                                         #:content
                                                                         ""

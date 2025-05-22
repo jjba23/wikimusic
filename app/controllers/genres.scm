@@ -326,6 +326,7 @@
               (genre (car ($genres 'get
                                    #:ret 'top
                                    #:condition (where #:identifier uuid))))
+              (external-sources '())
               (artworks ($genre_artworks 'get
                                          #:ret 'all
                                          #:order-by '(order_value asc)
@@ -333,7 +334,9 @@
                                                             uuid))))
          
          (response-emit (:mime rc
-                               (genre-edit-page (:i18n rc) genre artworks))))))
+                         (genre-edit-page (:i18n rc) #:genre genre #:artworks artworks
+                                          #:external-sources external-sources
+                                          ))))))
 
 (define (do-edit rc)
   (let* ((body (rc-body rc))

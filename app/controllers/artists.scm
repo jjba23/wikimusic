@@ -316,15 +316,18 @@
               (artist (car ($artists 'get
                                      #:ret 'top
                                      #:condition (where #:identifier uuid))))
+              (artist-external-sources '())
               (artworks ($artist_artworks 'get
                                           #:ret 'all
                                           #:order-by '(order_value asc)
                                           #:condition (where
-                                                             #:artist_identifier
-                                                             uuid))))
+                                                       #:artist_identifier
+                                                       uuid)))
+              (external-sources '()))
          
          (response-emit (:mime rc
-                               (artist-edit-page (:i18n rc) artist artworks))))))
+                         (artist-edit-page (:i18n rc) #:artist artist #:artworks artworks
+                                           #:external-sources external-sources))))))
 
 ;; ====== Data edit POST routes ======
 

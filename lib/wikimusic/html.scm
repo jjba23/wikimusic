@@ -546,12 +546,52 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                             (content-type
                                              application/x-www-form-urlencoded)
                                             (action ,(format #f
-                                                      "/~as/uuid/~a/artworks/~a/delete"
-                                                      entity entity-identifier
-                                                      artwork-identifier)))
+                                                             "/~as/uuid/~a/artworks/~a/delete"
+                                                             entity entity-identifier
+                                                             artwork-identifier)))
                                          ,(danger-submit-button (G_ "delete"))))
                                 artwork-identifier)))))
   (export artwork-form))
+
+(begin
+  (define* (external-sources-form G_
+                                  #:key
+                                  entity
+                                  entity-identifier
+                                  (external-sources-identifier #f)
+                                  (wikipedia-url "")
+                                  (youtube-url "")
+                                  (spotify-url "")
+                                  (soundcloud-url "")                                  )
+    (let* ((form-action (if (equal? #f external-sources-identifier)
+                            (format #f "/~as/uuid/~a/external-sources/new" entity
+                                    entity-identifier)
+                            (format #f "/~as/uuid/~a/artworks/external-sources/~a" entity
+                                    entity-identifier artwork-identifier))))
+      `((div (@ (class ,(mk-class '(flex flex-col gap-2))))
+             (form (@ (method POST)
+                      (content-type application/x-www-form-urlencoded)
+                      (action ,form-action))
+                   (div ,(input #:label (G_ "wikipedia url")
+                                #:name "wikipedia-url"
+                                #:value wikipedia-url
+                                #:required #f)
+                        ,(input #:label (G_ "youtube url")
+                                #:name "youtube-url"
+                                #:value youtube-url
+                                #:required #f)
+                        ,(input #:label (G_ "spotify url")
+                                #:name "spotify-url"
+                                #:value spotify-url
+                                #:required #f)
+                        ,(input #:label (G_ "soundcloud url")
+                                #:name "soundcloud-url"
+                                #:value soundcloud-url
+                                #:required #f)
+                        (div ,(submit-button (if external-sources-identifier
+                                                 (G_ "save")
+                                                 (G_ "save"))))))))))
+  (export external-sources-form))
 
 (begin
   (define* (sort-select G_
@@ -568,10 +608,10 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                         entity
                                                         (car s)))
                                         ,(cond
-                                           ((equal? user-sort
-                                                    (car s))
-                                            '(selected ""))
-                                           (else '(not-selected ""))))
+                                          ((equal? user-sort
+                                                   (car s))
+                                           '(selected ""))
+                                          (else '(not-selected ""))))
                                      ,(cdr s))))
 
                          `(("display-name-asc" unquote
@@ -707,5 +747,13 @@ function addSearchQueryParam(form) {
                                        ,(p (G_ "Youtube URL"))
                                        ,(a s))))
                               (assoc-ref external-sources "youtube_url"))
-
+         ,(render-if-nestring (lambda (s)
+                                `((div (@ (class ,(mk-class '(flex flex-col
+                                                                   gap-3
+                                                                   max-w-64
+                                                                   md:max-w-80
+                                                                   overflow-x-scroll))))
+                                       ,(p (G_ "Soundcloud URL"))
+                                       ,(a s))))
+                              (assoc-ref external-sources "soundcloud_url"))
          )))
