@@ -520,8 +520,44 @@
                           #:conn (DB-open rc)
                           #:entity 'genre
                           #:delete-condition (where #:identifier (params rc
-                                                                  "artwork-uuid"))
+                                                                         "artwork-uuid"))
                           #:redirect-url (format #f "~a/genres/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))
         (protected-endpoint rc do-delete)))
+
+(define (do-edit-external-sources rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body)))
+    (write kv)
+    (DB-query (DB-open rc)
+              (->sql update
+                     'genre_external_sources set
+                     `(
+                       (wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                     kv
+                                                                     "wikipedia-url")))))
+                       (spotify_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                   kv
+                                                                   "spotify-url")))))
+                       (youtube_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                   kv
+                                                                   "youtube-url")))))
+                       (soundcloud_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                      kv
+                                                                      "soundcloud-url")))))
+                       (last_edited_at ,(current-time)))
+                     (where #:identifier (params rc "sourcesuuid"))))
+    (redirect-to rc
+                 (string->uri (format #f "~a/genres/uuid/~a"
+                                      (current-myhost)
+                                      (params rc "uuid")))
+                 #:status 302)))
+
+(post "/genres/uuid/:uuid/external-sources/:sourcesuuid/edit"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-edit-external-sources rc)))))

@@ -360,6 +360,46 @@
                             (lambda ()
                               (do-edit rc)))))
 
+(define (do-edit-external-sources rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body)))
+    (write kv)
+    (DB-query (DB-open rc)
+              (->sql update
+                     'artist_external_sources set
+                     `(
+                       (wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                     kv
+                                                                     "wikipedia-url")))))
+                       (spotify_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                   kv
+                                                                   "spotify-url")))))
+                       (youtube_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                   kv
+                                                                   "youtube-url")))))
+                       (soundcloud_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                      kv
+                                                                      "soundcloud-url")))))
+                       (last_edited_at ,(current-time)))
+                     (where #:identifier (params rc "sourcesuuid"))))
+    (redirect-to rc
+                 (string->uri (format #f "~a/artists/uuid/~a"
+                                      (current-myhost)
+                                      (params rc "uuid")))
+                 #:status 302)))
+
+(post "/artists/uuid/:uuid/external-sources/:sourcesuuid/edit"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-edit-external-sources rc)))))
+
+
+
+
+
 (define (do-edit-artwork rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))

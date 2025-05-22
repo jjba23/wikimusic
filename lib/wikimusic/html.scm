@@ -566,7 +566,7 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
     (let* ((form-action (if (equal? #f external-sources-identifier)
                             (format #f "/~as/uuid/~a/external-sources/new" entity
                                     entity-identifier)
-                            (format #f "/~as/uuid/~a/artworks/external-sources/~a" entity
+                            (format #f "/~as/uuid/~a/external-sources/edit" entity
                                     entity-identifier artwork-identifier))))
       `((div (@ (class ,(mk-class '(flex flex-col gap-2))))
              (form (@ (method POST)
