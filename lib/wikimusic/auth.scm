@@ -17,31 +17,28 @@
 
 (define-module (wikimusic auth)
   #:use-module (web uri)
-  #:use-module (artanis artanis))
+  #:use-module (artanis artanis)
+  #:export (protected-api-endpoint protected-endpoint))
 
-(begin
-  (define-syntax-rule (protected-api-endpoint rc happy-flow-thunk)
-    "Protect an HTTP REST endpoint, preventing unauthorized access and returning proper error response."
-    (cond
-      ((:auth rc)
-       (happy-flow-thunk))
-      (else (:mime rc
-                   '((error . "You must be authenticated to use this API endpoint"))))))
-  (export protected-api-endpoint))
+(define-syntax-rule (protected-api-endpoint rc happy-flow-thunk)
+  "Protect an HTTP REST endpoint, preventing unauthorized access and returning proper error response."
+  (cond
+   ((:auth rc)
+    (happy-flow-thunk))
+   (else (:mime rc
+          '((error . "You must be authenticated to use this API endpoint"))))))
 
-(begin
-  (define-syntax-rule (protected-endpoint rc happy-flow-thunk)
-    "Protect an HTTP endpoint, preventing unauthorized access and redirecting to login page upon errors."
-    (cond
-      ((:session rc
-                 'check)
-       (happy-flow-thunk))
-      ((:auth rc)
-       (:session rc
-                 'spawn)
-       (happy-flow-thunk))
-      (else (redirect-to rc
-                         (string->uri (format #f "~a/login"
-                                              (current-myhost)))
-                         #:status 302))))
-  (export protected-endpoint))
+(define-syntax-rule (protected-endpoint rc happy-flow-thunk)
+  "Protect an HTTP endpoint, preventing unauthorized access and redirecting to login page upon errors."
+  (cond
+   ((:session rc
+     'check)
+    (happy-flow-thunk))
+   ((:auth rc)
+    (:session rc
+     'spawn)
+    (happy-flow-thunk))
+   (else (redirect-to rc
+                      (string->uri (format #f "~a/login"
+                                           (current-myhost)))
+                      #:status 302))))
