@@ -210,11 +210,11 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                                              sm:w-48
                                                                              shadow-md)))
                                                          (src ,(assoc-ref art
-                                                                "content_url")))))))
+                                                                          "content_url")))))))
                                    (cond
-                                     ((nil? artworks)
-                                      '())
-                                     (else (car artworks))))
+                                    ((nil? artworks)
+                                     '())
+                                    (else (car artworks))))
                 ,(a (assoc-ref x "display_name")
                     #:size 'text-xl
                     #:href item-link
@@ -222,24 +222,24 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                     #:hover '(hover:text-purple-500 dark:hover:text-purple-300))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,extra-top-info)
-                (div (@ (class ,(mk-class '(pt-2))))
-                     ,(em (format #f "~a: ~a"
-                                  (G_ "views")
-                                  (assoc-ref x "views"))
-                          #:size 'text-sm))
                 (div (@ (class ,(mk-class '(pt-2 flex flex-row gap-2))))
                      (span (@ (class ,(mk-class '(font-black text-green-800
-                                                  dark:text-green-600 text-xs))))
+                                                             dark:text-green-600 text-xs))))
                            ,(format #f "~a" likes))
                      (span (@ (class ,(mk-class '(font-black text-red-800
-                                                  dark:text-red-600 text-xs))))
+                                                             dark:text-red-600 text-xs))))
                            ,(format #f "~a" dislikes)))
-                (div (@ (class ,(mk-class '(pt-4 flex flex-row gap-2))))
+                (div (@ (class ,(mk-class '(pt-2))))
+                     ,(em (format #f "~a ~a"
+                                  (assoc-ref x "views")
+                                  (G_ "views"))
+                          #:size 'text-xs))
+                (div (@ (class ,(mk-class '(flex flex-row gap-2))))
                      ,(em (format #f "~a"
                                   (length comments))
-                          #:size 'text-sm)
+                          #:size 'text-xs)
                      ,(em (G_ "comments")
-                          #:size 'text-sm))
+                          #:size 'text-xs))
                 ,extra-bot-info)))))
 
 (define* (render-visibility-status status)

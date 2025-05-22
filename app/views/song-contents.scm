@@ -27,10 +27,10 @@
   #:use-module (wikimusic query-escape)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (render-song-contents render-version song-content-edit-page
-                                 song-contents-new-page song-content-form))
+  #:export (render-song-content render-version song-content-edit-page
+                                song-content-new-page song-content-form))
 
-(define* (render-song-contents G_ song song-contents ascii-size)
+(define* (render-song-content G_ song song-contents ascii-size)
   `(div ,(hr)
         (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))
              (span (@ (class ,(mk-class '(font-black text-2xl text-stone-700
@@ -225,7 +225,7 @@
     (html-template G_
                    #:body body)))
 
-(define* (song-contents-new-page G_ song-identifier)
+(define* (song-content-new-page G_ song-identifier)
   (html-template G_
                  #:body `(div (@ (class ,(mk-class '(container mx-auto))))
                               ,(song-content-form G_

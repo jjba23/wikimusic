@@ -28,44 +28,44 @@
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (genres-list-page genres-detail-page genre-edit-page genre-new-page
-                             genre-form))
+  #:export (genre-list-page genre-detail-page genre-edit-page genre-new-page
+                            genre-form))
 
-(define* (genres-list-page G_
-                           #:key genres
-                           artworks
-                           opinions
-                           comments
-                           limit
-                           offset
-                           search-query
-                           user-sort)
+(define* (genre-list-page G_
+                          #:key genres
+                          artworks
+                          opinions
+                          comments
+                          limit
+                          offset
+                          search-query
+                          user-sort)
   (let* ((page-buttons `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                           gap-3 my-4))))
                               ,(if (> offset 0)
                                    `((a (@ (href ,(format #f
-                                                   "/genres?offset=~a&limit=~a"
-                                                   (- offset limit) limit)))
+                                                          "/genres?offset=~a&limit=~a"
+                                                          (- offset limit) limit)))
                                         ,(icon-button #:icon 'arrow-left
                                                       #:content (G_ "previous"))))
                                    '())
                               ,(if (= (length genres) limit)
                                    `((a (@ (href ,(format #f
-                                                   "/genres?offset=~a&limit=~a"
-                                                   (+ offset limit) limit)))
+                                                          "/genres?offset=~a&limit=~a"
+                                                          (+ offset limit) limit)))
                                         ,(icon-button #:icon 'arrow-right
                                                       #:content (G_ "next"))))
                                    '()))))
          (body `(div (@ (class ,(mk-class '(container mx-auto))))
                      ((h2 (@ (class ,(mk-class '(font-black text-stone-800
-                                                 dark:text-stone-200
-                                                 text-2xl
-                                                 py-4
-                                                 px-1
-                                                 flex
-                                                 flex-row
-                                                 items-center
-                                                 gap-1))))
+                                                            dark:text-stone-200
+                                                            text-2xl
+                                                            py-4
+                                                            px-1
+                                                            flex
+                                                            flex-row
+                                                            items-center
+                                                            gap-1))))
                           ,(icon #:type 'disc)
                           ,(G_ "viewing genres"))
                       (div (@ (class ,(mk-class '(flex flex-wrap flex-row
@@ -92,11 +92,11 @@
                                                           'genre
                                                           x
                                                           (relevant-entities 'genre
-                                                           artworks x)
+                                                                             artworks x)
                                                           (relevant-entities 'genre
-                                                           opinions x)
+                                                                             opinions x)
                                                           (relevant-entities 'genre
-                                                           comments x))))
+                                                                             comments x))))
                                       genres))
                            ,page-buttons
                            ,(hr)
@@ -107,14 +107,14 @@
     (html-template G_
                    #:body body)))
 
-(define* (genres-detail-page G_
-                             #:key genre
-                             artworks
-                             opinions
-                             comments
-                             user-alist
-                             song-fragment
-                             external-sources)
+(define* (genre-detail-page G_
+                            #:key genre
+                            artworks
+                            opinions
+                            comments
+                            user-alist
+                            song-fragment
+                            external-sources)
   (html-template G_
                  #:body `((div (@ (class ,(mk-class '(container mx-auto))))
                                (,(h2 (assoc-ref genre "display_name")) (div (div ,

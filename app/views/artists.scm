@@ -28,43 +28,43 @@
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (artists-list-page artists-detail-page artist-edit-page
-                              artist-new-page artist-form))
+  #:export (artist-list-page artist-detail-page artist-edit-page
+                             artist-new-page artist-form))
 
-(define* (artists-list-page G_
-                            #:key artists
-                            artworks
-                            opinions
-                            comments
-                            limit
-                            offset
-                            search-query
-                            user-sort)
+(define* (artist-list-page G_
+                           #:key artists
+                           artworks
+                           opinions
+                           comments
+                           limit
+                           offset
+                           search-query
+                           user-sort)
   (let* ((page-buttons `((div (@ (class "flex flex-row flex-wrap gap-3 my-4"))
                               ,(if (> offset 0)
                                    `((a (@ (href ,(format #f
-                                                   "/artists?offset=~a&limit=~a"
-                                                   (- offset limit) limit)))
+                                                          "/artists?offset=~a&limit=~a"
+                                                          (- offset limit) limit)))
                                         ,(icon-button #:icon 'arrow-left
                                                       #:content (G_ "previous"))))
                                    '())
                               ,(if (= (length artists) limit)
                                    `((a (@ (href ,(format #f
-                                                   "/artists?offset=~a&limit=~a"
-                                                   (+ offset limit) limit)))
+                                                          "/artists?offset=~a&limit=~a"
+                                                          (+ offset limit) limit)))
                                         ,(icon-button #:icon 'arrow-right
                                                       #:content (G_ "next"))))
                                    '()))))
          (body `(div (@ (class ,(mk-class '(container mx-auto))))
                      ((h2 (@ (class ,(mk-class '(font-black text-stone-800
-                                                 dark:text-stone-200
-                                                 text-2xl
-                                                 py-4
-                                                 px-1
-                                                 flex
-                                                 flex-row
-                                                 items-center
-                                                 gap-1))))
+                                                            dark:text-stone-200
+                                                            text-2xl
+                                                            py-4
+                                                            px-1
+                                                            flex
+                                                            flex-row
+                                                            items-center
+                                                            gap-1))))
                           ,(icon #:type 'guitar)
                           ,(G_ "viewing artists"))
                       (div (@ (class ,(mk-class '(flex flex-wrap flex-row
@@ -91,11 +91,11 @@
                                                           'artist
                                                           x
                                                           (relevant-entities 'artist
-                                                           artworks x)
+                                                                             artworks x)
                                                           (relevant-entities 'artist
-                                                           opinions x)
+                                                                             opinions x)
                                                           (relevant-entities 'artist
-                                                           comments x))))
+                                                                             comments x))))
                                       artists))
                            ,page-buttons
                            ,(hr)
@@ -106,14 +106,14 @@
     (html-template G_
                    #:body body)))
 
-(define* (artists-detail-page G_
-                              #:key artist
-                              artworks
-                              opinions
-                              comments
-                              user-alist
-                              song-fragment
-                              external-sources)
+(define* (artist-detail-page G_
+                             #:key artist
+                             artworks
+                             opinions
+                             comments
+                             user-alist
+                             song-fragment
+                             external-sources)
   (html-template G_
                  #:body `((div (@ (class ,(mk-class '(container mx-auto))))
                                (,(h2 (assoc-ref artist "display_name")) (div (div ,
