@@ -336,8 +336,8 @@
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
-                                                          #:song_identifier
-                                                          uuid)))
+                                                                #:song_identifier
+                                                                uuid)))
               (song-genres ($song_genres 'get
                                          #:ret 'all
                                          #:condition (where #:song_identifier
@@ -353,8 +353,8 @@
               (song-artists ($song_artists 'get
                                            #:ret 'all
                                            #:condition (where
-                                                        #:song_identifier
-                                                        uuid)))
+                                                              #:song_identifier
+                                                              uuid)))
               (artist-uuids (map (lambda (a)
                                    (assoc-ref a "artist_identifier"))
                                  song-artists))
@@ -364,18 +364,23 @@
                                      #:ret 'all
                                      #:condition (where #:identifier
                                                         artist-uuids))))
-              (e ($song_external_sources 'get #:ret 'top #:condition (where #:song_identifier uuid)))
-              (external-sources (if (not (nil? e)) (car e) '()))
-              )
+              (e ($song_external_sources 'get
+                                         #:ret 'top
+                                         #:condition (where #:song_identifier
+                                                            uuid)))
+              (external-sources (if (not (nil? e))
+                                    (car e)
+                                    '())))
          
          (response-emit (:mime rc
-                         (song-edit-page (:i18n rc)
-                                         #:song song
-                                         #:song-contents song-contents
-                                         #:artworks artworks
-                                         #:artists artists
-                                         #:genres genres
-                                         #:external-sources external-sources))))))
+                               (song-edit-page (:i18n rc)
+                                               #:song song
+                                               #:song-contents song-contents
+                                               #:artworks artworks
+                                               #:artists artists
+                                               #:genres genres
+                                               #:external-sources
+                                               external-sources))))))
 
 (get "/songs/uuid/:uuid/contents/:version-uuid/edit"
      #:mime 'xml
@@ -393,8 +398,8 @@
                                                                version-uuid)))))
          
          (response-emit (:mime rc
-                         (song-content-edit-page (:i18n rc) song
-                                                 song-contents))))))
+                               (song-content-edit-page (:i18n rc) song
+                                                       song-contents))))))
 
 (define (do-edit rc)
   (let* ((body (rc-body rc))
@@ -793,7 +798,6 @@
                        #:status 302))
         (protected-endpoint rc do-delete)))
 
-
 (define (do-edit-external-sources rc)
   (let* ((body (rc-body rc))
          (kv (read-url-encoded-body body)))
@@ -801,8 +805,7 @@
     (DB-query (DB-open rc)
               (->sql update
                      'song_external_sources set
-                     `(
-                       (wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
+                     `((wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
                                                                      kv
                                                                      "wikipedia-url")))))
                        (spotify_url ,(escape-str (uri-decode (car (assoc-ref
@@ -838,20 +841,25 @@
     ($song_external_sources 'set
                             #:identifier new-uuid
                             #:song_identifier (params rc "uuid")
-                            #:wikipedia_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                    "wikipedia-url"))))
-                            #:soundcloud_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                     "soundcloud-url"))))
-                            #:youtube_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                  "youtube-url"))))
-                            #:spotify_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                  "spotify-url"))))
+                            #:wikipedia_url (escape-str (uri-decode (car (assoc-ref
+                                                                          kv
+                                                                          "wikipedia-url"))))
+                            #:soundcloud_url (escape-str (uri-decode (car (assoc-ref
+                                                                           kv
+                                                                           "soundcloud-url"))))
+                            #:youtube_url (escape-str (uri-decode (car (assoc-ref
+                                                                        kv
+                                                                        "youtube-url"))))
+                            #:spotify_url (escape-str (uri-decode (car (assoc-ref
+                                                                        kv
+                                                                        "spotify-url"))))
                             #:created_by user-identifier
                             #:created_at (current-time))
 
     (redirect-to rc
                  (string->uri (format #f "~a/songs/uuid/~a"
-                                      (current-myhost) (params rc "uuid")))
+                                      (current-myhost)
+                                      (params rc "uuid")))
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/external-sources/new"

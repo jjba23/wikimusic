@@ -41,45 +41,41 @@
                (username (uri-decode (car (assoc-ref kv "username"))))
                (u ($users 'get
                           #:ret 'top
-                          #:condition (where
-                                       #:username
-                                       username)))
+                          #:condition (where #:username username)))
                (identifier (if (not (nil? u))
-                               (assoc-ref (car u)
-                                          "identifier")
-                               #f)))
+                               (assoc-ref (car u) "identifier") #f)))
           (cond
-           ((:session rc
-             '(check "wikimusic-sid"))
-            (:cookies-set! rc
-             'wikimusic-user-identifier
-             "wikimusic-user-identifier" identifier)
-            (:cookies-setattr! rc
-             'wikimusic-user-identifier
-             #:expires 12000000
-             #:path "/"
-             #:http-only #t)
-            (redirect-to rc
-                         (string->uri (format #f "~a/songs"
-                                              (current-myhost)))
-                         #:status 302))
-           ((:auth rc)
-            (:session rc
-             '(check-and-spawn "wikimusic-sid"))
-            (:cookies-set! rc
-             'wikimusic-user-identifier
-             "wikimusic-user-identifier" identifier)
-            (:cookies-setattr! rc
-             'wikimusic-user-identifier
-             #:expires 12000000
-             #:path "/"
-             #:http-only #t)
-            (redirect-to rc
-                         (string->uri (format #f "~a/songs"
-                                              (current-myhost)))
-                         #:status 302))
-           (else (redirect-to rc
-                              (string->uri (format #f
-                                                   "~a/login?login_failed=true"
-                                                   (current-myhost)))
-                              #:status 302))))))
+            ((:session rc
+                       '(check "wikimusic-sid"))
+             (:cookies-set! rc
+                            'wikimusic-user-identifier
+                            "wikimusic-user-identifier" identifier)
+             (:cookies-setattr! rc
+                                'wikimusic-user-identifier
+                                #:expires 12000000
+                                #:path "/"
+                                #:http-only #t)
+             (redirect-to rc
+                          (string->uri (format #f "~a/songs"
+                                               (current-myhost)))
+                          #:status 302))
+            ((:auth rc)
+             (:session rc
+                       '(check-and-spawn "wikimusic-sid"))
+             (:cookies-set! rc
+                            'wikimusic-user-identifier
+                            "wikimusic-user-identifier" identifier)
+             (:cookies-setattr! rc
+                                'wikimusic-user-identifier
+                                #:expires 12000000
+                                #:path "/"
+                                #:http-only #t)
+             (redirect-to rc
+                          (string->uri (format #f "~a/songs"
+                                               (current-myhost)))
+                          #:status 302))
+            (else (redirect-to rc
+                               (string->uri (format #f
+                                             "~a/login?login_failed=true"
+                                             (current-myhost)))
+                               #:status 302))))))

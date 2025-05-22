@@ -140,7 +140,8 @@
   (export genres-detail-page))
 
 (begin
-  (define* (genre-edit-page G_ #:key genre artworks external-sources)
+  (define* (genre-edit-page G_
+                            #:key genre artworks external-sources)
     (let* ((arts (map (lambda (a)
                         `(div (figure (@ (class ,(mk-class '(py-3 sm:w-36))))
                                       (img (@ (loading "lazy")
@@ -152,14 +153,14 @@
                                                                   genre
                                                                   "identifier")
                                              #:artwork-identifier (assoc-ref a
-                                                                             "identifier")
+                                                                   "identifier")
                                              #:content-url (assoc-ref a
-                                                                      "content_url")
+                                                            "content_url")
                                              #:content-caption (assoc-ref-or-empty-str
                                                                 a
                                                                 "content_caption")
                                              #:order-value (assoc-ref a
-                                                                      "order_value"))))
+                                                            "order_value"))))
                       artworks))
            (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ,(if (assoc-ref genre "identifier")
@@ -198,9 +199,9 @@
                                          ,(G_ "editing genre"))
                                 ,(genre-form G_
                                              #:identifier (assoc-ref genre
-                                                                     "identifier")
+                                                           "identifier")
                                              #:display-name (assoc-ref genre
-                                                                       "display_name")
+                                                             "display_name")
                                              #:description (assoc-ref-or-empty-str
                                                             genre
                                                             "description")))
@@ -211,14 +212,16 @@
                                                                 dark:text-stone-200
                                                                 text-md
                                                                 cursor-pointer))))
-                                         ,(G_
-                                           "editing external sources"))
+                                         ,(G_ "editing external sources"))
                                 ,(external-sources-form G_
                                                         #:entity 'genre
                                                         #:identifier (assoc-ref
                                                                       genre
                                                                       "identifier")
-                                                        #:external-sources-identifier (assoc-ref external-sources "identifier")
+                                                        #:external-sources-identifier
+                                                        (assoc-ref
+                                                         external-sources
+                                                         "identifier")
                                                         #:wikipedia-url (assoc-ref
                                                                          external-sources
                                                                          "wikipedia_url")

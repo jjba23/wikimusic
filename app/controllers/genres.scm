@@ -326,8 +326,14 @@
               (genre (car ($genres 'get
                                    #:ret 'top
                                    #:condition (where #:identifier uuid))))
-              (e ($genre_external_sources 'get #:ret 'top #:condition (where #:genre_identifier uuid)))
-              (external-sources (if (not (nil? e)) (car e) '()))
+              (e ($genre_external_sources 'get
+                                          #:ret 'top
+                                          #:condition (where
+                                                             #:genre_identifier
+                                                             uuid)))
+              (external-sources (if (not (nil? e))
+                                    (car e)
+                                    '()))
               (artworks ($genre_artworks 'get
                                          #:ret 'all
                                          #:order-by '(order_value asc)
@@ -335,9 +341,11 @@
                                                             uuid))))
          
          (response-emit (:mime rc
-                         (genre-edit-page (:i18n rc) #:genre genre #:artworks artworks
-                                          #:external-sources external-sources
-                                          ))))))
+                               (genre-edit-page (:i18n rc)
+                                                #:genre genre
+                                                #:artworks artworks
+                                                #:external-sources
+                                                external-sources))))))
 
 (define (do-edit rc)
   (let* ((body (rc-body rc))
@@ -521,7 +529,7 @@
                           #:conn (DB-open rc)
                           #:entity 'genre
                           #:delete-condition (where #:identifier (params rc
-                                                                         "artwork-uuid"))
+                                                                  "artwork-uuid"))
                           #:redirect-url (format #f "~a/genres/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))
@@ -534,8 +542,7 @@
     (DB-query (DB-open rc)
               (->sql update
                      'genre_external_sources set
-                     `(
-                       (wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
+                     `((wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
                                                                      kv
                                                                      "wikipedia-url")))))
                        (spotify_url ,(escape-str (uri-decode (car (assoc-ref
@@ -571,20 +578,25 @@
     ($genre_external_sources 'set
                              #:identifier new-uuid
                              #:genre_identifier (params rc "uuid")
-                             #:wikipedia_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                     "wikipedia-url"))))
-                             #:soundcloud_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                      "soundcloud-url"))))
-                             #:youtube_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                   "youtube-url"))))
-                             #:spotify_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                   "spotify-url"))))
+                             #:wikipedia_url (escape-str (uri-decode (car (assoc-ref
+                                                                           kv
+                                                                           "wikipedia-url"))))
+                             #:soundcloud_url (escape-str (uri-decode (car (assoc-ref
+                                                                            kv
+                                                                            "soundcloud-url"))))
+                             #:youtube_url (escape-str (uri-decode (car (assoc-ref
+                                                                         kv
+                                                                         "youtube-url"))))
+                             #:spotify_url (escape-str (uri-decode (car (assoc-ref
+                                                                         kv
+                                                                         "spotify-url"))))
                              #:created_by user-identifier
                              #:created_at (current-time))
 
     (redirect-to rc
                  (string->uri (format #f "~a/genres/uuid/~a"
-                                      (current-myhost) (params rc "uuid")))
+                                      (current-myhost)
+                                      (params rc "uuid")))
                  #:status 302)))
 
 (post "/genres/uuid/:uuid/external-sources/new"

@@ -25,8 +25,6 @@
   '(("'" "&apos;")
     ("\"" "&quot;")))
 
-
-
 (define-public (escape-str str)
   (define result
     str)

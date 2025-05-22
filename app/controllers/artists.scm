@@ -321,15 +321,23 @@
                                           #:ret 'all
                                           #:order-by '(order_value asc)
                                           #:condition (where
-                                                       #:artist_identifier
-                                                       uuid)))
-              (e ($artist_external_sources 'get #:ret 'top #:condition (where #:artist_identifier uuid)))
-              (external-sources (if (not (nil? e)) (car e) '()))
-              )
+                                                             #:artist_identifier
+                                                             uuid)))
+              (e ($artist_external_sources 'get
+                                           #:ret 'top
+                                           #:condition (where
+                                                              #:artist_identifier
+                                                              uuid)))
+              (external-sources (if (not (nil? e))
+                                    (car e)
+                                    '())))
          
          (response-emit (:mime rc
-                         (artist-edit-page (:i18n rc) #:artist artist #:artworks artworks
-                                           #:external-sources external-sources))))))
+                               (artist-edit-page (:i18n rc)
+                                                 #:artist artist
+                                                 #:artworks artworks
+                                                 #:external-sources
+                                                 external-sources))))))
 
 ;; ====== Data edit POST routes ======
 
@@ -369,8 +377,7 @@
     (DB-query (DB-open rc)
               (->sql update
                      'artist_external_sources set
-                     `(
-                       (wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
+                     `((wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
                                                                      kv
                                                                      "wikipedia-url")))))
                        (spotify_url ,(escape-str (uri-decode (car (assoc-ref
@@ -397,10 +404,6 @@
         (protected-endpoint rc
                             (lambda ()
                               (do-edit-external-sources rc)))))
-
-
-
-
 
 (define (do-edit-artwork rc)
   (let* ((body (rc-body rc))
@@ -557,7 +560,7 @@
                           #:conn (DB-open rc)
                           #:entity 'artist
                           #:delete-condition (where #:identifier (params rc
-                                                                         "artwork-uuid"))
+                                                                  "artwork-uuid"))
                           #:redirect-url (format #f "~a/artists/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))
@@ -571,20 +574,25 @@
     ($artist_external_sources 'set
                               #:identifier new-uuid
                               #:artist_identifier (params rc "uuid")
-                              #:wikipedia_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                      "wikipedia-url"))))
-                              #:soundcloud_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                       "soundcloud-url"))))
-                              #:youtube_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                    "youtube-url"))))
-                              #:spotify_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                                    "spotify-url"))))
+                              #:wikipedia_url (escape-str (uri-decode (car (assoc-ref
+                                                                            kv
+                                                                            "wikipedia-url"))))
+                              #:soundcloud_url (escape-str (uri-decode (car (assoc-ref
+                                                                             kv
+                                                                             "soundcloud-url"))))
+                              #:youtube_url (escape-str (uri-decode (car (assoc-ref
+                                                                          kv
+                                                                          "youtube-url"))))
+                              #:spotify_url (escape-str (uri-decode (car (assoc-ref
+                                                                          kv
+                                                                          "spotify-url"))))
                               #:created_by user-identifier
                               #:created_at (current-time))
 
     (redirect-to rc
                  (string->uri (format #f "~a/artists/uuid/~a"
-                                      (current-myhost) (params rc "uuid")))
+                                      (current-myhost)
+                                      (params rc "uuid")))
                  #:status 302)))
 
 (post "/artists/uuid/:uuid/external-sources/new"
