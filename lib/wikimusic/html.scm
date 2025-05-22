@@ -198,7 +198,7 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                             px-3
                                             justify-center
                                             align-center
-                                            
+
                                             h-full))))
                 ,(render-if-nempty (lambda (art)
                                      `(figure (@ (class ,(mk-class '(py-3
@@ -210,25 +210,26 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                                              sm:w-48
                                                                              shadow-md)))
                                                          (src ,(assoc-ref art
-                                                                          "content_url")))))))
+                                                                "content_url")))))))
                                    (cond
-                                    ((nil? artworks)
-                                     '())
-                                    (else (car artworks))))
-                (div (@(class ,(mk-class '(text-center))))
+                                     ((nil? artworks)
+                                      '())
+                                     (else (car artworks))))
+                (div (@ (class ,(mk-class '(text-center))))
                      ,(a (assoc-ref x "display_name")
                          #:size 'text-xl
                          #:href item-link
                          #:color '(text-stone-900 dark:text-stone-100)
-                         #:hover '(hover:text-purple-500 dark:hover:text-purple-300)))
+                         #:hover '(hover:text-purple-500
+                                   dark:hover:text-purple-300)))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,extra-top-info)
                 (div (@ (class ,(mk-class '(pt-2 flex flex-row gap-2))))
                      (span (@ (class ,(mk-class '(font-black text-green-800
-                                                             dark:text-green-600 text-xs))))
+                                                  dark:text-green-600 text-xs))))
                            ,(format #f "~a" likes))
                      (span (@ (class ,(mk-class '(font-black text-red-800
-                                                             dark:text-red-600 text-xs))))
+                                                  dark:text-red-600 text-xs))))
                            ,(format #f "~a" dislikes)))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,(em (format #f "~a ~a"
@@ -595,10 +596,10 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                          `((option (@ (value ,(format #f "/~as?sort=~a" entity
                                                       (car s)))
                                       ,(cond
-                                        ((equal? user-sort
-                                                 (car s))
-                                         '(selected ""))
-                                        (else '(not-selected ""))))
+                                         ((equal? user-sort
+                                                  (car s))
+                                          '(selected ""))
+                                         (else '(not-selected ""))))
                                    ,(cdr s))))
 
                        `(("display-name-asc" unquote
@@ -696,6 +697,25 @@ function addSearchQueryParam(form) {
                             #:input-flex-css #f)
                     ,(submit-button (G_ "search")))))))
 
+(define* (render-external-link #:key link label)
+  (render-if-nestring (lambda (s)
+                        `((div (@ (class ,(mk-class '(flex flex-col gap-3
+                                                           max-w-64
+                                                           md:max-w-80
+                                                           overflow-x-scroll))))
+                               (div (@ (class ,(mk-class '(flex flex-row gap-1
+                                                                items-center
+                                                                align-center))))
+                                    ,(p label)
+                                    ,(icon #:type 'link
+                                           #:icon-css '(text-stone-800
+                                                        dark:text-stone-200)))
+                               ,(a s #:size 'text-sm
+                                   #:color '(text-stone-700 dark:text-stone-300)
+                                   #:hover '(hover:text-purple-500
+                                             dark:hover:text-purple-300)))))
+                      link))
+
 (define* (render-external-sources G_ external-sources)
   `((div (@ (class ,(mk-class '(flex flex-row
                                      flex-wrap
@@ -708,36 +728,15 @@ function addSearchQueryParam(form) {
                                      justify-end
                                      items-start
                                      align-end))))
-         ,(render-if-nestring (lambda (s)
-                                `((div (@ (class ,(mk-class '(flex flex-col
-                                                              gap-3 max-w-64
-                                                              md:max-w-80
-                                                              overflow-x-scroll))))
-                                       ,(p (G_ "Wikipedia URL"))
-                                       ,(a s))))
-                              (assoc-ref external-sources "wikipedia_url"))
-
-         ,(render-if-nestring (lambda (s)
-                                `((div (@ (class ,(mk-class '(flex flex-col
-                                                              gap-3 max-w-64
-                                                              md:max-w-80
-                                                              overflow-x-scroll))))
-                                       ,(p (G_ "Spotify URL"))
-                                       ,(a s))))
-                              (assoc-ref external-sources "spotify_url"))
-         ,(render-if-nestring (lambda (s)
-                                `((div (@ (class ,(mk-class '(flex flex-col
-                                                              gap-3 max-w-64
-                                                              md:max-w-80
-                                                              overflow-x-scroll))))
-                                       ,(p (G_ "Youtube URL"))
-                                       ,(a s))))
-                              (assoc-ref external-sources "youtube_url"))
-         ,(render-if-nestring (lambda (s)
-                                `((div (@ (class ,(mk-class '(flex flex-col
-                                                              gap-3 max-w-64
-                                                              md:max-w-80
-                                                              overflow-x-scroll))))
-                                       ,(p (G_ "Soundcloud URL"))
-                                       ,(a s))))
-                              (assoc-ref external-sources "soundcloud_url")))))
+         ,(render-external-link #:link (assoc-ref external-sources
+                                                  "wikipedia_url")
+                                #:label (G_ "Wikipedia URL"))
+         ,(render-external-link #:link (assoc-ref external-sources
+                                                  "spotify_url")
+                                #:label (G_ "Spotify URL"))
+         ,(render-external-link #:link (assoc-ref external-sources
+                                                  "youtube_url")
+                                #:label (G_ "Youtube URL"))
+         ,(render-external-link #:link (assoc-ref external-sources
+                                                  "soundcloud_url")
+                                #:label (G_ "Soundcloud URL")))))
