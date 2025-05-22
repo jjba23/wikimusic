@@ -153,14 +153,14 @@
                                                                   genre
                                                                   "identifier")
                                              #:artwork-identifier (assoc-ref a
-                                                                   "identifier")
+                                                                             "identifier")
                                              #:content-url (assoc-ref a
-                                                            "content_url")
+                                                                      "content_url")
                                              #:content-caption (assoc-ref-or-empty-str
                                                                 a
                                                                 "content_caption")
                                              #:order-value (assoc-ref a
-                                                            "order_value"))))
+                                                                      "order_value"))))
                       artworks))
            (body `(div (@ (class ,(mk-class '(container mx-auto))))
                        ,(if (assoc-ref genre "identifier")
@@ -199,9 +199,9 @@
                                          ,(G_ "editing genre"))
                                 ,(genre-form G_
                                              #:identifier (assoc-ref genre
-                                                           "identifier")
+                                                                     "identifier")
                                              #:display-name (assoc-ref genre
-                                                             "display_name")
+                                                                       "display_name")
                                              #:description (assoc-ref-or-empty-str
                                                             genre
                                                             "description")))
@@ -215,9 +215,9 @@
                                          ,(G_ "editing external sources"))
                                 ,(external-sources-form G_
                                                         #:entity 'genre
-                                                        #:identifier (assoc-ref
-                                                                      genre
-                                                                      "identifier")
+                                                        #:entity-identifier (assoc-ref
+                                                                             genre
+                                                                             "identifier")
                                                         #:external-sources-identifier
                                                         (assoc-ref
                                                          external-sources

@@ -150,7 +150,7 @@
                                                (img (@ (loading "lazy")
                                                        (class "rounded-xl")
                                                        (src ,(assoc-ref a
-                                                              "content_url")))))
+                                                                        "content_url")))))
                                        ,(artwork-form G_
                                                       #:entity 'artist
                                                       #:entity-identifier (assoc-ref
@@ -205,9 +205,9 @@
                                          ,(G_ "editing artist"))
                                 ,(artist-form G_
                                               #:identifier (assoc-ref artist
-                                                            "identifier")
+                                                                      "identifier")
                                               #:display-name (assoc-ref artist
-                                                              "display_name")
+                                                                        "display_name")
                                               #:description (assoc-ref-or-empty-str
                                                              artist
                                                              "description")))
@@ -221,9 +221,9 @@
                                          ,(G_ "editing external sources"))
                                 ,(external-sources-form G_
                                                         #:entity 'artist
-                                                        #:identifier (assoc-ref
-                                                                      artist
-                                                                      "identifier")
+                                                        #:entity-identifier (assoc-ref
+                                                                             artist
+                                                                             "identifier")
                                                         #:external-sources-identifier
                                                         (assoc-ref
                                                          external-sources
