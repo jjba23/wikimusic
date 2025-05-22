@@ -24,9 +24,10 @@
   #:use-module (ice-9 i18n)
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 textual-ports)
-  #:use-module (ice-9 string-fun))
+  #:use-module (ice-9 string-fun)
+  #:export (login-page))
 
-(define-public (login-page G_)
+(define* (login-page G_)
   (html-template G_
                  #:body `(div (@ (class ,(mk-class '(container mx-auto))))
                               (,(h2 (G_ "login to wikimusic")) (div (form (@ (action

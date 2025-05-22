@@ -24,9 +24,10 @@
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
-  #:use-module (ice-9 string-fun))
+  #:use-module (ice-9 string-fun)
+  #:export (welcome-page))
 
-(define-public (welcome-page G_)
+(define* (welcome-page G_)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               (div (@ (class "p-2"))
@@ -39,7 +40,7 @@
                                         ,(wikimusic-explain G_)
                                         ,(wikimusic-img))))))
 
-(define (wikimusic-img)
+(define* (wikimusic-img)
   `((div (div (@ (class ,(mk-class '(bg-stone-300/50 dark:bg-stone-900
                                                      max-w-56
                                                      sm:max-w-90
@@ -51,7 +52,7 @@
                               (src
                                "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg"))))))))
 
-(define (wikimusic-explain G_)
+(define* (wikimusic-explain G_)
   `((div (@ (class ,(mk-class '(max-w-prose my-8
                                             p-4
                                             bg-stone-300/50
@@ -69,7 +70,7 @@
          (p ,(G_
               "Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:"))
 
-         (ul (@ (class "my-4 px-2 list-disc"))
+         (ul (@ (class ,(mk-class '(my-4 px-2 list-disc))))
              (li ,(G_ "Discover music from diverse genres and traditions."))
              (li ,(G_
                    "Organize information with structured metadata and multimedia content."))
@@ -79,12 +80,17 @@
                    "Learn through curated resources that connect music theory, history, and practice.")))
 
          (div (@ (class "my-2"))
-              (a (@ (class
-                     "font-bold text-blue-900 hover:text-blue-700 flex flex-row gap-3")
+              (a (@ (class ,(mk-class '(font-bold text-purple-600
+                                                  hover:text-purple-800
+                                                  dark:text-purple-300
+                                                  hover:dark:text-purple-400
+                                                  flex
+                                                  flex-row
+                                                  gap-3)))
                     (href "https://www.buymeacoffee.com/jjbigorra"))
-                 (span "💙")
+                 (span "🩷")
                  ,(G_ "Please donate by clicking here")
-                 (span "💙")))
+                 (span "🩷")))
          (p ,(G_
               "This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong."))
 

@@ -26,9 +26,11 @@
   #:use-module (ice-9 i18n)
   #:use-module (wikimusic query-escape)
   #:use-module (ice-9 textual-ports)
-  #:use-module (ice-9 string-fun))
+  #:use-module (ice-9 string-fun)
+  #:export (render-song-contents render-version song-content-edit-page
+                                 song-contents-new-page song-content-form))
 
-(define-public (render-song-contents G_ song song-contents ascii-size)
+(define* (render-song-contents G_ song song-contents ascii-size)
   `(div ,(hr)
         (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))
              (span (@ (class ,(mk-class '(font-black text-2xl text-stone-700
@@ -47,7 +49,7 @@
                 ,(icon-button #:icon 'plus
                               #:content (G_ "new version"))))))
 
-(define-public (render-version G_ song version ascii-size)
+(define* (render-version G_ song version ascii-size)
   `(,(hr) (details (@ (open true))
                    (summary (@ (class ,(mk-class '(text-xl font-bold
                                                    text-stone-700
@@ -185,164 +187,157 @@
                                                  (assoc-ref version
                                                             "pdf_contents")))))))
 
-(begin
-  (define* (song-content-edit-page G_ song song-contents)
-    (let* ((clean-pdf-contents (lambda (x)
-                                 (if (equal? x
-                                      "data:application/octet-stream;base64,")
-                                     ""
-                                     (unescape-str (assoc-ref song-contents
-                                                              "pdf_contents")))))
-           (body `(div (@ (class ,(mk-class '(container mx-auto))))
-                       ((div ,(hr)
-                             ,(song-content-form G_
-                                                 #:song-identifier (assoc-ref
-                                                                    song
-                                                                    "identifier")
-                                                 #:song-content-identifier (assoc-ref
-                                                                            song-contents
-                                                                            "identifier")
-                                                 #:instrument-type (unescape-str
-                                                                    (assoc-ref
-                                                                     song-contents
-                                                                     "instrument_type"))
-                                                 #:version-name (unescape-str (assoc-ref
+(define* (song-content-edit-page G_ song song-contents)
+  (let* ((clean-pdf-contents (lambda (x)
+                               (if (equal? x
+                                    "data:application/octet-stream;base64,")
+                                   ""
+                                   (unescape-str (assoc-ref song-contents
+                                                            "pdf_contents")))))
+         (body `(div (@ (class ,(mk-class '(container mx-auto))))
+                     ((div ,(hr)
+                           ,(song-content-form G_
+                                               #:song-identifier (assoc-ref
+                                                                  song
+                                                                  "identifier")
+                                               #:song-content-identifier (assoc-ref
+                                                                          song-contents
+                                                                          "identifier")
+                                               #:instrument-type (unescape-str
+                                                                  (assoc-ref
+                                                                   song-contents
+                                                                   "instrument_type"))
+                                               #:version-name (unescape-str (assoc-ref
+                                                                             song-contents
+                                                                             "version_name"))
+                                               #:ascii-legend (unescape-str (assoc-ref
+                                                                             song-contents
+                                                                             "ascii_legend"))
+                                               #:ascii-contents (unescape-str (assoc-ref
                                                                                song-contents
-                                                                               "version_name"))
-                                                 #:ascii-legend (unescape-str (assoc-ref
-                                                                               song-contents
-                                                                               "ascii_legend"))
-                                                 #:ascii-contents (unescape-str
-                                                                   (assoc-ref
-                                                                    song-contents
-                                                                    "ascii_contents"))
-                                                 #:guitarpro-contents (unescape-str
-                                                                       (assoc-ref
-                                                                        song-contents
-                                                                        "guitarpro_contents"))
-                                                 #:pdf-contents
-                                                 clean-pdf-contents))))))
-      (html-template G_
-                     #:body body)))
-  (export song-content-edit-page))
-
-(begin
-  (define* (song-contents-new-page G_ song-identifier)
+                                                                               "ascii_contents"))
+                                               #:guitarpro-contents (unescape-str
+                                                                     (assoc-ref
+                                                                      song-contents
+                                                                      "guitarpro_contents"))
+                                               #:pdf-contents
+                                               clean-pdf-contents))))))
     (html-template G_
-                   #:body `(div (@ (class ,(mk-class '(container mx-auto))))
-                                ,(song-content-form G_
-                                                    #:song-identifier
-                                                    song-identifier))))
-  (export song-contents-new-page))
+                   #:body body)))
 
-(begin
-  (define* (song-content-form G_
-                              #:key song-identifier
-                              song-content-identifier
-                              (instrument-type "")
-                              (version-name "")
-                              (ascii-legend "")
-                              (ascii-contents "")
-                              (guitarpro-contents "")
-                              (pdf-contents ""))
-    `(,(if (and song-identifier song-content-identifier)
-           (h2 (format #f "~a: ~a ~a"
-                       (G_ "editing version") version-name instrument-type))
-           (h2 (G_ "new version"))) (form (@ (method POST)
-                                             (action ,(if (and song-identifier
-                                                           song-content-identifier)
-                                                          (format #f
-                                                           "/songs/uuid/~a/contents/~a/edit"
-                                                           song-identifier
-                                                           song-content-identifier)
-                                                          (format #f
-                                                           "/songs/uuid/~a/contents/new"
-                                                           song-identifier)))
-                                             (content-type
-                                              application/x-www-form-urlencoded))
-                                          (div ,(input #:label (G_
-                                                                "instrument type")
-                                                       #:name 'instrument-type
-                                                       #:value (unescape-str
-                                                                instrument-type)
-                                                       #:required #t)
-                                               ,(input #:label (G_
-                                                                "version name")
-                                                       #:name 'version-name
-                                                       #:value (unescape-str
-                                                                version-name)
-                                                       #:required #t)
-                                               (label (@ (class ,(mk-class '(dark:text-stone-300
-                                                                             text-stone-600
-                                                                             font-bold
-                                                                             text-sm
-                                                                             mt-3))))
-                                                      ,(G_ "PDF contents"))
-                                               (input (@ (type file)
-                                                         (id pdf-upload)
-                                                         (onchange
-                                                          "translateFileToBase64AddToInput(
+(define* (song-contents-new-page G_ song-identifier)
+  (html-template G_
+                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                              ,(song-content-form G_
+                                                  #:song-identifier
+                                                  song-identifier))))
+
+(define* (song-content-form G_
+                            #:key song-identifier
+                            song-content-identifier
+                            (instrument-type "")
+                            (version-name "")
+                            (ascii-legend "")
+                            (ascii-contents "")
+                            (guitarpro-contents "")
+                            (pdf-contents ""))
+  `(,(if (and song-identifier song-content-identifier)
+         (h2 (format #f "~a: ~a ~a"
+                     (G_ "editing version") version-name instrument-type))
+         (h2 (G_ "new version"))) (form (@ (method POST)
+                                           (action ,(if (and song-identifier
+                                                         song-content-identifier)
+                                                        (format #f
+                                                         "/songs/uuid/~a/contents/~a/edit"
+                                                         song-identifier
+                                                         song-content-identifier)
+                                                        (format #f
+                                                         "/songs/uuid/~a/contents/new"
+                                                         song-identifier)))
+                                           (content-type
+                                            application/x-www-form-urlencoded))
+                                        (div ,(input #:label (G_
+                                                              "instrument type")
+                                                     #:name 'instrument-type
+                                                     #:value (unescape-str
+                                                              instrument-type)
+                                                     #:required #t)
+                                             ,(input #:label (G_
+                                                              "version name")
+                                                     #:name 'version-name
+                                                     #:value (unescape-str
+                                                              version-name)
+                                                     #:required #t)
+                                             (label (@ (class ,(mk-class '(dark:text-stone-300
+                                                                           text-stone-600
+                                                                           font-bold
+                                                                           text-sm
+                                                                           mt-3))))
+                                                    ,(G_ "PDF contents"))
+                                             (input (@ (type file)
+                                                       (id pdf-upload)
+                                                       (onchange
+                                                        "translateFileToBase64AddToInput(
                                                                       document.getElementById('pdf-upload'),
                                                                       document.getElementById('pdf-contents')
                                                            )")
-                                                         (class ,(mk-class '(bg-stone-200
-                                                                             dark:bg-stone-900
-                                                                             my-2
-                                                                             px-3
-                                                                             py-2
-                                                                             text-stone-800
-                                                                             dark:text-stone-200
-                                                                             rounded-xl)))
-                                                         (value "")) "")
-                                               (input (@ (id pdf-contents)
-                                                         (name pdf-contents)
-                                                         (hidden "")) "")
-                                               ,(textarea #:label (G_
-                                                                   "ascii legend")
-                                                          #:name 'ascii-legend
-                                                          #:value (unescape-str
-                                                                   ascii-legend)
-                                                          #:required #f
-                                                          #:textarea-css '(p-3
-                                                                           rounded-xl
-                                                                           border-stone-200
-                                                                           dark:border-stone-700
-                                                                           dark:text-stone-300
-                                                                           bg-stone-200
-                                                                           dark:bg-stone-700/75
-                                                                           border-2
-                                                                           min-h-72
-                                                                           shadow-md
-                                                                           font-mono
-                                                                           text-sm
-                                                                           min-w-prose))
-                                               ,(textarea #:label (G_
-                                                                   "ascii contents")
-                                                          #:name 'ascii-contents
-                                                          #:value (unescape-str
-                                                                   ascii-contents)
-                                                          #:required #f
-                                                          #:textarea-css '(p-3
-                                                                           rounded-xl
-                                                                           border-stone-200
-                                                                           dark:border-stone-700
-                                                                           dark:text-stone-300
-                                                                           bg-stone-200
-                                                                           dark:bg-stone-700/75
-                                                                           border-2
-                                                                           min-h-240
-                                                                           text-sm
-                                                                           shadow-md
-                                                                           font-mono
-                                                                           min-w-prose))
+                                                       (class ,(mk-class '(bg-stone-200
+                                                                           dark:bg-stone-900
+                                                                           my-2
+                                                                           px-3
+                                                                           py-2
+                                                                           text-stone-800
+                                                                           dark:text-stone-200
+                                                                           rounded-xl)))
+                                                       (value "")) "")
+                                             (input (@ (id pdf-contents)
+                                                       (name pdf-contents)
+                                                       (hidden "")) "")
+                                             ,(textarea #:label (G_
+                                                                 "ascii legend")
+                                                        #:name 'ascii-legend
+                                                        #:value (unescape-str
+                                                                 ascii-legend)
+                                                        #:required #f
+                                                        #:textarea-css '(p-3
+                                                                         rounded-xl
+                                                                         border-stone-200
+                                                                         dark:border-stone-700
+                                                                         dark:text-stone-300
+                                                                         bg-stone-200
+                                                                         dark:bg-stone-700/75
+                                                                         border-2
+                                                                         min-h-72
+                                                                         shadow-md
+                                                                         font-mono
+                                                                         text-sm
+                                                                         min-w-prose))
+                                             ,(textarea #:label (G_
+                                                                 "ascii contents")
+                                                        #:name 'ascii-contents
+                                                        #:value (unescape-str
+                                                                 ascii-contents)
+                                                        #:required #f
+                                                        #:textarea-css '(p-3
+                                                                         rounded-xl
+                                                                         border-stone-200
+                                                                         dark:border-stone-700
+                                                                         dark:text-stone-300
+                                                                         bg-stone-200
+                                                                         dark:bg-stone-700/75
+                                                                         border-2
+                                                                         min-h-240
+                                                                         text-sm
+                                                                         shadow-md
+                                                                         font-mono
+                                                                         min-w-prose))
 
-                                               (input (@ (type file)
-                                                         (hidden true)
-                                                         (name
-                                                          guitarpro-contents)
-                                                         (value "")) "")))
-      (div ,(submit-button (if song-content-identifier
-                               (G_ "edit")
-                               (G_ "create"))))))
-  (export song-content-form))
+                                             (input (@ (type file)
+                                                       (hidden true)
+                                                       (name
+                                                        guitarpro-contents)
+                                                       (value "")) "")))
+    (div ,(submit-button (if song-content-identifier
+                             (G_ "edit")
+                             (G_ "create"))))))
 
