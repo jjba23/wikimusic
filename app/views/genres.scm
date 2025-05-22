@@ -218,6 +218,7 @@
                                                         #:identifier (assoc-ref
                                                                       genre
                                                                       "identifier")
+                                                        #:external-sources-identifier (assoc-ref external-sources "identifier")
                                                         #:wikipedia-url (assoc-ref
                                                                          external-sources
                                                                          "wikipedia_url")

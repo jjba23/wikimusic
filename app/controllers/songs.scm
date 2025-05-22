@@ -364,7 +364,9 @@
                                      #:ret 'all
                                      #:condition (where #:identifier
                                                         artist-uuids))))
-              (external-sources '()))
+              (e ($song_external_sources 'get #:ret 'top #:condition (where #:song_identifier uuid)))
+              (external-sources (if (not (nil? e)) (car e) '()))
+              )
          
          (response-emit (:mime rc
                          (song-edit-page (:i18n rc)
@@ -827,3 +829,35 @@
         (protected-endpoint rc
                             (lambda ()
                               (do-edit-external-sources rc)))))
+
+(define (do-new-external-sources rc)
+  (let* ((body (rc-body rc))
+         (kv (read-url-encoded-body body))
+         (new-uuid (generate-string-uuid))
+         (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
+    ($song_external_sources 'set
+                            #:identifier new-uuid
+                            #:song_identifier (params rc "uuid")
+                            #:wikipedia_url (escape-str (uri-decode (car (assoc-ref kv
+                                                                                    "wikipedia-url"))))
+                            #:soundcloud_url (escape-str (uri-decode (car (assoc-ref kv
+                                                                                     "soundcloud-url"))))
+                            #:youtube_url (escape-str (uri-decode (car (assoc-ref kv
+                                                                                  "youtube-url"))))
+                            #:spotify_url (escape-str (uri-decode (car (assoc-ref kv
+                                                                                  "spotify-url"))))
+                            #:created_by user-identifier
+                            #:created_at (current-time))
+
+    (redirect-to rc
+                 (string->uri (format #f "~a/songs/uuid/~a"
+                                      (current-myhost) (params rc "uuid")))
+                 #:status 302)))
+
+(post "/songs/uuid/:uuid/external-sources/new"
+      #:auth '(table users "username" "password_hash")
+      #:session #t
+      (lambda (rc)
+        (protected-endpoint rc
+                            (lambda ()
+                              (do-new-external-sources rc)))))

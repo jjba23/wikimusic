@@ -248,9 +248,9 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
 
 (define-public (render-visibility-status status)
   (cond
-    ((eq? status 0)
-     `(span "published"))
-    (else `(span "unkown status"))))
+   ((eq? status 0)
+    (em "published"))
+   (else (em "unkown status"))))
 
 (define-public (render-comment G_ user-alist comment)
   `(div (@ (class "py-3"))
@@ -291,7 +291,7 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
     (let* ((rendered-artworks (map (lambda (art)
                                      `(figure (@ (class ,(mk-class '(py-3
 
-                                                                          ))))
+                                                                     ))))
                                               (img (@ (loading lazy)
                                                       (class ,(mk-class '(rounded-xl
                                                                           shadow-md
@@ -300,7 +300,7 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                                           md:w-72
                                                                           h-auto)))
                                                       (src ,(assoc-ref art
-                                                             "content_url"))))
+                                                                       "content_url"))))
                                               ,(render-if-nempty (lambda (fc)
                                                                    `(figcaption ,fc))
                                                                  (assoc-ref
@@ -313,30 +313,30 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                                  "identifier")
                                                       (assoc-ref o
                                                                  (format #f
-                                                                  "~a_identifier"
-                                                                  entity)))
+                                                                         "~a_identifier"
+                                                                         entity)))
                                               (equal? 1
                                                       (assoc-ref o "is_like"))))
                                        opinions)))
            (dislike-count (length (filter (lambda (o)
                                             (and (equal? (assoc-ref x
-                                                          "identifier")
+                                                                    "identifier")
                                                          (assoc-ref o
                                                                     (format #f
                                                                             "~a_identifier"
                                                                             entity)))
                                                  (equal? 1
                                                          (assoc-ref o
-                                                          "is_dislike"))))
+                                                                    "is_dislike"))))
                                           opinions)))
            (opinion-buttons `((div (@ (class ,(mk-class '(flex flex-row
                                                                flex-wrap gap-3))))
                                    (form (@ (method POST)
                                             (action ,(format #f
-                                                      "/~as/uuid/~a/like"
-                                                      entity
-                                                      (assoc-ref x
-                                                                 "identifier"))))
+                                                             "/~as/uuid/~a/like"
+                                                             entity
+                                                             (assoc-ref x
+                                                                        "identifier"))))
                                          ,(icon-button #:icon 'thumbs-up
                                                        #:color '(text-stone-100)
                                                        #:background '(bg-green-700)
@@ -348,7 +348,7 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                                          "like")
                                                                        (span (@
                                                                               (class
-                                                                               "font-light text-xs"))
+                                                                                "font-light text-xs"))
                                                                              ,
                                                                              (format
                                                                               #f
@@ -356,10 +356,10 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                                               like-count)))))
                                    (form (@ (method POST)
                                             (action ,(format #f
-                                                      "/~as/uuid/~a/dislike"
-                                                      entity
-                                                      (assoc-ref x
-                                                                 "identifier"))))
+                                                             "/~as/uuid/~a/dislike"
+                                                             entity
+                                                             (assoc-ref x
+                                                                        "identifier"))))
                                          ,(icon-button #:icon 'thumbs-down
                                                        #:color '(text-stone-100)
                                                        #:background '(bg-red-700)
@@ -372,9 +372,9 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
 
                                                                        (span (@
                                                                               (class ,
-                                                                               (mk-class '
-                                                                                (font-light
-                                                                                 text-xs))))
+                                                                                (mk-class '
+                                                                                 (font-light
+                                                                                  text-xs))))
                                                                              ,
                                                                              (format
                                                                               #f
@@ -386,18 +386,16 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                                         dark:text-stone-400
                                                                         font-bold))))
                                                            ,(G_ "description"))
-                                                        (p (@ (class ,(mk-class '
-                                                                       (pl-3
-                                                                        whitespace-break-spaces
-                                                                        text-stone-800
-                                                                        dark:text-stone-300
-                                                                        max-w-prose))))
-                                                           ,description)))
+                                                        (div (@(class ,(mk-class '(max-w-prose pl-3 whitespace-break-spaces))))
+                                                             ,(p 
+                                                               description #:weight 'font-light))
+                                                        ))
                                                 (assoc-ref x "description")))
            (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
                                                      `((dt (@ (class ,(mk-class '
                                                                        (pt-3
-                                                                        pb-1text-stone-700
+                                                                        pb-1
+                                                                        text-stone-700
                                                                         dark:text-stone-400
                                                                         font-bold))))
                                                            ,(G_ "last edited"))
@@ -405,24 +403,25 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                                        (pl-3
                                                                         text-stone-800
                                                                         dark:text-stone-300))))
-                                                           ,(strftime "%c"
-                                                                      (localtime
-                                                                       (string->number
-                                                                        last-edited-at))))))
+                                                           ,(em
+                                                             (strftime "%c"
+                                                                       (localtime
+                                                                        (string->number
+                                                                         last-edited-at)))))))
                                                    (assoc-ref x
-                                                    "last_edited_at")))
+                                                              "last_edited_at")))
            (maybe-approved-by (render-if-nempty (lambda (approved-by)
                                                   `((dt (@ (class ,(mk-class '
-                                                                             (pt-3
-                                                                              pb-1
-                                                                              text-stone-700
-                                                                              dark:text-stone-400
-                                                                              font-bold))))
+                                                                    (pt-3
+                                                                     pb-1
+                                                                     text-stone-700
+                                                                     dark:text-stone-400
+                                                                     font-bold))))
                                                         ,(G_ "approved by"))
                                                     (dd (@ (class ,(mk-class '
-                                                                             (pl-3
-                                                                              text-stone-800
-                                                                              dark:text-stone-300))))
+                                                                    (pl-3
+                                                                     text-stone-800
+                                                                     dark:text-stone-300))))
                                                         ,approved-by)))
                                                 (assoc-ref x "approved_by"))))
       
@@ -441,17 +440,17 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                           ,(G_ "views"))
                       (dd (@ (class ,(mk-class '(pl-3 text-stone-800
                                                       dark:text-stone-300))))
-                          ,(format #f "~a"
-                                   (assoc-ref x "views")))
+                          ,(em (format #f "~a"
+                                       (assoc-ref x "views"))))
                       (dt (@ (class ,(mk-class '(pt-3 pb-1 text-stone-700
                                                       dark:text-stone-400
                                                       font-bold))))
                           ,(G_ "created"))
                       (dd (@ (class ,(mk-class '(pl-3 text-stone-800
                                                       dark:text-stone-300))))
-                          ,(strftime "%c"
-                                     (localtime (string->number (assoc-ref x
-                                                                 "created_at")))))
+                          ,(em (strftime "%c"
+                                         (localtime (string->number (assoc-ref x
+                                                                               "created_at"))))))
                       ,maybe-last-edited-at
                       (dt (@ (class ,(mk-class '(pt-3 pb-1 text-stone-700
                                                       dark:text-stone-400
@@ -464,17 +463,17 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                                             flex-wrap
                                                                             flex-row
                                                                             gap-2))))
-                                                     (span ,(format #f
-                                                             "~a (~a) &lt;~a&gt;"
-                                                             (assoc-ref u
-                                                              "display_name")
-                                                             (assoc-ref u
-                                                              "username")
-                                                             (assoc-ref u
-                                                              "email_address")))))
+                                                     ,(em (format #f
+                                                                  "~a (~a) &lt;~a&gt;"
+                                                                  (assoc-ref u
+                                                                             "display_name")
+                                                                  (assoc-ref u
+                                                                             "username")
+                                                                  (assoc-ref u
+                                                                             "email_address")))))
                                              (car (assoc-ref user-alist
                                                              (assoc-ref x
-                                                              "created_by")))))
+                                                                        "created_by")))))
                       (dt (@ (class ,(mk-class '(pt-3 pb-1 text-stone-700
                                                       dark:text-stone-400
                                                       font-bold))))
@@ -482,7 +481,7 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                       (dd (@ (class ,(mk-class '(pl-3 text-stone-800
                                                       dark:text-stone-300))))
                           ,(render-visibility-status (assoc-ref x
-                                                      "visibility_status")))
+                                                                "visibility_status")))
                       ,maybe-approved-by
                       (dt (@ (class ,(mk-class '(pt-3 pb-1 pb-1 text-stone-700
                                                       dark:text-stone-400
@@ -493,20 +492,21 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
 
                           (div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                            gap-4))))
-                               ,(mono (assoc-ref x "identifier"))
+                               ,(mono (assoc-ref x "identifier") #:size 'text-sm)
                                ,(icon-button #:icon 'copy
                                              #:content "copy"
 
                                              #:on-click (format #f
-                                                         "navigator.clipboard.writeText('~a')"
-                                                         (assoc-ref x
-                                                          "identifier"))))))))
+                                                                "navigator.clipboard.writeText('~a')"
+                                                                (assoc-ref x
+                                                                           "identifier"))))))))
         (details (summary (@ (class ,(mk-class '(text-stone-800
                                                  dark:text-stone-200
                                                  cursor-pointer))))
-                          ,(format #f "~a ~a"
-                                   (length comments)
-                                   (G_ "comments")))
+                          ,(em
+                            (format #f "~a ~a"
+                                    (length comments)
+                                    (G_ "comments"))))
                  ,rendered-comments))))
   (export entity-details))
 
@@ -566,8 +566,8 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
     (let* ((form-action (if (equal? #f external-sources-identifier)
                             (format #f "/~as/uuid/~a/external-sources/new" entity
                                     entity-identifier)
-                            (format #f "/~as/uuid/~a/external-sources/edit" entity
-                                    entity-identifier artwork-identifier))))
+                            (format #f "/~as/uuid/~a/external-sources/~a/edit" entity
+                                    entity-identifier external-sources-identifier))))
       `((div (@ (class ,(mk-class '(flex flex-col gap-2))))
              (form (@ (method POST)
                       (content-type application/x-www-form-urlencoded)
