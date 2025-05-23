@@ -210,11 +210,11 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                                                                              sm:w-48
                                                                              shadow-md)))
                                                          (src ,(assoc-ref art
-                                                                "content_url")))))))
+                                                                          "content_url")))))))
                                    (cond
-                                     ((nil? artworks)
-                                      '())
-                                     (else (car artworks))))
+                                    ((nil? artworks)
+                                     '())
+                                    (else (car artworks))))
                 (div (@ (class ,(mk-class '(text-center))))
                      ,(a (assoc-ref x "display_name")
                          #:size 'text-xl
@@ -226,22 +226,25 @@ async function translateFileToBase64AddToInput(sourceInput, targetInput) {
                      ,extra-top-info)
                 (div (@ (class ,(mk-class '(pt-2 flex flex-row gap-2))))
                      (span (@ (class ,(mk-class '(font-black text-green-800
-                                                  dark:text-green-600 text-xs))))
+                                                             dark:text-green-600 text-xs))))
                            ,(format #f "~a" likes))
                      (span (@ (class ,(mk-class '(font-black text-red-800
-                                                  dark:text-red-600 text-xs))))
+                                                             dark:text-red-600 text-xs))))
                            ,(format #f "~a" dislikes)))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,(em (format #f "~a ~a"
                                   (assoc-ref x "views")
                                   (G_ "views"))
-                          #:size 'text-xs))
+                          #:size 'text-xs
+                          #:color '(text-stone-700 dark:text-stone-300)))
                 (div (@ (class ,(mk-class '(flex flex-row gap-2))))
                      ,(em (format #f "~a"
                                   (length comments))
-                          #:size 'text-xs)
+                          #:size 'text-xs
+                          #:color '(text-stone-700 dark:text-stone-300))
                      ,(em (G_ "comments")
-                          #:size 'text-xs))
+                          #:size 'text-xs
+                          #:color '(text-stone-700 dark:text-stone-300)))
                 ,extra-bot-info)))))
 
 (define* (render-visibility-status status)

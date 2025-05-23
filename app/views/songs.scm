@@ -47,9 +47,11 @@
                                                                            gap-2))))
                                                     ,(em (format #f "~a"
                                                                  (car vc))
-                                                         #:size 'text-xs)
+                                                         #:size 'text-xs
+                                                         #:color '(text-stone-700 dark:text-stone-300))
                                                     ,(em (G_ "versions")
-                                                         #:size 'text-xs))))
+                                                         #:size 'text-xs
+                                                         #:color '(text-stone-700 dark:text-stone-300)))))
                                            (assoc-ref song-version-count-alist
                                                       (assoc-ref x "identifier"))))
          (this-song-artists-relations (map (lambda (aa)
