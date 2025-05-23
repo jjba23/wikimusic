@@ -143,7 +143,7 @@
                                              (img (@ (loading "lazy")
                                                      (class "rounded-xl")
                                                      (src ,(assoc-ref a
-                                                            "content_url")))))
+                                                                      "content_url")))))
                                      ,(artwork-form G_
                                                     #:entity 'artist
                                                     #:entity-identifier (assoc-ref
@@ -153,12 +153,12 @@
                                                                           a
                                                                           "identifier")
                                                     #:content-url (assoc-ref a
-                                                                   "content_url")
+                                                                             "content_url")
                                                     #:content-caption (assoc-ref-or-empty-str
                                                                        a
                                                                        "content_caption")
                                                     #:order-value (assoc-ref a
-                                                                   "order_value"))))
+                                                                             "order_value"))))
                              artworks))
          (body `(div (@ (class ,(mk-class '(container mx-auto))))
                      ,(if (assoc-ref artist "identifier")
@@ -196,9 +196,9 @@
                                        ,(G_ "editing artist"))
                               ,(artist-form G_
                                             #:identifier (assoc-ref artist
-                                                          "identifier")
+                                                                    "identifier")
                                             #:display-name (assoc-ref artist
-                                                            "display_name")
+                                                                      "display_name")
                                             #:description (assoc-ref-or-empty-str
                                                            artist
                                                            "description")))
@@ -246,7 +246,7 @@
   `((form (@ (method POST)
              (action ,(if identifier
                           (format #f "/artists/uuid/~a/edit" identifier)
-                          (format #f "/artists/new" identifier)))
+                          "/artists/new"))
              (content-type application/x-www-form-urlencoded))
           (div ,(input #:label (G_ "display name")
                        #:name "display-name"

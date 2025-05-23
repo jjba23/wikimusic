@@ -92,6 +92,7 @@
                        #:extra-top-info extra-top-info
                        #:extra-bot-info extra-bot-info)))))
 
+
 (define* (song-list-page G_
                          #:key (only-tiles #f)
                          songs
@@ -523,7 +524,7 @@
   `((form (@ (method POST)
              (action ,(if identifier
                           (format #f "/songs/uuid/~a/edit" identifier)
-                          (format #f "/songs/new" identifier)))
+                          "/songs/new"))
              (content-type application/x-www-form-urlencoded))
           (div ,(input #:label (G_ "display name")
                        #:name "display-name"

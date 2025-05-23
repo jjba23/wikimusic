@@ -242,7 +242,7 @@
   `((form (@ (method POST)
              (action ,(if identifier
                           (format #f "/genres/uuid/~a/edit" identifier)
-                          (format #f "/genres/new" identifier)))
+                          "/genres/new"))
              (content-type application/x-www-form-urlencoded))
           (div ,(input #:label (G_ "display name")
                        #:name "display-name"
