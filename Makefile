@@ -161,6 +161,5 @@ merge-i18n-es:
 # Development REPL
 repl:
 	guix shell -m manifest.scm -- guile  \
-		-L lib/wikimusic -L app/models -L app/controllers \
-		-L app/views \
+		-L lib -L . \
 		-c '((@ (ares server) run-nrepl-server))'
