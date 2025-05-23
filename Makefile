@@ -160,4 +160,7 @@ merge-i18n-es:
 
 # Development REPL
 repl:
-	guix shell -m manifest.scm -- guile --fresh-auto-compile -c '((@ (ares server) run-nrepl-server))'
+	guix shell -m manifest.scm -- guile  \
+		-L lib/wikimusic -L app/models -L app/controllers \
+		-L app/views \
+		-c '((@ (ares server) run-nrepl-server))'
