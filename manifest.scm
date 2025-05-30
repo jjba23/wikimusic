@@ -68,80 +68,80 @@
 
 (define-public guile-hygguile
   (package
-   (name "guile-hygguile")
-   (version "0.5.2")
-   (source
-    (origin
-     (method git-fetch)
-     (uri (git-reference
-           (url "https://codeberg.org/jjba23/hygguile.git")
-           (commit (string-append "v" version))))
-     (file-name (git-file-name name version))
-     (sha256
-      (base32 "1dgscn4l791n0maqp62lwzh7i545rnwchp8wfqwl18jbxzn8cgw3"))))
-   (build-system guile-build-system)
-   (native-inputs (list guile-3.0))
-   (arguments
-    (list
-     #:source-directory "src"))
-   (home-page "https://codeberg.org/jjba23/hygguile")
-   (synopsis
-    "SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects")
-   (description
-    "Cozy and professional user-interfaces for everyone.
+    (name "guile-hygguile")
+    (version "0.5.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/hygguile.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1dgscn4l791n0maqp62lwzh7i545rnwchp8wfqwl18jbxzn8cgw3"))))
+    (build-system guile-build-system)
+    (native-inputs (list guile-3.0))
+    (arguments
+     (list
+      #:source-directory "src"))
+    (home-page "https://codeberg.org/jjba23/hygguile")
+    (synopsis
+     "SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects")
+    (description
+     "Cozy and professional user-interfaces for everyone.
         SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects.
         hygge + guile = hygguile")
-   (license license:lgpl3+)))
+    (license license:lgpl3+)))
 
 (define-public guile-kracht
   (package
-   (name "guile-kracht")
-   (version "0.1.2")
-   (source
-    (origin
-     (method git-fetch)
-     (uri (git-reference
-           (url "https://codeberg.org/jjba23/kracht.git")
-           (commit (string-append "v" version))))
-     (file-name (git-file-name name version))
-     (sha256
-      (base32 "08pgkj111sjwlkv3q30zqhrz2zxis06iknmb09qkmf3vh9ww1d73"))))
-   (build-system guile-build-system)
-   (native-inputs (list guile-3.0))
-   (arguments
-    (list
-     #:source-directory "src"))
-   (home-page "https://codeberg.org/jjba23/kracht")
-   (synopsis
-    "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
-   (description
-    "Good prelude for Guile Scheme, an opt-in enhancement to the standard library. kracht means power/strength in the Dutch language, and is also a recursive acronym which stands for: KRACHT Reliable And Consistent Helper Tools")
-   (license license:lgpl3+)))
+    (name "guile-kracht")
+    (version "0.1.2")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/kracht.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "08pgkj111sjwlkv3q30zqhrz2zxis06iknmb09qkmf3vh9ww1d73"))))
+    (build-system guile-build-system)
+    (native-inputs (list guile-3.0))
+    (arguments
+     (list
+      #:source-directory "src"))
+    (home-page "https://codeberg.org/jjba23/kracht")
+    (synopsis
+     "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
+    (description
+     "Good prelude for Guile Scheme, an opt-in enhancement to the standard library. kracht means power/strength in the Dutch language, and is also a recursive acronym which stands for: KRACHT Reliable And Consistent Helper Tools")
+    (license license:lgpl3+)))
 
 (define-public guile-orgwebalchemy
   (package
-   (name "guile-orgwebalchemy")
-   (version "0.1.0")
-   (source
-    (origin
-     (method git-fetch)
-     (uri (git-reference
-           (url "https://codeberg.org/jjba23/orgwebalchemy.git")
-           (commit (string-append "v" version))))
-     (file-name (git-file-name name version))
-     (sha256
-      (base32 "0mzm3rbldfhzlj5mg70w11v2givpgl0bzlpw513vw1cg85l7vkf9"))))
-   (build-system guile-build-system)
-   (native-inputs (list guile-3.0))
-   (arguments
-    (list
-     #:source-directory "src"))
-   (home-page "https://codeberg.org/jjba23/orgwebalchemy")
-   (synopsis
-    "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
-   (description
-    "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
-   (license license:lgpl3+)))
+    (name "guile-orgwebalchemy")
+    (version "0.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/orgwebalchemy.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0mzm3rbldfhzlj5mg70w11v2givpgl0bzlpw513vw1cg85l7vkf9"))))
+    (build-system guile-build-system)
+    (native-inputs (list guile-3.0))
+    (arguments
+     (list
+      #:source-directory "src"))
+    (home-page "https://codeberg.org/jjba23/orgwebalchemy")
+    (synopsis
+     "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
+    (description
+     "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
+    (license license:lgpl3+)))
 
 (packages->manifest (list (specification->package "make")
                           (specification->package "gettext")

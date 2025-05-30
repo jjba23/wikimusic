@@ -123,7 +123,8 @@
                                                      (option #:value 2
                                                              #:content (G_
                                                                         "2 line")
-                                                             #:selected-value 2)
+                                                             #:selected-value
+                                                             2)
                                                      (option #:value 4
                                                              #:content (G_
                                                                         "4 line"))
@@ -164,9 +165,10 @@
                                                                   justify-center))))
                                            ,(sub-h3 (G_ "auto-scrolling:"))
                                            ,(icon-button #:id 'start-autoscroll
-                                                         #:icon 'mouse-scroll
-                                                         #:content (G_ "scroll")
-                                                         #:on-click "startSongAutoScroll()")
+                                             #:icon 'mouse-scroll
+                                             #:content (G_ "scroll")
+                                             #:on-click
+                                             "startSongAutoScroll()")
                                            ,line-scroll-select
                                            ,second-scroll-select)))
          (render-ascii-content (lambda (ascii-contents)
@@ -185,7 +187,9 @@
                                                                               cursor-pointer))))
                                                                         ,(G_
                                                                           "ascii contents"))
-                                                                       (pre (@ (id ascii-content-container)
+                                                                       (pre (@
+                                                                             (id
+                                                                              ascii-content-container)
                                                                              (class ,
                                                                               (mk-class
                                                                                (append
