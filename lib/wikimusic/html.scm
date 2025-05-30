@@ -54,7 +54,8 @@
 
 (define* asset-library
   (build-asset-library '("pub/css/fonts.css" "pub/css/phosphor.css"
-                         "pub/js/tailwind.js")))
+                         "pub/js/tailwind.js" "pub/js/song-auto-scroll.js"
+                         "pub/js/file-base64.js")))
 
 (define* (page-footer G_)
   `(,(footer `(,(em (G_ "the free music knowledge encyclopaedia")) ,(em (G_
@@ -132,29 +133,8 @@
                                                       "pub/js/tailwind.js"))
                                   (script ,toggle-dark-theme-js)
                                   (script ,remember-dark-theme-js)
-                                  (script
-                                   "
-const fileToBase64 = (file) => {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(file);
-
-    fileReader.onload = () => {
-      resolve(fileReader.result);
-    };
-
-    fileReader.onerror = (error) => {
-      reject(error);
-    };
-  });
-};
-
-async function translateFileToBase64AddToInput(sourceInput, targetInput) {
-  const file = sourceInput.files[0];
-  const base64 = await fileToBase64(file);
-  targetInput.setAttribute('value', base64);
-};
-"))
+                                  (script ,(assoc-ref asset-library "pub/js/song-auto-scroll.js"))
+                                  (script ,(assoc-ref asset-library "pub/js/file-base64.js")))
                             (body (@ (class ,(mk-class '(bg-stone-100
                                                          dark:bg-stone-800))))
                                   ,(with-footer #:main `((div (@ (class ,(mk-class '
