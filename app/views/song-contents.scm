@@ -122,12 +122,12 @@
                                                                         "1 line"))
                                                      (option #:value 2
                                                              #:content (G_
-                                                                        "2 line")
-                                                             #:selected-value
-                                                             2)
+                                                                        "2 line"))
                                                      (option #:value 4
                                                              #:content (G_
-                                                                        "4 line"))
+                                                                        "4 line")
+                                                             #:selected-value
+                                                             4)
                                                      (option #:value 8
                                                              #:content (G_
                                                                         "8 line"))
