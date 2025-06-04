@@ -53,9 +53,8 @@
                           render-external-sources))
 
 (define* asset-library
-  (build-asset-library '("pub/css/fonts.css" "pub/css/phosphor.css"
-                         "pub/js/tailwind.js" "pub/js/song-auto-scroll.js"
-                         "pub/js/file-base64.js")))
+  (build-asset-library '("pub/css/phosphor.css" "pub/js/tailwind.js"
+                         "pub/js/song-auto-scroll.js" "pub/js/file-base64.js")))
 
 (define* (page-footer G_)
   `(,(footer `(,(em (G_ "the free music knowledge encyclopaedia")) ,(em (G_
@@ -113,19 +112,26 @@
   
   `("<!DOCTYPE html>" (html (head (title "Wikimusic")
                                   (style ,(assoc-ref asset-library
-                                                     "pub/css/fonts.css"))
-                                  (style ,(assoc-ref asset-library
                                                      "pub/css/phosphor.css"))
+                                  (link (@ (rel preconnect)
+                                           (href
+                                            "https://fonts.googleapis.com")))
+                                  (link (@ (rel preconnect)
+                                           (href "https://fonts.gstatic.com")
+                                           (crossorigin "")))
+                                  (link (@ (rel stylesheet)
+                                           (href
+                                            "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap")))
                                   (style (@ (type "text/tailwindcss"))
                                    "
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
-  --font-sans: \"Adwaita Sans\", sans-serif;
-  --font-mono: \"Adwaita Mono\", monospace;
+  --font-sans: \"IBM Plex Sans\", sans-serif;
+  --font-mono: \"IBM Plex Mono\", monospace;
 }
 ")
-                                  (meta (@ (name "viewport")
+                                  (meta (@ (name viewport)
                                            (content
                                             "width=device-width, initial-scale=1.0")))
                                   (meta (@ (charset "UTF-8")))
