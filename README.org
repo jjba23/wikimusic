@@ -75,3 +75,4 @@ We welcome everyone to feel invited to the wikimusic Project, and encourage acti
 Find here the Backlog and Kanban boards for wikimusic: https://lucidplan.jointhefreeworld.org/tickets/wikimusic
 
 -----
+
