@@ -44,28 +44,28 @@
                                                           gap-3 my-4))))
                               ,(if (> offset 0)
                                    `((a (@ (href ,(format #f
-                                                          "/genres?offset=~a&limit=~a"
-                                                          (- offset limit) limit)))
+                                                   "/genres?offset=~a&limit=~a"
+                                                   (- offset limit) limit)))
                                         ,(icon-button #:icon 'arrow-left
                                                       #:content (G_ "previous"))))
                                    '())
                               ,(if (= (length genres) limit)
                                    `((a (@ (href ,(format #f
-                                                          "/genres?offset=~a&limit=~a"
-                                                          (+ offset limit) limit)))
+                                                   "/genres?offset=~a&limit=~a"
+                                                   (+ offset limit) limit)))
                                         ,(icon-button #:icon 'arrow-right
                                                       #:content (G_ "next"))))
                                    '()))))
          (body `(div (@ (class ,(mk-class '(container mx-auto))))
                      ((h2 (@ (class ,(mk-class '(font-black text-stone-800
-                                                            dark:text-stone-200
-                                                            text-2xl
-                                                            py-4
-                                                            px-1
-                                                            flex
-                                                            flex-row
-                                                            items-center
-                                                            gap-1))))
+                                                 dark:text-stone-200
+                                                 text-2xl
+                                                 py-4
+                                                 px-1
+                                                 flex
+                                                 flex-row
+                                                 items-center
+                                                 gap-1))))
                           ,(icon #:type 'disc)
                           ,(G_ "viewing genres"))
                       (div (@ (class ,(mk-class '(flex flex-wrap flex-row
@@ -92,11 +92,11 @@
                                                           'genre
                                                           x
                                                           (relevant-entities 'genre
-                                                                             artworks x)
+                                                           artworks x)
                                                           (relevant-entities 'genre
-                                                                             opinions x)
+                                                           opinions x)
                                                           (relevant-entities 'genre
-                                                                             comments x))))
+                                                           comments x))))
                                       genres))
                            ,page-buttons
                            ,(hr)
