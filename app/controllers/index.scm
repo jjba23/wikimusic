@@ -31,3 +31,4 @@
 
 
 (get "/robots.txt" static-page-emitter)
+(get "/favicon.ico" static-page-emitter)
