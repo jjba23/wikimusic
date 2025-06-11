@@ -31,6 +31,7 @@
              (gnu packages rust-apps)
              (guix build-system guile)
              (gnu packages linux)
+             (gnu packages emacs)
              (gnu packages perl)
              (gnu packages compression)
              (gnu packages sqlite)
@@ -156,5 +157,6 @@
                           guile-gcrypt
                           watchexec
                           guile-dbi
+                          emacs
                           guile-dbd-sqlite3))
 
