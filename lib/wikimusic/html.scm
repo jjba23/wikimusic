@@ -138,6 +138,12 @@
                                            (type text/css)
                                            (href
                                             "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css")))
+                                  (link (@ (rel "shortcut icon")
+                                           (href "/favicon.ico")
+                                           (type "image/x-icon")))
+                                  (link (@ (rel "icon")
+                                           (href "/favicon.ico")
+                                           (type "image/x-icon")))
                                   (script ,(assoc-ref asset-library
                                                       "pub/js/tailwind.js"))
                                   (script ,toggle-dark-theme-js)
