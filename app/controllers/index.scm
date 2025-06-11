@@ -29,3 +29,5 @@
        (response-emit (:mime rc
                              (welcome-page (:i18n rc))))))
 
+
+(get "/robots.txt" static-page-emitter)
