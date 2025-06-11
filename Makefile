@@ -171,3 +171,4 @@ deploy:
 	mkdir -pv $(DEPLOY_WWW)/manuals/wikimusic
 	rm -rfv $(DEPLOY_WWW)/manuals/wikimusic/index.html
 	mv -v docs/manual/en-GB.html $(DEPLOY_WWW)/manuals/wikimusic/index.html
+
