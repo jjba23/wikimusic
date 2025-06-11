@@ -19,6 +19,8 @@
 
 # Constants
 
+DEPLOY_WWW=/srv/http/jointhefreeworld.org
+
 WIKIMUSIC_DB="wikimusic.db"
 COPYRIGHT_HOLDERS="Josep Bigorra"
 I18N_LOCATION="sys/i18n/locale"
