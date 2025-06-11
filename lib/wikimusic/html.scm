@@ -53,8 +53,8 @@
                           render-external-sources))
 
 (define* asset-library
-  (build-asset-library '("pub/css/phosphor.css" "pub/js/tailwind.js"
-                         "pub/js/song-auto-scroll.js" "pub/js/file-base64.js")))
+  (build-asset-library '("pub/js/tailwind.js" "pub/js/song-auto-scroll.js"
+                         "pub/js/file-base64.js")))
 
 (define* (page-footer G_)
   `(,(footer `(,(em (G_ "the free music knowledge encyclopaedia")) ,(em (G_
@@ -112,8 +112,10 @@
                         (proj '()))
   
   `("<!DOCTYPE html>" (html (head (title "Wikimusic")
-                                  (style ,(assoc-ref asset-library
-                                                     "pub/css/phosphor.css"))
+                                  (link (@ (rel stylesheet)
+                                           (type text/css)
+                                           (href
+                                            "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css")))
                                   (link (@ (rel preconnect)
                                            (href
                                             "https://fonts.googleapis.com")))
