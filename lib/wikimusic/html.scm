@@ -112,10 +112,6 @@
                         (proj '()))
   
   `("<!DOCTYPE html>" (html (head (title "Wikimusic")
-                                  (link (@ (rel stylesheet)
-                                           (type text/css)
-                                           (href
-                                            "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css")))
                                   (link (@ (rel preconnect)
                                            (href
                                             "https://fonts.googleapis.com")))
@@ -138,6 +134,10 @@
                                            (content
                                             "width=device-width, initial-scale=1.0")))
                                   (meta (@ (charset "UTF-8")))
+                                  (link (@ (rel stylesheet)
+                                           (type text/css)
+                                           (href
+                                            "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css")))
                                   (script ,(assoc-ref asset-library
                                                       "pub/js/tailwind.js"))
                                   (script ,toggle-dark-theme-js)
