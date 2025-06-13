@@ -84,15 +84,32 @@ Find here the Backlog and Kanban boards for wikimusic: https://lucidplan.jointhe
 
 --------
 
-* Authentication
+* Authentication, Authorization, User management
 
-Wikimusic requires an authenticated session for performing administrative tasks such as creating/deleting jobs and profiles.
+Bewaking is a nice library to help you secure your web applications with Guile Scheme: https://codeberg.org/jjba23/bewaking
 
-Upon starting a blank new wikimusic deployment you will have no users in the database.
+With bewaking we use secure tokens encrypted and stored in secure cookies (for browsers) and headers (for REST API)
 
-Check in ~db/migration~ and edit the password field, or add more users. An important note is that currently authentication works by using the username (NOT email) and the passwords should NOT contain any special characters.
+If you want to be a super user in wikimusic your token will need to have the ~wikimusic:modify-permissions~ permission, effectively meaning you can give yourself and others all wanted permissions and do everything.
+
+See more of the permissions here:
+
+- wikimusic:song-create
+- wikimusic:song-delete
+- wikimusic:artist-create
+- wikimusic:artist-delete
+- wikimusic:genre-create
+- wikimusic:genre-delete  
+- wikimusic:user-create
+- wikimusic:user-delete
+- wikimusic:modify-permissions
+
+Wikimusic requires an authenticated session for performing administrative tasks such as creating/deleting tickets and projects.
+
+Upon starting a blank new wikimusic deployment you will have no users in the database. Check in ~db/migration~ and edit the password field and salt, or add more users. An important note is that currently the passwords should NOT contain any special characters (letters and numbers are OK).
 
 Then do a ~guix shell -m manifest.scm -- art migrate up user~ to add your users.
+
 
 
 ----
