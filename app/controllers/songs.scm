@@ -763,7 +763,14 @@
                            #:needed-permissions '(wikimusic:song-create)
                            #:rc rc
                            #:happy-flow (lambda ()
-                                          (do-opinion rc 1 0))
+                                          (do-opinion rc 1 0
+                                                      (decrypt-token #:token (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")
+                                                       #:encryption-key
+                                                       encryption-key
+                                                       #:signing-key
+                                                       signing-key)))
                            #:unhappy-flow back-to-login)))
 
 (post "/songs/uuid/:uuid/dislike"
@@ -773,7 +780,14 @@
                            #:needed-permissions '(wikimusic:song-create)
                            #:rc rc
                            #:happy-flow (lambda ()
-                                          (do-opinion rc 0 1))
+                                          (do-opinion rc 0 1
+                                                      (decrypt-token #:token (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")
+                                                       #:encryption-key
+                                                       encryption-key
+                                                       #:signing-key
+                                                       signing-key)))
                            #:unhappy-flow back-to-login)))
 
 ;; ====== Delete data routes ======
@@ -895,11 +909,15 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-new-external-sources)
-          (let* ((body (rc-body rc))
+          (let* ((t (decrypt-token #:token (:cookies-value rc
+                                            "x-bewaking-wikimusic")
+                                   #:encryption-key encryption-key
+                                   #:signing-key signing-key))
+                 (body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
-                 (user-identifier (:cookies-value rc
-                                                  "wikimusic-user-identifier")))
+                 (user-identifier (assoc-ref t
+                                             'owner-id)))
             ($song_external_sources 'set
                                     #:identifier new-uuid
                                     #:song_identifier (params rc "uuid")

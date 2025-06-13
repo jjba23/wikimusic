@@ -347,7 +347,6 @@
         (define (do-edit)
           (let* ((body (rc-body rc))
                  (kv (read-url-encoded-body body)))
-            (write kv)
             (DB-query (DB-open rc)
                       (->sql update
                              'artists set
@@ -445,11 +444,15 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-new-artwork)
-          (let* ((body (rc-body rc))
+          (let* ((t (decrypt-token #:token (:cookies-value rc
+                                            "x-bewaking-wikimusic")
+                                   #:encryption-key encryption-key
+                                   #:signing-key signing-key))
+                 (body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
-                 (user-identifier (:cookies-value rc
-                                                  "wikimusic-user-identifier")))
+                 (user-identifier (assoc-ref t
+                                             'owner-id)))
             ($artist_artworks 'set
                               #:identifier new-uuid
                               #:artist_identifier (params rc "uuid")
@@ -481,11 +484,15 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-new)
-          (let* ((body (rc-body rc))
+          (let* ((t (decrypt-token #:token (:cookies-value rc
+                                            "x-bewaking-wikimusic")
+                                   #:encryption-key encryption-key
+                                   #:signing-key signing-key))
+                 (body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
-                 (user-identifier (:cookies-value rc
-                                                  "wikimusic-user-identifier")))
+                 (user-identifier (assoc-ref t
+                                             'owner-id)))
             ($artists 'set
                       #:identifier new-uuid
                       #:display_name (escape-str (uri-decode (car (assoc-ref
@@ -508,9 +515,10 @@
                            #:happy-flow do-new
                            #:unhappy-flow back-to-login)))
 
-(define (do-opinion rc is-like is-dislike)
+(define (do-opinion rc is-like is-dislike t)
   (let* ((uuid (params rc "uuid"))
-         (user-identifier (:cookies-value rc "wikimusic-user-identifier"))
+         (user-identifier (assoc-ref t
+                                     'owner-id))
          (rec (car ($artists 'get
                              #:condition (where #:identifier uuid))))
          (new-uuid (generate-string-uuid))
@@ -546,7 +554,14 @@
                            #:needed-permissions '()
                            #:rc rc
                            #:happy-flow (lambda ()
-                                          (do-opinion rc 1 0))
+                                          (do-opinion rc 1 0
+                                                      (decrypt-token #:token (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")
+                                                       #:encryption-key
+                                                       encryption-key
+                                                       #:signing-key
+                                                       signing-key)))
                            #:unhappy-flow back-to-login)))
 
 (post "/artists/uuid/:uuid/dislike"
@@ -556,7 +571,14 @@
                            #:needed-permissions '()
                            #:rc rc
                            #:happy-flow (lambda ()
-                                          (do-opinion rc 0 1))
+                                          (do-opinion rc 0 1
+                                                      (decrypt-token #:token (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")
+                                                       #:encryption-key
+                                                       encryption-key
+                                                       #:signing-key
+                                                       signing-key)))
                            #:unhappy-flow back-to-login)))
 
 ;; ====== Delete data routes ======
@@ -583,11 +605,15 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-new-external-sources)
-          (let* ((body (rc-body rc))
+          (let* ((t (decrypt-token #:token (:cookies-value rc
+                                            "x-bewaking-wikimusic")
+                                   #:encryption-key encryption-key
+                                   #:signing-key signing-key))
+                 (body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
-                 (user-identifier (:cookies-value rc
-                                                  "wikimusic-user-identifier")))
+                 (user-identifier (assoc-ref t
+                                             'owner-id)))
             ($artist_external_sources 'set
                                       #:identifier new-uuid
                                       #:artist_identifier (params rc "uuid")
