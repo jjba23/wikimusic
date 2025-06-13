@@ -73,6 +73,7 @@
                                   'x-bewaking-wikimusic
                                   #:expires (* 3600 24 7)
                                   #:path "/"
+                                  #:secure #t
                                   #:http-only #t)
                (redirect-to rc
                             (string->uri (format #f
