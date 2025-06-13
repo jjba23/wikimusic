@@ -543,7 +543,8 @@
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
                            #:rc rc
-                           #:happy-flow (lambda(rc) (do-opinion rc 1 0))
+                           #:happy-flow (lambda (rc)
+                                          (do-opinion rc 1 0))
                            #:unhappy-flow back-to-login)))
 
 (post "/artists/uuid/:uuid/dislike"
@@ -552,7 +553,8 @@
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
                            #:rc rc
-                           #:happy-flow (lambda(rc) (do-opinion rc 0 1))
+                           #:happy-flow (lambda (rc)
+                                          (do-opinion rc 0 1))
                            #:unhappy-flow back-to-login)))
 
 ;; ====== Delete data routes ======

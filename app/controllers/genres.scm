@@ -368,8 +368,7 @@
                  #:status 302)))
 
 (post "/genres/uuid/:uuid/edit"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (protected-endpoint rc
                             (lambda ()
@@ -399,8 +398,7 @@
                  #:status 302)))
 
 (post "/genres/uuid/:uuid/artworks/edit/:artwork-uuid"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:genre-create)
@@ -438,8 +436,7 @@
                  #:status 302)))
 
 (post "/genres/uuid/:uuid/artworks/new"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:genre-create)
@@ -469,8 +466,7 @@
                  #:status 302)))
 
 (post "/genres/new"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:genre-create)
@@ -508,30 +504,29 @@
                  #:status 302)))
 
 (post "/genres/uuid/:uuid/like"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
                            #:rc rc
-                           #:happy-flow (lambda(rc) (do-opinion rc 1 0))
+                           #:happy-flow (lambda (rc)
+                                          (do-opinion rc 1 0))
                            #:unhappy-flow back-to-login)))
 
 (post "/genres/uuid/:uuid/dislike"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
                            #:rc rc
-                           #:happy-flow (lambda(rc) (do-opinion rc 0 1))
+                           #:happy-flow (lambda (rc)
+                                          (do-opinion rc 0 1))
                            #:unhappy-flow back-to-login)))
 
 ;; ====== Delete data routes ======
 
 (post "/genres/uuid/:uuid/artworks/:artwork-uuid/delete"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-delete)
           (delete-artwork #:rc rc
@@ -576,8 +571,7 @@
                  #:status 302)))
 
 (post "/genres/uuid/:uuid/external-sources/:sourcesuuid/edit"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:genre-create)
@@ -615,8 +609,7 @@
                  #:status 302)))
 
 (post "/genres/uuid/:uuid/external-sources/new"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:genre-create)

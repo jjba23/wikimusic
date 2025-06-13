@@ -22,11 +22,11 @@
                       (identifier char-field
                                   (#:primary-key #:maxlen 36))
                       (username char-field
-                                    (#:not-null #:maxlen 256))
+                                (#:not-null #:maxlen 256))
                       (email char-field
-                                (#:not-null #:unique #:maxlen 256))
+                             (#:not-null #:unique #:maxlen 256))
                       (password char-field
-                                     (#:maxlen 2048))
+                                (#:maxlen 2048))
                       (salt char-field
                             (#:maxlen 36))
                       (permissions char-field

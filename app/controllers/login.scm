@@ -25,7 +25,7 @@
         (ice-9 string-fun)
         (app models users)
         (bewaking bewaking)
-        (artanis security nss)        
+        (artanis security nss)
         (ice-9 string-fun)
         (app views login))
 
@@ -60,7 +60,7 @@
                (t (generate-token #:encryption-key encryption-key
                                   #:signing-key signing-key
                                   #:get-owner-details get-owner-details)))
-
+          
           (cond
             ((equal? (string->sha-256 (string-append password
                                                      (assoc-ref (car u) "salt")))

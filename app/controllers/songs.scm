@@ -17,7 +17,6 @@
 
 (define-artanis-controller songs)
 
-(import (app views songs))
 (import (wikimusic html)
         (wikimusic url)
         (wikimusic domain)
@@ -39,6 +38,7 @@
         (app models song_genres)
         (app models song_external_sources)
         (uuid generate)
+        (app views songs)
         (app views song-contents)
         (wikimusic query-escape)
         (app models users)
@@ -421,12 +421,13 @@
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/edit"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-edit rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow do-edit
+                           #:unhappy-flow back-to-login)))
 
 (define (do-contents-edit rc)
   (let* ((body (rc-body rc))
@@ -458,12 +459,13 @@
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/contents/:version-uuid/edit"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-contents-edit rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow do-contents-edit
+                           #:unhappy-flow back-to-login)))
 
 (define (do-edit-artwork rc)
   (let* ((body (rc-body rc))
@@ -489,12 +491,13 @@
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/artworks/edit/:artwork-uuid"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-edit-artwork rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow do-edit-artwork
+                           #:unhappy-flow back-to-login)))
 
 ;; 
 ;; ====== Data create POST routes ======
@@ -534,12 +537,13 @@
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/contents/new"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-new-content rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow do-new-content
+                           #:unhappy-flow back-to-login)))
 
 (define (do-new-artwork rc)
   (let* ((body (rc-body rc))
@@ -567,12 +571,13 @@
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/artworks/new"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-new-artwork rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow do-new-artwork
+                           #:unhappy-flow back-to-login)))
 
 (define (do-new-song-artist rc)
   (let* ((body (rc-body rc))
@@ -603,12 +608,13 @@
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/artists"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-new-song-artist rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow do-new-song-artist
+                           #:unhappy-flow back-to-login)))
 
 (define (do-new-song-genre rc)
   (let* ((body (rc-body rc))
@@ -639,12 +645,13 @@
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/genres"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-new-song-genre rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow do-new-song-genre
+                           #:unhappy-flow back-to-login)))
 
 (define (do-new rc)
   (let* ((body (rc-body rc))
@@ -677,12 +684,13 @@
                  #:status 302)))
 
 (post "/songs/new"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-new rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow do-new
+                           #:unhappy-flow back-to-login)))
 
 (define (do-opinion rc is-like is-dislike)
   (let* ((uuid (params rc "uuid"))
@@ -715,26 +723,29 @@
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/like"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-opinion rc 1 0)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow (lambda (rc)
+                                          (do-opinion rc 1 0))
+                           #:unhappy-flow back-to-login)))
 
 (post "/songs/uuid/:uuid/dislike"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-opinion rc 0 1)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow (lambda (rc)
+                                          (do-opinion rc 0 1))
+                           #:unhappy-flow back-to-login)))
 
 ;; ====== Delete data routes ======
 
 (post "/songs/uuid/:uuid/artworks/:artwork-uuid/delete"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-delete)
           (delete-artwork #:rc rc
@@ -745,11 +756,14 @@
                           #:redirect-url (format #f "~a/songs/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))
-        (protected-endpoint rc do-delete)))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-delete)
+                           #:rc rc
+                           #:happy-flow do-delete
+                           #:unhappy-flow back-to-login)))
 
 (post "/songs/uuid/:uuid/contents/:version-uuid/delete"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-delete)
           (DB-query (DB-open rc)
@@ -761,41 +775,53 @@
                                             (current-myhost)
                                             (params rc "uuid")))
                        #:status 302))
-        (protected-endpoint rc do-delete)))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-delete)
+                           #:rc rc
+                           #:happy-flow do-delete
+                           #:unhappy-flow back-to-login)))
+
+(define (do-delete-artist rc)
+  (DB-query (DB-open rc)
+            (->sql delete from
+                   'song_artists
+                   (where #:artist_identifier (params rc "artist-uuid")
+                          #:song_identifier (params rc "uuid"))))
+  (redirect-to rc
+               (string->uri (format #f "~a/songs/uuid/~a/edit"
+                                    (current-myhost)
+                                    (params rc "uuid")))
+               #:status 302))
 
 (post "/songs/uuid/:uuid/artists/:artist-uuid/delete"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (define (do-delete)
-          (DB-query (DB-open rc)
-                    (->sql delete from
-                           'song_artists
-                           (where #:artist_identifier (params rc "artist-uuid")
-                                  #:song_identifier (params rc "uuid"))))
-          (redirect-to rc
-                       (string->uri (format #f "~a/songs/uuid/~a/edit"
-                                            (current-myhost)
-                                            (params rc "uuid")))
-                       #:status 302))
-        (protected-endpoint rc do-delete)))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-delete)
+                           #:rc rc
+                           #:happy-flow do-delete-artist
+                           #:unhappy-flow back-to-login)))
+
+(define (do-delete-genre rc)
+  (DB-query (DB-open rc)
+            (->sql delete from
+                   'song_genres
+                   (where #:genre_identifier (params rc "genre-uuid")
+                          #:song_identifier (params rc "uuid"))))
+  (redirect-to rc
+               (string->uri (format #f "~a/songs/uuid/~a/edit"
+                                    (current-myhost)
+                                    (params rc "uuid")))
+               #:status 302))
 
 (post "/songs/uuid/:uuid/genres/:genre-uuid/delete"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (define (do-delete)
-          (DB-query (DB-open rc)
-                    (->sql delete from
-                           'song_genres
-                           (where #:genre_identifier (params rc "genre-uuid")
-                                  #:song_identifier (params rc "uuid"))))
-          (redirect-to rc
-                       (string->uri (format #f "~a/songs/uuid/~a/edit"
-                                            (current-myhost)
-                                            (params rc "uuid")))
-                       #:status 302))
-        (protected-endpoint rc do-delete)))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-delete)
+                           #:rc rc
+                           #:happy-flow do-delete-genre
+                           #:unhappy-flow back-to-login)))
 
 (define (do-edit-external-sources rc)
   (let* ((body (rc-body rc))
@@ -825,12 +851,13 @@
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/external-sources/:sourcesuuid/edit"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-edit-external-sources rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow do-edit-external-sources
+                           #:unhappy-flow back-to-login)))
 
 (define (do-new-external-sources rc)
   (let* ((body (rc-body rc))
@@ -862,9 +889,10 @@
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/external-sources/new"
-      #:auth '(table users "username" "password_hash")
-      #:session #t
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-new-external-sources rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:song-create)
+                           #:rc rc
+                           #:happy-flow do-new-external-sources
+                           #:unhappy-flow back-to-login)))
