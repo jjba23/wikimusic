@@ -402,9 +402,11 @@
       #:auth '(table users "username" "password_hash")
       #:session #t
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-edit-artwork rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:genre-create)
+                           #:rc rc
+                           #:happy-flow do-edit-artwork
+                           #:unhappy-flow back-to-login)))
 
 ;; 
 ;; ====== Data create POST routes ======
@@ -439,9 +441,11 @@
       #:auth '(table users "username" "password_hash")
       #:session #t
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-new-artwork rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:genre-create)
+                           #:rc rc
+                           #:happy-flow do-new-artwork
+                           #:unhappy-flow back-to-login)))
 
 (define (do-new rc)
   (let* ((body (rc-body rc))
@@ -468,9 +472,11 @@
       #:auth '(table users "username" "password_hash")
       #:session #t
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-new rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:genre-create)
+                           #:rc rc
+                           #:happy-flow do-new
+                           #:unhappy-flow back-to-login)))
 
 (define (do-opinion rc is-like is-dislike)
   (let* ((uuid (params rc "uuid"))
@@ -484,7 +490,6 @@
                         ($genre_opinions 'get
                                          #:condition (where #:genre_identifier
                                                             uuid)))))
-    (write rec)
     (if (not (nil? ex-op))
         ($genre_opinions 'mod
                          'row-delete
@@ -506,17 +511,21 @@
       #:auth '(table users "username" "password_hash")
       #:session #t
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-opinion rc 1 0)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '()
+                           #:rc rc
+                           #:happy-flow (lambda(rc) (do-opinion rc 1 0))
+                           #:unhappy-flow back-to-login)))
 
 (post "/genres/uuid/:uuid/dislike"
       #:auth '(table users "username" "password_hash")
       #:session #t
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-opinion rc 0 1)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '()
+                           #:rc rc
+                           #:happy-flow (lambda(rc) (do-opinion rc 0 1))
+                           #:unhappy-flow back-to-login)))
 
 ;; ====== Delete data routes ======
 
@@ -533,7 +542,11 @@
                           #:redirect-url (format #f "~a/genres/uuid/~a/edit"
                                                  (current-myhost)
                                                  (params rc "uuid"))))
-        (protected-endpoint rc do-delete)))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:genre-delete)
+                           #:rc rc
+                           #:happy-flow do-delete
+                           #:unhappy-flow back-to-login)))
 
 (define (do-edit-external-sources rc)
   (let* ((body (rc-body rc))
@@ -566,9 +579,11 @@
       #:auth '(table users "username" "password_hash")
       #:session #t
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-edit-external-sources rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:genre-create)
+                           #:rc rc
+                           #:happy-flow do-edit-external-sources
+                           #:unhappy-flow back-to-login)))
 
 (define (do-new-external-sources rc)
   (let* ((body (rc-body rc))
@@ -603,6 +618,8 @@
       #:auth '(table users "username" "password_hash")
       #:session #t
       (lambda (rc)
-        (protected-endpoint rc
-                            (lambda ()
-                              (do-new-external-sources rc)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:genre-create)
+                           #:rc rc
+                           #:happy-flow do-new-external-sources
+                           #:unhappy-flow back-to-login)))

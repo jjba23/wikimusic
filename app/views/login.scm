@@ -28,48 +28,32 @@
   #:export (login-page))
 
 (define* (login-page G_)
-  (html-template G_
-                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
-                              (,(h2 (G_ "login to wikimusic")) (div (form (@ (action
-                                                                              "/login")
-                                                                             (class ,
-                                                                              (mk-class '
-                                                                               (w-full
-                                                                                rounded-xl
-                                                                                bg-stone-200/75
-                                                                                dark:bg-stone-900
-                                                                                p-4
-                                                                                flex
-                                                                                flex-row
-                                                                                flex-wrap
-                                                                                items-center
-                                                                                gap-4
-                                                                                align-center)))
-                                                                             (method
-                                                                              POST))
-                                                                          ,(input
-                                                                            #:label
-                                                                            (G_
-                                                                             "username")
-                                                                            #:name
-                                                                            "username"
-                                                                            #:value
-                                                                            ""
-                                                                            #:required
-                                                                            #t)
-                                                                          ,(input
-                                                                            #:label
-                                                                            (G_
-                                                                             "password")
-                                                                            #:name
-                                                                            "password_hash"
-                                                                            #:value
-                                                                            ""
-                                                                            #:type 'password
-                                                                            #:required
-                                                                            #t)
-                                                                          (div ,
-                                                                           (submit-button
-                                                                            (G_
-                                                                             "login")))))))))
+  (let* ((login-form `(div (form (@ (action "/login")
+                                    (class ,(mk-class '(w-full rounded-xl
+                                                        bg-stone-200/75
+                                                        dark:bg-stone-900
+                                                        p-4
+                                                        flex
+                                                        flex-row
+                                                        flex-wrap
+                                                        items-center
+                                                        gap-4
+                                                        shadow-md
+                                                        align-center)))
+                                    (method POST))
+                                 ,(input #:label (G_ "email")
+                                         #:name "email"
+                                         #:type 'email
+                                         #:value ""
+                                         #:required #t)
+                                 ,(input #:label (G_ "password")
+                                         #:name "password_hash"
+                                         #:value ""
+                                         #:type 'password
+                                         #:required #t)
+                                 (div ,(submit-button (G_ "login"))))))
+         (login-body `(div (@ (class ,(mk-class '(container mx-auto))))
+                           (,(h2 (G_ "login to wikimusic")) ,login-form))))
+    (html-template G_
+                   #:body login-body)))
 

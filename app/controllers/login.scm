@@ -19,8 +19,13 @@
 
 (import (wikimusic html)
         (wikimusic url)
+        (wikimusic env)
         (web uri)
+        (wikimusic auth)
+        (ice-9 string-fun)
         (app models users)
+        (bewaking bewaking)
+        (artanis security nss)        
         (ice-9 string-fun)
         (app views login))
 
@@ -32,48 +37,47 @@
                              (login-page (:i18n rc))))))
 
 (post "/login"
-      #:auth '(table users "username" "password_hash")
-      #:session '(spawn "wikimusic-sid")
-      #:cookies '(names wikimusic-user-identifier)
+      #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
-               (username (uri-decode (car (assoc-ref kv "username"))))
-               (u ($users 'get
-                          #:ret 'top
-                          #:condition (where #:username username)))
-               (identifier (if (not (nil? u))
-                               (assoc-ref (car u) "identifier") #f)))
+               (email (uri-decode (car (assoc-ref kv "email"))))
+               (password (uri-decode (car (assoc-ref kv "password"))))
+               (u ($user 'get
+                         #:ret 'top
+                         #:condition (where #:email email)))
+               (get-owner-details (lambda ()
+                                    `((id unquote
+                                          (assoc-ref (car u) "id"))
+                                      (email unquote
+                                             (assoc-ref (car u) "email"))
+                                      (name unquote
+                                            (assoc-ref (car u) "username"))
+                                      (permissions unquote
+                                                   (eval-string (assoc-ref (car
+                                                                            u)
+                                                                 "permissions"))))))
+               (t (generate-token #:encryption-key encryption-key
+                                  #:signing-key signing-key
+                                  #:get-owner-details get-owner-details)))
+
           (cond
-            ((:session rc
-                       '(check "wikimusic-sid"))
-             (:cookies-set! rc
-                            'wikimusic-user-identifier
-                            "wikimusic-user-identifier" identifier)
-             (:cookies-setattr! rc
-                                'wikimusic-user-identifier
-                                #:expires 12000000
-                                #:path "/"
-                                #:http-only #t)
-             (redirect-to rc
-                          (string->uri (format #f "~a/songs"
-                                               (current-myhost)))
-                          #:status 302))
-            ((:auth rc)
-             (:session rc
-                       '(check-and-spawn "wikimusic-sid"))
-             (:cookies-set! rc
-                            'wikimusic-user-identifier
-                            "wikimusic-user-identifier" identifier)
-             (:cookies-setattr! rc
-                                'wikimusic-user-identifier
-                                #:expires 12000000
-                                #:path "/"
-                                #:http-only #t)
-             (redirect-to rc
-                          (string->uri (format #f "~a/songs"
-                                               (current-myhost)))
-                          #:status 302))
+            ((equal? (string->sha-256 (string-append password
+                                                     (assoc-ref (car u) "salt")))
+                     (assoc-ref (car u) "password"))
+             (begin
+               (:cookies-set! rc
+                              'x-bewaking-wikimusic "x-bewaking-wikimusic" t)
+               (:cookies-setattr! rc
+                                  'x-bewaking-wikimusic
+                                  #:expires (* 3600 24 7)
+                                  #:path "/"
+                                  #:http-only #t)
+               (redirect-to rc
+                            (string->uri (format #f
+                                          "~a/song?login_succeeded=true"
+                                          (current-myhost)))
+                            #:status 302)))
             (else (redirect-to rc
                                (string->uri (format #f
                                              "~a/login?login_failed=true"
