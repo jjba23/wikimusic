@@ -450,13 +450,11 @@
                                                                           flex-row
                                                                           gap-2))))
                                                    ,(em (format #f
-                                                         "~a (~a) &lt;~a&gt;"
-                                                         (assoc-ref u
-                                                          "display_name")
+                                                         "~a &lt;~a&gt;"
                                                          (assoc-ref u
                                                           "username")
                                                          (assoc-ref u
-                                                          "email_address")))))
+                                                          "email")))))
                                            (car (assoc-ref user-alist
                                                            (assoc-ref x
                                                             "created_by")))))

@@ -36,6 +36,7 @@
         (app models song_contents)
         (wikimusic query-escape)
         (uuid generate)
+        (bewaking bewaking)
         (app models users)
         (app views songs)
         (app views artists))
@@ -183,9 +184,8 @@
                                     (car raw-external-sources)))
               (users ($users 'get
                              #:ret 'all
-                             #:order-by '(display_name asc)
-                             #:columns '(identifier display_name email_address
-                                                    username avatar_url)))
+                             #:order-by '(username asc)
+                             #:columns '(identifier username email)))
               (user-alist (map (lambda (u)
                                  `(,(assoc-ref u "identifier") ,u)) users))
 
@@ -341,97 +341,96 @@
 
 ;; ====== Data edit POST routes ======
 
-(define (do-edit rc)
-  (let* ((body (rc-body rc))
-         (kv (read-url-encoded-body body)))
-    (write kv)
-    (DB-query (DB-open rc)
-              (->sql update
-                     'artists set
-                     `((display_name ,(escape-str (uri-decode (car (assoc-ref
-                                                                    kv
-                                                                    "display-name")))))
-                       (description ,(escape-str (uri-decode (car (assoc-ref
-                                                                   kv
-                                                                   "description")))))
-                       (last_edited_at ,(current-time)))
-                     (where #:identifier (params rc "uuid"))))
-    (redirect-to rc
-                 (string->uri (format #f "~a/artists/uuid/~a"
-                                      (current-myhost)
-                                      (params rc "uuid")))
-                 #:status 302)))
-
 (post "/artists/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
+        (define (do-edit)
+          (let* ((body (rc-body rc))
+                 (kv (read-url-encoded-body body)))
+            (write kv)
+            (DB-query (DB-open rc)
+                      (->sql update
+                             'artists set
+                             `((display_name ,(escape-str (uri-decode (car (assoc-ref
+                                                                            kv
+                                                                            "display-name")))))
+                               (description ,(escape-str (uri-decode (car (assoc-ref
+                                                                           kv
+                                                                           "description")))))
+                               (last_edited_at ,(current-time)))
+                             (where #:identifier (params rc "uuid"))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/artists/uuid/~a"
+                                              (current-myhost)
+                                              (params rc "uuid")))
+                         #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:artist-create)
                            #:rc rc
                            #:happy-flow do-edit
                            #:unhappy-flow back-to-login)))
 
-(define (do-edit-external-sources rc)
-  (let* ((body (rc-body rc))
-         (kv (read-url-encoded-body body)))
-    (DB-query (DB-open rc)
-              (->sql update
-                     'artist_external_sources set
-                     `((wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
-                                                                     kv
-                                                                     "wikipedia-url")))))
-                       (spotify_url ,(escape-str (uri-decode (car (assoc-ref
-                                                                   kv
-                                                                   "spotify-url")))))
-                       (youtube_url ,(escape-str (uri-decode (car (assoc-ref
-                                                                   kv
-                                                                   "youtube-url")))))
-                       (soundcloud_url ,(escape-str (uri-decode (car (assoc-ref
-                                                                      kv
-                                                                      "soundcloud-url")))))
-                       (last_edited_at ,(current-time)))
-                     (where #:identifier (params rc "sourcesuuid"))))
-    (redirect-to rc
-                 (string->uri (format #f "~a/artists/uuid/~a"
-                                      (current-myhost)
-                                      (params rc "uuid")))
-                 #:status 302)))
-
 (post "/artists/uuid/:uuid/external-sources/:sourcesuuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
+        (define (do-edit-external-sources)
+          (let* ((body (rc-body rc))
+                 (kv (read-url-encoded-body body)))
+            (DB-query (DB-open rc)
+                      (->sql update
+                             'artist_external_sources set
+                             `((wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                             kv
+                                                                             "wikipedia-url")))))
+                               (spotify_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                           kv
+                                                                           "spotify-url")))))
+                               (youtube_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                           kv
+                                                                           "youtube-url")))))
+                               (soundcloud_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                              kv
+                                                                              "soundcloud-url")))))
+                               (last_edited_at ,(current-time)))
+                             (where #:identifier (params rc "sourcesuuid"))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/artists/uuid/~a"
+                                              (current-myhost)
+                                              (params rc "uuid")))
+                         #:status 302)))
+
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:artist-create)
                            #:rc rc
                            #:happy-flow do-edit-external-sources
                            #:unhappy-flow back-to-login)))
 
-(define (do-edit-artwork rc)
-  (let* ((body (rc-body rc))
-         (kv (read-url-encoded-body body)))
-    (DB-query (DB-open rc)
-              (->sql update
-                     'artist_artworks set
-                     `((content_url ,(escape-str (uri-decode (car (assoc-ref
-                                                                   kv
-                                                                   "content-url")))))
-                       (content_caption ,(escape-str (uri-decode (car (assoc-ref
-                                                                       kv
-                                                                       "content-caption")))))
-                       (order_value ,(escape-str (uri-decode (car (assoc-ref
-                                                                   kv
-                                                                   "order-value")))))
-                       (last_edited_at ,(current-time)))
-                     (where #:identifier (params rc "artwork-uuid"))))
-    (redirect-to rc
-                 (string->uri (format #f "~a/artists/uuid/~a/edit"
-                                      (current-myhost)
-                                      (params rc "uuid")))
-                 #:status 302)))
-
 (post "/artists/uuid/:uuid/artworks/edit/:artwork-uuid"
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
+        (define (do-edit-artwork)
+          (let* ((body (rc-body rc))
+                 (kv (read-url-encoded-body body)))
+            (DB-query (DB-open rc)
+                      (->sql update
+                             'artist_artworks set
+                             `((content_url ,(escape-str (uri-decode (car (assoc-ref
+                                                                           kv
+                                                                           "content-url")))))
+                               (content_caption ,(escape-str (uri-decode (car (assoc-ref
+                                                                               kv
+                                                                               "content-caption")))))
+                               (order_value ,(escape-str (uri-decode (car (assoc-ref
+                                                                           kv
+                                                                           "order-value")))))
+                               (last_edited_at ,(current-time)))
+                             (where #:identifier (params rc "artwork-uuid"))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/artists/uuid/~a/edit"
+                                              (current-myhost)
+                                              (params rc "uuid")))
+                         #:status 302)))
+
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:artist-create)
                            #:rc rc
@@ -442,64 +441,67 @@
 ;; ====== Data create POST routes ======
 ;; 
 
-(define (do-new-artwork rc)
-  (let* ((body (rc-body rc))
-         (kv (read-url-encoded-body body))
-         (new-uuid (generate-string-uuid))
-         (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
-    ($artist_artworks 'set
-                      #:identifier new-uuid
-                      #:artist_identifier (params rc "uuid")
-                      #:created_by user-identifier
-                      #:visibility_status 0
-                      #:content_url (escape-str (uri-decode (car (assoc-ref kv
-                                                                  "content-url"))))
-                      #:content_caption (escape-str (uri-decode (car (assoc-ref
-                                                                      kv
-                                                                      "content-caption"))))
-                      #:order_value (escape-str (uri-decode (car (assoc-ref kv
-                                                                  "order-value"))))
-                      #:created_at (current-time))
-
-    (redirect-to rc
-                 (string->uri (format #f "~a/artists/uuid/~a/edit"
-                                      (current-myhost)
-                                      (params rc "uuid")))
-                 #:status 302)))
-
 (post "/artists/uuid/:uuid/artworks/new"
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
+        (define (do-new-artwork)
+          (let* ((body (rc-body rc))
+                 (kv (read-url-encoded-body body))
+                 (new-uuid (generate-string-uuid))
+                 (user-identifier (:cookies-value rc
+                                                  "wikimusic-user-identifier")))
+            ($artist_artworks 'set
+                              #:identifier new-uuid
+                              #:artist_identifier (params rc "uuid")
+                              #:created_by user-identifier
+                              #:visibility_status 0
+                              #:content_url (escape-str (uri-decode (car (assoc-ref
+                                                                          kv
+                                                                          "content-url"))))
+                              #:content_caption (escape-str (uri-decode (car (assoc-ref
+                                                                              kv
+                                                                              "content-caption"))))
+                              #:order_value (escape-str (uri-decode (car (assoc-ref
+                                                                          kv
+                                                                          "order-value"))))
+                              #:created_at (current-time))
+
+            (redirect-to rc
+                         (string->uri (format #f "~a/artists/uuid/~a/edit"
+                                              (current-myhost)
+                                              (params rc "uuid")))
+                         #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:artist-create)
                            #:rc rc
                            #:happy-flow do-new-artwork
                            #:unhappy-flow back-to-login)))
 
-(define (do-new rc)
-  (let* ((body (rc-body rc))
-         (kv (read-url-encoded-body body))
-         (new-uuid (generate-string-uuid))
-         (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
-    ($artists 'set
-              #:identifier new-uuid
-              #:display_name (escape-str (uri-decode (car (assoc-ref kv
-                                                           "display-name"))))
-              #:description (escape-str (uri-decode (car (assoc-ref kv
-                                                          "description"))))
-              #:created_by user-identifier
-              #:visibility_status 0
-              #:views 0
-              #:created_at (current-time))
-
-    (redirect-to rc
-                 (string->uri (format #f "~a/artists/uuid/~a"
-                                      (current-myhost) new-uuid))
-                 #:status 302)))
-
 (post "/artists/new"
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
+        (define (do-new)
+          (let* ((body (rc-body rc))
+                 (kv (read-url-encoded-body body))
+                 (new-uuid (generate-string-uuid))
+                 (user-identifier (:cookies-value rc
+                                                  "wikimusic-user-identifier")))
+            ($artists 'set
+                      #:identifier new-uuid
+                      #:display_name (escape-str (uri-decode (car (assoc-ref
+                                                                   kv
+                                                                   "display-name"))))
+                      #:description (escape-str (uri-decode (car (assoc-ref kv
+                                                                  "description"))))
+                      #:created_by user-identifier
+                      #:visibility_status 0
+                      #:views 0
+                      #:created_at (current-time))
+
+            (redirect-to rc
+                         (string->uri (format #f "~a/artists/uuid/~a"
+                                              (current-myhost) new-uuid))
+                         #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:artist-create)
                            #:rc rc
@@ -543,7 +545,7 @@
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
                            #:rc rc
-                           #:happy-flow (lambda (rc)
+                           #:happy-flow (lambda ()
                                           (do-opinion rc 1 0))
                            #:unhappy-flow back-to-login)))
 
@@ -553,7 +555,7 @@
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
                            #:rc rc
-                           #:happy-flow (lambda (rc)
+                           #:happy-flow (lambda ()
                                           (do-opinion rc 0 1))
                            #:unhappy-flow back-to-login)))
 
@@ -577,38 +579,43 @@
                            #:happy-flow do-delete
                            #:unhappy-flow back-to-login)))
 
-(define (do-new-external-sources rc)
-  (let* ((body (rc-body rc))
-         (kv (read-url-encoded-body body))
-         (new-uuid (generate-string-uuid))
-         (user-identifier (:cookies-value rc "wikimusic-user-identifier")))
-    ($artist_external_sources 'set
-                              #:identifier new-uuid
-                              #:artist_identifier (params rc "uuid")
-                              #:wikipedia_url (escape-str (uri-decode (car (assoc-ref
-                                                                            kv
-                                                                            "wikipedia-url"))))
-                              #:soundcloud_url (escape-str (uri-decode (car (assoc-ref
-                                                                             kv
-                                                                             "soundcloud-url"))))
-                              #:youtube_url (escape-str (uri-decode (car (assoc-ref
-                                                                          kv
-                                                                          "youtube-url"))))
-                              #:spotify_url (escape-str (uri-decode (car (assoc-ref
-                                                                          kv
-                                                                          "spotify-url"))))
-                              #:created_by user-identifier
-                              #:created_at (current-time))
-
-    (redirect-to rc
-                 (string->uri (format #f "~a/artists/uuid/~a"
-                                      (current-myhost)
-                                      (params rc "uuid")))
-                 #:status 302)))
-
 (post "/artists/uuid/:uuid/external-sources/new"
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
+        (define (do-new-external-sources)
+          (let* ((body (rc-body rc))
+                 (kv (read-url-encoded-body body))
+                 (new-uuid (generate-string-uuid))
+                 (user-identifier (:cookies-value rc
+                                                  "wikimusic-user-identifier")))
+            ($artist_external_sources 'set
+                                      #:identifier new-uuid
+                                      #:artist_identifier (params rc "uuid")
+                                      #:wikipedia_url (escape-str (uri-decode (car
+                                                                               (assoc-ref
+                                                                                kv
+                                                                                "wikipedia-url"))))
+                                      #:soundcloud_url (escape-str (uri-decode
+                                                                    (car (assoc-ref
+                                                                          kv
+                                                                          "soundcloud-url"))))
+                                      #:youtube_url (escape-str (uri-decode (car
+                                                                             (assoc-ref
+                                                                              kv
+                                                                              "youtube-url"))))
+                                      #:spotify_url (escape-str (uri-decode (car
+                                                                             (assoc-ref
+                                                                              kv
+                                                                              "spotify-url"))))
+                                      #:created_by user-identifier
+                                      #:created_at (current-time))
+
+            (redirect-to rc
+                         (string->uri (format #f "~a/artists/uuid/~a"
+                                              (current-myhost)
+                                              (params rc "uuid")))
+                         #:status 302)))
+
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:artist-create)
                            #:rc rc

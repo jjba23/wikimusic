@@ -24,6 +24,7 @@
         (wikimusic auth)
         (ice-9 string-fun)
         (app models users)
+        (wikimusic env)
         (bewaking bewaking)
         (artanis security nss)
         (ice-9 string-fun)
@@ -43,12 +44,12 @@
                (kv (read-url-encoded-body body))
                (email (uri-decode (car (assoc-ref kv "email"))))
                (password (uri-decode (car (assoc-ref kv "password"))))
-               (u ($user 'get
-                         #:ret 'top
-                         #:condition (where #:email email)))
+               (u ($users 'get
+                          #:ret 'top
+                          #:condition (where #:email email)))
                (get-owner-details (lambda ()
                                     `((id unquote
-                                          (assoc-ref (car u) "id"))
+                                          (assoc-ref (car u) "identifier"))
                                       (email unquote
                                              (assoc-ref (car u) "email"))
                                       (name unquote
@@ -75,7 +76,7 @@
                                   #:http-only #t)
                (redirect-to rc
                             (string->uri (format #f
-                                          "~a/song?login_succeeded=true"
+                                          "~a/songs?login_succeeded=true"
                                           (current-myhost)))
                             #:status 302)))
             (else (redirect-to rc

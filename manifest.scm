@@ -147,6 +147,33 @@ easing the learning curve, and reducing the cognitive load.")
      "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
     (license license:lgpl3+)))
 
+(define-public guile-bewaking
+  (package
+    (name "guile-bewaking")
+    (version "0.0.23")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/bewaking.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1gphng3s60f871z1snd8424q25s7mp1a8dl0g9j4wfjcyl0j3m1y"))))
+    (build-system guile-build-system)
+    (native-inputs (list guile-uuid guile-gcrypt guile-3.0))
+    (arguments
+     (list
+      #:source-directory "src"))
+    (home-page "https://codeberg.org/jjba23/bewaking")
+    (synopsis
+     "DSL and helpers for authentication/authorization in Guile Scheme projects")
+    (description
+     "bewaking helps you create and verify lifetime-limited encrypted digital credentials that carry
+specific user information securely, protected through multiple layers of cryptographic
+and obfuscation techniques, a.k.a secure tokens.")
+    (license license:lgpl3+)))
+
 (packages->manifest (list (specification->package "make")
                           (specification->package "gettext")
                           guile-next
@@ -156,6 +183,7 @@ easing the learning curve, and reducing the cognitive load.")
                           guile-hygguile
                           guile-kracht
                           guile-orgwebalchemy
+                          guile-bewaking
                           sqlite
                           guile-gcrypt
                           watchexec

@@ -22,3 +22,10 @@
  (textdomain "translate")
  ;; Set base locale for gettext at startup
  (setlocale LC_MESSAGES "en_US.UTF-8")
+
+(catch #t
+  (lambda()
+    (display "\nloading env.scm\n")
+    (load "env.scm"))
+  (lambda(key . args)
+    (display (format #f "error loading env.scm: ~a: ~a" key args))))

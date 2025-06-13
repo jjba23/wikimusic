@@ -47,7 +47,7 @@
                                          #:value ""
                                          #:required #t)
                                  ,(input #:label (G_ "password")
-                                         #:name "password_hash"
+                                         #:name "password"
                                          #:value ""
                                          #:type 'password
                                          #:required #t)
