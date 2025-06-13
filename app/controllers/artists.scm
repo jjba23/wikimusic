@@ -65,6 +65,7 @@
                                                'wikimusic-artist-sort
                                                #:expires 12000000
                                                #:path "/"
+                                               #:secure #t
                                                #:http-only #t)
                             (get-from-qstr rc "sort"))
                            ((not (equal? #f
@@ -201,6 +202,7 @@
                                                     'wikimusic-song-sort
                                                     #:expires 12000000
                                                     #:path "/"
+                                                    #:secure #t
                                                     #:http-only #t)
                                  (get-from-qstr rc "sort"))
                                 ((not (equal? #f
