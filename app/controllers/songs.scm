@@ -414,6 +414,11 @@
                                (description ,(escape-str (uri-decode (car (assoc-ref
                                                                            kv
                                                                            "description")))))
+                               (music_key ,(escape-str (uri-decode (car (assoc-ref kv "music-key")))))
+                               (music_tuning ,(escape-str (uri-decode (car (assoc-ref kv "music-tuning")))))
+                               (music_creation_date ,(escape-str (uri-decode (car (assoc-ref kv "music-creation-date")))))
+                               (album_name ,(escape-str (uri-decode (car (assoc-ref kv "album-name")))))
+                               (album_info_link ,(escape-str (uri-decode (car (assoc-ref kv "album-info-link")))))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "uuid"))))
             (redirect-to rc
