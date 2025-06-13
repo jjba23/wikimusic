@@ -453,8 +453,7 @@
                                                          "~a &lt;~a&gt;"
                                                          (assoc-ref u
                                                           "username")
-                                                         (assoc-ref u
-                                                          "email")))))
+                                                         (assoc-ref u "email")))))
                                            (car (assoc-ref user-alist
                                                            (assoc-ref x
                                                             "created_by")))))
