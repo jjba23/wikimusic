@@ -22,6 +22,7 @@
         (wikimusic controller)
         (wikimusic url)
         (ice-9 string-fun)
+        (wikimusic env)
         (wikimusic auth)
         (wikimusic domain)
         (app models artists)
@@ -72,7 +73,6 @@
                             (:cookies-value rc "wikimusic-artist-sort"))
                            (else "display-name-asc")))
               (query-sort (entity-sort-from-query user-sort))
-              (_ (write query-sort))
               (query-offset (cond
                               ((not (nil? (get-from-qstr rc "offset")))
                                (string->number (get-from-qstr rc "offset")))
@@ -529,7 +529,6 @@
                                           #:condition (where
                                                              #:artist_identifier
                                                              uuid)))))
-    (write rec)
     (if (not (nil? ex-op))
         ($artist_opinions 'mod
                           'row-delete

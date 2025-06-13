@@ -26,6 +26,7 @@
         (wikimusic auth)
         (app models songs)
         (app models genres)
+        (wikimusic env)
         (app models artists)
         (app models song_artworks)
         (app models song_contents)
@@ -258,9 +259,7 @@
                                     '()
                                     (car raw-external-sources)))
               (users ($users 'get
-                             #:ret 'all
-                             #:order-by '(username asc)
-                             #:columns '(identifier username email)))
+                             #:ret 'all))
               (user-alist (map (lambda (u)
                                  `(,(assoc-ref u "identifier") ,u)) users))
               (song-contents ($song_contents 'get
@@ -514,7 +513,7 @@
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
-                                             'owner-identifier)))
+                                             'owner-id)))
             ($song_contents 'set
                             #:identifier new-uuid
                             #:song_identifier (params rc "uuid")
@@ -563,30 +562,28 @@
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
-                                             'owner-identifier))
-                 ($song_artworks 'set
-                                 #:identifier new-uuid
-                                 #:song_identifier (params rc "uuid")
-                                 #:created_by user-identifier
-                                 #:visibility_status 0
-                                 #:content_url (escape-str (uri-decode (car (assoc-ref
-                                                                             kv
-                                                                             "content-url"))))
-                                 #:content_caption (escape-str (uri-decode (car
-                                                                            (assoc-ref
-                                                                             kv
-                                                                             "content-caption"))))
-                                 #:order_value (escape-str (uri-decode (car (assoc-ref
-                                                                             kv
-                                                                             "order-value"))))
-                                 #:created_at (current-time))
+                                             'owner-id)))
+            ($song_artworks 'set
+                            #:identifier new-uuid
+                            #:song_identifier (params rc "uuid")
+                            #:created_by user-identifier
+                            #:visibility_status 0
+                            #:content_url (escape-str (uri-decode (car (assoc-ref
+                                                                        kv
+                                                                        "content-url"))))
+                            #:content_caption (escape-str (uri-decode (car (assoc-ref
+                                                                            kv
+                                                                            "content-caption"))))
+                            #:order_value (escape-str (uri-decode (car (assoc-ref
+                                                                        kv
+                                                                        "order-value"))))
+                            #:created_at (current-time))
 
-                 (redirect-to rc
-                              (string->uri (format #f "~a/songs/uuid/~a/edit"
-                                                   (current-myhost)
-                                                   (params rc "uuid")))
-                              #:status 302))
-            ))
+            (redirect-to rc
+                         (string->uri (format #f "~a/songs/uuid/~a/edit"
+                                              (current-myhost)
+                                              (params rc "uuid")))
+                         #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:song-create)
                            #:rc rc
@@ -605,7 +602,7 @@
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
-                                             'owner-identifier))
+                                             'owner-id))
                  (artist ($artists 'get
                                    #:ret 'top
                                    #:condition (where #:identifier (uri-decode
@@ -648,7 +645,7 @@
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
-                                             'owner-identifier))
+                                             'owner-id))
                  (genre ($genres 'get
                                  #:ret 'top
                                  #:condition (where #:identifier (uri-decode (car
@@ -691,7 +688,7 @@
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
-                                             'owner-identifier)))
+                                             'owner-id)))
             ($songs 'set
                     #:identifier new-uuid
                     #:display_name (escape-str (uri-decode (car (assoc-ref kv
@@ -728,7 +725,7 @@
 (define (do-opinion rc is-like is-dislike t)
   (let* ((uuid (params rc "uuid"))
          (user-identifier (assoc-ref t
-                                     'owner-identifier))
+                                     'owner-id))
          (rec (car ($songs 'get
                            #:condition (where #:identifier uuid))))
          (new-uuid (generate-string-uuid))
@@ -738,7 +735,6 @@
                         ($song_opinions 'get
                                         #:condition (where #:song_identifier
                                                            uuid)))))
-    (write rec)
     (if (not (nil? ex-op))
         ($song_opinions 'mod
                         'row-delete
@@ -875,7 +871,6 @@
         (define (do-edit-external-sources)
           (let* ((body (rc-body rc))
                  (kv (read-url-encoded-body body)))
-            (write kv)
             (DB-query (DB-open rc)
                       (->sql update
                              'song_external_sources set
