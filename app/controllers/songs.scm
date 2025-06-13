@@ -506,11 +506,15 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-new-content)
-          (let* ((body (rc-body rc))
+          (let* ((t (decrypt-token #:token (:cookies-value rc
+                                            "x-bewaking-wikimusic")
+                                   #:encryption-key encryption-key
+                                   #:signing-key signing-key))
+                 (body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
-                 (user-identifier (:cookies-value rc
-                                                  "wikimusic-user-identifier")))
+                 (user-identifier (assoc-ref t
+                                             'owner-identifier)))
             ($song_contents 'set
                             #:identifier new-uuid
                             #:song_identifier (params rc "uuid")
@@ -551,32 +555,38 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-new-artwork)
-          (let* ((body (rc-body rc))
+          (let* ((t (decrypt-token #:token (:cookies-value rc
+                                            "x-bewaking-wikimusic")
+                                   #:encryption-key encryption-key
+                                   #:signing-key signing-key))
+                 (body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
-                 (user-identifier (:cookies-value rc
-                                                  "wikimusic-user-identifier")))
-            ($song_artworks 'set
-                            #:identifier new-uuid
-                            #:song_identifier (params rc "uuid")
-                            #:created_by user-identifier
-                            #:visibility_status 0
-                            #:content_url (escape-str (uri-decode (car (assoc-ref
-                                                                        kv
-                                                                        "content-url"))))
-                            #:content_caption (escape-str (uri-decode (car (assoc-ref
-                                                                            kv
-                                                                            "content-caption"))))
-                            #:order_value (escape-str (uri-decode (car (assoc-ref
-                                                                        kv
-                                                                        "order-value"))))
-                            #:created_at (current-time))
+                 (user-identifier (assoc-ref t
+                                             'owner-identifier))
+                 ($song_artworks 'set
+                                 #:identifier new-uuid
+                                 #:song_identifier (params rc "uuid")
+                                 #:created_by user-identifier
+                                 #:visibility_status 0
+                                 #:content_url (escape-str (uri-decode (car (assoc-ref
+                                                                             kv
+                                                                             "content-url"))))
+                                 #:content_caption (escape-str (uri-decode (car
+                                                                            (assoc-ref
+                                                                             kv
+                                                                             "content-caption"))))
+                                 #:order_value (escape-str (uri-decode (car (assoc-ref
+                                                                             kv
+                                                                             "order-value"))))
+                                 #:created_at (current-time))
 
-            (redirect-to rc
-                         (string->uri (format #f "~a/songs/uuid/~a/edit"
-                                              (current-myhost)
-                                              (params rc "uuid")))
-                         #:status 302)))
+                 (redirect-to rc
+                              (string->uri (format #f "~a/songs/uuid/~a/edit"
+                                                   (current-myhost)
+                                                   (params rc "uuid")))
+                              #:status 302))
+            ))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:song-create)
                            #:rc rc
@@ -587,11 +597,15 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-new-song-artist)
-          (let* ((body (rc-body rc))
+          (let* ((t (decrypt-token #:token (:cookies-value rc
+                                            "x-bewaking-wikimusic")
+                                   #:encryption-key encryption-key
+                                   #:signing-key signing-key))
+                 (body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
-                 (user-identifier (:cookies-value rc
-                                                  "wikimusic-user-identifier"))
+                 (user-identifier (assoc-ref t
+                                             'owner-identifier))
                  (artist ($artists 'get
                                    #:ret 'top
                                    #:condition (where #:identifier (uri-decode
@@ -626,11 +640,15 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-new-song-genre)
-          (let* ((body (rc-body rc))
+          (let* ((t (decrypt-token #:token (:cookies-value rc
+                                            "x-bewaking-wikimusic")
+                                   #:encryption-key encryption-key
+                                   #:signing-key signing-key))
+                 (body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
-                 (user-identifier (:cookies-value rc
-                                                  "wikimusic-user-identifier"))
+                 (user-identifier (assoc-ref t
+                                             'owner-identifier))
                  (genre ($genres 'get
                                  #:ret 'top
                                  #:condition (where #:identifier (uri-decode (car
@@ -665,11 +683,15 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-new)
-          (let* ((body (rc-body rc))
+          (let* ((t (decrypt-token #:token (:cookies-value rc
+                                            "x-bewaking-wikimusic")
+                                   #:encryption-key encryption-key
+                                   #:signing-key signing-key))
+                 (body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (new-uuid (generate-string-uuid))
-                 (user-identifier (:cookies-value rc
-                                                  "wikimusic-user-identifier")))
+                 (user-identifier (assoc-ref t
+                                             'owner-identifier)))
             ($songs 'set
                     #:identifier new-uuid
                     #:display_name (escape-str (uri-decode (car (assoc-ref kv
@@ -703,9 +725,10 @@
                            #:happy-flow do-new
                            #:unhappy-flow back-to-login)))
 
-(define (do-opinion rc is-like is-dislike)
+(define (do-opinion rc is-like is-dislike t)
   (let* ((uuid (params rc "uuid"))
-         (user-identifier (:cookies-value rc "wikimusic-user-identifier"))
+         (user-identifier (assoc-ref t
+                                     'owner-identifier))
          (rec (car ($songs 'get
                            #:condition (where #:identifier uuid))))
          (new-uuid (generate-string-uuid))
