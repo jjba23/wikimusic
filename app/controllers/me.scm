@@ -169,6 +169,7 @@
                       ($users 'get
                              #:ret 'top
                              #:condition (where #:email_address (uri-decode (car email))))))
+               (_ (write (assoc-ref (car u) "identifier")))
                (_ ($password_reset 'mod
                                    'row-delete
                                    (where #:user_id (assoc-ref (car u) "identifier"))))

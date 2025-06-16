@@ -183,6 +183,7 @@ and obfuscation techniques, a.k.a secure tokens.")
                           guile-kracht
                           guile-orgwebalchemy
                           guile-bewaking
+                          guile-curl
                           sqlite
                           guile-gcrypt
                           watchexec
