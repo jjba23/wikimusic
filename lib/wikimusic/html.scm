@@ -54,6 +54,7 @@
 
 (define* asset-library
   (build-asset-library '("pub/js/tailwind.js" "pub/js/song-auto-scroll.js"
+                         "pub/js/song-chord-highlighter.js"
                          "pub/js/file-base64.js")))
 
 (define* (page-footer G_)
@@ -187,6 +188,8 @@
                                                       "pub/js/tailwind.js"))
                                   (script ,toggle-dark-theme-js)
                                   (script ,remember-dark-theme-js)
+                                  (script ,(assoc-ref asset-library
+                                                      "pub/js/song-chord-highlighter.js"))
                                   (script ,(assoc-ref asset-library
                                             "pub/js/song-auto-scroll.js"))
                                   (script ,(assoc-ref asset-library

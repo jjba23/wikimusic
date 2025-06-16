@@ -97,7 +97,7 @@
                                                                           dark:text-stone-300
                                                                           cursor-pointer))))
                                                    ,(G_ "ascii legend"))
-                                          (pre (@ (class ,(mk-class (append (list
+                                          (pre (@ (id ascii-legend-container)(class ,(mk-class (append (list
                                                                              (string->symbol
                                                                               ascii-size))
                                                                             '(p-4
@@ -157,58 +157,60 @@
                                                        (option #:value 32
                                                                #:content (G_
                                                                           "32 second")))))
-         (autoscroll-button-section `((div (@ (class ,(mk-class '(flex
-                                                                  flex-row
-                                                                  flex-wrap
-                                                                  gap-4
-                                                                  items-center
-                                                                  justify-center))))
-                                           ,(sub-h3 (G_ "auto-scrolling:"))
-                                           ,(icon-button #:id 'start-autoscroll
-                                             #:icon 'mouse-scroll
-                                             #:content (G_ "scroll")
-                                             #:on-click
-                                             "startSongAutoScroll()")
-                                           ,line-scroll-select
-                                           ,second-scroll-select)))
+         (ascii-button-section `((div (@ (class ,(mk-class '(flex flex-row
+                                                             flex-wrap gap-4
+                                                             items-center
+                                                             justify-center))))
+                                      ,(sub-h3 (G_ "auto-scrolling:"))
+                                      ,(icon-button #:id 'start-autoscroll
+                                                    #:icon 'mouse-scroll
+                                                    #:content (G_ "scroll")
+                                                    #:on-click
+                                                    "startSongAutoScroll()")
+                                      ,line-scroll-select
+                                      ,second-scroll-select
+                                      ,(icon-button #:icon 'music-notes-simple
+                                                    #:content (G_
+                                                               "highlight chords")
+                                                    #:on-click
+                                                    (string-append "highlightChords('ascii-content-container');"
+                                                                   "highlightChords('ascii-legend-container');")))))
          (render-ascii-content (lambda (ascii-contents)
-                                 `(,autoscroll-button-section (details (@ (open
-                                                                           true)
+                                 `(,ascii-button-section (details (@ (open
+                                                                      true)
+                                                                     (class ,(mk-class '
+                                                                              (my-6))))
+                                                                  (summary (@ (class ,
+                                                                               (mk-class '
+                                                                                (text-xl
+                                                                                 font-bold
+                                                                                 text-stone-700
+                                                                                 dark:text-stone-300
+                                                                                 cursor-pointer))))
+                                                                           ,(G_
+                                                                             "ascii contents"))
+
+                                                                  (pre (@ (id
+                                                                           ascii-content-container)
                                                                           (class ,
-                                                                           (mk-class '
-                                                                            (my-6))))
-                                                                       (summary
-                                                                        (@ (class ,
-                                                                            (mk-class '
-                                                                             (text-xl
-                                                                              font-bold
-                                                                              text-stone-700
-                                                                              dark:text-stone-300
-                                                                              cursor-pointer))))
-                                                                        ,(G_
-                                                                          "ascii contents"))
-                                                                       (pre (@
-                                                                             (id
-                                                                              ascii-content-container)
-                                                                             (class ,
-                                                                              (mk-class
-                                                                               (append
-                                                                                (list
-                                                                                 (string->symbol
-                                                                                  ascii-size))
-                                                                                '
-                                                                                (p-4
-                                                                                 md:p-6
-                                                                                 shadow-md
-                                                                                 font-mono
-                                                                                 bg-stone-200/75
-                                                                                 dark:bg-stone-900
-                                                                                 text-black
-                                                                                 dark:text-white
-                                                                                 rounded-xl
-                                                                                 white-space-pre
-                                                                                 overflow-x-scroll)))))
-                                                                            ,ascii-contents)))))
+                                                                           (mk-class
+                                                                            (append
+                                                                             (list
+                                                                              (string->symbol
+                                                                               ascii-size))
+                                                                             '
+                                                                             (p-4
+                                                                              md:p-6
+                                                                              shadow-md
+                                                                              font-mono
+                                                                              bg-stone-200/75
+                                                                              dark:bg-stone-900
+                                                                              text-black
+                                                                              dark:text-white
+                                                                              rounded-xl
+                                                                              white-space-pre
+                                                                              overflow-x-scroll)))))
+                                                                       ,ascii-contents)))))
          (ascii-content-section (render-if-nestring render-ascii-content
                                                     (assoc-ref version
                                                      "ascii_contents")))
