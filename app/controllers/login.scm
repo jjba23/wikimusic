@@ -27,6 +27,8 @@
         (wikimusic env)
         (bewaking bewaking)
         (artanis security nss)
+        (app models users)
+        (app models password_reset)
         (ice-9 string-fun)
         (app views login))
 
@@ -46,12 +48,12 @@
                (password (uri-decode (car (assoc-ref kv "password"))))
                (u ($users 'get
                           #:ret 'top
-                          #:condition (where #:email email)))
+                          #:condition (where #:email_address email)))
                (get-owner-details (lambda ()
                                     `((id unquote
                                           (assoc-ref (car u) "identifier"))
                                       (email unquote
-                                             (assoc-ref (car u) "email"))
+                                             (assoc-ref (car u) "email_address"))
                                       (name unquote
                                             (assoc-ref (car u) "username"))
                                       (permissions unquote
@@ -85,3 +87,23 @@
                                              "~a/login?login_failed=true"
                                              (current-myhost)))
                                #:status 302))))))
+
+(get "/logout"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     #:cookies '(names x-bewaking-wikimusic)
+     (lambda (rc)
+       (begin
+           (:cookies-set! rc
+                          'x-bewaking-wikimusic "x-bewaking-wikimusic" "")
+           (:cookies-setattr! rc
+                              'x-bewaking-wikimusic
+                              #:expires 1
+                              #:path "/"
+                              #:secure #t
+                              #:http-only #t)
+
+           (redirect-to rc
+                        (string->uri (format #f "~a/"
+                                             (current-myhost)))
+                        #:status 302))))

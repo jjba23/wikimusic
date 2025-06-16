@@ -74,8 +74,7 @@
                            #:size 'text-sm
                            #:weight 'font-light))))))
 
-(define* (nav G_
-              #:key (proj '()))
+(define* (nav G_ #:key is-logged-in)
   `((div (@ (class ,(mk-class '(flex flex-row
                                      flex-wrap
                                      gap-3
@@ -93,6 +92,29 @@
                               #:icon-css '(text-xl text-stone-800
                                                    dark:text-stone-200)))
                  ,(h4 (G_ "Wikimusic"))))
+           ,(if (not is-logged-in)
+                 `((a (@ (class ,(mk-class '(text-sm lowercase
+                                                     text-white
+                                                     dark:text-black
+                                                     font-sans
+                                                     font-medium
+                                                     px-2
+                                                     flex-items-center
+                                                     gap-2)))
+                         (href "/login"))
+                      ,(icon-button #:icon 'sign-in
+                                    #:content (G_ "login"))))
+                 `((a (@ (class ,(mk-class '(text-sm lowercase
+                                                     text-white
+                                                     dark:text-black
+                                                     font-sans
+                                                     font-medium
+                                                     px-2
+                                                     flex-items-center
+                                                     gap-2)))
+                         (href "/me"))
+                      ,(icon-button #:icon 'user-circle
+                                    #:content (G_ "me")))))
          (a (@ (href "/songs"))
             ,(icon-button #:icon 'music-notes-simple
                           #:content (G_ "songs")))
@@ -102,14 +124,11 @@
          (a (@ (href "/artists"))
             ,(icon-button #:icon 'guitar
                           #:content (G_ "artists")))
-         (a (@ (href "/login"))
-            ,(icon-button #:icon 'sign-in
-                          #:content (G_ "login")))
+   
          ,(ui-mode-button))))
 
 (define* (html-template G_
-                        #:key body
-                        (proj '()))
+                        #:key body (is-logged-in #f))
   
   `("<!DOCTYPE html>" (html (head (title "Wikimusic")
                                   (link (@ (rel preconnect)
@@ -165,9 +184,7 @@
                                                                                flex-col
                                                                                gap-8
                                                                                justify-start))))
-                                                                   ,(nav G_
-                                                                         #:proj
-                                                                         proj)
+                                                                   ,(nav G_ #:is-logged-in is-logged-in)
                                                                    ,body)))
                                                 #:footer (page-footer G_))))))
 
