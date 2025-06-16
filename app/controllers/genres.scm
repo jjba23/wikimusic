@@ -148,24 +148,23 @@
                                                 #:search-query user-search
                                                 #:user-sort user-sort
                                                 #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic")))))))
+                                                                rc
+                                                                "x-bewaking-wikimusic")))))))
 
 (get "/genres/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
-          #:cookies '(names x-bewaking-wikimusic)
+     #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
                              (genre-new-page (:i18n rc)
-                                             #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic"))))))
+                                             #:is-logged-in (:cookies-value rc
+                                                             "x-bewaking-wikimusic"))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
-          #:cookies '(names x-bewaking-wikimusic)
+     #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((uuid (params rc "uuid"))
               (genre (car ($genres 'get
@@ -328,13 +327,13 @@
                                                   #:external-sources
                                                   external-sources
                                                   #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic")))))))
+                                                                  rc
+                                                                  "x-bewaking-wikimusic")))))))
 
 (get "/genres/uuid/:uuid/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
-          #:cookies '(names x-bewaking-wikimusic)
+     #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((uuid (params rc "uuid"))
               (genre (car ($genres 'get
@@ -361,8 +360,8 @@
                                                 #:external-sources
                                                 external-sources
                                                 #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic")))))))
+                                                                rc
+                                                                "x-bewaking-wikimusic")))))))
 
 (post "/genres/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)

@@ -148,8 +148,8 @@
                                                  #:search-query user-search
                                                  #:user-sort user-sort
                                                  #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic")))))))
+                                                                 rc
+                                                                 "x-bewaking-wikimusic")))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
@@ -304,26 +304,26 @@
                                                    #:external-sources
                                                    external-sources
                                                    #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic")))))))
+                                                                   rc
+                                                                   "x-bewaking-wikimusic")))))))
 
 ;; ====== Data edit GET routes ======
 
 (get "/artists/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
-          #:cookies '(names x-bewaking-wikimusic)
+     #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
                              (artist-new-page (:i18n rc)
                                               #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic"))))))
+                                                              rc
+                                                              "x-bewaking-wikimusic"))))))
 
 (get "/artists/uuid/:uuid/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
-          #:cookies '(names x-bewaking-wikimusic)
+     #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((uuid (params rc "uuid"))
               (artist (car ($artists 'get
@@ -352,8 +352,8 @@
                                                  #:external-sources
                                                  external-sources
                                                  #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic")))))))
+                                                                 rc
+                                                                 "x-bewaking-wikimusic")))))))
 
 ;; ====== Data edit POST routes ======
 

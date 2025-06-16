@@ -139,7 +139,10 @@
                           ,song-fragment)))
 
 (define* (genre-edit-page G_
-                          #:key genre artworks external-sources is-logged-in)
+                          #:key genre
+                          artworks
+                          external-sources
+                          is-logged-in)
   (let* ((arts (map (lambda (a)
                       `(div (figure (@ (class ,(mk-class '(py-3 sm:w-36))))
                                     (img (@ (loading "lazy")
@@ -235,7 +238,8 @@
                    #:is-logged-in is-logged-in
                    #:body body)))
 
-(define* (genre-new-page G_ #:key is-logged-in)
+(define* (genre-new-page G_
+                         #:key is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
                  #:body `(div (@ (class ,(mk-class '(container mx-auto))))

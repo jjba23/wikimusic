@@ -30,7 +30,7 @@
         (rnrs bytevectors)
         (json)
         (artanis security nss)
-        (app models password_reset)        
+        (app models password_reset)
         (bewaking bewaking))
 
 (get "/me"
@@ -39,13 +39,13 @@
      #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((t (decrypt-token #:token (:cookies-value rc
-                                                        "x-bewaking-wikimusic")
+                                         "x-bewaking-wikimusic")
                                 #:encryption-key encryption-key
                                 #:signing-key signing-key))
               (user ($users 'get
-                           #:ret 'top
-                           #:condition (where #:identifier (assoc-ref t
-                                                              'owner-id)))))
+                            #:ret 'top
+                            #:condition (where #:identifier (assoc-ref t
+                                                                       'owner-id)))))
          
          (catch #t
                 (lambda ()
@@ -76,12 +76,12 @@
                                   #:encryption-key encryption-key
                                   #:signing-key signing-key))
                 (user ($users 'get
-                             #:ret 'top
-                             #:condition (where #:identifier (assoc-ref t
-                                                                'owner-id))))
+                              #:ret 'top
+                              #:condition (where #:identifier (assoc-ref t
+                                                                         'owner-id))))
                 (users ($users 'get
-                              #:ret 'all
-                              #:order-by '(username asc))))
+                               #:ret 'all
+                               #:order-by '(username asc))))
            (response-emit (:mime rc
                                  (users-page (:i18n rc)
                                              #:users users
@@ -112,8 +112,9 @@
                    (error "reset token is found but not valid anymore")))
               (user-id (assoc-ref tt "user_id"))
               (email (assoc-ref (car ($users 'get
-                                            #:ret 'top
-                                            #:condition (where #:identifier user-id)))
+                                             #:ret 'top
+                                             #:condition (where #:identifier
+                                                                user-id)))
                                 "email")))
          (response-emit (:mime rc
                                (reset-password-page (:i18n rc)
@@ -163,15 +164,18 @@
                           (assoc-ref (read-url-encoded-body body) "email")))
                (u (if (not email)
                       ($users 'get
-                             #:ret 'top
-                             #:condition (where #:identifier (assoc-ref existing-token
-                                                      'owner-id)))
+                              #:ret 'top
+                              #:condition (where #:identifier (assoc-ref
+                                                               existing-token
+                                                               'owner-id)))
                       ($users 'get
-                             #:ret 'top
-                             #:condition (where #:email (uri-decode (car email))))))
+                              #:ret 'top
+                              #:condition (where #:email (uri-decode (car
+                                                                      email))))))
                (_ ($password_reset 'mod
                                    'row-delete
-                                   (where #:user_id (assoc-ref (car u) "identifier"))))
+                                   (where #:user_id (assoc-ref (car u)
+                                                               "identifier"))))
                (reset-token (base16-encode (format #f "~a-~a-~a"
                                                    (generate-string-uuid)
                                                    (generate-string-uuid)
@@ -225,8 +229,8 @@
                     (error "password confirmation did not match!")))
                (user-id (assoc-ref tt "user_id"))
                (u ($users 'get
-                         #:ret 'top
-                         #:condition (where #:identifier user-id)))
+                          #:ret 'top
+                          #:condition (where #:identifier user-id)))
                (new-salt (generate-string-uuid))
                (h (string->sha-256 (string-append new-password new-salt)))
                (_ (DB-query (DB-open rc)
@@ -236,7 +240,8 @@
                              (assoc-ref (car u) "identifier"))))
                (_ ($password_reset 'mod
                                    'row-delete
-                                   (where #:user_id (assoc-ref (car u) "identifier")))))
+                                   (where #:user_id (assoc-ref (car u)
+                                                               "identifier")))))
           (:cookies-set! rc
                          'x-bewaking-wikimusic "x-bewaking-wikimusic" "")
           (:cookies-setattr! rc

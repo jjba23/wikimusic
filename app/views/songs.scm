@@ -47,11 +47,11 @@
                                                                            gap-2))))
                                                     ,(em (format #f "~a"
                                                                  (car vc))
-                                                         #:size 'text-xs
+                                                         #:size '(text-xs)
                                                          #:color '(text-stone-700
                                                                    dark:text-stone-300))
                                                     ,(em (G_ "versions")
-                                                         #:size 'text-xs
+                                                         #:size '(text-xs)
                                                          #:color '(text-stone-700
                                                                    dark:text-stone-300)))))
                                            (assoc-ref song-version-count-alist
@@ -76,8 +76,8 @@
                                                        align-center))))
                                 ,(map (lambda (ar)
                                         (a (assoc-ref ar "display_name")
-                                           #:weight 'font-light
-                                           #:size 'text-md
+                                           #:weight '(font-light)
+                                           #:size '(text-md)
                                            #:href (format #f
                                                           "/artists/uuid/~a"
                                                           (assoc-ref ar
@@ -217,8 +217,8 @@
   
   (let* ((artist-name-titles (map (lambda (ar)
                                     `((div ,(a (assoc-ref ar "display_name")
-                                               #:size 'text-lg
-                                               #:weight 'font-light
+                                               #:size '(text-lg)
+                                               #:weight '(font-light)
                                                #:color '(text-stone-900
                                                          dark:text-stone-100)
                                                #:hover '(hover:text-purple-500
@@ -231,8 +231,8 @@
                                   artists))
          (genre-name-titles (map (lambda (ar)
                                    `((div ,(a (assoc-ref ar "display_name")
-                                              #:size 'text-lg
-                                              #:weight 'font-light
+                                              #:size '(text-lg)
+                                              #:weight '(font-light)
                                               #:color '(text-stone-900
                                                         dark:text-stone-100)
                                               #:hover '(hover:text-purple-500
@@ -284,68 +284,68 @@
                             ,(render-external-sources G_ external-sources)
                             (div (@ (class ,(mk-class '(px-4 py-6))))
                                  (dl ,(render-if-nestring (lambda (tuning)
-                                                          `((dt (@ (class ,(mk-class '
-                                                                            (pt-3
-                                                                             pb-1
-                                                                             text-stone-700
-                                                                             dark:text-stone-400
-                                                                             font-bold))))
-                                                                ,(G_
-                                                                  "music tuning"))
-                                                            (dd (@ (class ,(mk-class '
-                                                                            (pl-3
-                                                                             text-stone-800
-                                                                             dark:text-stone-300))))
-                                                                ,(em (format
-                                                                             #f
-                                                                             "~a"
-                                                                             (assoc-ref
-                                                                              song
-                                                                              "music_tuning"))))))
-                                                        (assoc-ref song
-                                                         "music_tuning"))
+                                                            `((dt (@ (class ,(mk-class '
+                                                                              (pt-3
+                                                                               pb-1
+                                                                               text-stone-700
+                                                                               dark:text-stone-400
+                                                                               font-bold))))
+                                                                  ,(G_
+                                                                    "music tuning"))
+                                                              (dd (@ (class ,(mk-class '
+                                                                              (pl-3
+                                                                               text-stone-800
+                                                                               dark:text-stone-300))))
+                                                                  ,(em (format
+                                                                        #f
+                                                                        "~a"
+                                                                        (assoc-ref
+                                                                         song
+                                                                         "music_tuning"))))))
+                                                          (assoc-ref song
+                                                           "music_tuning"))
                                      ,(render-if-nestring (lambda (keyy)
-                                                          `((dt (@ (class ,(mk-class '
-                                                                            (pt-3
-                                                                             pb-1
-                                                                             text-stone-700
-                                                                             dark:text-stone-400
-                                                                             font-bold))))
-                                                                ,(G_
-                                                                  "music key"))
-                                                            (dd (@ (class ,(mk-class '
-                                                                            (pl-3
-                                                                             text-stone-800
-                                                                             dark:text-stone-300))))
-                                                                ,(em (format
-                                                                             #f
-                                                                             "~a"
-                                                                             (assoc-ref
-                                                                              song
-                                                                              "music_key"))))))
-                                                        (assoc-ref song
-                                                         "music_key"))
+                                                            `((dt (@ (class ,(mk-class '
+                                                                              (pt-3
+                                                                               pb-1
+                                                                               text-stone-700
+                                                                               dark:text-stone-400
+                                                                               font-bold))))
+                                                                  ,(G_
+                                                                    "music key"))
+                                                              (dd (@ (class ,(mk-class '
+                                                                              (pl-3
+                                                                               text-stone-800
+                                                                               dark:text-stone-300))))
+                                                                  ,(em (format
+                                                                        #f
+                                                                        "~a"
+                                                                        (assoc-ref
+                                                                         song
+                                                                         "music_key"))))))
+                                                          (assoc-ref song
+                                                           "music_key"))
                                      ,(render-if-nestring (lambda (album-name)
-                                                          `((dt (@ (class ,(mk-class '
-                                                                            (pt-3
-                                                                             pb-1
-                                                                             text-stone-700
-                                                                             dark:text-stone-400
-                                                                             font-bold))))
-                                                                ,(G_
-                                                                  "album name"))
-                                                            (dd (@ (class ,(mk-class '
-                                                                            (pl-3
-                                                                             text-stone-800
-                                                                             dark:text-stone-300))))
-                                                                ,(em (format
-                                                                             #f
-                                                                             "~a"
-                                                                             (assoc-ref
-                                                                              song
-                                                                              "album_name"))))))
-                                                        (assoc-ref song
-                                                         "album_name"))))
+                                                            `((dt (@ (class ,(mk-class '
+                                                                              (pt-3
+                                                                               pb-1
+                                                                               text-stone-700
+                                                                               dark:text-stone-400
+                                                                               font-bold))))
+                                                                  ,(G_
+                                                                    "album name"))
+                                                              (dd (@ (class ,(mk-class '
+                                                                              (pl-3
+                                                                               text-stone-800
+                                                                               dark:text-stone-300))))
+                                                                  ,(em (format
+                                                                        #f
+                                                                        "~a"
+                                                                        (assoc-ref
+                                                                         song
+                                                                         "album_name"))))))
+                                                          (assoc-ref song
+                                                           "album_name"))))
 
                             (div ,(render-song-content G_ song song-contents
                                                        ascii-size))))))
@@ -582,7 +582,8 @@
                    #:is-logged-in is-logged-in
                    #:body html)))
 
-(define* (song-new-page G_ #:key is-logged-in)
+(define* (song-new-page G_
+                        #:key is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
                  #:body `(div (@ (class ,(mk-class '(container mx-auto))))

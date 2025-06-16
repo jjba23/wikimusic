@@ -247,7 +247,8 @@
                           ,ascii-content-section
                           ,pdf-content-section)))))
 
-(define* (song-content-edit-page G_ #:key song song-contents is-logged-in)
+(define* (song-content-edit-page G_
+                                 #:key song song-contents is-logged-in)
   (let* ((clean-pdf-contents (lambda (x)
                                (if (equal? x
                                     "data:application/octet-stream;base64,")
@@ -286,7 +287,8 @@
                    #:is-logged-in is-logged-in
                    #:body body)))
 
-(define* (song-content-new-page G_ #:key song-identifier is-logged-in)
+(define* (song-content-new-page G_
+                                #:key song-identifier is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
                  #:body `(div (@ (class ,(mk-class '(container mx-auto))))

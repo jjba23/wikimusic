@@ -71,10 +71,11 @@
                     ,(em "version:")
                     ,(mono (format #f "~a"
                                    (get-short-commit-sha))
-                           #:size 'text-sm
-                           #:weight 'font-light))))))
+                           #:size '(text-sm)
+                           #:weight '(font-light)))))))
 
-(define* (nav G_ #:key is-logged-in)
+(define* (nav G_
+              #:key is-logged-in)
   `((div (@ (class ,(mk-class '(flex flex-row
                                      flex-wrap
                                      gap-3
@@ -92,29 +93,29 @@
                               #:icon-css '(text-xl text-stone-800
                                                    dark:text-stone-200)))
                  ,(h4 (G_ "Wikimusic"))))
-           ,(if (not is-logged-in)
-                 `((a (@ (class ,(mk-class '(text-sm lowercase
-                                                     text-white
-                                                     dark:text-black
-                                                     font-sans
-                                                     font-medium
-                                                     px-2
-                                                     flex-items-center
-                                                     gap-2)))
-                         (href "/login"))
-                      ,(icon-button #:icon 'sign-in
-                                    #:content (G_ "login"))))
-                 `((a (@ (class ,(mk-class '(text-sm lowercase
-                                                     text-white
-                                                     dark:text-black
-                                                     font-sans
-                                                     font-medium
-                                                     px-2
-                                                     flex-items-center
-                                                     gap-2)))
-                         (href "/me"))
-                      ,(icon-button #:icon 'user-circle
-                                    #:content (G_ "me")))))
+         ,(if (not is-logged-in)
+              `((a (@ (class ,(mk-class '(text-sm lowercase
+                                                  text-white
+                                                  dark:text-black
+                                                  font-sans
+                                                  font-medium
+                                                  px-2
+                                                  flex-items-center
+                                                  gap-2)))
+                      (href "/login"))
+                   ,(icon-button #:icon 'sign-in
+                                 #:content (G_ "login"))))
+              `((a (@ (class ,(mk-class '(text-sm lowercase
+                                                  text-white
+                                                  dark:text-black
+                                                  font-sans
+                                                  font-medium
+                                                  px-2
+                                                  flex-items-center
+                                                  gap-2)))
+                      (href "/me"))
+                   ,(icon-button #:icon 'user-circle
+                                 #:content (G_ "me")))))
          (a (@ (href "/songs"))
             ,(icon-button #:icon 'music-notes-simple
                           #:content (G_ "songs")))
@@ -124,11 +125,12 @@
          (a (@ (href "/artists"))
             ,(icon-button #:icon 'guitar
                           #:content (G_ "artists")))
-   
+
          ,(ui-mode-button))))
 
 (define* (html-template G_
-                        #:key (title "WikiMusic") body (is-logged-in #f))
+                        #:key (title "WikiMusic") body
+                        (is-logged-in #f))
   
   `("<!DOCTYPE html>" (html (head (title ,title)
                                   (link (@ (rel preconnect)
@@ -184,7 +186,9 @@
                                                                                flex-col
                                                                                gap-8
                                                                                justify-start))))
-                                                                   ,(nav G_ #:is-logged-in is-logged-in)
+                                                                   ,(nav G_
+                                                                     #:is-logged-in
+                                                                     is-logged-in)
                                                                    ,body)))
                                                 #:footer (page-footer G_))))))
 
@@ -231,7 +235,7 @@
                                      (else (car artworks))))
                 (div (@ (class ,(mk-class '(text-center))))
                      ,(a (assoc-ref x "display_name")
-                         #:size 'text-xl
+                         #:size '(text-xl)
                          #:href item-link
                          #:color '(text-stone-900 dark:text-stone-100)
                          #:hover '(hover:text-purple-500
@@ -249,15 +253,15 @@
                      ,(em (format #f "~a ~a"
                                   (assoc-ref x "views")
                                   (G_ "views"))
-                          #:size 'text-xs
+                          #:size '(text-xs)
                           #:color '(text-stone-700 dark:text-stone-300)))
                 (div (@ (class ,(mk-class '(flex flex-row gap-2))))
                      ,(em (format #f "~a"
                                   (length comments))
-                          #:size 'text-xs
+                          #:size '(text-xs)
                           #:color '(text-stone-700 dark:text-stone-300))
                      ,(em (G_ "comments")
-                          #:size 'text-xs
+                          #:size '(text-xs)
                           #:color '(text-stone-700 dark:text-stone-300)))
                 ,extra-bot-info)))))
 
@@ -396,7 +400,7 @@
                                                                         pl-3
                                                                         whitespace-break-spaces))))
                                                            ,(p description
-                                                               #:weight 'font-light))))
+                                                               #:weight '(font-light)))))
                                               (assoc-ref x "description")))
          (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
                                                    `((dt (@ (class ,(mk-class '
@@ -493,7 +497,7 @@
                         (div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                          gap-4))))
                              ,(mono (assoc-ref x "identifier")
-                                    #:size 'text-sm
+                                    #:size '(text-sm)
                                     #:color '(text-stone-600
                                               dark:text-stone-400))
                              ,(icon-button #:icon 'copy
@@ -725,7 +729,7 @@ function addSearchQueryParam(form) {
                                            #:icon-css '(text-stone-800
                                                         dark:text-stone-200)))
                                ,(a s
-                                   #:size 'text-sm
+                                   #:size '(text-sm)
                                    #:color '(text-stone-700
                                              dark:text-stone-300)
                                    #:hover '(hover:text-purple-500

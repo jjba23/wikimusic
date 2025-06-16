@@ -35,13 +35,12 @@
 (get "/login"
      #:mime 'xml
      #:i18n '(cookie "lang")
-          #:cookies '(names x-bewaking-wikimusic)
+     #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
                              (login-page (:i18n rc)
-                                         #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic"))))))
+                                         #:is-logged-in (:cookies-value rc
+                                                         "x-bewaking-wikimusic"))))))
 
 (post "/login"
       #:cookies '(names x-bewaking-wikimusic)
@@ -99,16 +98,16 @@
      #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (begin
-           (:cookies-set! rc
-                          'x-bewaking-wikimusic "x-bewaking-wikimusic" "")
-           (:cookies-setattr! rc
-                              'x-bewaking-wikimusic
-                              #:expires 1
-                              #:path "/"
-                              #:secure #t
-                              #:http-only #t)
+         (:cookies-set! rc
+                        'x-bewaking-wikimusic "x-bewaking-wikimusic" "")
+         (:cookies-setattr! rc
+                            'x-bewaking-wikimusic
+                            #:expires 1
+                            #:path "/"
+                            #:secure #t
+                            #:http-only #t)
 
-           (redirect-to rc
-                        (string->uri (format #f "~a/"
-                                             (current-myhost)))
-                        #:status 302))))
+         (redirect-to rc
+                      (string->uri (format #f "~a/"
+                                           (current-myhost)))
+                      #:status 302))))

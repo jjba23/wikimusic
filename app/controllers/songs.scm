@@ -193,31 +193,32 @@
                                                #:search-query user-search
                                                #:user-sort user-sort
                                                #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic")))))))
+                                                               rc
+                                                               "x-bewaking-wikimusic")))))))
 
 (get "/songs/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
-          #:cookies '(names x-bewaking-wikimusic)
+     #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
                              (song-new-page (:i18n rc)
-                                            #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic"))))))
+                                            #:is-logged-in (:cookies-value rc
+                                                            "x-bewaking-wikimusic"))))))
 
 (get "/songs/uuid/:uuid/contents/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
-          #:cookies '(names x-bewaking-wikimusic)
+     #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
                              (song-content-new-page (:i18n rc)
-                                                    #:song-identifier (params rc "uuid")
+                                                    #:song-identifier (params
+                                                                       rc
+                                                                       "uuid")
                                                     #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic"))))))
+                                                                    rc
+                                                                    "x-bewaking-wikimusic"))))))
 
 (get "/songs/uuid/:uuid"
      #:mime 'xml
@@ -331,8 +332,8 @@
                                                  #:external-sources
                                                  external-sources
                                                  #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic")))))))
+                                                                 rc
+                                                                 "x-bewaking-wikimusic")))))))
 
 (get "/songs/uuid/:uuid/edit"
      #:mime 'xml
@@ -396,8 +397,8 @@
                                                #:external-sources
                                                external-sources
                                                #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic")))))))
+                                                               rc
+                                                               "x-bewaking-wikimusic")))))))
 
 (get "/songs/uuid/:uuid/contents/:version-uuid/edit"
      #:mime 'xml
@@ -417,10 +418,11 @@
          (response-emit (:mime rc
                                (song-content-edit-page (:i18n rc)
                                                        #:song song
-                                                       #:song-contents song-contents
+                                                       #:song-contents
+                                                       song-contents
                                                        #:is-logged-in (:cookies-value
-                                                                              rc
-                                                                              "x-bewaking-wikimusic")))))))
+                                                                       rc
+                                                                       "x-bewaking-wikimusic")))))))
 
 (post "/songs/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
@@ -437,11 +439,22 @@
                                (description ,(escape-str (uri-decode (car (assoc-ref
                                                                            kv
                                                                            "description")))))
-                               (music_key ,(escape-str (uri-decode (car (assoc-ref kv "music-key")))))
-                               (music_tuning ,(escape-str (uri-decode (car (assoc-ref kv "music-tuning")))))
-                               (music_creation_date ,(escape-str (uri-decode (car (assoc-ref kv "music-creation-date")))))
-                               (album_name ,(escape-str (uri-decode (car (assoc-ref kv "album-name")))))
-                               (album_info_link ,(escape-str (uri-decode (car (assoc-ref kv "album-info-link")))))
+                               (music_key ,(escape-str (uri-decode (car (assoc-ref
+                                                                         kv
+                                                                         "music-key")))))
+                               (music_tuning ,(escape-str (uri-decode (car (assoc-ref
+                                                                            kv
+                                                                            "music-tuning")))))
+                               (music_creation_date ,(escape-str (uri-decode (car
+                                                                              (assoc-ref
+                                                                               kv
+                                                                               "music-creation-date")))))
+                               (album_name ,(escape-str (uri-decode (car (assoc-ref
+                                                                          kv
+                                                                          "album-name")))))
+                               (album_info_link ,(escape-str (uri-decode (car (assoc-ref
+                                                                               kv
+                                                                               "album-info-link")))))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "uuid"))))
             (redirect-to rc

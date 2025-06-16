@@ -27,7 +27,8 @@
   #:use-module (ice-9 string-fun)
   #:export (welcome-page))
 
-(define* (welcome-page G_ #:key is-logged-in)
+(define* (welcome-page G_
+                       #:key is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
                  #:body `(div (@ (class "container mx-auto"))
