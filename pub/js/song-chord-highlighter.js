@@ -32,7 +32,7 @@ const highlightChords = (id) => {
     const chordRegex = /\b[A-G](#|b)?(m|maj|min|dim|aug|sus|add)?\d*(\/[A-G](#|b)?)?\b/g
 
     const boldedContent = originalContent.replace(chordRegex, (match) => {
-      return `<strong class="font-black text-black font-sans">${match}</strong>`
+      return `<strong class="font-black text-black dark:text-white font-sans">${match}</strong>`
     })
 
     preElement.innerHTML = boldedContent
