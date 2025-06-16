@@ -91,10 +91,17 @@
          (div (@ (class ,(mk-class '(px-4 py-1 w-full md:w-min))))
               (a (@ (href "/")
                     (class ,(mk-class '(flex flex-row gap-2 items-center))))
-                 (span ,(icon #:type 'music-note
-                              #:icon-css '(text-xl text-stone-800
-                                                   dark:text-stone-200)))
-                 ,(h3 (G_ "Wikimusic"))))
+                 ,(sub-h3 (list (icon #:type 'music-note
+                                      #:icon-css '(text-xl text-stone-700
+                                                   dark:text-stone-200
+                                                   hover:text-purple-800
+                                                   hover:dark:text-purple-300))
+                                "&nbsp;"
+                                (G_ "Wikimusic"))
+                          #:color '(text-stone-700 dark:text-stone-200
+                                                   hover:text-purple-800
+                                                   hover:dark:text-purple-300)
+                          #:size '(text-xl lg:text-2xl))))
          ,(if (not is-logged-in)
               `((a (@ (class ,(mk-class '(text-sm lowercase
                                                   text-white
@@ -122,31 +129,31 @@
                       (href "/me"))
                    ,(icon-button #:icon 'user-circle
                                  #:content (G_ "me")
-                                 #:size '(text-xs md:text-sm)
-                                 #:extra-classes '(py-1 md:py-2 px-2 md:px-3
+                                 #:size '(text-xs lg:text-sm)
+                                 #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                         max-w-prose
                                                         cursor-pointer)))))
          (a (@ (href "/songs"))
             ,(icon-button #:icon 'music-notes-simple
                           #:content (G_ "songs")
-                          #:size '(text-xs md:text-sm)
-                          #:extra-classes '(py-1 md:py-2 px-2 md:px-3
+                          #:size '(text-xs lg:text-sm)
+                          #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                  max-w-prose cursor-pointer)))
          (a (@ (href "/genres"))
             ,(icon-button #:icon 'disc
                           #:content (G_ "genres")
-                          #:size '(text-xs md:text-sm)
-                          #:extra-classes '(py-1 md:py-2 px-2 md:px-3
+                          #:size '(text-xs lg:text-sm)
+                          #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                  max-w-prose cursor-pointer)))
          (a (@ (href "/artists"))
             ,(icon-button #:icon 'guitar
                           #:content (G_ "artists")
-                          #:size '(text-xs md:text-sm)
-                          #:extra-classes '(py-1 md:py-2 px-2 md:px-3
+                          #:size '(text-xs lg:text-sm)
+                          #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                  max-w-prose cursor-pointer)))
 
-         ,(ui-mode-button #:size '(text-xs md:text-sm)
-                          #:extra-classes '(py-1 md:py-2 px-2 md:px-3
+         ,(ui-mode-button #:size '(text-xs lg:text-sm)
+                          #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                  max-w-prose cursor-pointer)))))
 
 (define* (html-template G_
