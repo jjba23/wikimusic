@@ -32,6 +32,8 @@
              (guix build-system guile)
              (gnu packages linux)
              (gnu packages emacs)
+             (gnu packages vim)             
+             (gnu packages tls) 
              (gnu packages perl)
              (gnu packages compression)
              (gnu packages sqlite)
@@ -41,36 +43,33 @@
               #:prefix license:))
 
 (define-public guile-uuid
-  (let ((commit "64002d74025f577e1eeea7bc51218a2c7929631f")
-        (revision "0"))
-    (package
-      (name "guile-uuid")
-      (version (git-version "0.0.0" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://codeberg.org/elb/guile-uuid.git")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "1q6dqm2hzq75aa5mrrwgqdml864pdrxc98j7pyj1y0827phnzjfj"))))
-      (build-system guile-build-system)
-      (native-inputs (list guile-3.0 guile-gcrypt))
-      (home-page "https://codeberg.org/elb/guile-uuid")
-      (synopsis
-       "Guile-UUID is a UUID generation and manipulation module for GNU Guile.")
-      (description
-       "This package implements RFC 9562 UUIDs, and can generate versions 1 and 3–8 from that specification.
-        It provides parsing for UUIDs in standard hex-and-dash format of any variant and version.
-        It can also query the variant and version of UUIDs from the RFC.
-        Simple routines for converting between binary and hex-and-dash string UUIDs are included.")
-      (license license:gpl3+))))
+  (package
+    (name "guile-uuid")
+    (version "0.9.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/elb/guile-uuid.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0g508aajkyi513wbhm1rhs03ilnb701lwlrvppkmc0vynydlk9ws"))))
+    (build-system guile-build-system)
+    (native-inputs (list guile-3.0 guile-gcrypt))
+    (home-page "https://codeberg.org/elb/guile-uuid")
+    (synopsis "UUID generation and manipulation library for Guile Scheme")
+    (description
+     "This package implements RFC 9562 UUIDs, and can generate versions
+1 and 3–8 from that specification. It also provides parsing for UUIDs in
+standard hex-and-dash format of any variant and version. Simple routines for converting
+between binary and hex-and-dash string UUIDs are included.")
+    (license license:gpl3+)))
 
 (define-public guile-hygguile
   (package
     (name "guile-hygguile")
-    (version "0.5.9")
+    (version "0.5.15")
     (source
      (origin
        (method git-fetch)
@@ -79,7 +78,7 @@
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "01xixcay0qsbkmd47j46ky6cqn278ayb78sdf2cgq5fn3rbgigsc"))))
+        (base32 "0hyjgfy5j8prjg4xlwf9fi8lr423z4bkp313l1ihq01d48v5cq9d"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -189,5 +188,7 @@ and obfuscation techniques, a.k.a secure tokens.")
                           watchexec
                           guile-dbi
                           emacs
+                          openssl
+                          xxd
                           guile-dbd-sqlite3))
 
