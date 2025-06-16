@@ -41,7 +41,7 @@
                                                                justify-start
                                                                my-4))))
                                    ,(em (G_ "my unique id:"))
-                                   ,(mono (assoc-ref user "id")
+                                   ,(mono (assoc-ref user "identifier")
                                           #:size '(text-xs)))
                               (div (@ (class ,(mk-class '(flex flex-row
                                                                flex-wrap
@@ -124,7 +124,7 @@
                   #:size '(text-sm)))
          (div (@ (class ,(mk-class '(flex flex-col gap-2))))
               ,(em (G_ "id"))
-              ,(mono (assoc-ref u "id")
+              ,(mono (assoc-ref u "identifier")
                      #:size '(text-xs)))
 
          (div (@ (class ,(mk-class '(flex flex-col gap-2))))
