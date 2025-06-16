@@ -39,7 +39,8 @@
                            limit
                            offset
                            search-query
-                           user-sort)
+                           user-sort
+                           is-logged-in)
   (let* ((page-buttons `((div (@ (class "flex flex-row flex-wrap gap-3 my-4"))
                               ,(if (> offset 0)
                                    `((a (@ (href ,(format #f
@@ -104,7 +105,8 @@
                                 (a (@ (href "/artists/new"))
                                    ,(button (G_ "new artist")))))))))
     (html-template G_
-                   #:body body)))
+                   #:body body
+                   #:is-logged-in is-logged-in)))
 
 (define* (artist-detail-page G_
                              #:key artist
@@ -113,8 +115,10 @@
                              comments
                              user-alist
                              song-fragment
-                             external-sources)
+                             external-sources
+                             is-logged-in)
   (html-template G_
+                 #:is-logged-in is-logged-in
                  #:body `((div (@ (class ,(mk-class '(container mx-auto))))
                                (,(h2 (assoc-ref artist "display_name")) (div (div ,
                                                                               (entity-details
@@ -136,7 +140,8 @@
 (define* (artist-edit-page G_
                            #:key artist
                            (artworks '())
-                           (external-sources '()))
+                           (external-sources '())
+                           is-logged-in)
   (let* ((artwork-forms (map (lambda (a)
                                `(div (figure (@ (class ,(mk-class '(py-3
                                                                     sm:w-36))))
@@ -232,10 +237,12 @@
                                                                         external-sources
                                                                         "soundcloud_url"))))))
     (html-template G_
+                   #:is-logged-in is-logged-in
                    #:body body)))
 
-(define* (artist-new-page G_)
+(define* (artist-new-page G_ #:key is-logged-in)
   (html-template G_
+                 #:is-logged-in is-logged-in
                  #:body `(div (@ (class "container mx-auto"))
                               ,(artist-form G_))))
 

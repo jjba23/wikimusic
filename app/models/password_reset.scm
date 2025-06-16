@@ -1,7 +1,7 @@
 (import (artanis mvc model))
 
 (create-artanis-model password_reset
-                      (:deps user)
+                      (:deps users)
                       (user_id char-field
                                (#:unique #:not-null #:maxlen 36))
                       (reset_token char-field

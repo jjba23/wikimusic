@@ -44,7 +44,7 @@
                                 #:signing-key signing-key))
               (user ($users 'get
                            #:ret 'top
-                           #:condition (where #:id (assoc-ref t
+                           #:condition (where #:identifier (assoc-ref t
                                                               'owner-id)))))
          
          (catch #t
@@ -113,7 +113,7 @@
               (user-id (assoc-ref tt "user_id"))
               (email (assoc-ref (car ($users 'get
                                             #:ret 'top
-                                            #:condition (where #:id user-id)))
+                                            #:condition (where #:identifier user-id)))
                                 "email_address")))
          (response-emit (:mime rc
                                (reset-password-page (:i18n rc)
@@ -164,12 +164,11 @@
                (u (if (not email)
                       ($users 'get
                              #:ret 'top
-                             #:condition (where #:id (assoc-ref existing-token
+                             #:condition (where #:identifier (assoc-ref existing-token
                                                       'owner-id)))
                       ($users 'get
                              #:ret 'top
                              #:condition (where #:email_address (uri-decode (car email))))))
-               (_ (write (assoc-ref (car u) "identifier")))
                (_ ($password_reset 'mod
                                    'row-delete
                                    (where #:user_id (assoc-ref (car u) "identifier"))))
@@ -227,12 +226,12 @@
                (user-id (assoc-ref tt "user_id"))
                (u ($users 'get
                          #:ret 'top
-                         #:condition (where #:id user-id)))
+                         #:condition (where #:identifier user-id)))
                (new-salt (generate-string-uuid))
                (h (string->sha-256 (string-append new-password new-salt)))
                (_ (DB-query (DB-open rc)
                             (format #f
-                             "UPDATE user SET salt = '~a', password = '~a' WHERE id = '~a'"
+                             "UPDATE users SET salt = '~a', password_hash = '~a' WHERE identifier = '~a'"
                              new-salt h
                              (assoc-ref (car u) "identifier"))))
                (_ ($password_reset 'mod

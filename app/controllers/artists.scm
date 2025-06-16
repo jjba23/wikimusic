@@ -47,7 +47,7 @@
 (get "/artists"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-artist-sort)
+     #:cookies '(names wikimusic-artist-sort x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((user-search (cond
                              ((equal? #f
@@ -146,11 +146,15 @@
                                                  #:limit query-limit
                                                  #:offset query-offset
                                                  #:search-query user-search
-                                                 #:user-sort user-sort))))))
+                                                 #:user-sort user-sort
+                                                 #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")))))))
 
 (get "/artists/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
+     #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((uuid (params rc "uuid"))
               (artist (car ($artists 'get
@@ -185,8 +189,7 @@
                                     (car raw-external-sources)))
               (users ($users 'get
                              #:ret 'all
-                             #:order-by '(username asc)
-                             #:columns '(identifier username email)))
+                             #:order-by '(username asc)))
               (user-alist (map (lambda (u)
                                  `(,(assoc-ref u "identifier") ,u)) users))
 
@@ -299,20 +302,28 @@
                                                    #:song-fragment
                                                    song-fragment
                                                    #:external-sources
-                                                   external-sources))))))
+                                                   external-sources
+                                                   #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")))))))
 
 ;; ====== Data edit GET routes ======
 
 (get "/artists/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
+          #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
-                             (artist-new-page (:i18n rc))))))
+                             (artist-new-page (:i18n rc)
+                                              #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic"))))))
 
 (get "/artists/uuid/:uuid/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
+          #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((uuid (params rc "uuid"))
               (artist (car ($artists 'get
@@ -339,7 +350,10 @@
                                                  #:artist artist
                                                  #:artworks artworks
                                                  #:external-sources
-                                                 external-sources))))))
+                                                 external-sources
+                                                 #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")))))))
 
 ;; ====== Data edit POST routes ======
 

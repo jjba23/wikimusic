@@ -25,9 +25,13 @@
 (get "/"
      #:mime 'xml
      #:i18n '(cookie "lang")
+          #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
-                             (welcome-page (:i18n rc))))))
+                             (welcome-page (:i18n rc)
+                                           #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic"))))))
 
 (get "/robots.txt" static-page-emitter)
 (get "/favicon.ico" static-page-emitter)

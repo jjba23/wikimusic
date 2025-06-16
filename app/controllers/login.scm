@@ -35,9 +35,13 @@
 (get "/login"
      #:mime 'xml
      #:i18n '(cookie "lang")
+          #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
-                             (login-page (:i18n rc))))))
+                             (login-page (:i18n rc)
+                                         #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic"))))))
 
 (post "/login"
       #:cookies '(names x-bewaking-wikimusic)
@@ -67,7 +71,7 @@
           (cond
             ((equal? (string->sha-256 (string-append password
                                                      (assoc-ref (car u) "salt")))
-                     (assoc-ref (car u) "password"))
+                     (assoc-ref (car u) "password_hash"))
              (begin
                (:cookies-set! rc
                               'x-bewaking-wikimusic "x-bewaking-wikimusic" t)

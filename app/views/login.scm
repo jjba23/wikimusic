@@ -27,7 +27,7 @@
   #:use-module (ice-9 string-fun)
   #:export (login-page))
 
-(define* (login-page G_)
+(define* (login-page G_ #:key is-logged-in)
   (let* ((login-form `(div (form (@ (action "/login")
                                     (class ,(mk-class '(w-full rounded-xl
                                                         bg-stone-200/75
@@ -73,6 +73,7 @@
                                                #:type 'submit
                                                #:content (G_ "reset password")))))))
     (html-template G_
+                   #:is-logged-in is-logged-in
                    #:body `((div (@ (class ,(mk-class '(container mx-auto))))
                                  (div (@ (class ,(mk-class '(w-full flex
                                                                     flex-row

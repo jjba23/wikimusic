@@ -47,7 +47,7 @@
 (get "/genres"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-genre-sort)
+     #:cookies '(names wikimusic-genre-sort x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((user-search (cond
                              ((equal? #f
@@ -146,18 +146,26 @@
                                                 #:limit query-limit
                                                 #:offset query-offset
                                                 #:search-query user-search
-                                                #:user-sort user-sort))))))
+                                                #:user-sort user-sort
+                                                #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")))))))
 
 (get "/genres/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
+          #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
-                             (genre-new-page (:i18n rc))))))
+                             (genre-new-page (:i18n rc)
+                                             #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic"))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
+          #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((uuid (params rc "uuid"))
               (genre (car ($genres 'get
@@ -189,8 +197,7 @@
                                     (car raw-external-sources)))
               (users ($users 'get
                              #:ret 'all
-                             #:order-by '(username asc)
-                             #:columns '(identifier username email)))
+                             #:order-by '(username asc)))
               (user-alist (map (lambda (u)
                                  `(,(assoc-ref u "identifier") ,u)) users))
               ;; song-specific
@@ -319,11 +326,15 @@
                                                   #:song-fragment
                                                   song-fragment
                                                   #:external-sources
-                                                  external-sources))))))
+                                                  external-sources
+                                                  #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")))))))
 
 (get "/genres/uuid/:uuid/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
+          #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((uuid (params rc "uuid"))
               (genre (car ($genres 'get
@@ -348,7 +359,10 @@
                                                 #:genre genre
                                                 #:artworks artworks
                                                 #:external-sources
-                                                external-sources))))))
+                                                external-sources
+                                                #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")))))))
 
 (post "/genres/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)

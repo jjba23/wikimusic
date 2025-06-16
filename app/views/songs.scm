@@ -110,7 +110,8 @@
                          limit
                          offset
                          search-query
-                         user-sort)
+                         user-sort
+                         is-logged-in)
   (let* ((page-buttons `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                           gap-3 my-4))))
                               ,(if (> offset 0)
@@ -196,6 +197,7 @@
                                        ,(button (G_ "new song"))))))))))
     (if only-tiles body
         (html-template G_
+                       #:is-logged-in is-logged-in
                        #:body body))))
 
 (define* (song-detail-page G_
@@ -210,7 +212,8 @@
                            comments
                            user-alist
                            (ascii-size 'text-md)
-                           external-sources)
+                           external-sources
+                           is-logged-in)
   
   (let* ((artist-name-titles (map (lambda (ar)
                                     `((div ,(a (assoc-ref ar "display_name")
@@ -241,6 +244,7 @@
                                                                  "identifier"))))))
                                  genres)))
     (html-template G_
+                   #:is-logged-in is-logged-in
                    #:body `((div (@ (class ,(mk-class '(container mx-auto))))
                                  ((div (@ (class ,(mk-class '(flex flex-col
                                                                    gap-4))))
@@ -352,7 +356,8 @@
                          artworks
                          (artists '())
                          (genres '())
-                         (external-sources '()))
+                         (external-sources '())
+                         is-logged-in)
   (let* ((html `(div (@ (class ,(mk-class '(container mx-auto))))
                      ,(if (assoc-ref song "identifier")
                           (h2 (format #f "~a: ~a"
@@ -574,10 +579,12 @@
                                                                       (hover:bg-red-900))))))
                                          genres))))))
     (html-template G_
+                   #:is-logged-in is-logged-in
                    #:body html)))
 
-(define* (song-new-page G_)
+(define* (song-new-page G_ #:key is-logged-in)
   (html-template G_
+                 #:is-logged-in is-logged-in
                  #:body `(div (@ (class ,(mk-class '(container mx-auto))))
                               ,(song-form G_))))
 

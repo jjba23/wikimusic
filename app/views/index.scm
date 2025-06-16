@@ -27,8 +27,9 @@
   #:use-module (ice-9 string-fun)
   #:export (welcome-page))
 
-(define* (welcome-page G_)
+(define* (welcome-page G_ #:key is-logged-in)
   (html-template G_
+                 #:is-logged-in is-logged-in
                  #:body `(div (@ (class "container mx-auto"))
                               (div (@ (class "p-2"))
                                    ,(h2 (G_ "Welcome to Wikimusic"))

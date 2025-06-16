@@ -49,7 +49,7 @@
 (get "/songs"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-song-sort)
+     #:cookies '(names wikimusic-song-sort x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((user-search (cond
                              ((equal? #f
@@ -191,27 +191,38 @@
                                                #:limit query-limit
                                                #:offset query-offset
                                                #:search-query user-search
-                                               #:user-sort user-sort))))))
+                                               #:user-sort user-sort
+                                               #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")))))))
 
 (get "/songs/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
+          #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
-                             (song-new-page (:i18n rc))))))
+                             (song-new-page (:i18n rc)
+                                            #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic"))))))
 
 (get "/songs/uuid/:uuid/contents/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
+          #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (response-emit (:mime rc
                              (song-content-new-page (:i18n rc)
-                                                    (params rc "uuid"))))))
+                                                    #:song-identifier (params rc "uuid")
+                                                    #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic"))))))
 
 (get "/songs/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-ascii-size)
+     #:cookies '(names wikimusic-ascii-size x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((ascii-size (cond
                             ((not (equal? #f
@@ -318,7 +329,10 @@
                                                  #:user-alist user-alist
                                                  #:ascii-size ascii-size
                                                  #:external-sources
-                                                 external-sources))))))
+                                                 external-sources
+                                                 #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")))))))
 
 (get "/songs/uuid/:uuid/edit"
      #:mime 'xml
@@ -380,7 +394,10 @@
                                                #:artists artists
                                                #:genres genres
                                                #:external-sources
-                                               external-sources))))))
+                                               external-sources
+                                               #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")))))))
 
 (get "/songs/uuid/:uuid/contents/:version-uuid/edit"
      #:mime 'xml
@@ -398,8 +415,12 @@
                                                                version-uuid)))))
          
          (response-emit (:mime rc
-                               (song-content-edit-page (:i18n rc) song
-                                                       song-contents))))))
+                               (song-content-edit-page (:i18n rc)
+                                                       #:song song
+                                                       #:song-contents song-contents
+                                                       #:is-logged-in (:cookies-value
+                                                                              rc
+                                                                              "x-bewaking-wikimusic")))))))
 
 (post "/songs/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)

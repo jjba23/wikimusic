@@ -39,7 +39,8 @@
                           limit
                           offset
                           search-query
-                          user-sort)
+                          user-sort
+                          is-logged-in)
   (let* ((page-buttons `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                           gap-3 my-4))))
                               ,(if (> offset 0)
@@ -105,6 +106,7 @@
                                 (a (@ (href "/genres/new"))
                                    ,(button (G_ "new genre")))))))))
     (html-template G_
+                   #:is-logged-in is-logged-in
                    #:body body)))
 
 (define* (genre-detail-page G_
@@ -114,8 +116,10 @@
                             comments
                             user-alist
                             song-fragment
-                            external-sources)
+                            external-sources
+                            is-logged-in)
   (html-template G_
+                 #:is-logged-in is-logged-in
                  #:body `((div (@ (class ,(mk-class '(container mx-auto))))
                                (,(h2 (assoc-ref genre "display_name")) (div (div ,
                                                                              (entity-details
@@ -135,7 +139,7 @@
                           ,song-fragment)))
 
 (define* (genre-edit-page G_
-                          #:key genre artworks external-sources)
+                          #:key genre artworks external-sources is-logged-in)
   (let* ((arts (map (lambda (a)
                       `(div (figure (@ (class ,(mk-class '(py-3 sm:w-36))))
                                     (img (@ (loading "lazy")
@@ -228,10 +232,12 @@
                                                                         external-sources
                                                                         "soundcloud_url"))))))
     (html-template G_
+                   #:is-logged-in is-logged-in
                    #:body body)))
 
-(define* (genre-new-page G_)
+(define* (genre-new-page G_ #:key is-logged-in)
   (html-template G_
+                 #:is-logged-in is-logged-in
                  #:body `(div (@ (class ,(mk-class '(container mx-auto))))
                               ,(genre-form G_))))
 
