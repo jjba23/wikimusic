@@ -109,7 +109,8 @@
                                  #:content (G_ "login")
                                  #:size '(text-xs md:text-sm)
                                  #:extra-classes '(py-1 md:py-2 px-2 md:px-3
-                                                 max-w-prose cursor-pointer))))
+                                                        max-w-prose
+                                                        cursor-pointer))))
               `((a (@ (class ,(mk-class '(text-sm lowercase
                                                   text-white
                                                   dark:text-black
@@ -123,7 +124,8 @@
                                  #:content (G_ "me")
                                  #:size '(text-xs md:text-sm)
                                  #:extra-classes '(py-1 md:py-2 px-2 md:px-3
-                                                 max-w-prose cursor-pointer)))))
+                                                        max-w-prose
+                                                        cursor-pointer)))))
          (a (@ (href "/songs"))
             ,(icon-button #:icon 'music-notes-simple
                           #:content (G_ "songs")
@@ -189,7 +191,7 @@
                                   (script ,toggle-dark-theme-js)
                                   (script ,remember-dark-theme-js)
                                   (script ,(assoc-ref asset-library
-                                                      "pub/js/song-chord-highlighter.js"))
+                                            "pub/js/song-chord-highlighter.js"))
                                   (script ,(assoc-ref asset-library
                                             "pub/js/song-auto-scroll.js"))
                                   (script ,(assoc-ref asset-library

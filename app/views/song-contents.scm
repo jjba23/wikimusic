@@ -97,7 +97,8 @@
                                                                           dark:text-stone-300
                                                                           cursor-pointer))))
                                                    ,(G_ "ascii legend"))
-                                          (pre (@ (id ascii-legend-container)(class ,(mk-class (append (list
+                                          (pre (@ (id ascii-legend-container)
+                                                  (class ,(mk-class (append (list
                                                                              (string->symbol
                                                                               ascii-size))
                                                                             '(p-4
@@ -172,9 +173,9 @@
                                       ,(icon-button #:icon 'music-notes-simple
                                                     #:content (G_
                                                                "highlight chords")
-                                                    #:on-click
-                                                    (string-append "highlightChords('ascii-content-container');"
-                                                                   "highlightChords('ascii-legend-container');")))))
+                                                    #:on-click (string-append
+                                                                "highlightChords('ascii-content-container');"
+                                                                "highlightChords('ascii-legend-container');")))))
          (render-ascii-content (lambda (ascii-contents)
                                  `(,ascii-button-section (details (@ (open
                                                                       true)
