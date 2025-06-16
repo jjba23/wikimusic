@@ -93,7 +93,7 @@
                  (span ,(icon #:type 'music-note
                               #:icon-css '(text-xl text-stone-800
                                                    dark:text-stone-200)))
-                 ,(h4 (G_ "Wikimusic"))))
+                 ,(h3 (G_ "Wikimusic"))))
          ,(if (not is-logged-in)
               `((a (@ (class ,(mk-class '(text-sm lowercase
                                                   text-white
