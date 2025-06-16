@@ -52,18 +52,19 @@
                (password (uri-decode (car (assoc-ref kv "password"))))
                (u ($users 'get
                           #:ret 'top
-                          #:condition (where #:email_address email)))
+                          #:condition (where #:email email)))
                (get-owner-details (lambda ()
                                     `((id unquote
                                           (assoc-ref (car u) "identifier"))
                                       (email unquote
-                                             (assoc-ref (car u) "email_address"))
+                                             (assoc-ref (car u) "email"))
                                       (name unquote
                                             (assoc-ref (car u) "username"))
                                       (permissions unquote
                                                    (eval-string (assoc-ref (car
                                                                             u)
                                                                  "permissions"))))))
+               (_ (write (get-owner-details)))
                (t (generate-token #:encryption-key encryption-key
                                   #:signing-key signing-key
                                   #:get-owner-details get-owner-details)))
@@ -71,7 +72,7 @@
           (cond
             ((equal? (string->sha-256 (string-append password
                                                      (assoc-ref (car u) "salt")))
-                     (assoc-ref (car u) "password_hash"))
+                     (assoc-ref (car u) "password"))
              (begin
                (:cookies-set! rc
                               'x-bewaking-wikimusic "x-bewaking-wikimusic" t)

@@ -77,7 +77,7 @@
                                   #:signing-key signing-key))
                 (user ($users 'get
                              #:ret 'top
-                             #:condition (where #:id (assoc-ref t
+                             #:condition (where #:identifier (assoc-ref t
                                                                 'owner-id))))
                 (users ($users 'get
                               #:ret 'all
@@ -114,7 +114,7 @@
               (email (assoc-ref (car ($users 'get
                                             #:ret 'top
                                             #:condition (where #:identifier user-id)))
-                                "email_address")))
+                                "email")))
          (response-emit (:mime rc
                                (reset-password-page (:i18n rc)
                                                     #:token (params rc "token")
@@ -168,7 +168,7 @@
                                                       'owner-id)))
                       ($users 'get
                              #:ret 'top
-                             #:condition (where #:email_address (uri-decode (car email))))))
+                             #:condition (where #:email (uri-decode (car email))))))
                (_ ($password_reset 'mod
                                    'row-delete
                                    (where #:user_id (assoc-ref (car u) "identifier"))))
@@ -184,7 +184,7 @@
                                (template . password-reset)
                                (template-vars (system-name . Wikimusic)
                                               (user unquote
-                                                    (assoc-ref (car u) "email_address"))
+                                                    (assoc-ref (car u) "email"))
                                               (reset-link unquote
                                                           (format #f
                                                            "~a/password/reset/token/~a"
@@ -193,7 +193,7 @@
                                (sender-name . "No Reply - Wikimusic")
                                (sender-address . "noreply@wikimusic.jointhefreeworld.org")
                                (subject . "Wikimusic - Password Reset")
-                               (recipients . #(((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email_address"))))))))
+                               (recipients . #(((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email"))))))))
           
           (send-to-pingwing #:body mail-payload)
           (redirect-to rc
@@ -231,7 +231,7 @@
                (h (string->sha-256 (string-append new-password new-salt)))
                (_ (DB-query (DB-open rc)
                             (format #f
-                             "UPDATE users SET salt = '~a', password_hash = '~a' WHERE identifier = '~a'"
+                             "UPDATE users SET salt = '~a', password = '~a' WHERE identifier = '~a'"
                              new-salt h
                              (assoc-ref (car u) "identifier"))))
                (_ ($password_reset 'mod

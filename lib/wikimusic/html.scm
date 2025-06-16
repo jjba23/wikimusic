@@ -128,9 +128,9 @@
          ,(ui-mode-button))))
 
 (define* (html-template G_
-                        #:key body (is-logged-in #f))
+                        #:key (title "WikiMusic") body (is-logged-in #f))
   
-  `("<!DOCTYPE html>" (html (head (title "Wikimusic")
+  `("<!DOCTYPE html>" (html (head (title ,title)
                                   (link (@ (rel preconnect)
                                            (href
                                             "https://fonts.googleapis.com")))
@@ -274,7 +274,7 @@
                                  ,(format #f "~a (~a) &lt;~a&gt;"
                                           (assoc-ref u "display_name")
                                           (assoc-ref u "username")
-                                          (assoc-ref u "email_address"))))
+                                          (assoc-ref u "email"))))
                            (car (assoc-ref user-alist
                                            (assoc-ref comment "created_by"))))
         (p (@ (class ,(mk-class '(text-sm text-stone-900))))
@@ -470,7 +470,7 @@
                                                          "~a &lt;~a&gt;"
                                                          (assoc-ref u
                                                           "username")
-                                                         (assoc-ref u "email_address")))))
+                                                         (assoc-ref u "email")))))
                                            (car (assoc-ref user-alist
                                                            (assoc-ref x
                                                             "created_by")))))
