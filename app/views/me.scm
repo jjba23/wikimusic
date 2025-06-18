@@ -224,6 +224,8 @@
                                                         wikimusic:artist-delete
                                                         wikimusic:genre-create
                                                         wikimusic:genre-delete
+                                                        wikimusic:user-create
+                                                        wikimusic:user-delete
                                                         wikimusic:modify-permissions)))
                                                (div ,(submit-button (G_
                                                                      "create"))))))))))
