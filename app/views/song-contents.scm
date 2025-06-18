@@ -51,8 +51,8 @@
 
 (define* (render-version G_ song version ascii-size)
   (let* ((v-name (render-if-nempty (lambda (version-name)
-                                     (format #f "~a ~a ~a"
-                                             (G_ "version") version-name
+                                     (format #f "~a ~a"
+                                             version-name
                                              (assoc-ref version
                                                         "instrument_type")))
                                    (assoc-ref version "version_name")))
