@@ -68,7 +68,9 @@
                               (div (@ (class ,(mk-class '(max-w-prose))))
                                    ,(em (G_
                                          "tip: if your session permissions don't match the DB consider logging out and logging in again"))))))
-         
+         (has-modify-permissions (member 'wikimusic:modify-permissions
+                                         (assoc-ref token
+                                                    'owner-permissions)))
          (session-duration `((div (@ (class ,(mk-class '(py-8 px-4))))
                                   ,(em (format #f "~a: ~a"
                                                (G_ "logged in until")
@@ -88,10 +90,12 @@
                                                                   flex-row
                                                                   flex-wrap
                                                                   gap-6))))
-                                      (a (@ (href "/users/manage"))
-                                         ,(icon-button #:icon 'user-switch
-                                                       #:content (G_
-                                                                  "go to user management")))
+                                      ,(if has-modify-permissions
+                                           `((a (@ (href "/users/manage"))
+                                                ,(icon-button #:icon 'user-switch
+                                                              #:content (G_
+                                                                         "go to user management"))))
+                                           '())
                                       (a (@ (href "/logout"))
                                          ,(icon-button #:icon 'sign-out
                                                        #:content (G_ "logout")))
@@ -270,7 +274,10 @@
                                                            bg-stone-200
                                                            dark:bg-stone-900))))
                                     (form (@ (method POST)
-                                             (action ,(format #f "/users/edit/~a" (assoc-ref u "identifier"))))
+                                             (action ,(format #f
+                                                       "/users/edit/~a"
+                                                       (assoc-ref u
+                                                        "identifier"))))
                                           (input (@ (hidden "")
                                                     (value ,(assoc-ref u
                                                              "identifier"))))
@@ -300,6 +307,7 @@
                                                              #:checked (not (nil?
                                                                              (member
                                                                               p
+
                                                                               
                                                                               (eval-string
                                                                                (assoc-ref
