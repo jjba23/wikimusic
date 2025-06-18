@@ -119,6 +119,25 @@
                           #:happy-flow go-to-new-user
                           #:unhappy-flow back-to-login)))
 
+(get "/users/edit/:identifier"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     #:cookies '(names x-bewaking-wikimusic)
+     (lambda (rc)
+       (define (go-to-edit-user)
+         (let* ((user (car ($users 'get
+                                   #:ret 'top
+                                   #:condition (where #:identifier (params rc
+                                                                    "identifier"))))))
+           (response-emit (:mime rc
+                                 (edit-user-page (:i18n rc) user)))))
+
+       (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                          #:needed-permissions '(wikimusic:modify-permissions)
+                          #:rc rc
+                          #:happy-flow go-to-edit-user
+                          #:unhappy-flow back-to-login)))
+
 (define (from-checkbox body n)
   (if (assoc-ref (read-url-encoded-body body)
                  (uri-encode (symbol->string n))) n #f))
@@ -156,8 +175,8 @@
                             #:email email
                             #:permissions (format #f "`~s" permissions)))
                  (u ($users 'get
-                                 #:ret 'top
-                                 #:condition (where #:identifier new-id))))
+                            #:ret 'top
+                            #:condition (where #:identifier new-id))))
             (request-password-reset u)
             (redirect-to rc
                          (string->uri (format #f
