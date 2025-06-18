@@ -30,6 +30,6 @@
                                              wikimusic:song-create wikimusic:song-delete
                                              wikimusic:artist-create wikimusic:artist-delete
                                              wikimusic:genre-create wikimusic:genre-delete
-                                             wikimusic:users-create wikimusic:users-delete)")
+                                             wikimusic:user-create wikimusic:user-delete)")
             (display "done.\n"))
 
