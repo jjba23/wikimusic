@@ -270,7 +270,7 @@
                                                            bg-stone-200
                                                            dark:bg-stone-900))))
                                     (form (@ (method POST)
-                                             (action "/users/edit"))
+                                             (action ,(format #f "/users/edit/~a" (assoc-ref u "identifier"))))
                                           (input (@ (hidden "")
                                                     (value ,(assoc-ref u
                                                              "identifier"))))

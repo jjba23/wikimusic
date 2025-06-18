@@ -210,6 +210,45 @@
                            #:happy-flow do-delete-user
                            #:unhappy-flow back-to-login)))
 
+(post "/users/edit/:identifier"
+      #:cookies '(names x-bewaking-wikimusic)
+      (lambda (rc)
+        (define (do-edit-user)
+          (let* (
+                 (body (rc-body rc))
+                 (kv (read-url-encoded-body body))
+                 (username (escape-str (uri-decode (car (assoc-ref kv
+                                                                   "username")))))
+                 (email (escape-str (uri-decode (car (assoc-ref kv "email")))))
+                 (permissions (filter (lambda (p)
+                                        (not (equal? #f p)))
+                                      (map (lambda (p)
+                                             (from-checkbox body p))
+                                           '(wikimusic:song-create
+                                             wikimusic:song-delete
+                                             wikimusic:artist-create
+                                             wikimusic:artist-delete
+                                             wikimusic:genre-create
+                                             wikimusic:genre-delete
+                                             wikimusic:modify-permissions))))
+                 (_ (DB-query (DB-open rc)
+                              (->sql update 'users set
+                                     `((username ,username)
+                                       (email ,email)
+                                       (permissions ,(format #f "`~s" permissions)))
+                                     (where #:identifier (params rc "identifier"))))))
+            (redirect-to rc
+                         (string->uri (format #f
+                                              "~a/users/manage/?edited=true"
+                                              (current-myhost)))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:modify-permissions)
+                           #:rc rc
+                           #:happy-flow do-edit-user
+                           #:unhappy-flow back-to-login)))
+
+
 (get "/password/reset/token/:token"
      #:mime 'xml
      #:i18n '(cookie "lang")
