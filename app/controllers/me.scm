@@ -167,6 +167,8 @@
                                              wikimusic:artist-delete
                                              wikimusic:genre-create
                                              wikimusic:genre-delete
+                                             wikimusic:user-create
+                                             wikimusic:user-delete                                             
                                              wikimusic:modify-permissions))))
                  (new-id (generate-string-uuid))
                  (_ ($users 'set
@@ -230,6 +232,8 @@
                                              wikimusic:artist-delete
                                              wikimusic:genre-create
                                              wikimusic:genre-delete
+                                             wikimusic:user-create
+                                             wikimusic:user-delete
                                              wikimusic:modify-permissions))))
                  (_ (DB-query (DB-open rc)
                               (->sql update 'users set

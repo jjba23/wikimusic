@@ -797,7 +797,7 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
-                           #:needed-permissions '(wikimusic:song-create)
+                           #:needed-permissions '()
                            #:rc rc
                            #:happy-flow (lambda ()
                                           (do-opinion rc 1 0
@@ -814,7 +814,7 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
-                           #:needed-permissions '(wikimusic:song-create)
+                           #:needed-permissions '()
                            #:rc rc
                            #:happy-flow (lambda ()
                                           (do-opinion rc 0 1
