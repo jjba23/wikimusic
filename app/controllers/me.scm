@@ -114,7 +114,7 @@
                                  (new-user-page (:i18n rc))))))
 
        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
-                          #:needed-permissions '(wikimusic:modify-permissions)
+                          #:needed-permissions '(wikimusic:user-create)
                           #:rc rc
                           #:happy-flow go-to-new-user
                           #:unhappy-flow back-to-login)))
@@ -186,7 +186,7 @@
                                               (current-myhost)))
                          #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
-                           #:needed-permissions '(wikimusic:modify-permissions)
+                           #:needed-permissions '(wikimusic:user-create)
                            #:rc rc
                            #:happy-flow do-new-user
                            #:unhappy-flow back-to-login)))
@@ -207,7 +207,7 @@
                                               (current-myhost)))
                          #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
-                           #:needed-permissions '(wikimusic:modify-permissions)
+                           #:needed-permissions '(wikimusic:user-delete)
                            #:rc rc
                            #:happy-flow do-delete-user
                            #:unhappy-flow back-to-login)))
