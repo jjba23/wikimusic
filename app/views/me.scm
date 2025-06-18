@@ -25,7 +25,7 @@
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (me-page users-page reset-password-page))
+  #:export (me-page users-page reset-password-page new-user-page))
 
 (define* (me-page G_
                   #:key is-logged-in token user)
@@ -130,16 +130,36 @@
          (div (@ (class ,(mk-class '(flex flex-col gap-2))))
               ,(em (G_ "permissions"))
               ,(mono (assoc-ref u "permissions")
-                     #:size '(text-xs))))
+                     #:size '(text-xs)))
+         (div (@ (class ,(mk-class '(flex flex-row gap-3))))
+              (div (form (@ (method POST)
+                            (action "/users/delete"))
+                         (input (@ (name identifier)
+                                   (value ,(assoc-ref u "identifier"))
+                                   (hidden "")))
+                         ,(button (G_ "delete")
+                                  #:on-click (format #f
+                                              "return confirm('~a: ~a')"
+                                              (assoc-ref u "email")
+                                              (G_
+                                               "are you sure you want to delete this user?"))
+                                  #:type 'submit
+                                  #:background '(bg-red-700)
+                                  #:color '(text-stone-200)
+                                  #:hover-background '(hover:bg-red-900))))))
     ,(hr)))
 
 (define* (users-page G_
-                     #:key users token is-logged-in)
+                     #:key users)
   (html-template G_
                  #:title "wikimusic"
-                 #:is-logged-in is-logged-in
+                 #:is-logged-in #t
                  #:body `((div (@ (class ,(mk-class '(container mx-auto))))
                                ,(h2 (G_ "User management"))
+                               (div (@ (class ,(mk-class '(my-6))))
+                                    (a (@ (href "/users/new"))
+                                       ,(icon-button #:icon 'user-plus
+                                                     #:content (G_ "new user"))))
                                (div (@ (class ,(mk-class '(flex flex-col
                                                            gap-4
                                                            my-8
@@ -150,6 +170,53 @@
                                                            dark:bg-stone-900))))
                                     ,(map (lambda (u)
                                             (render-user G_ u)) users))))))
+
+(define (make-permission-checkbox p)
+  `((div ,(input #:type 'checkbox
+                 #:input-flex-css '(my-2 flex flex-row gap-1)
+                 #:label (format #f "~a" p)
+                 #:name (format #f "~a" p)))))
+
+(define* (new-user-page G_)
+  (html-template G_
+                 #:title "wikimusic"
+                 #:is-logged-in #t
+                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                               (div ,(h2 (G_ "New User")))
+                               (div (@ (class ,(mk-class '(flex flex-col
+                                                           gap-4
+                                                           my-8
+                                                           py-8
+                                                           px-4
+                                                           rounded-xl
+                                                           bg-stone-200
+                                                           dark:bg-stone-900))))
+                                    (form (@ (method POST)
+                                             (action "/users/new"))
+                                          (div ,(input #:label (G_ "username")
+                                                       #:name 'username
+                                                       #:required #t))
+                                          (div ,(input #:label (G_ "email")
+                                                       #:name 'email
+                                                       #:type 'email
+                                                       #:required #t))
+                                          (div (@ (class ,(mk-class '(my-6))))
+                                               ,(sub-h4 (G_ "user permissions"))
+                                               (div (@ (class ,(mk-class '(flex
+                                                                           flex-col
+                                                                           gap-1))))
+
+                                                    ,(map
+                                                      make-permission-checkbox
+                                                      '(wikimusic:song-create
+                                                        wikimusic:song-delete
+                                                        wikimusic:artist-create
+                                                        wikimusic:artist-delete
+                                                        wikimusic:genre-create
+                                                        wikimusic:genre-delete
+                                                        wikimusic:modify-permissions)))
+                                               (div ,(submit-button (G_
+                                                                     "create"))))))))))
 
 (define* (reset-password-page G_
                               #:key token email)
