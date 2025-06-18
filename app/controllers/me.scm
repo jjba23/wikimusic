@@ -23,6 +23,7 @@
         (app models users)
         (wikimusic env)
         (wikimusic auth)
+        (wikimusic query-escape)
         (app views me)
         (curl)
         (wikimusic url)
@@ -84,16 +85,169 @@
                                #:order-by '(username asc))))
            (response-emit (:mime rc
                                  (users-page (:i18n rc)
-                                             #:users users
-                                             #:token t
-                                             #:is-logged-in (:cookies-value rc
-                                                             "x-bewaking-wikimusic"))))))
+                                             #:users users)))))
 
        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                           #:needed-permissions '(wikimusic:modify-permissions)
                           #:rc rc
                           #:happy-flow go-to-users-management
                           #:unhappy-flow back-to-login)))
+
+(get "/users/new"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     #:cookies '(names x-bewaking-wikimusic)
+     (lambda (rc)
+       (define (go-to-new-user)
+         (let* ((t (decrypt-token #:token (:cookies-value rc
+                                           "x-bewaking-wikimusic")
+                                  #:encryption-key encryption-key
+                                  #:signing-key signing-key))
+                (user ($users 'get
+                              #:ret 'top
+                              #:condition (where #:identifier (assoc-ref t
+                                                                         'owner-id))))
+                (users ($users 'get
+                               #:ret 'all
+                               #:order-by '(username asc))))
+           (response-emit (:mime rc
+                                 (new-user-page (:i18n rc))))))
+
+       (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                          #:needed-permissions '(wikimusic:modify-permissions)
+                          #:rc rc
+                          #:happy-flow go-to-new-user
+                          #:unhappy-flow back-to-login)))
+
+(get "/users/edit/:identifier"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     #:cookies '(names x-bewaking-wikimusic)
+     (lambda (rc)
+       (define (go-to-edit-user)
+         (let* ((user (car ($users 'get
+                                   #:ret 'top
+                                   #:condition (where #:identifier (params rc
+                                                                    "identifier"))))))
+           (response-emit (:mime rc
+                                 (edit-user-page (:i18n rc) user)))))
+
+       (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                          #:needed-permissions '(wikimusic:modify-permissions)
+                          #:rc rc
+                          #:happy-flow go-to-edit-user
+                          #:unhappy-flow back-to-login)))
+
+(define (from-checkbox body n)
+  (if (assoc-ref (read-url-encoded-body body)
+                 (uri-encode (symbol->string n))) n #f))
+(post "/users/new"
+      #:cookies '(names x-bewaking-wikimusic)
+      (lambda (rc)
+        (define (do-new-user)
+          (let* ((existing-token (if (:cookies-value rc "x-bewaking-wikimusic")
+                                     (decrypt-token #:token (:cookies-value rc
+                                                             "x-bewaking-wikimusic")
+                                                    #:encryption-key
+                                                    encryption-key
+                                                    #:signing-key signing-key)
+                                     #f))
+                 (body (rc-body rc))
+                 (kv (read-url-encoded-body body))
+                 (username (escape-str (uri-decode (car (assoc-ref kv
+                                                                   "username")))))
+                 (email (escape-str (uri-decode (car (assoc-ref kv "email")))))
+                 (permissions (filter (lambda (p)
+                                        (not (equal? #f p)))
+                                      (map (lambda (p)
+                                             (from-checkbox body p))
+                                           '(wikimusic:song-create
+                                             wikimusic:song-delete
+                                             wikimusic:artist-create
+                                             wikimusic:artist-delete
+                                             wikimusic:genre-create
+                                             wikimusic:genre-delete
+                                             wikimusic:modify-permissions))))
+                 (new-id (generate-string-uuid))
+                 (_ ($users 'set
+                            #:identifier new-id
+                            #:username username
+                            #:email email
+                            #:permissions (format #f "`~s" permissions)))
+                 (u ($users 'get
+                            #:ret 'top
+                            #:condition (where #:identifier new-id))))
+            (request-password-reset u)
+            (redirect-to rc
+                         (string->uri (format #f
+                                              "~a/users/manage/?created=true"
+                                              (current-myhost)))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:modify-permissions)
+                           #:rc rc
+                           #:happy-flow do-new-user
+                           #:unhappy-flow back-to-login)))
+
+(post "/users/delete"
+      #:cookies '(names x-bewaking-wikimusic)
+      (lambda (rc)
+        (define (do-delete-user)
+          (let* ((body (rc-body rc))
+                 (identifier (assoc-ref (read-url-encoded-body body)
+                                        "identifier"))
+                 (_ ($users 'mod
+                            'row-delete
+                            (where #:identifier identifier))))
+            (redirect-to rc
+                         (string->uri (format #f
+                                              "~a/users/manage/?deleted=true"
+                                              (current-myhost)))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:modify-permissions)
+                           #:rc rc
+                           #:happy-flow do-delete-user
+                           #:unhappy-flow back-to-login)))
+
+(post "/users/edit/:identifier"
+      #:cookies '(names x-bewaking-wikimusic)
+      (lambda (rc)
+        (define (do-edit-user)
+          (let* (
+                 (body (rc-body rc))
+                 (kv (read-url-encoded-body body))
+                 (username (escape-str (uri-decode (car (assoc-ref kv
+                                                                   "username")))))
+                 (email (escape-str (uri-decode (car (assoc-ref kv "email")))))
+                 (permissions (filter (lambda (p)
+                                        (not (equal? #f p)))
+                                      (map (lambda (p)
+                                             (from-checkbox body p))
+                                           '(wikimusic:song-create
+                                             wikimusic:song-delete
+                                             wikimusic:artist-create
+                                             wikimusic:artist-delete
+                                             wikimusic:genre-create
+                                             wikimusic:genre-delete
+                                             wikimusic:modify-permissions))))
+                 (_ (DB-query (DB-open rc)
+                              (->sql update 'users set
+                                     `((username ,username)
+                                       (email ,email)
+                                       (permissions ,(format #f "`~s" permissions)))
+                                     (where #:identifier (params rc "identifier"))))))
+            (redirect-to rc
+                         (string->uri (format #f
+                                              "~a/users/manage/?edited=true"
+                                              (current-myhost)))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:modify-permissions)
+                           #:rc rc
+                           #:happy-flow do-edit-user
+                           #:unhappy-flow back-to-login)))
+
 
 (get "/password/reset/token/:token"
      #:mime 'xml
@@ -122,7 +276,7 @@
                                                     #:email email))))))
 
 (define* (send-to-pingwing #:key body)
-  
+  (write body)
   (let* ((handle (curl-easy-init))
          (_ (begin
               (curl-easy-setopt handle
@@ -149,6 +303,33 @@
                       r))))
     (display rr)))
 
+(define (request-password-reset u)
+  (let* ((_ ($password_reset 'mod
+                             'row-delete
+                             (where #:user_id (assoc-ref (car u) "identifier"))))
+         (reset-token (base16-encode (format #f "~a-~a-~a"
+                                             (generate-string-uuid)
+                                             (generate-string-uuid)
+                                             (generate-string-uuid))))
+         (pr ($password_reset 'set
+                              #:user_id (assoc-ref (car u) "identifier")
+                              #:reset_token reset-token
+                              #:created_at (current-time)))
+         (mail-payload `((task-type . send-email) (template . password-reset)
+                         (template-vars (system-name . Wikimusic)
+                                        (user unquote
+                                              (assoc-ref (car u) "email"))
+                                        (reset-link unquote
+                                                    (format #f
+                                                     "~a/password/reset/token/~a"
+                                                     (current-myhost)
+                                                     reset-token)))
+                         (sender-name . "No Reply - Wikimusic")
+                         (sender-address . "noreply@wikimusic.jointhefreeworld.org")
+                         (subject . "Wikimusic - Password Reset")
+                         (recipients . #(((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email"))))))))
+    (send-to-pingwing #:body mail-payload)))
+
 (post "/password/reset"
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
@@ -171,35 +352,9 @@
                       ($users 'get
                               #:ret 'top
                               #:condition (where #:email (uri-decode (car
-                                                                      email))))))
-               (_ ($password_reset 'mod
-                                   'row-delete
-                                   (where #:user_id (assoc-ref (car u)
-                                                               "identifier"))))
-               (reset-token (base16-encode (format #f "~a-~a-~a"
-                                                   (generate-string-uuid)
-                                                   (generate-string-uuid)
-                                                   (generate-string-uuid))))
-               (pr ($password_reset 'set
-                                    #:user_id (assoc-ref (car u) "identifier")
-                                    #:reset_token reset-token
-                                    #:created_at (current-time)))
-               (mail-payload `((task-type . send-email)
-                               (template . password-reset)
-                               (template-vars (system-name . Wikimusic)
-                                              (user unquote
-                                                    (assoc-ref (car u) "email"))
-                                              (reset-link unquote
-                                                          (format #f
-                                                           "~a/password/reset/token/~a"
-                                                           (current-myhost)
-                                                           reset-token)))
-                               (sender-name . "No Reply - Wikimusic")
-                               (sender-address . "noreply@wikimusic.jointhefreeworld.org")
-                               (subject . "Wikimusic - Password Reset")
-                               (recipients . #(((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email"))))))))
+                                                                      email)))))))
           
-          (send-to-pingwing #:body mail-payload)
+          (request-password-reset u)
           (redirect-to rc
                        (string->uri (format #f "~a/?sent-password-reset=true"
                                             (current-myhost)))
