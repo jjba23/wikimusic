@@ -26,7 +26,6 @@
         (kracht prelude)
         (app views me)
         (curl)
-        (wikimusic url)
         (uuid generate)
         (rnrs bytevectors)
         (json)

@@ -20,7 +20,6 @@
 (import (wikimusic html)
         (web uri)
         (wikimusic controller)
-        (wikimusic url)
         (ice-9 string-fun)
         (wikimusic env)
         (wikimusic auth)

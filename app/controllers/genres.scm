@@ -19,7 +19,6 @@
 
 (import (wikimusic html)
         (web uri)
-        (wikimusic url)
         (wikimusic env)
         (wikimusic auth)
         (wikimusic controller)

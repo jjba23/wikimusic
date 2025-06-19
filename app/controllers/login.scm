@@ -18,7 +18,7 @@
 (define-artanis-controller login)
 
 (import (wikimusic html)
-        (wikimusic url)
+        (kracht prelude)
         (wikimusic env)
         (web uri)
         (wikimusic auth)

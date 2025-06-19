@@ -259,8 +259,9 @@
                        #:required #t)
                ,(textarea #:label (G_ "description")
                           #:name "description"
-                          #:value (html-unescape description))))
-    (div ,(submit-button (if identifier
+                          #:value (html-unescape description)))
+          (div ,(submit-button (if identifier
                              (G_ "edit")
-                             (G_ "create"))))))
+                             (G_ "create")))))
+    ))
 

@@ -18,7 +18,6 @@
 (define-artanis-controller songs)
 
 (import (wikimusic html)
-        (wikimusic url)
         (wikimusic domain)
         (wikimusic controller)
         (web uri)
@@ -657,7 +656,7 @@
                                  #:ret 'top
                                  #:condition (where #:identifier (assoc-ref
                                                                   body
-                                                                  "genere-identifier")))))
+                                                                  "genre-identifier")))))
             (when (not (nil? genre))
               (log-info "creating song-genre relation: song ~a genre ~a"
                         (params rc "uuid")

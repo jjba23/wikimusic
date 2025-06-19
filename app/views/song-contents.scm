@@ -403,8 +403,9 @@
                                                        (hidden true)
                                                        (name
                                                         guitarpro-contents)
-                                                       (value "")) "")))
-    (div ,(submit-button (if song-content-identifier
-                             (G_ "edit")
-                             (G_ "create"))))))
+                                                       (value "")) ""))
+                                        (div ,(submit-button (if
+                                                              song-content-identifier
+                                                              (G_ "edit")
+                                                              (G_ "create")))))))
 
