@@ -371,8 +371,10 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'genres set
-                             `((display_name ,(html-escape (assoc-ref body "display-name")))
-                               (description ,(html-escape (assoc-ref body "description")))
+                             `((display_name ,(html-escape (assoc-ref body
+                                                            "display-name")))
+                               (description ,(html-escape (assoc-ref body
+                                                           "description")))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "uuid"))))
             (redirect-to rc
@@ -394,9 +396,12 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'genre_artworks set
-                             `((content_url ,(html-escape (assoc-ref body "content-url")))
-                               (content_caption ,(html-escape (assoc-ref body "content-caption")))
-                               (order_value ,(html-escape (assoc-ref body "order-value")))
+                             `((content_url ,(html-escape (assoc-ref body
+                                                           "content-url")))
+                               (content_caption ,(html-escape (assoc-ref body
+                                                               "content-caption")))
+                               (order_value ,(html-escape (assoc-ref body
+                                                           "order-value")))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "artwork-uuid"))))
             (redirect-to rc
@@ -431,9 +436,12 @@
                              #:genre_identifier (params rc "uuid")
                              #:created_by user-identifier
                              #:visibility_status 0
-                             #:content_url (html-escape (assoc-ref body "content-url"))
-                             #:content_caption (html-escape (assoc-ref body "content-caption"))
-                             #:order_value (html-escape (assoc-ref body "order-value"))
+                             #:content_url (html-escape (assoc-ref body
+                                                         "content-url"))
+                             #:content_caption (html-escape (assoc-ref body
+                                                             "content-caption"))
+                             #:order_value (html-escape (assoc-ref body
+                                                         "order-value"))
                              #:created_at (current-time))
 
             (redirect-to rc
@@ -461,7 +469,8 @@
                                              'owner-id)))
             ($genres 'set
                      #:identifier new-uuid
-                     #:display_name (html-escape (assoc-ref body "display-name"))
+                     #:display_name (html-escape (assoc-ref body
+                                                            "display-name"))
                      #:description (html-escape (assoc-ref body "description"))
                      #:created_by user-identifier
                      #:visibility_status 0
@@ -571,10 +580,14 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'genre_external_sources set
-                             `((wikipedia_url ,(html-escape (assoc-ref body "wikipedia-url")))
-                               (spotify_url ,(html-escape (assoc-ref body "spotify-url")))
-                               (youtube_url ,(html-escape (assoc-ref body "youtube-url")))
-                               (soundcloud_url ,(html-escape (assoc-ref body "soundcloud-url")))
+                             `((wikipedia_url ,(html-escape (assoc-ref body
+                                                             "wikipedia-url")))
+                               (spotify_url ,(html-escape (assoc-ref body
+                                                           "spotify-url")))
+                               (youtube_url ,(html-escape (assoc-ref body
+                                                           "youtube-url")))
+                               (soundcloud_url ,(html-escape (assoc-ref body
+                                                              "soundcloud-url")))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "sourcesuuid"))))
             (redirect-to rc
@@ -604,10 +617,18 @@
             ($genre_external_sources 'set
                                      #:identifier new-uuid
                                      #:genre_identifier (params rc "uuid")
-                                     #:wikipedia_url (html-escape (assoc-ref body "wikipedia-url"))
-                                     #:soundcloud_url (html-escape (assoc-ref body "soundcloud-url"))
-                                     #:youtube_url (html-escape (assoc-ref body "youtube-url"))
-                                     #:spotify_url (html-escape (assoc-ref body "spotify-url"))
+                                     #:wikipedia_url (html-escape (assoc-ref
+                                                                   body
+                                                                   "wikipedia-url"))
+                                     #:soundcloud_url (html-escape (assoc-ref
+                                                                    body
+                                                                    "soundcloud-url"))
+                                     #:youtube_url (html-escape (assoc-ref
+                                                                 body
+                                                                 "youtube-url"))
+                                     #:spotify_url (html-escape (assoc-ref
+                                                                 body
+                                                                 "spotify-url"))
                                      #:created_by user-identifier
                                      #:created_at (current-time))
 

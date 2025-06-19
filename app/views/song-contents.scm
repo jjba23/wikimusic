@@ -51,8 +51,7 @@
 
 (define* (render-version G_ song version ascii-size)
   (let* ((v-name (render-if-nempty (lambda (version-name)
-                                     (format #f "~a ~a"
-                                             version-name
+                                     (format #f "~a ~a" version-name
                                              (assoc-ref version
                                                         "instrument_type")))
                                    (assoc-ref version "version_name")))
@@ -257,7 +256,7 @@
                                     "data:application/octet-stream;base64,")
                                    ""
                                    (html-unescape (assoc-ref song-contents
-                                                            "pdf_contents")))))
+                                                             "pdf_contents")))))
          (body `(div (@ (class ,(mk-class '(container mx-auto))))
                      ((div ,(hr)
                            ,(song-content-form G_
@@ -272,14 +271,15 @@
                                                                    song-contents
                                                                    "instrument_type"))
                                                #:version-name (html-unescape (assoc-ref
-                                                                             song-contents
-                                                                             "version_name"))
+                                                                              song-contents
+                                                                              "version_name"))
                                                #:ascii-legend (html-unescape (assoc-ref
-                                                                             song-contents
-                                                                             "ascii_legend"))
-                                               #:ascii-contents (html-unescape (assoc-ref
-                                                                               song-contents
-                                                                               "ascii_contents"))
+                                                                              song-contents
+                                                                              "ascii_legend"))
+                                               #:ascii-contents (html-unescape
+                                                                 (assoc-ref
+                                                                  song-contents
+                                                                  "ascii_contents"))
                                                #:guitarpro-contents (html-unescape
                                                                      (assoc-ref
                                                                       song-contents

@@ -66,7 +66,6 @@ standard hex-and-dash format of any variant and version. Simple routines for con
 between binary and hex-and-dash string UUIDs are included.")
     (license license:gpl3+)))
 
-
 (define-public guile-hygguile
   (package
     (name "guile-hygguile")

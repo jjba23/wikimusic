@@ -139,7 +139,8 @@
                           #:unhappy-flow back-to-login)))
 
 (define (from-checkbox body n)
-  (if (assoc-ref body (symbol->string n)) n #f))
+  (if (assoc-ref body
+                 (symbol->string n)) n #f))
 
 (post "/users/new"
       #:cookies '(names x-bewaking-wikimusic)
@@ -166,7 +167,7 @@
                                              wikimusic:genre-create
                                              wikimusic:genre-delete
                                              wikimusic:user-create
-                                             wikimusic:user-delete                                             
+                                             wikimusic:user-delete
                                              wikimusic:modify-permissions))))
                  (new-id (generate-string-uuid))
                  (_ ($users 'set
@@ -230,11 +231,14 @@
                                              wikimusic:user-delete
                                              wikimusic:modify-permissions))))
                  (_ (DB-query (DB-open rc)
-                              (->sql update 'users set
+                              (->sql update
+                                     'users set
                                      `((username ,username)
                                        (email ,email)
-                                       (permissions ,(format #f "`~s" permissions)))
-                                     (where #:identifier (params rc "identifier"))))))
+                                       (permissions ,(format #f "`~s"
+                                                             permissions)))
+                                     (where #:identifier (params rc
+                                                                 "identifier"))))))
             (redirect-to rc
                          (string->uri (format #f
                                               "~a/users/manage/?edited=true"
@@ -245,7 +249,6 @@
                            #:rc rc
                            #:happy-flow do-edit-user
                            #:unhappy-flow back-to-login)))
-
 
 (get "/password/reset/token/:token"
      #:mime 'xml
@@ -338,8 +341,7 @@
                                                   encryption-key
                                                   #:signing-key signing-key)
                                    #f))
-               (body (if (not (rc-body rc))
-                         #f
+               (body (if (not (rc-body rc)) #f
                          (alist-from-url-encoded-body (rc-body rc))))
                (email (if (not body) #f
                           (assoc-ref body "email")))
