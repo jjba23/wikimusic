@@ -26,7 +26,6 @@
   #:use-module (kracht prelude)
   #:use-module (ice-9 i18n)
   #:use-module (srfi srfi-1)
-  #:use-module (wikimusic query-escape)
   #:use-module (app views song-contents)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
@@ -282,70 +281,40 @@
                                                              #:user-alist
                                                              user-alist)))))
                             ,(render-external-sources G_ external-sources)
-                            (div (@ (class ,(mk-class '(px-4 py-6))))
+                            (div (@ (class ,(mk-class '(px-4 py-6))))                                 
                                  (dl ,(render-if-nestring (lambda (tuning)
-                                                            `((dt (@ (class ,(mk-class '
-                                                                              (pt-3
-                                                                               pb-1
-                                                                               text-stone-700
-                                                                               dark:text-stone-400
-                                                                               font-bold))))
-                                                                  ,(G_
-                                                                    "music tuning"))
-                                                              (dd (@ (class ,(mk-class '
-                                                                              (pl-3
-                                                                               text-stone-800
-                                                                               dark:text-stone-300))))
-                                                                  ,(em (format
-                                                                        #f
-                                                                        "~a"
-                                                                        (assoc-ref
-                                                                         song
-                                                                         "music_tuning"))))))
+                                                            (list (dt (G_
+                                                                       "tuning"))
+                                                                  (dd tuning)))
                                                           (assoc-ref song
                                                            "music_tuning"))
                                      ,(render-if-nestring (lambda (keyy)
-                                                            `((dt (@ (class ,(mk-class '
-                                                                              (pt-3
-                                                                               pb-1
-                                                                               text-stone-700
-                                                                               dark:text-stone-400
-                                                                               font-bold))))
-                                                                  ,(G_
-                                                                    "music key"))
-                                                              (dd (@ (class ,(mk-class '
-                                                                              (pl-3
-                                                                               text-stone-800
-                                                                               dark:text-stone-300))))
-                                                                  ,(em (format
-                                                                        #f
-                                                                        "~a"
-                                                                        (assoc-ref
-                                                                         song
-                                                                         "music_key"))))))
+                                                            (list (dt (G_
+                                                                       "music key"))
+                                                                  (dd keyy)))
                                                           (assoc-ref song
                                                            "music_key"))
-                                     ,(render-if-nestring (lambda (album-name)
-                                                            `((dt (@ (class ,(mk-class '
-                                                                              (pt-3
-                                                                               pb-1
-                                                                               text-stone-700
-                                                                               dark:text-stone-400
-                                                                               font-bold))))
-                                                                  ,(G_
-                                                                    "album name"))
-                                                              (dd (@ (class ,(mk-class '
-                                                                              (pl-3
-                                                                               text-stone-800
-                                                                               dark:text-stone-300))))
-                                                                  ,(em (format
-                                                                        #f
-                                                                        "~a"
-                                                                        (assoc-ref
-                                                                         song
-                                                                         "album_name"))))))
+                                     ,(render-if-nestring (lambda (music-creation-date)
+                                                            (list (dt (G_
+                                                                       "music creation date"))
+                                                                  (dd
+                                                                   music-creation-date)))
                                                           (assoc-ref song
-                                                           "album_name"))))
+                                                           "music_creation_date"))
+                                     ,(render-if-nestring (lambda (album-name)
+                                                            (list (dt (G_
+                                                                       "album name"))
+                                                                  (dd
+                                                                   album-name)))
+                                                          (assoc-ref song
+                                                           "album_name"))
+                                     ,(render-if-nestring (lambda (album-link)
+                                                            (list (dt (G_
+                                                                       "album info link"))
+                                                                  (dd (a
+                                                                       album-link))))
+                                                          (assoc-ref song
+                                                           "album_info_link"))))
 
                             (div ,(render-song-content G_ song song-contents
                                                        ascii-size))))))
@@ -605,28 +574,28 @@
              (content-type application/x-www-form-urlencoded))
           (div ,(input #:label (G_ "display name")
                        #:name "display-name"
-                       #:value (unescape-str display-name)
+                       #:value (html-unescape display-name)
                        #:required #t)
 
                ,(input #:label (G_ "music key")
                        #:name "music-key"
-                       #:value (unescape-str music-key))
+                       #:value (html-unescape music-key))
                ,(input #:label (G_ "music tuning")
                        #:name "music-tuning"
-                       #:value (unescape-str music-tuning))
+                       #:value (html-unescape music-tuning))
                ,(input #:label (G_ "music creation date")
                        #:name "music-creation-date"
-                       #:value (unescape-str music-creation-date))
+                       #:value (html-unescape music-creation-date))
                ,(input #:label (G_ "album name")
                        #:name "album-name"
-                       #:value (unescape-str album-name))
+                       #:value (html-unescape album-name))
                ,(input #:label (G_ "album info url")
                        #:name "album-info-link"
-                       #:value (unescape-str album-info-link))
+                       #:value (html-unescape album-info-link))
                ,(textarea #:label (G_ "description")
                           #:name "description"
-                          #:value (unescape-str description))))
-    (div ,(submit-button (if identifier
-                             (G_ "edit")
-                             (G_ "create"))))))
+                          #:value (html-unescape description)))
+          (div ,(submit-button (if identifier
+                                   (G_ "edit")
+                                   (G_ "create")))))))
 

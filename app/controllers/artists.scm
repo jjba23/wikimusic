@@ -20,7 +20,6 @@
 (import (wikimusic html)
         (web uri)
         (wikimusic controller)
-        (wikimusic url)
         (ice-9 string-fun)
         (wikimusic env)
         (wikimusic auth)
@@ -35,7 +34,7 @@
         (app models song_opinions)
         (app models song_comments)
         (app models song_contents)
-        (wikimusic query-escape)
+        (kracht prelude)
         (uuid generate)
         (bewaking bewaking)
         (app models users)
@@ -53,7 +52,7 @@
                              ((equal? #f
                                       (get-from-qstr rc "search"))
                               #f)
-                             (else (escape-str (get-from-qstr rc "search")))))
+                             (else (html-escape (get-from-qstr rc "search")))))
               (user-sort (cond
                            ((not (equal? #f
                                          (get-from-qstr rc "sort")))
@@ -100,9 +99,9 @@
                                                                    (" WHERE (display_name LIKE '%~a%' OR description LIKE '%~a%') "
                                                                     " ORDER BY ~a ~a LIMIT ~a OFFSET ~a ")
                                                                    " ")
-                                                                  (escape-str
+                                                                  (html-escape
                                                                    user-search)
-                                                                  (escape-str
+                                                                  (html-escape
                                                                    user-search)
                                                                   (car
                                                                    query-sort)
@@ -361,17 +360,14 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-edit)
-          (let* ((body (rc-body rc))
-                 (kv (read-url-encoded-body body)))
+          (let* ((body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
                       (->sql update
                              'artists set
-                             `((display_name ,(escape-str (uri-decode (car (assoc-ref
-                                                                            kv
-                                                                            "display-name")))))
-                               (description ,(escape-str (uri-decode (car (assoc-ref
-                                                                           kv
-                                                                           "description")))))
+                             `((display_name ,(html-escape (assoc-ref body
+                                                            "display-name")))
+                               (description ,(html-escape (assoc-ref body
+                                                           "description")))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "uuid"))))
             (redirect-to rc
@@ -389,23 +385,18 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-edit-external-sources)
-          (let* ((body (rc-body rc))
-                 (kv (read-url-encoded-body body)))
+          (let* ((body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
                       (->sql update
                              'artist_external_sources set
-                             `((wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
-                                                                             kv
-                                                                             "wikipedia-url")))))
-                               (spotify_url ,(escape-str (uri-decode (car (assoc-ref
-                                                                           kv
-                                                                           "spotify-url")))))
-                               (youtube_url ,(escape-str (uri-decode (car (assoc-ref
-                                                                           kv
-                                                                           "youtube-url")))))
-                               (soundcloud_url ,(escape-str (uri-decode (car (assoc-ref
-                                                                              kv
-                                                                              "soundcloud-url")))))
+                             `((wikipedia_url ,(html-escape (assoc-ref body
+                                                             "wikipedia-url")))
+                               (spotify_url ,(html-escape (assoc-ref body
+                                                           "spotify-url")))
+                               (youtube_url ,(html-escape (assoc-ref body
+                                                           "youtube-url")))
+                               (soundcloud_url ,(html-escape (assoc-ref body
+                                                              "soundcloud-url")))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "sourcesuuid"))))
             (redirect-to rc
@@ -424,20 +415,16 @@
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
         (define (do-edit-artwork)
-          (let* ((body (rc-body rc))
-                 (kv (read-url-encoded-body body)))
+          (let* ((body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
                       (->sql update
                              'artist_artworks set
-                             `((content_url ,(escape-str (uri-decode (car (assoc-ref
-                                                                           kv
-                                                                           "content-url")))))
-                               (content_caption ,(escape-str (uri-decode (car (assoc-ref
-                                                                               kv
-                                                                               "content-caption")))))
-                               (order_value ,(escape-str (uri-decode (car (assoc-ref
-                                                                           kv
-                                                                           "order-value")))))
+                             `((content_url ,(html-escape (assoc-ref body
+                                                           "content-url")))
+                               (content_caption ,(html-escape (assoc-ref body
+                                                               "content-caption")))
+                               (order_value ,(html-escape (assoc-ref body
+                                                           "order-value")))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "artwork-uuid"))))
             (redirect-to rc
@@ -464,8 +451,7 @@
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
-                 (body (rc-body rc))
-                 (kv (read-url-encoded-body body))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
@@ -474,15 +460,12 @@
                               #:artist_identifier (params rc "uuid")
                               #:created_by user-identifier
                               #:visibility_status 0
-                              #:content_url (escape-str (uri-decode (car (assoc-ref
-                                                                          kv
-                                                                          "content-url"))))
-                              #:content_caption (escape-str (uri-decode (car (assoc-ref
-                                                                              kv
-                                                                              "content-caption"))))
-                              #:order_value (escape-str (uri-decode (car (assoc-ref
-                                                                          kv
-                                                                          "order-value"))))
+                              #:content_url (html-escape (assoc-ref body
+                                                          "content-url"))
+                              #:content_caption (html-escape (assoc-ref body
+                                                              "content-caption"))
+                              #:order_value (html-escape (assoc-ref body
+                                                          "order-value"))
                               #:created_at (current-time))
 
             (redirect-to rc
@@ -504,18 +487,15 @@
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
-                 (body (rc-body rc))
-                 (kv (read-url-encoded-body body))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
             ($artists 'set
                       #:identifier new-uuid
-                      #:display_name (escape-str (uri-decode (car (assoc-ref
-                                                                   kv
-                                                                   "display-name"))))
-                      #:description (escape-str (uri-decode (car (assoc-ref kv
-                                                                  "description"))))
+                      #:display_name (html-escape (assoc-ref body
+                                                             "display-name"))
+                      #:description (html-escape (assoc-ref body "description"))
                       #:created_by user-identifier
                       #:visibility_status 0
                       #:views 0
@@ -624,30 +604,25 @@
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
-                 (body (rc-body rc))
-                 (kv (read-url-encoded-body body))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
             ($artist_external_sources 'set
                                       #:identifier new-uuid
                                       #:artist_identifier (params rc "uuid")
-                                      #:wikipedia_url (escape-str (uri-decode (car
-                                                                               (assoc-ref
-                                                                                kv
-                                                                                "wikipedia-url"))))
-                                      #:soundcloud_url (escape-str (uri-decode
-                                                                    (car (assoc-ref
-                                                                          kv
-                                                                          "soundcloud-url"))))
-                                      #:youtube_url (escape-str (uri-decode (car
-                                                                             (assoc-ref
-                                                                              kv
-                                                                              "youtube-url"))))
-                                      #:spotify_url (escape-str (uri-decode (car
-                                                                             (assoc-ref
-                                                                              kv
-                                                                              "spotify-url"))))
+                                      #:wikipedia_url (html-escape (assoc-ref
+                                                                    body
+                                                                    "wikipedia-url"))
+                                      #:soundcloud_url (html-escape (assoc-ref
+                                                                     body
+                                                                     "soundcloud-url"))
+                                      #:youtube_url (html-escape (assoc-ref
+                                                                  body
+                                                                  "youtube-url"))
+                                      #:spotify_url (html-escape (assoc-ref
+                                                                  body
+                                                                  "spotify-url"))
                                       #:created_by user-identifier
                                       #:created_at (current-time))
 
