@@ -244,7 +244,9 @@
                                  genres)))
     (html-template G_
                    #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                   #:body `((div (@ (class ,(mk-class '(container mx-auto p-3
+                                                                  sm:p-1
+                                                                  md:p-0))))
                                  ((div (@ (class ,(mk-class '(flex flex-col
                                                                    gap-4))))
                                        ,(h2 (assoc-ref song "display_name"))
@@ -281,7 +283,7 @@
                                                              #:user-alist
                                                              user-alist)))))
                             ,(render-external-sources G_ external-sources)
-                            (div (@ (class ,(mk-class '(px-4 py-6))))                                 
+                            (div (@ (class ,(mk-class '(px-4 py-6))))
                                  (dl ,(render-if-nestring (lambda (tuning)
                                                             (list (dt (G_
                                                                        "tuning"))

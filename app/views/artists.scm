@@ -118,7 +118,8 @@
                              is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                 #:body `((div (@ (class ,(mk-class '(container mx-auto p-3
+                                                                sm:p-1 md:p-0))))
                                (,(h2 (assoc-ref artist "display_name")) (div (div ,
                                                                               (entity-details
                                                                                G_
@@ -263,7 +264,6 @@
                           #:name "description"
                           #:value (html-unescape description)))
           (div ,(submit-button (if identifier
-                             (G_ "edit")
-                             (G_ "create")))))
-    ))
+                                   (G_ "edit")
+                                   (G_ "create")))))))
 

@@ -295,11 +295,11 @@
                           #:color '(text-stone-700 dark:text-stone-300)))
                 ,extra-bot-info)))))
 
-(define* (render-visibility-status status)
+(define* (render-visibility-status G_ status)
   (cond
     ((eq? status 0)
-     (em "published"))
-    (else (em "unkown status"))))
+     (G_ "published"))
+    (else (G_ "unkown status"))))
 
 (define* (render-comment G_ user-alist comment)
   `(div (@ (class "py-3"))
@@ -433,33 +433,15 @@
                                                                #:weight '(font-light)))))
                                               (assoc-ref x "description")))
          (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
-                                                   `((dt (@ (class ,(mk-class '
-                                                                              (pt-3
-                                                                               pb-1
-                                                                               text-stone-700
-                                                                               dark:text-stone-400
-                                                                               font-bold))))
-                                                         ,(G_ "last edited"))
-                                                     (dd (@ (class ,(mk-class '
-                                                                              (pl-3
-                                                                               text-stone-800
-                                                                               dark:text-stone-300))))
-                                                         ,(em (strftime "%c"
-                                                                        (localtime
-                                                                         (string->number
-                                                                          last-edited-at)))))))
+                                                   `(,(dt (G_ "last edited")) ,
+                                                     (dd (strftime "%c"
+
+                                                                   (localtime (string->number
+                                                                               last-edited-at))))))
                                                  (assoc-ref x "last_edited_at")))
          (maybe-approved-by (render-if-nempty (lambda (approved-by)
-                                                `((dt (@ (class ,(mk-class '(pt-3
-                                                                             pb-1
-                                                                             text-stone-700
-                                                                             dark:text-stone-400
-                                                                             font-bold))))
-                                                      ,(G_ "approved by"))
-                                                  (dd (@ (class ,(mk-class '(pl-3
-                                                                             text-stone-800
-                                                                             dark:text-stone-300))))
-                                                      ,approved-by)))
+                                                `(,(dt (G_ "approved by")) ,(dd
+                                                                             approved-by)))
                                               (assoc-ref x "approved_by"))))
     
     `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
@@ -471,72 +453,41 @@
                         ,(icon-button #:icon 'pencil
                                       #:content (G_ "edit"))))
                 ,maybe-description
-                (dl (dt (@ (class ,(mk-class '(pt-3 pb-1 text-stone-700
-                                                    dark:text-stone-400
-                                                    font-bold))))
-                        ,(G_ "views"))
-                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800
-                                                    dark:text-stone-300))))
-                        ,(em (format #f "~a"
-                                     (assoc-ref x "views"))))
-                    (dt (@ (class ,(mk-class '(pt-3 pb-1 text-stone-700
-                                                    dark:text-stone-400
-                                                    font-bold))))
-                        ,(G_ "created"))
-                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800
-                                                    dark:text-stone-300))))
-                        ,(em (strftime "%c"
-                                       (localtime (string->number (assoc-ref x
-                                                                   "created_at"))))))
+                (dl ,(dt (G_ "views"))
+                    ,(dd (format #f "~a"
+                                 (assoc-ref x "views")))
+                    ,(dt (G_ "created"))
+                    ,(dd (strftime "%c"
+                                   (localtime (string->number (assoc-ref x
+                                                               "created_at")))))
                     ,maybe-last-edited-at
-                    (dt (@ (class ,(mk-class '(pt-3 pb-1 text-stone-700
-                                                    dark:text-stone-400
-                                                    font-bold))))
-                        ,(G_ "contributor"))
-                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800
-                                                    dark:text-stone-300))))
-                        ,(render-if-nempty (lambda (u)
-                                             `(div (@ (class ,(mk-class '(flex
-                                                                          flex-wrap
-                                                                          flex-row
-                                                                          gap-2))))
-                                                   ,(em (format #f
-                                                         "~a &lt;~a&gt;"
-                                                         (assoc-ref u
-                                                          "username")
-                                                         (assoc-ref u "email")))))
+                    ,(dt (G_ "contributor"))
+                    ,(dd (render-if-nempty (lambda (u)
+                                             (format #f "~a &lt;~a&gt;"
+                                                     (assoc-ref u "username")
+                                                     (assoc-ref u "email")))
                                            (car (assoc-ref user-alist
                                                            (assoc-ref x
                                                             "created_by")))))
-                    (dt (@ (class ,(mk-class '(pt-3 pb-1 text-stone-700
-                                                    dark:text-stone-400
-                                                    font-bold))))
-                        ,(G_ "visibility"))
-                    (dd (@ (class ,(mk-class '(pl-3 text-stone-800
-                                                    dark:text-stone-300))))
-                        ,(render-visibility-status (assoc-ref x
+                    ,(dt (G_ "visibility"))
+                    ,(dd (render-visibility-status G_
+                                                   (assoc-ref x
                                                     "visibility_status")))
                     ,maybe-approved-by
-                    (dt (@ (class ,(mk-class '(pt-3 pb-1 pb-1 text-stone-700
-                                                    dark:text-stone-400
-                                                    font-bold))))
-                        ,(G_ "uuid"))
-                    (dd (@ (class ,(mk-class '(pl-3 text-sm text-stone-600
-                                                    dark:text-stone-300))))
+                    ,(dt (G_ "uuid"))
+                    ,(dd `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                            gap-4))))
+                                ,(mono (assoc-ref x "identifier")
+                                       #:size '(text-sm)
+                                       #:color '(text-stone-600
+                                                 dark:text-stone-400))
+                                ,(icon-button #:icon 'copy
+                                              #:content "copy"
 
-                        (div (@ (class ,(mk-class '(flex flex-row flex-wrap
-                                                         gap-4))))
-                             ,(mono (assoc-ref x "identifier")
-                                    #:size '(text-sm)
-                                    #:color '(text-stone-600
-                                              dark:text-stone-400))
-                             ,(icon-button #:icon 'copy
-                                           #:content "copy"
-
-                                           #:on-click (format #f
-                                                       "navigator.clipboard.writeText('~a')"
-                                                       (assoc-ref x
-                                                        "identifier"))))))))
+                                              #:on-click (format #f
+                                                          "navigator.clipboard.writeText('~a')"
+                                                          (assoc-ref x
+                                                           "identifier")))))))))
       (details (summary (@ (class ,(mk-class '(text-stone-800
                                                dark:text-stone-200
                                                cursor-pointer))))
