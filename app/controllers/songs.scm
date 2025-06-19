@@ -42,7 +42,6 @@
         (app views songs)
         (bewaking bewaking)
         (app views song-contents)
-        (wikimusic query-escape)
         (app models users)
         (app views songs))
 
@@ -55,7 +54,7 @@
                              ((equal? #f
                                       (get-from-qstr rc "search"))
                               #f)
-                             (else (escape-str (get-from-qstr rc "search")))))
+                             (else (html-escape (get-from-qstr rc "search")))))
               (user-sort (cond
                            ((not (equal? #f
                                          (get-from-qstr rc "sort")))
@@ -102,9 +101,9 @@
                                                                  (" WHERE (display_name LIKE '%~a%' OR description LIKE '%~a%') "
                                                                   " ORDER BY ~a ~a LIMIT ~a OFFSET ~a ")
                                                                  " ")
-                                                                (escape-str
+                                                                (html-escape
                                                                  user-search)
-                                                                (escape-str
+                                                                (html-escape
                                                                  user-search)
                                                                 (car
                                                                  query-sort)
@@ -433,26 +432,26 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'songs set
-                             `((display_name ,(escape-str (uri-decode (car (assoc-ref
+                             `((display_name ,(html-escape (uri-decode (car (assoc-ref
                                                                             kv
                                                                             "display-name")))))
-                               (description ,(escape-str (uri-decode (car (assoc-ref
+                               (description ,(html-escape (uri-decode (car (assoc-ref
                                                                            kv
                                                                            "description")))))
-                               (music_key ,(escape-str (uri-decode (car (assoc-ref
+                               (music_key ,(html-escape (uri-decode (car (assoc-ref
                                                                          kv
                                                                          "music-key")))))
-                               (music_tuning ,(escape-str (uri-decode (car (assoc-ref
+                               (music_tuning ,(html-escape (uri-decode (car (assoc-ref
                                                                             kv
                                                                             "music-tuning")))))
-                               (music_creation_date ,(escape-str (uri-decode (car
+                               (music_creation_date ,(html-escape (uri-decode (car
                                                                               (assoc-ref
                                                                                kv
                                                                                "music-creation-date")))))
-                               (album_name ,(escape-str (uri-decode (car (assoc-ref
+                               (album_name ,(html-escape (uri-decode (car (assoc-ref
                                                                           kv
                                                                           "album-name")))))
-                               (album_info_link ,(escape-str (uri-decode (car (assoc-ref
+                               (album_info_link ,(html-escape (uri-decode (car (assoc-ref
                                                                                kv
                                                                                "album-info-link")))))
                                (last_edited_at ,(current-time)))
@@ -478,19 +477,19 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'song_contents set
-                             `((instrument_type ,(escape-str (uri-decode (car (assoc-ref
+                             `((instrument_type ,(html-escape (uri-decode (car (assoc-ref
                                                                                kv
                                                                                "instrument-type")))))
-                               (version_name ,(escape-str (uri-decode (car (assoc-ref
+                               (version_name ,(html-escape (uri-decode (car (assoc-ref
                                                                             kv
                                                                             "version-name")))))
-                               (ascii_legend ,(escape-str (uri-decode (car (assoc-ref
+                               (ascii_legend ,(html-escape (uri-decode (car (assoc-ref
                                                                             kv
                                                                             "ascii-legend")))))
-                               (ascii_contents ,(escape-str (uri-decode (car (assoc-ref
+                               (ascii_contents ,(html-escape (uri-decode (car (assoc-ref
                                                                               kv
                                                                               "ascii-contents")))))
-                               (pdf_contents ,(escape-str (uri-decode (car (assoc-ref
+                               (pdf_contents ,(html-escape (uri-decode (car (assoc-ref
                                                                             kv
                                                                             "pdf-contents")))))
                                (last_edited_at ,(current-time)))
@@ -516,13 +515,13 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'song_artworks set
-                             `((content_url ,(escape-str (uri-decode (car (assoc-ref
+                             `((content_url ,(html-escape (uri-decode (car (assoc-ref
                                                                            kv
                                                                            "content-url")))))
-                               (content_caption ,(escape-str (uri-decode (car (assoc-ref
+                               (content_caption ,(html-escape (uri-decode (car (assoc-ref
                                                                                kv
                                                                                "content-caption")))))
-                               (order_value ,(escape-str (uri-decode (car (assoc-ref
+                               (order_value ,(html-escape (uri-decode (car (assoc-ref
                                                                            kv
                                                                            "order-value")))))
                                (last_edited_at ,(current-time)))
@@ -560,22 +559,22 @@
                             #:song_identifier (params rc "uuid")
                             #:created_by user-identifier
                             #:visibility_status 0
-                            #:instrument_type (escape-str (uri-decode (car (assoc-ref
+                            #:instrument_type (html-escape (uri-decode (car (assoc-ref
                                                                             kv
                                                                             "instrument-type"))))
-                            #:version_name (escape-str (uri-decode (car (assoc-ref
+                            #:version_name (html-escape (uri-decode (car (assoc-ref
                                                                          kv
                                                                          "version-name"))))
-                            #:ascii_legend (escape-str (uri-decode (car (assoc-ref
+                            #:ascii_legend (html-escape (uri-decode (car (assoc-ref
                                                                          kv
                                                                          "ascii-legend"))))
-                            #:ascii_contents (escape-str (uri-decode (car (assoc-ref
+                            #:ascii_contents (html-escape (uri-decode (car (assoc-ref
                                                                            kv
                                                                            "ascii-contents"))))
-                            #:pdf_contents (escape-str (uri-decode (car (assoc-ref
+                            #:pdf_contents (html-escape (uri-decode (car (assoc-ref
                                                                          kv
                                                                          "pdf-contents"))))
-                            #:guitarpro_contents (escape-str (uri-decode (car (assoc-ref
+                            #:guitarpro_contents (html-escape (uri-decode (car (assoc-ref
                                                                                kv
                                                                                "guitarpro-contents"))))
                             #:created_at (current-time))
@@ -609,13 +608,13 @@
                             #:song_identifier (params rc "uuid")
                             #:created_by user-identifier
                             #:visibility_status 0
-                            #:content_url (escape-str (uri-decode (car (assoc-ref
+                            #:content_url (html-escape (uri-decode (car (assoc-ref
                                                                         kv
                                                                         "content-url"))))
-                            #:content_caption (escape-str (uri-decode (car (assoc-ref
+                            #:content_caption (html-escape (uri-decode (car (assoc-ref
                                                                             kv
                                                                             "content-caption"))))
-                            #:order_value (escape-str (uri-decode (car (assoc-ref
+                            #:order_value (html-escape (uri-decode (car (assoc-ref
                                                                         kv
                                                                         "order-value"))))
                             #:created_at (current-time))
@@ -732,21 +731,21 @@
                                              'owner-id)))
             ($songs 'set
                     #:identifier new-uuid
-                    #:display_name (escape-str (uri-decode (car (assoc-ref kv
+                    #:display_name (html-escape (uri-decode (car (assoc-ref kv
                                                                  "display-name"))))
-                    #:music_key (escape-str (uri-decode (car (assoc-ref kv
+                    #:music_key (html-escape (uri-decode (car (assoc-ref kv
                                                               "music-key"))))
-                    #:music_tuning (escape-str (uri-decode (car (assoc-ref kv
+                    #:music_tuning (html-escape (uri-decode (car (assoc-ref kv
                                                                  "music-tuning"))))
-                    #:music_creation_date (escape-str (uri-decode (car (assoc-ref
+                    #:music_creation_date (html-escape (uri-decode (car (assoc-ref
                                                                         kv
                                                                         "music-creation-date"))))
-                    #:album_name (escape-str (uri-decode (car (assoc-ref kv
+                    #:album_name (html-escape (uri-decode (car (assoc-ref kv
                                                                "album-name"))))
-                    #:album_info_link (escape-str (uri-decode (car (assoc-ref
+                    #:album_info_link (html-escape (uri-decode (car (assoc-ref
                                                                     kv
                                                                     "album-info-link"))))
-                    #:description (escape-str (uri-decode (car (assoc-ref kv
+                    #:description (html-escape (uri-decode (car (assoc-ref kv
                                                                 "description"))))
                     #:created_by user-identifier
                     #:visibility_status 0
@@ -915,16 +914,16 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'song_external_sources set
-                             `((wikipedia_url ,(escape-str (uri-decode (car (assoc-ref
+                             `((wikipedia_url ,(html-escape (uri-decode (car (assoc-ref
                                                                              kv
                                                                              "wikipedia-url")))))
-                               (spotify_url ,(escape-str (uri-decode (car (assoc-ref
+                               (spotify_url ,(html-escape (uri-decode (car (assoc-ref
                                                                            kv
                                                                            "spotify-url")))))
-                               (youtube_url ,(escape-str (uri-decode (car (assoc-ref
+                               (youtube_url ,(html-escape (uri-decode (car (assoc-ref
                                                                            kv
                                                                            "youtube-url")))))
-                               (soundcloud_url ,(escape-str (uri-decode (car (assoc-ref
+                               (soundcloud_url ,(html-escape (uri-decode (car (assoc-ref
                                                                               kv
                                                                               "soundcloud-url")))))
                                (last_edited_at ,(current-time)))
@@ -957,19 +956,19 @@
             ($song_external_sources 'set
                                     #:identifier new-uuid
                                     #:song_identifier (params rc "uuid")
-                                    #:wikipedia_url (escape-str (uri-decode (car
+                                    #:wikipedia_url (html-escape (uri-decode (car
                                                                              (assoc-ref
                                                                               kv
                                                                               "wikipedia-url"))))
-                                    #:soundcloud_url (escape-str (uri-decode (car
+                                    #:soundcloud_url (html-escape (uri-decode (car
                                                                               (assoc-ref
                                                                                kv
                                                                                "soundcloud-url"))))
-                                    #:youtube_url (escape-str (uri-decode (car
+                                    #:youtube_url (html-escape (uri-decode (car
                                                                            (assoc-ref
                                                                             kv
                                                                             "youtube-url"))))
-                                    #:spotify_url (escape-str (uri-decode (car
+                                    #:spotify_url (html-escape (uri-decode (car
                                                                            (assoc-ref
                                                                             kv
                                                                             "spotify-url"))))

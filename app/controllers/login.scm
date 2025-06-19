@@ -45,10 +45,9 @@
 (post "/login"
       #:cookies '(names x-bewaking-wikimusic)
       (lambda (rc)
-        (let* ((body (rc-body rc))
-               (kv (read-url-encoded-body body))
-               (email (uri-decode (car (assoc-ref kv "email"))))
-               (password (uri-decode (car (assoc-ref kv "password"))))
+        (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+               (email  (assoc-ref body "email"))
+               (password  (assoc-ref body "password"))
                (u ($users 'get
                           #:ret 'top
                           #:condition (where #:email email)))

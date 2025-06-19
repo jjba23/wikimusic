@@ -24,7 +24,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 i18n)
-  #:use-module (wikimusic query-escape)
+  #:use-module (kracht prelude)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
   #:export (render-song-content render-version song-content-edit-page
@@ -256,7 +256,7 @@
                                (if (equal? x
                                     "data:application/octet-stream;base64,")
                                    ""
-                                   (unescape-str (assoc-ref song-contents
+                                   (html-unescape (assoc-ref song-contents
                                                             "pdf_contents")))))
          (body `(div (@ (class ,(mk-class '(container mx-auto))))
                      ((div ,(hr)
@@ -267,20 +267,20 @@
                                                #:song-content-identifier (assoc-ref
                                                                           song-contents
                                                                           "identifier")
-                                               #:instrument-type (unescape-str
+                                               #:instrument-type (html-unescape
                                                                   (assoc-ref
                                                                    song-contents
                                                                    "instrument_type"))
-                                               #:version-name (unescape-str (assoc-ref
+                                               #:version-name (html-unescape (assoc-ref
                                                                              song-contents
                                                                              "version_name"))
-                                               #:ascii-legend (unescape-str (assoc-ref
+                                               #:ascii-legend (html-unescape (assoc-ref
                                                                              song-contents
                                                                              "ascii_legend"))
-                                               #:ascii-contents (unescape-str (assoc-ref
+                                               #:ascii-contents (html-unescape (assoc-ref
                                                                                song-contents
                                                                                "ascii_contents"))
-                                               #:guitarpro-contents (unescape-str
+                                               #:guitarpro-contents (html-unescape
                                                                      (assoc-ref
                                                                       song-contents
                                                                       "guitarpro_contents"))
@@ -326,13 +326,13 @@
                                         (div ,(input #:label (G_
                                                               "instrument type")
                                                      #:name 'instrument-type
-                                                     #:value (unescape-str
+                                                     #:value (html-unescape
                                                               instrument-type)
                                                      #:required #t)
                                              ,(input #:label (G_
                                                               "version name")
                                                      #:name 'version-name
-                                                     #:value (unescape-str
+                                                     #:value (html-unescape
                                                               version-name)
                                                      #:required #t)
                                              (label (@ (class ,(mk-class '(dark:text-stone-300
@@ -363,7 +363,7 @@
                                              ,(textarea #:label (G_
                                                                  "ascii legend")
                                                         #:name 'ascii-legend
-                                                        #:value (unescape-str
+                                                        #:value (html-unescape
                                                                  ascii-legend)
                                                         #:required #f
                                                         #:textarea-css '(p-3
@@ -382,7 +382,7 @@
                                              ,(textarea #:label (G_
                                                                  "ascii contents")
                                                         #:name 'ascii-contents
-                                                        #:value (unescape-str
+                                                        #:value (html-unescape
                                                                  ascii-contents)
                                                         #:required #f
                                                         #:textarea-css '(p-3

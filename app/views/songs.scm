@@ -26,7 +26,6 @@
   #:use-module (kracht prelude)
   #:use-module (ice-9 i18n)
   #:use-module (srfi srfi-1)
-  #:use-module (wikimusic query-escape)
   #:use-module (app views song-contents)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
@@ -605,27 +604,27 @@
              (content-type application/x-www-form-urlencoded))
           (div ,(input #:label (G_ "display name")
                        #:name "display-name"
-                       #:value (unescape-str display-name)
+                       #:value (html-unescape display-name)
                        #:required #t)
 
                ,(input #:label (G_ "music key")
                        #:name "music-key"
-                       #:value (unescape-str music-key))
+                       #:value (html-unescape music-key))
                ,(input #:label (G_ "music tuning")
                        #:name "music-tuning"
-                       #:value (unescape-str music-tuning))
+                       #:value (html-unescape music-tuning))
                ,(input #:label (G_ "music creation date")
                        #:name "music-creation-date"
-                       #:value (unescape-str music-creation-date))
+                       #:value (html-unescape music-creation-date))
                ,(input #:label (G_ "album name")
                        #:name "album-name"
-                       #:value (unescape-str album-name))
+                       #:value (html-unescape album-name))
                ,(input #:label (G_ "album info url")
                        #:name "album-info-link"
-                       #:value (unescape-str album-info-link))
+                       #:value (html-unescape album-info-link))
                ,(textarea #:label (G_ "description")
                           #:name "description"
-                          #:value (unescape-str description))))
+                          #:value (html-unescape description))))
     (div ,(submit-button (if identifier
                              (G_ "edit")
                              (G_ "create"))))))
