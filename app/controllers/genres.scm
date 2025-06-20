@@ -650,9 +650,10 @@
                                      #:created_at (current-time))
 
             (redirect-to rc
-                         (string->uri (format #f "~a/genres/uuid/~a"
+                         (string->uri (format #f "~a/genres/uuid/~a?notify-title=~a"
                                               (current-myhost)
-                                              (params rc "uuid")))
+                                              (params rc "uuid")
+                                              (uri-encode (G_ "Edited genre succesfully!"))))
                          #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:genre-create)
