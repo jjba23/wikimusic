@@ -173,13 +173,13 @@
                                            (type "image/x-icon")))
                                   (script ,(assoc-ref asset-library
                                                       "pub/js/tailwind.js"))
-                                    ,(custom-fonts)
-                                    ,(phosphor-icons)
-                                    ,(custom-tailwind-theme)
-                                    ,(toggle-dark-theme-js)
-                                    ,(copy-pre-inner-text-js)
-                                    ,(show-notifications-from-url-js)
-                                    ,(remember-dark-theme-js)                                  
+                                  ,(custom-fonts)
+                                  ,(phosphor-icons)
+                                  ,(custom-tailwind-theme)
+                                  ,(toggle-dark-theme-js)
+                                  ,(copy-pre-inner-text-js)
+                                  ,(show-notifications-from-url-js)
+                                  ,(remember-dark-theme-js)
                                   (script ,(assoc-ref asset-library
                                             "pub/js/song-chord-highlighter.js"))
                                   (script ,(assoc-ref asset-library
@@ -204,8 +204,7 @@
                                                                      is-logged-in)
                                                                    ,body)))
                                                 #:footer (page-footer G_))
-                                                                      ,notification-tray
-                                  ))))
+                                  ,notification-tray))))
 
 (define* (item-tile G_
                     entity
@@ -718,18 +717,18 @@ function addSearchQueryParam(form) {
                                      items-start
                                      align-end))))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
-                                                        external-sources
-                                                        "wikipedia_url"))
+                                                    external-sources
+                                                    "wikipedia_url"))
                                 #:label (G_ "Wikipedia"))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
-                                                        external-sources
-                                                        "spotify_url"))
+                                                    external-sources
+                                                    "spotify_url"))
                                 #:label (G_ "Spotify"))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
-                                                        external-sources
-                                                        "youtube_url"))
+                                                    external-sources
+                                                    "youtube_url"))
                                 #:label (G_ "Youtube"))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
-                                                        external-sources
-                                                        "soundcloud_url"))
+                                                    external-sources
+                                                    "soundcloud_url"))
                                 #:label (G_ "Soundcloud")))))
