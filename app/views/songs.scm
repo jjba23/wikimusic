@@ -284,7 +284,7 @@
                                                              #:user-alist
                                                              user-alist)))))
                             ,(render-external-sources G_ external-sources)
-                            (div (@ (class ,(mk-class '(px-4 py-6))))
+                            (div (@ (class ,(mk-class '(px-4 py-6 container mx-auto))))
                                  (dl ,(render-if-nestring (lambda (tuning)
                                                             (list (dt (G_
                                                                        "tuning"))

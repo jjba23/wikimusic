@@ -697,13 +697,15 @@ function addSearchQueryParam(form) {
                                                                  gap-1))))
                                           (span ,label)
                                           ,(icon #:type 'link
-                                                 #:icon-css '(text-stone-800
+                                                 #:icon-css '(text-stone-600
                                                               text-2xl
-                                                              dark:text-stone-200))))
+                                                              dark:text-stone-400
+                                                              hover:text-purple-500
+                                                              dark:hover:text-purple-300))))
                                    #:href l
                                    #:size '(text-lg)
-                                   #:color '(text-stone-700
-                                             dark:text-stone-300)
+                                   #:color '(text-stone-600
+                                             dark:text-stone-400)
                                    #:hover '(hover:text-purple-500
                                              dark:hover:text-purple-300))
 
@@ -718,7 +720,7 @@ function addSearchQueryParam(form) {
                                      md:py-12
                                      md:px-18
                                      w-full
-                                     justify-end
+                                     justify-center
                                      items-start
                                      align-end))))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
