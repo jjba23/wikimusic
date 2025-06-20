@@ -428,7 +428,7 @@
                                                        external-sources
                                                        "identifier")
                                                       #:wikipedia-url (uri-decode
-                                                                       (assoc-ref
+                                                                       (assoc-ref-or-empty-str
                                                                         external-sources
                                                                         "wikipedia_url"))
                                                       #:spotify-url (uri-decode

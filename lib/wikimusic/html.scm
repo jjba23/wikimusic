@@ -732,15 +732,19 @@ function addSearchQueryParam(form) {
                                      justify-end
                                      items-start
                                      align-end))))
-         ,(render-external-link #:link (uri-decode (assoc-ref external-sources
-                                                    "wikipedia_url"))
+         ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
+                                                        external-sources
+                                                        "wikipedia_url"))
                                 #:label (G_ "Wikipedia"))
-         ,(render-external-link #:link (uri-decode (assoc-ref external-sources
-                                                    "spotify_url"))
+         ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
+                                                        external-sources
+                                                        "spotify_url"))
                                 #:label (G_ "Spotify"))
-         ,(render-external-link #:link (uri-decode (assoc-ref external-sources
-                                                    "youtube_url"))
+         ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
+                                                        external-sources
+                                                        "youtube_url"))
                                 #:label (G_ "Youtube"))
-         ,(render-external-link #:link (uri-decode (assoc-ref external-sources
-                                                    "soundcloud_url"))
+         ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
+                                                        external-sources
+                                                        "soundcloud_url"))
                                 #:label (G_ "Soundcloud")))))

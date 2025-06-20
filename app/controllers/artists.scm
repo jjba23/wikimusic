@@ -611,16 +611,16 @@
             ($artist_external_sources 'set
                                       #:identifier new-uuid
                                       #:artist_identifier (params rc "uuid")
-                                      #:wikipedia_url (uri-encode (assoc-ref
+                                      #:wikipedia_url (uri-encode (assoc-ref-or-empty-str
                                                                    body
                                                                    "wikipedia-url"))
-                                      #:soundcloud_url (uri-encode (assoc-ref
+                                      #:soundcloud_url (uri-encode (assoc-ref-or-empty-str
                                                                     body
                                                                     "soundcloud-url"))
-                                      #:youtube_url (uri-encode (assoc-ref
+                                      #:youtube_url (uri-encode (assoc-ref-or-empty-str
                                                                  body
                                                                  "youtube-url"))
-                                      #:spotify_url (uri-encode (assoc-ref
+                                      #:spotify_url (uri-encode (assoc-ref-or-empty-str
                                                                  body
                                                                  "spotify-url"))
                                       #:created_by user-identifier
