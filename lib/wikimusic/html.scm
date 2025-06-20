@@ -161,32 +161,10 @@
                         (is-logged-in #f))
   
   `("<!DOCTYPE html>" (html (head (title ,title)
-                                  (link (@ (rel preconnect)
-                                           (href
-                                            "https://fonts.googleapis.com")))
-                                  (link (@ (rel preconnect)
-                                           (href "https://fonts.gstatic.com")
-                                           (crossorigin "")))
-                                  (link (@ (rel stylesheet)
-                                           (href
-                                            "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap")))
-                                  (style (@ (type "text/tailwindcss"))
-                                   "
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-
-@theme {
-  --font-sans: \"IBM Plex Sans\", sans-serif;
-  --font-mono: \"IBM Plex Mono\", monospace;
-}
-")
                                   (meta (@ (name viewport)
                                            (content
                                             "width=device-width, initial-scale=1.0")))
-                                  (meta (@ (charset "UTF-8")))
-                                  (link (@ (rel stylesheet)
-                                           (type text/css)
-                                           (href
-                                            "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css")))
+                                  (meta (@ (charset UTF-8)))
                                   (link (@ (rel "shortcut icon")
                                            (href "/favicon.ico")
                                            (type "image/x-icon")))
@@ -195,8 +173,13 @@
                                            (type "image/x-icon")))
                                   (script ,(assoc-ref asset-library
                                                       "pub/js/tailwind.js"))
-                                  (script ,toggle-dark-theme-js)
-                                  (script ,remember-dark-theme-js)
+                                    ,(custom-fonts)
+                                    ,(phosphor-icons)
+                                    ,(custom-tailwind-theme)
+                                    ,(toggle-dark-theme-js)
+                                    ,(copy-pre-inner-text-js)
+                                    ,(show-notifications-from-url-js)
+                                    ,(remember-dark-theme-js)                                  
                                   (script ,(assoc-ref asset-library
                                             "pub/js/song-chord-highlighter.js"))
                                   (script ,(assoc-ref asset-library
@@ -220,7 +203,9 @@
                                                                      #:is-logged-in
                                                                      is-logged-in)
                                                                    ,body)))
-                                                #:footer (page-footer G_))))))
+                                                #:footer (page-footer G_))
+                                                                      ,notification-tray
+                                  ))))
 
 (define* (item-tile G_
                     entity
