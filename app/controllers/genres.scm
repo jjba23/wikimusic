@@ -395,8 +395,8 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'genre_artworks set
-                             `((content_url ,(html-escape (assoc-ref body
-                                                           "content-url")))
+                             `((content_url ,(uri-encode (assoc-ref body
+                                                          "content-url")))
                                (content_caption ,(html-escape (assoc-ref body
                                                                "content-caption")))
                                (order_value ,(html-escape (assoc-ref body
@@ -435,8 +435,8 @@
                              #:genre_identifier (params rc "uuid")
                              #:created_by user-identifier
                              #:visibility_status 0
-                             #:content_url (html-escape (assoc-ref body
-                                                         "content-url"))
+                             #:content_url (uri-encode (assoc-ref body
+                                                        "content-url"))
                              #:content_caption (html-escape (assoc-ref body
                                                              "content-caption"))
                              #:order_value (html-escape (assoc-ref body
@@ -579,14 +579,14 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'genre_external_sources set
-                             `((wikipedia_url ,(html-escape (assoc-ref body
-                                                             "wikipedia-url")))
-                               (spotify_url ,(html-escape (assoc-ref body
-                                                           "spotify-url")))
-                               (youtube_url ,(html-escape (assoc-ref body
-                                                           "youtube-url")))
-                               (soundcloud_url ,(html-escape (assoc-ref body
-                                                              "soundcloud-url")))
+                             `((wikipedia_url ,(uri-encode (assoc-ref body
+                                                            "wikipedia-url")))
+                               (spotify_url ,(uri-encode (assoc-ref body
+                                                          "spotify-url")))
+                               (youtube_url ,(uri-encode (assoc-ref body
+                                                          "youtube-url")))
+                               (soundcloud_url ,(uri-encode (assoc-ref body
+                                                             "soundcloud-url")))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "sourcesuuid"))))
             (redirect-to rc
@@ -616,18 +616,16 @@
             ($genre_external_sources 'set
                                      #:identifier new-uuid
                                      #:genre_identifier (params rc "uuid")
-                                     #:wikipedia_url (html-escape (assoc-ref
+                                     #:wikipedia_url (uri-encode (assoc-ref
+                                                                  body
+                                                                  "wikipedia-url"))
+                                     #:soundcloud_url (uri-encode (assoc-ref
                                                                    body
-                                                                   "wikipedia-url"))
-                                     #:soundcloud_url (html-escape (assoc-ref
-                                                                    body
-                                                                    "soundcloud-url"))
-                                     #:youtube_url (html-escape (assoc-ref
-                                                                 body
-                                                                 "youtube-url"))
-                                     #:spotify_url (html-escape (assoc-ref
-                                                                 body
-                                                                 "spotify-url"))
+                                                                   "soundcloud-url"))
+                                     #:youtube_url (uri-encode (assoc-ref body
+                                                                "youtube-url"))
+                                     #:spotify_url (uri-encode (assoc-ref body
+                                                                "spotify-url"))
                                      #:created_by user-identifier
                                      #:created_at (current-time))
 

@@ -257,8 +257,9 @@
                                                                              w-40
                                                                              sm:w-48
                                                                              shadow-md)))
-                                                         (src ,(assoc-ref art
-                                                                "content_url")))))))
+                                                         (src ,(uri-decode (assoc-ref
+                                                                            art
+                                                                            "content_url"))))))))
                                    (cond
                                      ((nil? artworks)
                                       '())
@@ -347,8 +348,9 @@
                                                                         sm:w-64
                                                                         md:w-72
                                                                         h-auto)))
-                                                    (src ,(assoc-ref art
-                                                           "content_url"))))
+                                                    (src ,(uri-decode (assoc-ref
+                                                                       art
+                                                                       "content_url")))))
                                             ,(render-if-nempty (lambda (fc)
                                                                  `(figcaption ,fc))
                                                                (assoc-ref art
@@ -697,25 +699,26 @@ function addSearchQueryParam(form) {
                     ,(submit-button (G_ "search")))))))
 
 (define* (render-external-link #:key link label)
-  (render-if-nestring (lambda (s)
-                        `((div (@ (class ,(mk-class '(flex flex-col gap-3
-                                                           max-w-64
-                                                           md:max-w-80
-                                                           overflow-x-scroll))))
-                               (div (@ (class ,(mk-class '(flex flex-row gap-1
-                                                                items-center
-                                                                align-center))))
-                                    ,(p label)
-                                    ,(icon #:type 'link
-                                           #:icon-css '(text-stone-800
-                                                        dark:text-stone-200)))
-                               ,(a s
+  (render-if-nestring (lambda (l)
+                        `((div (@ (class ,(mk-class '(flex flex-row gap-1
+                                                           items-center
+                                                           align-center))))
+                               ,(a `((div (@ (class ,(mk-class '(flex flex-row
+                                                                 items-center
+                                                                 gap-1))))
+                                          (span ,label)
+                                          ,(icon #:type 'link
+                                                 #:icon-css '(text-stone-800
+                                                              text-xl
+                                                              dark:text-stone-200))))
+                                   #:href l
                                    #:size '(text-sm)
                                    #:color '(text-stone-700
                                              dark:text-stone-300)
                                    #:hover '(hover:text-purple-500
-                                             dark:hover:text-purple-300)))))
-                      link))
+                                             dark:hover:text-purple-300))
+
+                               ))) link))
 
 (define* (render-external-sources G_ external-sources)
   `((div (@ (class ,(mk-class '(flex flex-row
@@ -729,15 +732,15 @@ function addSearchQueryParam(form) {
                                      justify-end
                                      items-start
                                      align-end))))
-         ,(render-external-link #:link (assoc-ref external-sources
-                                                  "wikipedia_url")
-                                #:label (G_ "Wikipedia URL"))
-         ,(render-external-link #:link (assoc-ref external-sources
-                                                  "spotify_url")
-                                #:label (G_ "Spotify URL"))
-         ,(render-external-link #:link (assoc-ref external-sources
-                                                  "youtube_url")
-                                #:label (G_ "Youtube URL"))
-         ,(render-external-link #:link (assoc-ref external-sources
-                                                  "soundcloud_url")
-                                #:label (G_ "Soundcloud URL")))))
+         ,(render-external-link #:link (uri-decode (assoc-ref external-sources
+                                                    "wikipedia_url"))
+                                #:label (G_ "Wikipedia"))
+         ,(render-external-link #:link (uri-decode (assoc-ref external-sources
+                                                    "spotify_url"))
+                                #:label (G_ "Spotify"))
+         ,(render-external-link #:link (uri-decode (assoc-ref external-sources
+                                                    "youtube_url"))
+                                #:label (G_ "Youtube"))
+         ,(render-external-link #:link (uri-decode (assoc-ref external-sources
+                                                    "soundcloud_url"))
+                                #:label (G_ "Soundcloud")))))

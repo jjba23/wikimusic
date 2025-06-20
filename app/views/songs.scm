@@ -24,6 +24,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (hygguile hygguile)
   #:use-module (kracht prelude)
+  #:use-module (web uri)
   #:use-module (ice-9 i18n)
   #:use-module (srfi srfi-1)
   #:use-module (app views song-contents)
@@ -358,9 +359,10 @@
                                                            #:artwork-identifier
                                                            (assoc-ref a
                                                             "identifier")
-                                                           #:content-url (assoc-ref
-                                                                          a
-                                                                          "content_url")
+                                                           #:content-url (uri-decode
+                                                                          (assoc-ref
+                                                                           a
+                                                                           "content_url"))
                                                            #:content-caption (assoc-ref-or-empty-str
                                                                               a
                                                                               "content_caption")
@@ -425,18 +427,22 @@
                                                       (assoc-ref
                                                        external-sources
                                                        "identifier")
-                                                      #:wikipedia-url (assoc-ref
-                                                                       external-sources
-                                                                       "wikipedia_url")
-                                                      #:spotify-url (assoc-ref-or-empty-str
-                                                                     external-sources
-                                                                     "spotify_url")
-                                                      #:youtube-url (assoc-ref-or-empty-str
-                                                                     external-sources
-                                                                     "youtube_url")
-                                                      #:soundcloud-url (assoc-ref-or-empty-str
+                                                      #:wikipedia-url (uri-decode
+                                                                       (assoc-ref
                                                                         external-sources
-                                                                        "soundcloud_url")))
+                                                                        "wikipedia_url"))
+                                                      #:spotify-url (uri-decode
+                                                                     (assoc-ref-or-empty-str
+                                                                      external-sources
+                                                                      "spotify_url"))
+                                                      #:youtube-url (uri-decode
+                                                                     (assoc-ref-or-empty-str
+                                                                      external-sources
+                                                                      "youtube_url"))
+                                                      #:soundcloud-url (uri-decode
+                                                                        (assoc-ref-or-empty-str
+                                                                         external-sources
+                                                                         "soundcloud_url"))))
                      ,(hr)
                      (details (@ (open true)
                                  (class ,(mk-class '(py-6))))
@@ -593,7 +599,7 @@
                        #:value (html-unescape album-name))
                ,(input #:label (G_ "album info url")
                        #:name "album-info-link"
-                       #:value (html-unescape album-info-link))
+                       #:value (uri-decode album-info-link))
                ,(textarea #:label (G_ "description")
                           #:name "description"
                           #:value (html-unescape description)))

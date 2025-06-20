@@ -443,8 +443,8 @@
                                                                    "music-creation-date")))
                                (album_name ,(html-escape (assoc-ref body
                                                           "album-name")))
-                               (album_info_link ,(html-escape (assoc-ref body
-                                                               "album-info-link")))
+                               (album_info_link ,(uri-encode (assoc-ref body
+                                                              "album-info-link")))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "uuid"))))
             (redirect-to rc
@@ -499,8 +499,8 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'song_artworks set
-                             `((content_url ,(html-escape (assoc-ref body
-                                                           "content-url")))
+                             `((content_url ,(uri-encode (assoc-ref body
+                                                          "content-url")))
                                (content_caption ,(html-escape (assoc-ref body
                                                                "content-caption")))
                                (order_value ,(html-escape (assoc-ref body
@@ -581,8 +581,8 @@
                             #:song_identifier (params rc "uuid")
                             #:created_by user-identifier
                             #:visibility_status 0
-                            #:content_url (html-escape (assoc-ref body
-                                                        "content-url"))
+                            #:content_url (uri-encode (assoc-ref body
+                                                       "content-url"))
                             #:content_caption (html-escape (assoc-ref body
                                                             "content-caption"))
                             #:order_value (html-escape (assoc-ref body
@@ -701,8 +701,8 @@
                     #:music_creation_date (html-escape (assoc-ref body
                                                         "music-creation-date"))
                     #:album_name (html-escape (assoc-ref body "album-name"))
-                    #:album_info_link (html-escape (assoc-ref body
-                                                    "album-info-link"))
+                    #:album_info_link (uri-encode (assoc-ref body
+                                                   "album-info-link"))
                     #:description (html-escape (assoc-ref body "description"))
                     #:created_by user-identifier
                     #:visibility_status 0
@@ -870,14 +870,14 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'song_external_sources set
-                             `((wikipedia_url ,(html-escape (assoc-ref body
-                                                             "wikipedia-url")))
-                               (spotify_url ,(html-escape (assoc-ref body
-                                                           "spotify-url")))
-                               (youtube_url ,(html-escape (assoc-ref body
-                                                           "youtube-url")))
-                               (soundcloud_url ,(html-escape (assoc-ref body
-                                                              "soundcloud-url")))
+                             `((wikipedia_url ,(uri-encode (assoc-ref body
+                                                            "wikipedia-url")))
+                               (spotify_url ,(uri-encode (assoc-ref body
+                                                          "spotify-url")))
+                               (youtube_url ,(uri-encode (assoc-ref body
+                                                          "youtube-url")))
+                               (soundcloud_url ,(uri-encode (assoc-ref body
+                                                             "soundcloud-url")))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "sourcesuuid"))))
             (redirect-to rc
@@ -907,16 +907,16 @@
             ($song_external_sources 'set
                                     #:identifier new-uuid
                                     #:song_identifier (params rc "uuid")
-                                    #:wikipedia_url (html-escape (assoc-ref
+                                    #:wikipedia_url (uri-encode (assoc-ref
+                                                                 body
+                                                                 "wikipedia-url"))
+                                    #:soundcloud_url (uri-encode (assoc-ref
                                                                   body
-                                                                  "wikipedia-url"))
-                                    #:soundcloud_url (html-escape (assoc-ref
-                                                                   body
-                                                                   "soundcloud-url"))
-                                    #:youtube_url (html-escape (assoc-ref body
-                                                                "youtube-url"))
-                                    #:spotify_url (html-escape (assoc-ref body
-                                                                "spotify-url"))
+                                                                  "soundcloud-url"))
+                                    #:youtube_url (uri-encode (assoc-ref body
+                                                               "youtube-url"))
+                                    #:spotify_url (uri-encode (assoc-ref body
+                                                               "spotify-url"))
                                     #:created_by user-identifier
                                     #:created_at (current-time))
 

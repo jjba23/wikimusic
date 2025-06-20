@@ -24,6 +24,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
   #:use-module (kracht prelude)
+  #:use-module (web uri)
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
@@ -147,8 +148,9 @@
                                                                     sm:w-36))))
                                              (img (@ (loading "lazy")
                                                      (class "rounded-xl")
-                                                     (src ,(assoc-ref a
-                                                            "content_url")))))
+                                                     (src ,(uri-decode (assoc-ref
+                                                                        a
+                                                                        "content_url"))))))
                                      ,(artwork-form G_
                                                     #:entity 'artist
                                                     #:entity-identifier (assoc-ref
@@ -157,8 +159,9 @@
                                                     #:artwork-identifier (assoc-ref
                                                                           a
                                                                           "identifier")
-                                                    #:content-url (assoc-ref a
-                                                                   "content_url")
+                                                    #:content-url (uri-decode (assoc-ref
+                                                                               a
+                                                                               "content_url"))
                                                     #:content-caption (assoc-ref-or-empty-str
                                                                        a
                                                                        "content_caption")
@@ -224,18 +227,22 @@
                                                       (assoc-ref
                                                        external-sources
                                                        "identifier")
-                                                      #:wikipedia-url (assoc-ref
-                                                                       external-sources
-                                                                       "wikipedia_url")
-                                                      #:spotify-url (assoc-ref-or-empty-str
-                                                                     external-sources
-                                                                     "spotify_url")
-                                                      #:youtube-url (assoc-ref-or-empty-str
-                                                                     external-sources
-                                                                     "youtube_url")
-                                                      #:soundcloud-url (assoc-ref-or-empty-str
+                                                      #:wikipedia-url (uri-decode
+                                                                       (assoc-ref
                                                                         external-sources
-                                                                        "soundcloud_url"))))))
+                                                                        "wikipedia_url"))
+                                                      #:spotify-url (uri-decode
+                                                                     (assoc-ref-or-empty-str
+                                                                      external-sources
+                                                                      "spotify_url"))
+                                                      #:youtube-url (uri-decode
+                                                                     (assoc-ref-or-empty-str
+                                                                      external-sources
+                                                                      "youtube_url"))
+                                                      #:soundcloud-url (uri-decode
+                                                                        (assoc-ref-or-empty-str
+                                                                         external-sources
+                                                                         "soundcloud_url")))))))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:body body)))
