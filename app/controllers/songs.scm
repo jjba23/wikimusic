@@ -452,9 +452,10 @@
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "uuid"))))
             (redirect-to rc
-                         (string->uri (format #f "~a/songs/uuid/~a"
+                         (string->uri (format #f "~a/songs/uuid/~a?notify-title=~a"
                                               (current-myhost)
-                                              (params rc "uuid")))
+                                              (params rc "uuid")
+                                              (uri-encode (G_ "Edited song succesfully!"))))
                          #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:song-create)
