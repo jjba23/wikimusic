@@ -337,7 +337,8 @@
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((uuid (params rc "uuid"))
+       (let* ((G_ (:i18n rc))
+              (uuid (params rc "uuid"))
               (song (car ($songs 'get
                                  #:ret 'top
                                  #:condition (where #:identifier uuid))))
@@ -402,7 +403,8 @@
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((uuid (params rc "uuid"))
+       (let* ((G_ (:i18n rc))
+              (uuid (params rc "uuid"))
               (song (car ($songs 'get
                                  #:ret 'top
                                  #:condition (where #:identifier uuid))))
@@ -427,7 +429,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc))))
+          (let* ((G_ (:i18n rc))
+                 (body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
                       (->sql update
                              'songs set
@@ -462,9 +465,10 @@
 (post "/songs/uuid/:uuid/contents/:version-uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
       #:i18n '(cookie "lang")
-      (lambda (rc)        
+      (lambda (rc)
         (define (do-contents-edit)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc))))
+          (let* ((G_ (:i18n rc))
+                 (body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
                       (->sql update
                              'song_contents set
@@ -497,7 +501,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-artwork)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc))))
+          (let* ((G_ (:i18n rc))
+                 (body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
                       (->sql update
                              'song_artworks set
@@ -529,7 +534,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-content)
-          (let* ((t (decrypt-token #:token (:cookies-value rc
+          (let* ((G_ (:i18n rc))
+                 (t (decrypt-token #:token (:cookies-value rc
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
@@ -572,7 +578,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-artwork)
-          (let* ((t (decrypt-token #:token (:cookies-value rc
+          (let* ((G_ (:i18n rc))
+                 (t (decrypt-token #:token (:cookies-value rc
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
@@ -609,7 +616,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-song-artist)
-          (let* ((t (decrypt-token #:token (:cookies-value rc
+          (let* ((G_ (:i18n rc))
+                 (t (decrypt-token #:token (:cookies-value rc
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
@@ -650,7 +658,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-song-genre)
-          (let* ((t (decrypt-token #:token (:cookies-value rc
+          (let* ((G_ (:i18n rc))
+                 (t (decrypt-token #:token (:cookies-value rc
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
@@ -692,7 +701,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new)
-          (let* ((t (decrypt-token #:token (:cookies-value rc
+          (let* ((G_ (:i18n rc))
+                 (t (decrypt-token #:token (:cookies-value rc
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
@@ -727,7 +737,8 @@
                            #:unhappy-flow back-to-login)))
 
 (define (do-opinion rc is-like is-dislike t)
-  (let* ((uuid (params rc "uuid"))
+  (let* ((G_ (:i18n rc))
+         (uuid (params rc "uuid"))
          (user-identifier (assoc-ref t
                                      'owner-id))
          (rec (car ($songs 'get
@@ -799,14 +810,15 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete)
-          (delete-artwork #:rc rc
-                          #:conn (DB-open rc)
-                          #:entity 'song
-                          #:delete-condition (where #:identifier (params rc
-                                                                  "artwork-uuid"))
-                          #:redirect-url (format #f "~a/songs/uuid/~a/edit"
-                                                 (current-myhost)
-                                                 (params rc "uuid"))))
+          (let* ((G_ (:i18n rc)))
+            (delete-artwork #:rc rc
+                            #:conn (DB-open rc)
+                            #:entity 'song
+                            #:delete-condition (where #:identifier (params rc
+                                                                    "artwork-uuid"))
+                            #:redirect-url (format #f "~a/songs/uuid/~a/edit"
+                                                   (current-myhost)
+                                                   (params rc "uuid")))))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:song-delete)
                            #:rc rc
@@ -818,15 +830,16 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete)
-          (DB-query (DB-open rc)
-                    (->sql delete from
-                           'song_contents
-                           (where #:identifier (params rc "version-uuid"))))
-          (redirect-to rc
-                       (string->uri (format #f "~a/songs/uuid/~a"
-                                            (current-myhost)
-                                            (params rc "uuid")))
-                       #:status 302))
+          (let* ((G_ (:i18n rc)))
+            (DB-query (DB-open rc)
+                      (->sql delete from
+                             'song_contents
+                             (where #:identifier (params rc "version-uuid"))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/songs/uuid/~a"
+                                              (current-myhost)
+                                              (params rc "uuid")))
+                         #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:song-delete)
                            #:rc rc
@@ -838,16 +851,18 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete-artist)
-          (DB-query (DB-open rc)
-                    (->sql delete from
-                           'song_artists
-                           (where #:artist_identifier (params rc "artist-uuid")
-                                  #:song_identifier (params rc "uuid"))))
-          (redirect-to rc
-                       (string->uri (format #f "~a/songs/uuid/~a/edit"
-                                            (current-myhost)
-                                            (params rc "uuid")))
-                       #:status 302))
+          (let* ((G_ (:i18n rc)))
+            (DB-query (DB-open rc)
+                      (->sql delete from
+                             'song_artists
+                             (where #:artist_identifier (params rc
+                                                                "artist-uuid")
+                                    #:song_identifier (params rc "uuid"))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/songs/uuid/~a/edit"
+                                              (current-myhost)
+                                              (params rc "uuid")))
+                         #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:song-delete)
                            #:rc rc
@@ -859,16 +874,17 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete-genre)
-          (DB-query (DB-open rc)
-                    (->sql delete from
-                           'song_genres
-                           (where #:genre_identifier (params rc "genre-uuid")
-                                  #:song_identifier (params rc "uuid"))))
-          (redirect-to rc
-                       (string->uri (format #f "~a/songs/uuid/~a/edit"
-                                            (current-myhost)
-                                            (params rc "uuid")))
-                       #:status 302))
+          (let* ((G_ (:i18n rc)))
+            (DB-query (DB-open rc)
+                      (->sql delete from
+                             'song_genres
+                             (where #:genre_identifier (params rc "genre-uuid")
+                                    #:song_identifier (params rc "uuid"))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/songs/uuid/~a/edit"
+                                              (current-myhost)
+                                              (params rc "uuid")))
+                         #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:song-delete)
                            #:rc rc
@@ -880,7 +896,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-external-sources)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc))))
+          (let* ((G_ (:i18n rc))
+                 (body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
                       (->sql update
                              'song_external_sources set
@@ -911,7 +928,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-external-sources)
-          (let* ((t (decrypt-token #:token (:cookies-value rc
+          (let* ((G_ (:i18n rc))
+                 (t (decrypt-token #:token (:cookies-value rc
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
