@@ -336,7 +336,12 @@
                                                                        art
                                                                        "content_url")))))
                                             ,(render-if-nempty (lambda (fc)
-                                                                 `(figcaption ,fc))
+                                                                 `(figcaption (@
+                                                                               (class ,
+                                                                                (mk-class '
+                                                                                 (text-stone-700
+                                                                                  dark:text-stone-300))))
+                                                                              ,fc))
                                                                (assoc-ref art
                                                                 "content_caption"))))
                                  artworks))
@@ -693,10 +698,10 @@ function addSearchQueryParam(form) {
                                           (span ,label)
                                           ,(icon #:type 'link
                                                  #:icon-css '(text-stone-800
-                                                              text-xl
+                                                              text-2xl
                                                               dark:text-stone-200))))
                                    #:href l
-                                   #:size '(text-sm)
+                                   #:size '(text-lg)
                                    #:color '(text-stone-700
                                              dark:text-stone-300)
                                    #:hover '(hover:text-purple-500
