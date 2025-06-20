@@ -367,7 +367,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc))))
+          (let* ((G_ (:i18n rc))
+                 (body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
                       (->sql update
                              'genres set
@@ -393,7 +394,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-artwork)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc))))
+          (let* ((G_ (:i18n rc))
+                 (body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
                       (->sql update
                              'genre_artworks set
@@ -425,7 +427,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-artwork)
-          (let* ((t (decrypt-token #:token (:cookies-value rc
+          (let* ((G_ (:i18n rc))
+                 (t (decrypt-token #:token (:cookies-value rc
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
@@ -462,7 +465,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new)
-          (let* ((t (decrypt-token #:token (:cookies-value rc
+          (let* ((G_ (:i18n rc))
+                 (t (decrypt-token #:token (:cookies-value rc
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
@@ -492,7 +496,8 @@
                            #:unhappy-flow back-to-login)))
 
 (define (do-opinion rc is-like is-dislike t)
-  (let* ((uuid (params rc "uuid"))
+  (let* ((G_ (:i18n rc))
+         (uuid (params rc "uuid"))
          (user-identifier (assoc-ref t
                                      'owner-id))
          (rec (car ($genres 'get
@@ -564,14 +569,15 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete)
-          (delete-artwork #:rc rc
-                          #:conn (DB-open rc)
-                          #:entity 'genre
-                          #:delete-condition (where #:identifier (params rc
-                                                                  "artwork-uuid"))
-                          #:redirect-url (format #f "~a/genres/uuid/~a/edit"
-                                                 (current-myhost)
-                                                 (params rc "uuid"))))
+          (let* ((G_ (:i18n rc)))
+            (delete-artwork #:rc rc
+                            #:conn (DB-open rc)
+                            #:entity 'genre
+                            #:delete-condition (where #:identifier (params rc
+                                                                    "artwork-uuid"))
+                            #:redirect-url (format #f "~a/genres/uuid/~a/edit"
+                                                   (current-myhost)
+                                                   (params rc "uuid")))))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:genre-delete)
                            #:rc rc
@@ -583,7 +589,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-external-sources)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc))))
+          (let* ((G_ (:i18n rc))
+                 (body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
                       (->sql update
                              'genre_external_sources set
@@ -614,7 +621,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-external-sources)
-          (let* ((t (decrypt-token #:token (:cookies-value rc
+          (let* ((G_ (:i18n rc))
+                 (t (decrypt-token #:token (:cookies-value rc
                                             "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))

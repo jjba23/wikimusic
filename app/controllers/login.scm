@@ -46,7 +46,8 @@
       #:cookies '(names x-bewaking-wikimusic)
       #:i18n '(cookie "lang")
       (lambda (rc)
-        (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+        (let* ((G_ (:i18n rc))
+               (body (alist-from-url-encoded-body (rc-body rc)))
                (email (assoc-ref body "email"))
                (password (assoc-ref body "password"))
                (u ($users 'get

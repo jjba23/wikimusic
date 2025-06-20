@@ -146,7 +146,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-user)
-          (let* ((existing-token (if (:cookies-value rc "x-bewaking-wikimusic")
+          (let* ((G_ (:i18n rc))
+                 (existing-token (if (:cookies-value rc "x-bewaking-wikimusic")
                                      (decrypt-token #:token (:cookies-value rc
                                                              "x-bewaking-wikimusic")
                                                     #:encryption-key
@@ -195,7 +196,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete-user)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+          (let* ((G_ (:i18n rc))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
                  (identifier (assoc-ref body "identifier"))
                  (_ ($users 'mod
                             'row-delete
@@ -216,7 +218,8 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-user)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+          (let* ((G_ (:i18n rc))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
                  (username (html-escape (assoc-ref body "username")))
                  (email (html-escape (assoc-ref body "email")))
                  (permissions (filter (lambda (p)
@@ -337,7 +340,8 @@
       #:cookies '(names x-bewaking-wikimusic)
       #:i18n '(cookie "lang")
       (lambda (rc)
-        (let* ((existing-token (if (:cookies-value rc "x-bewaking-wikimusic")
+        (let* ((G_ (:i18n rc))
+               (existing-token (if (:cookies-value rc "x-bewaking-wikimusic")
                                    (decrypt-token #:token (:cookies-value rc
                                                            "x-bewaking-wikimusic")
                                                   #:encryption-key
@@ -368,7 +372,8 @@
       #:cookies '(names x-bewaking-wikimusic)
       #:i18n '(cookie "lang")
       (lambda (rc)
-        (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+        (let* ((G_ (:i18n rc))
+               (body (alist-from-url-encoded-body (rc-body rc)))
                (email (assoc-ref body "email"))
                (reset-token (assoc-ref body "reset-token"))
                (new-password (assoc-ref body "new-password"))

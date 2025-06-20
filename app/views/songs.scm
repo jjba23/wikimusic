@@ -349,8 +349,9 @@
                                                     (img (@ (loading "lazy")
                                                             (class
                                                              "rounded-xl")
-                                                            (src ,(uri-decode (assoc-ref a
-                                                                   "content_url"))))))
+                                                            (src ,(uri-decode (assoc-ref
+                                                                               a
+                                                                               "content_url"))))))
                                             ,(artwork-form G_
                                                            #:entity 'song
                                                            #:entity-identifier
