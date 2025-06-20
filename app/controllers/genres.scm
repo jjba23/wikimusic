@@ -364,6 +364,7 @@
 
 (post "/genres/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit)
           (let* ((body (alist-from-url-encoded-body (rc-body rc))))
@@ -389,6 +390,7 @@
 
 (post "/genres/uuid/:uuid/artworks/edit/:artwork-uuid"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-artwork)
           (let* ((body (alist-from-url-encoded-body (rc-body rc))))
@@ -420,6 +422,7 @@
 
 (post "/genres/uuid/:uuid/artworks/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-artwork)
           (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -456,6 +459,7 @@
 
 (post "/genres/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new)
           (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -519,6 +523,7 @@
 
 (post "/genres/uuid/:uuid/like"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
@@ -536,6 +541,7 @@
 
 (post "/genres/uuid/:uuid/dislike"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
@@ -555,6 +561,7 @@
 
 (post "/genres/uuid/:uuid/artworks/:artwork-uuid/delete"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete)
           (delete-artwork #:rc rc
@@ -573,6 +580,7 @@
 
 (post "/genres/uuid/:uuid/external-sources/:sourcesuuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-external-sources)
           (let* ((body (alist-from-url-encoded-body (rc-body rc))))
@@ -603,6 +611,7 @@
 
 (post "/genres/uuid/:uuid/external-sources/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-external-sources)
           (let* ((t (decrypt-token #:token (:cookies-value rc

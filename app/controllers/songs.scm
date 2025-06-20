@@ -424,6 +424,7 @@
 
 (post "/songs/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit)
           (let* ((body (alist-from-url-encoded-body (rc-body rc))))
@@ -460,8 +461,8 @@
 
 (post "/songs/uuid/:uuid/contents/:version-uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
-      (lambda (rc)
-        
+      #:i18n '(cookie "lang")
+      (lambda (rc)        
         (define (do-contents-edit)
           (let* ((body (alist-from-url-encoded-body (rc-body rc))))
             (DB-query (DB-open rc)
@@ -493,6 +494,7 @@
 
 (post "/songs/uuid/:uuid/artworks/edit/:artwork-uuid"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-artwork)
           (let* ((body (alist-from-url-encoded-body (rc-body rc))))
@@ -524,6 +526,7 @@
 
 (post "/songs/uuid/:uuid/contents/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-content)
           (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -566,6 +569,7 @@
 
 (post "/songs/uuid/:uuid/artworks/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-artwork)
           (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -602,6 +606,7 @@
 
 (post "/songs/uuid/:uuid/artists"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-song-artist)
           (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -642,6 +647,7 @@
 
 (post "/songs/uuid/:uuid/genres"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-song-genre)
           (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -683,6 +689,7 @@
 
 (post "/songs/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new)
           (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -751,6 +758,7 @@
 
 (post "/songs/uuid/:uuid/like"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
@@ -768,6 +776,7 @@
 
 (post "/songs/uuid/:uuid/dislike"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
@@ -787,6 +796,7 @@
 
 (post "/songs/uuid/:uuid/artworks/:artwork-uuid/delete"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete)
           (delete-artwork #:rc rc
@@ -805,6 +815,7 @@
 
 (post "/songs/uuid/:uuid/contents/:version-uuid/delete"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete)
           (DB-query (DB-open rc)
@@ -824,6 +835,7 @@
 
 (post "/songs/uuid/:uuid/artists/:artist-uuid/delete"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete-artist)
           (DB-query (DB-open rc)
@@ -844,6 +856,7 @@
 
 (post "/songs/uuid/:uuid/genres/:genre-uuid/delete"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete-genre)
           (DB-query (DB-open rc)
@@ -864,6 +877,7 @@
 
 (post "/songs/uuid/:uuid/external-sources/:sourcesuuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-external-sources)
           (let* ((body (alist-from-url-encoded-body (rc-body rc))))
@@ -894,6 +908,7 @@
 
 (post "/songs/uuid/:uuid/external-sources/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-external-sources)
           (let* ((t (decrypt-token #:token (:cookies-value rc

@@ -358,6 +358,7 @@
 
 (post "/artists/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit)
           (let* ((body (alist-from-url-encoded-body (rc-body rc))))
@@ -383,6 +384,7 @@
 
 (post "/artists/uuid/:uuid/external-sources/:sourcesuuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-external-sources)
           (let* ((body (alist-from-url-encoded-body (rc-body rc))))
@@ -413,6 +415,7 @@
 
 (post "/artists/uuid/:uuid/artworks/edit/:artwork-uuid"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-artwork)
           (let* ((body (alist-from-url-encoded-body (rc-body rc))))
@@ -445,6 +448,7 @@
 
 (post "/artists/uuid/:uuid/artworks/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-artwork)
           (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -481,6 +485,7 @@
 
 (post "/artists/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new)
           (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -544,6 +549,7 @@
 
 (post "/artists/uuid/:uuid/like"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
@@ -561,6 +567,7 @@
 
 (post "/artists/uuid/:uuid/dislike"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '()
@@ -580,6 +587,7 @@
 
 (post "/artists/uuid/:uuid/artworks/:artwork-uuid/delete"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete)
           (delete-artwork #:rc rc
@@ -598,6 +606,7 @@
 
 (post "/artists/uuid/:uuid/external-sources/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-external-sources)
           (let* ((t (decrypt-token #:token (:cookies-value rc

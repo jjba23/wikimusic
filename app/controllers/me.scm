@@ -143,6 +143,7 @@
 
 (post "/users/new"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-user)
           (let* ((existing-token (if (:cookies-value rc "x-bewaking-wikimusic")
@@ -191,6 +192,7 @@
 
 (post "/users/delete"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete-user)
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
@@ -211,6 +213,7 @@
 
 (post "/users/edit/:identifier"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-user)
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
@@ -332,6 +335,7 @@
 
 (post "/password/reset"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (let* ((existing-token (if (:cookies-value rc "x-bewaking-wikimusic")
                                    (decrypt-token #:token (:cookies-value rc
@@ -362,6 +366,7 @@
 
 (post "/password/do-reset"
       #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
       (lambda (rc)
         (let* ((body (alist-from-url-encoded-body (rc-body rc)))
                (email (assoc-ref body "email"))
