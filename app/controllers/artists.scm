@@ -549,8 +549,11 @@
                       #:is_dislike is-dislike
                       #:created_at (current-time))
     (redirect-to rc
-                 (string->uri (format #f "~a/artists/uuid/~a"
-                                      (current-myhost) uuid))
+                 (string->uri (format #f "~a/artists/uuid/~a?notify-title=~a"
+                                      (current-myhost) uuid
+                                      (if (equal? 1 is-like)
+                                          (uri-encode (G_ "Liked artist!"))
+                                          (uri-encode (G_ "Disliked artist!")))))
                  #:status 302)))
 
 (post "/artists/uuid/:uuid/like"

@@ -522,8 +522,11 @@
                      #:is_dislike is-dislike
                      #:created_at (current-time))
     (redirect-to rc
-                 (string->uri (format #f "~a/genres/uuid/~a"
-                                      (current-myhost) uuid))
+                 (string->uri (format #f "~a/genres/uuid/~a?notify-title=~a"
+                                      (current-myhost) uuid
+                                      (if (equal? 1 is-like)
+                                          (uri-encode (G_ "Liked genre!"))
+                                          (uri-encode (G_ "Disliked genre!")))))
                  #:status 302)))
 
 (post "/genres/uuid/:uuid/like"
