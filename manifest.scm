@@ -116,9 +116,13 @@ easing the learning curve, and reducing the cognitive load.")
       #:source-directory "src"))
     (home-page "https://codeberg.org/jjba23/kracht")
     (synopsis
-     "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
+     "Utility methods and functionalities for Guile Scheme programming")
     (description
-     "Good prelude for Guile Scheme, an opt-in enhancement to the standard library. kracht means power/strength in the Dutch language, and is also a recursive acronym which stands for: KRACHT Reliable And Consistent Helper Tools")
+     "Kracht provides helpful and convenient functionalities that can help you
+develop more comfortably in your Guile Scheme project. You can see it as a
+batteries-included addition to the (already great) standard library
+of Guile Scheme, complementing it, and helping developers write cleaner,
+more efficient, and more powerful code.")
     (license license:lgpl3+)))
 
 (define-public guile-orgwebalchemy
