@@ -99,7 +99,7 @@ easing the learning curve, and reducing the cognitive load.")
 (define-public guile-kracht
   (package
     (name "guile-kracht")
-    (version "0.1.11")
+    (version "0.2.1")
     (source
      (origin
        (method git-fetch)
@@ -108,7 +108,7 @@ easing the learning curve, and reducing the cognitive load.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0x6wwxddcdyd38b9lsfvyk81l28z92w4g180fl2p9lsxh97j7x8g"))))
+        (base32 "0mcyi3a6vpqm4z01rcmv6fqhf7gayppa9yib76jqrihxv8w70m5g"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
