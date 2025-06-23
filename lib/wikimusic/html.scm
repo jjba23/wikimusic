@@ -61,12 +61,12 @@
   `(,(footer `(,(em (G_ "the free music knowledge encyclopaedia")) ,(em (G_
                                                                          "wikimusic is free software, available under the GNU AGPL v3 or newer"))
                (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                justify-start))))
+                                                justify-start items-center))))
                     ,(em (G_ "find the source code here"))
                     ,(a "https://codeberg.org/jjba23/wikimusic"
                         #:size '(text-sm)))
                (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                align-center))))
+                                                align-center items-center))))
                     ,(em (G_ "find the manual here"))
                     ,(a "https://jointhefreeworld.org/manuals/wikimusic/"
                         #:size '(text-sm)))
