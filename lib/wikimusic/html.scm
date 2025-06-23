@@ -63,7 +63,13 @@
                (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                                 justify-start))))
                     ,(em (G_ "find the source code here"))
-                    ,(a "https://codeberg.org/jjba23/wikimusic" #:size '(text-sm)))
+                    ,(a "https://codeberg.org/jjba23/wikimusic"
+                        #:size '(text-sm)))
+               (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                                align-center))))
+                    ,(em (G_ "find the manual here"))
+                    ,(a "https://jointhefreeworld.org/manuals/wikimusic/"
+                        #:size '(text-sm)))
                ,(em (G_
                      "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"))
 
