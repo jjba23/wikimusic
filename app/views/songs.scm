@@ -315,7 +315,7 @@
                                                             (list (dt (G_
                                                                        "album info link"))
                                                                   (dd (a
-                                                                       (html-unescape album-link)))))
+                                                                       (uri-decode album-link)))))
                                                           (assoc-ref song
                                                            "album_info_link"))))
 
