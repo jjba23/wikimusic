@@ -153,7 +153,7 @@ more efficient, and more powerful code.")
 (define-public guile-bewaking
   (package
     (name "guile-bewaking")
-    (version "0.0.23")
+    (version "0.1.2")
     (source
      (origin
        (method git-fetch)
@@ -162,19 +162,24 @@ more efficient, and more powerful code.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1gphng3s60f871z1snd8424q25s7mp1a8dl0g9j4wfjcyl0j3m1y"))))
+        (base32 "1808vhxx312ifghlx1misii9x6sa2h5k1q0fbxahcx85gaddip30"))))
     (build-system guile-build-system)
     (native-inputs (list guile-uuid guile-gcrypt guile-3.0))
+    (propagated-inputs (list openssl xxd))
     (arguments
      (list
       #:source-directory "src"))
     (home-page "https://codeberg.org/jjba23/bewaking")
     (synopsis
-     "DSL and helpers for authentication/authorization in Guile Scheme projects")
+     "Authentication / Authorization library for Guile Scheme")
     (description
-     "bewaking helps you create and verify lifetime-limited encrypted digital credentials that carry
-specific user information securely, protected through multiple layers of cryptographic
-and obfuscation techniques, a.k.a secure tokens.")
+     "bewaking is a library that helps you with secure tokens.
+It allows you to create and verify lifetime-limited encrypted digital
+credentials that carry information securely.
+
+Tokens are protected through multiple layers of cryptography techniques
+and obfuscation tricks, producing secure tokens you can use for example for
+user sessions on the web or authenticating API calls.")
     (license license:lgpl3+)))
 
 (packages->manifest (list (specification->package "make")
