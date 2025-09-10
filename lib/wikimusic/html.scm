@@ -53,7 +53,7 @@
                           render-external-sources))
 
 (define* asset-library
-  (build-asset-library '("pub/js/tailwind.js" "pub/js/song-auto-scroll.js"
+  (build-asset-library '("pub/js/song-auto-scroll.js"
                          "pub/js/song-chord-highlighter.js"
                          "pub/js/file-base64.js")))
 
@@ -167,10 +167,8 @@
                         (is-logged-in #f))
   
   `("<!DOCTYPE html>" (html (head (title ,title)
-                                  (meta (@ (name viewport)
-                                           (content
-                                            "width=device-width, initial-scale=1.0")))
-                                  (meta (@ (charset UTF-8)))
+                                  ,hygguile-recommended-meta
+                                  ,hygguile-recommended-resources
                                   (link (@ (rel "shortcut icon")
                                            (href "/favicon.ico")
                                            (type "image/x-icon")))
@@ -206,13 +204,6 @@
   ]
 }
 ")
-                                  ,(custom-fonts)
-                                  ,(phosphor-icons)
-                                  ,(custom-tailwind-theme)
-                                  ,(toggle-dark-theme-js)
-                                  ,(copy-pre-inner-text-js)
-                                  ,(show-notifications-from-url-js)
-                                  ,(remember-dark-theme-js)
                                   (script ,(assoc-ref asset-library
                                             "pub/js/song-chord-highlighter.js"))
                                   (script ,(assoc-ref asset-library
