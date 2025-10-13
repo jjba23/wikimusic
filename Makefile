@@ -175,5 +175,5 @@ deploy:
 	mv -v docs/manual/en-GB.html $(DEPLOY_WWW)/manuals/wikimusic/index.html
 
 olive-css:
-	curl --output "./pub/css/lucidplan.olive.min.css" \
-		"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/lucidplan.olive.min.css"
+	curl --output "./pub/css/wikimusic.olive.min.css" \
+		"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/wikimusic.olive.min.css"
