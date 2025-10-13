@@ -167,31 +167,17 @@
                         (is-logged-in #f))
   
   `("<!DOCTYPE html>" (html (head (title ,title)
-                                  ,hygguile-recommended-meta
-                                  ,hygguile-recommended-resources
+                                  ,(hygguile-recommended-meta)
+                                  ,(hygguile-recommended-resources)
                                   (link (@ (rel "shortcut icon")
                                            (href "/favicon.ico")
-                                           (type "image/x-icon")))
+                                           (type "image/x-icon")) "")
                                   (link (@ (rel "icon")
                                            (href "/favicon.ico")
-                                           (type "image/x-icon")))
-                                  (style "
-@view-transition {
-  navigation: auto;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: fade 0.04s ease both;
-}
-
-@keyframes fade {
-  from { opacity: 0.3; }
-  to   { opacity: 1; }
-}
-")
-                                  (script ,(assoc-ref asset-library
-                                                      "pub/js/tailwind.js"))
+                                           (type "image/x-icon")) "")
+                                                                  (link (@ (rel stylesheet)
+                                         (href "/css/wikimusic.olive.min.css"))
+                                      "")
                                   (script (@ (type speculationrules))
                                           "
 {
