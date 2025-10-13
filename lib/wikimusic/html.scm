@@ -96,18 +96,21 @@
 
          (div (@ (class ,(mk-class '(px-4 py-1 w-full md:w-min))))
               (a (@ (href "/")
-                    (class ,(mk-class '(flex flex-row gap-2 items-center))))
-                 ,(sub-h3 (list (icon #:type 'music-note
-                                      #:icon-css '(text-xl text-stone-700
-                                                   dark:text-stone-300
-                                                   hover:text-purple-800
-                                                   hover:dark:text-purple-300))
-                                "&nbsp;"
-                                (G_ "Wikimusic"))
-                          #:color '(text-onyx-300 dark:text-stone-300
-                                                   hover:text-purple-800
-                                                   hover:dark:text-purple-300)
-                          #:size '(text-xl lg:text-2xl))))
+                    (class ,(mk-class '(flex flex-row gap-2 items-center
+                                             no-underline))))
+                 ,(h1 (list (icon #:type 'music-note
+                                  #:icon-css '(text-xl text-onyx-300
+                                               dark:text-stone-300
+                                               hover:text-persia-pink-900
+                                               hover:dark:text-persia-pink-300
+
+                                               )) "&nbsp;"
+                            (G_ "Wikimusic"))
+                      #:color '(text-onyx-300 dark:text-stone-300
+                                              hover:text-persia-pink-900
+                                              hover:dark:text-persia-pink-300)
+                      #:family '(font-serif)
+                      #:size '(text-xl))))
          ,(if (not is-logged-in)
               `((a (@ (class ,(mk-class '(text-sm lowercase
                                                   text-white
@@ -167,19 +170,19 @@
                         (is-logged-in #f))
   
   `(,doctype-html (html (head (title ,title)
-                                  ,(hygguile-recommended-meta)
-                                  ,(hygguile-recommended-resources)
-                                  (link (@ (rel "shortcut icon")
-                                           (href "/favicon.ico")
-                                           (type "image/x-icon")) "")
-                                  (link (@ (rel "icon")
-                                           (href "/favicon.ico")
-                                           (type "image/x-icon")) "")
-                                                                  (link (@ (rel stylesheet)
-                                         (href "/css/wikimusic.olive.min.css"))
-                                      "")
-                                  (script (@ (type speculationrules))
-                                          "
+                              ,(hygguile-recommended-meta)
+                              ,(hygguile-recommended-resources)
+                              (link (@ (rel "shortcut icon")
+                                       (href "/favicon.ico")
+                                       (type "image/x-icon")) "")
+                              (link (@ (rel "icon")
+                                       (href "/favicon.ico")
+                                       (type "image/x-icon")) "")
+                              (link (@ (rel stylesheet)
+                                       (href "/css/wikimusic.olive.min.css"))
+                                    "")
+                              (script (@ (type speculationrules))
+                                      "
 {
   \"prerender\": [
     {
@@ -190,31 +193,29 @@
   ]
 }
 ")
-                                  (script ,(assoc-ref asset-library
-                                            "pub/js/song-chord-highlighter.js"))
-                                  (script ,(assoc-ref asset-library
-                                            "pub/js/song-auto-scroll.js"))
-                                  (script ,(assoc-ref asset-library
-                                                      "pub/js/file-base64.js")))
-                            (body (@ (class ,(mk-class '(bg-stone-100
-                                                         dark:bg-stone-800))))
-                                  ,notification-tray
-                                  ,(with-footer #:main `((div (@ (class ,(mk-class '
-                                                                          (flex
-                                                                           flex-col
-                                                                           justify-between
-                                                                           min-h-96))))
-                                                              (div (@ (class ,
-                                                                             (mk-class '
-                                                                              (flex
-                                                                               flex-col
-                                                                               gap-8
-                                                                               justify-start))))
-                                                                   ,(nav G_
-                                                                     #:is-logged-in
-                                                                     is-logged-in)
-                                                                   ,body)))
-                                                #:footer (page-footer G_))))))
+                              (script ,(assoc-ref asset-library
+                                        "pub/js/song-chord-highlighter.js"))
+                              (script ,(assoc-ref asset-library
+                                        "pub/js/song-auto-scroll.js"))
+                              (script ,(assoc-ref asset-library
+                                                  "pub/js/file-base64.js")))
+                        (body (@ (class ,(mk-class '(bg-stone-100 dark:bg-onyx-900))))
+                              ,notification-tray
+                              ,(with-footer #:main `((div (@ (class ,(mk-class '
+                                                                      (flex
+                                                                       flex-col
+                                                                       justify-between
+                                                                       min-h-96))))
+                                                          (div (@ (class ,(mk-class '
+                                                                           (flex
+                                                                            flex-col
+                                                                            gap-8
+                                                                            justify-start))))
+                                                               ,(nav G_
+                                                                 #:is-logged-in
+                                                                 is-logged-in)
+                                                               ,body)))
+                                            #:footer (page-footer G_))))))
 
 (define* (item-tile G_
                     entity
@@ -233,7 +234,7 @@
                                     (equal? 1
                                             (assoc-ref o "is_dislike")))
                                   opinions))))
-    `((div (@ (class ,(mk-class '(bg-stone-200 dark:bg-stone-900 rounded-2xl
+    `((div (@ (class ,(mk-class '(bg-stone-300 dark:bg-onyx-700 rounded-2xl
                                                shadow-md h-full))))
            (div (@ (class ,(mk-class '(flex flex-col
                                             py-3
@@ -248,9 +249,9 @@
                                               (a (@ (href ,item-link))
                                                  (img (@ (loading "lazy")
                                                          (class ,(mk-class '(rounded-xl
-                                                                             w-40
-                                                                             sm:w-48
-                                                                             shadow-md)))
+                                                                             w-48
+                                                                             sm:w-64
+                                                                             shadow-xl)))
                                                          (src ,(uri-decode (assoc-ref
                                                                             art
                                                                             "content_url"))))))))
@@ -262,9 +263,9 @@
                      ,(a (assoc-ref x "display_name")
                          #:size '(text-xl)
                          #:href item-link
-                         #:color '(text-stone-900 dark:text-stone-100)
-                         #:hover '(hover:text-purple-500
-                                   dark:hover:text-purple-300)))
+                         #:color '(text-onyx-300 dark:text-stone-100)
+                         #:hover '(hover:text-persia-pink-500
+                                   dark:hover:text-persia-pink-300)))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,extra-top-info)
                 (div (@ (class ,(mk-class '(pt-2 flex flex-row gap-2))))
@@ -710,14 +711,14 @@ function addSearchQueryParam(form) {
                                                  #:icon-css '(text-stone-600
                                                               text-2xl
                                                               dark:text-stone-400
-                                                              hover:text-purple-500
-                                                              dark:hover:text-purple-300))))
+                                                              hover:text-persia-pink-500
+                                                              dark:hover:text-persia-pink-300))))
                                    #:href l
                                    #:size '(text-lg)
                                    #:color '(text-stone-600
                                              dark:text-stone-400)
-                                   #:hover '(hover:text-purple-500
-                                             dark:hover:text-purple-300))
+                                   #:hover '(hover:text-persia-pink-500
+                                             dark:hover:text-persia-pink-300))
 
                                ))) link))
 

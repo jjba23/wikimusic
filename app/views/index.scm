@@ -31,7 +31,7 @@
                        #:key is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `(div (div (@ (class ,(mk-class '(p-2))))
+                 #:body `(div (div (@ (class ,(mk-class '(p-2 ))))
                                    (div (@ (class ,(mk-class '(flex flex-row
                                                                     flex-wrap
                                                                     gap-5 px-3
