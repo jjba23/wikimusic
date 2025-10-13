@@ -99,7 +99,7 @@
                     (class ,(mk-class '(flex flex-row gap-2 items-center))))
                  ,(sub-h3 (list (icon #:type 'music-note
                                       #:icon-css '(text-xl text-stone-700
-                                                   dark:text-stone-200
+                                                   dark:text-stone-300
                                                    hover:text-purple-800
                                                    hover:dark:text-purple-300))
                                 "&nbsp;"
@@ -489,8 +489,8 @@
                                                           "navigator.clipboard.writeText('~a')"
                                                           (assoc-ref x
                                                            "identifier")))))))))
-      (details (summary (@ (class ,(mk-class '(text-stone-800
-                                               dark:text-stone-200
+      (details (summary (@ (class ,(mk-class '(text-onyx-300
+                                               dark:text-stone-300
                                                cursor-pointer))))
                         ,(em (format #f "~a ~a"
                                      (length comments)
@@ -587,7 +587,7 @@
                                             dark:border-stone-700
                                             bg-stone-300
                                             dark:bg-stone-900
-                                            text-stone-800
+                                            text-onyx-300
                                             dark:text-stone-300
                                             rounded-xl
                                             shadow-md))))
@@ -635,7 +635,7 @@
                                             dark:border-stone-700
                                             bg-stone-300
                                             dark:bg-stone-900
-                                            text-stone-800
+                                            text-onyx-300
                                             dark:text-stone-300
                                             rounded-xl
                                             shadow-md))))

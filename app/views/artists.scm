@@ -57,8 +57,8 @@
                                                       #:content (G_ "next"))))
                                    '()))))
          (body `(div (@ (class ,(mk-class '(container mx-auto))))
-                     ((h2 (@ (class ,(mk-class '(font-black text-stone-800
-                                                 dark:text-stone-200
+                     ((h2 (@ (class ,(mk-class '(font-black text-onyx-300
+                                                 dark:text-stone-300
                                                  text-2xl
                                                  py-4
                                                  px-1
@@ -176,7 +176,7 @@
                           (h2 (G_ "new artist")))
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
+                                                              text-onyx-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "edit artworks"))
@@ -184,8 +184,8 @@
                      ,(hr)
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "new artwork"))
@@ -197,8 +197,8 @@
                      ,(hr)
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "editing artist"))
@@ -213,8 +213,8 @@
                      ,(hr)
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "editing external sources"))

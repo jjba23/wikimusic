@@ -353,8 +353,8 @@
                                                                            my-2
                                                                            px-3
                                                                            py-2
-                                                                           text-stone-800
-                                                                           dark:text-stone-200
+                                                                           text-onyx-300
+                                                                           dark:text-stone-300
                                                                            rounded-xl)))
                                                        (value "")) "")
                                              (input (@ (id pdf-contents)

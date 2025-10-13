@@ -131,8 +131,8 @@
                                    '()))))
          (body `(div (@ (class ,(mk-class '(container mx-auto))))
                      (,(unless only-tiles
-                         `(h2 (@ (class ,(mk-class '(font-black text-stone-800
-                                                     dark:text-stone-200
+                         `(h2 (@ (class ,(mk-class '(font-black text-onyx-300
+                                                     dark:text-stone-300
                                                      text-2xl
                                                      py-4
                                                      px-1
@@ -338,8 +338,8 @@
                           (h2 (G_ "new song")))
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "edit artworks"))
@@ -375,8 +375,8 @@
                      (details (@ (open true)
                                  (class "cursor-pointer"))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md))))
                                        ,(G_ "new artwork"))
                               ,(artwork-form G_
@@ -387,8 +387,8 @@
                      ,(hr)
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "editing song"))
@@ -414,8 +414,8 @@
                      ,(hr)
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "editing external sources"))
@@ -448,8 +448,8 @@
                      (details (@ (open true)
                                  (class ,(mk-class '(py-6))))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "song's artists"))
@@ -504,8 +504,8 @@
                      (details (@ (open true)
                                  (class ,(mk-class '(py-6))))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "song's genres"))
