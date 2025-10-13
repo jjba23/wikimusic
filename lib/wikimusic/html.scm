@@ -90,9 +90,9 @@
                                      items-center
                                      justify-start
                                      w-full
-                                     hover:text-blue-700
-                                     bg-stone-200
-                                     dark:bg-stone-900))))
+                                     hover:text-china-violet-700
+                                     bg-stone-300/50
+                                     dark:bg-onyx-700))))
 
          (div (@ (class ,(mk-class '(px-4 py-1 w-full md:w-min))))
               (a (@ (href "/")
@@ -104,7 +104,7 @@
                                                    hover:dark:text-purple-300))
                                 "&nbsp;"
                                 (G_ "Wikimusic"))
-                          #:color '(text-stone-700 dark:text-stone-200
+                          #:color '(text-onyx-300 dark:text-stone-300
                                                    hover:text-purple-800
                                                    hover:dark:text-purple-300)
                           #:size '(text-xl lg:text-2xl))))
@@ -166,7 +166,7 @@
                         #:key (title "WikiMusic") body
                         (is-logged-in #f))
   
-  `("<!DOCTYPE html>" (html (head (title ,title)
+  `(,doctype-html (html (head (title ,title)
                                   ,(hygguile-recommended-meta)
                                   ,(hygguile-recommended-resources)
                                   (link (@ (rel "shortcut icon")
