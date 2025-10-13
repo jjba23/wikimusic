@@ -104,8 +104,8 @@
                                                                               font-mono
                                                                               md:p-6
                                                                               shadow-md
-                                                                              bg-stone-200/75
-                                                                              dark:bg-stone-900
+                                                                              bg-stone-300/55
+                                                                              dark:bg-onyx-700
                                                                               text-black
                                                                               dark:text-white
                                                                               rounded-xl
@@ -203,8 +203,8 @@
                                                                               md:p-6
                                                                               shadow-md
                                                                               font-mono
-                                                                              bg-stone-200/75
-                                                                              dark:bg-stone-900
+                                                                              bg-stone-300/75
+                                                                              dark:bg-onyx-700
                                                                               text-black
                                                                               dark:text-white
                                                                               rounded-xl

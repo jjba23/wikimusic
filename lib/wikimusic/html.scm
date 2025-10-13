@@ -199,7 +199,8 @@
                                         "pub/js/song-auto-scroll.js"))
                               (script ,(assoc-ref asset-library
                                                   "pub/js/file-base64.js")))
-                        (body (@ (class ,(mk-class '(bg-stone-100 dark:bg-onyx-900))))
+                        (body (@ (class ,(mk-class '(bg-stone-100
+                                                     dark:bg-onyx-900))))
                               ,notification-tray
                               ,(with-footer #:main `((div (@ (class ,(mk-class '
                                                                       (flex
@@ -249,8 +250,8 @@
                                               (a (@ (href ,item-link))
                                                  (img (@ (loading "lazy")
                                                          (class ,(mk-class '(rounded-xl
-                                                                             w-48
-                                                                             sm:w-64
+                                                                             w-full
+                                                                             max-w-prose
                                                                              shadow-xl)))
                                                          (src ,(uri-decode (assoc-ref
                                                                             art
@@ -583,11 +584,11 @@
          (select (@ (onchange "window.location.href=this.value;")
                     (name "sort-select")
                     (id "sort-select")
-                    (class ,(mk-class '(p-3 border-2
-                                            border-stone-200
-                                            dark:border-stone-700
+                    (class ,(mk-class '(p-3 border-3
+                                            border-persia-pink-300/25
+                                            dark:border-persia-pink-300/25
                                             bg-stone-300
-                                            dark:bg-stone-900
+                                            dark:bg-onyx-700
                                             text-onyx-300
                                             dark:text-stone-300
                                             rounded-xl
@@ -631,14 +632,15 @@
          (select (@ (onchange "window.location.href=this.value;")
                     (name "ascii-size-select")
                     (id "ascii-size-select")
-                    (class ,(mk-class '(p-3 border-2
-                                            border-stone-200
-                                            dark:border-stone-700
+                    (class ,(mk-class '(p-3 border-3
+                                            border-persia-pink-300/25
+                                            dark:border-persia-pink-300/25
                                             bg-stone-300
-                                            dark:bg-stone-900
+                                            dark:bg-onyx-700
                                             text-onyx-300
                                             dark:text-stone-300
                                             rounded-xl
+                                            max-w-72
                                             shadow-md))))
                  (option ,(G_ "ascii size"))
                  ,(map (lambda (s)
@@ -649,7 +651,20 @@
                        `(("text-xs" . "text-xs") ("text-sm" . "text-sm")
                          ("text-md" . "text-md")
                          ("text-lg" . "text-lg")
-                         ("text-xl" . "text-xl")))))))
+                         ("text-xl" . "text-xl")
+                         ("text-1" . "text-1")
+                         ("text-2" . "text-2")
+                         ("text-3" . "text-3")
+                         ("text-4" . "text-4")
+                         ("text-5" . "text-5")
+                         ("text-6" . "text-6")
+                         ("text-7" . "text-7")
+                         ("text-8" . "text-8")
+                         ("text-9" . "text-9")
+                         ("text-10" . "text-10")
+                         ("text-11" . "text-11")
+                         ("text-12" . "text-12")
+                         ("text-16" . "text-16")))))))
 
 (define* (search-box G_
                      #:key search-query)
@@ -689,11 +704,13 @@ function addSearchQueryParam(form) {
                             #:placeholder (G_ "Search...")
                             #:input-css '(p-3 max-w-prose
                                               rounded-xl
-                                              border-stone-200
-                                              dark:border-stone-700
+                                              border-3
+                                              border-persia-pink-300/25
+                                              dark:border-persia-pink-300/25
+                                              bg-stone-300
+                                              dark:bg-onyx-700
                                               dark:text-stone-300
-                                              dark:bg-stone-700/75
-                                              border-2
+                                              text-onyx-300
                                               shadow-md)
                             #:input-flex-css #f)
                     ,(submit-button (G_ "search")))))))
