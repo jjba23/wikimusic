@@ -47,12 +47,12 @@
                                                                            gap-2))))
                                                     ,(em (format #f "~a"
                                                                  (car vc))
-                                                         #:size '(text-xs)
-                                                         #:color '(text-stone-700
+                                                         #:size '(text-sm)
+                                                         #:color '(text-onyx-300
                                                                    dark:text-stone-300))
                                                     ,(em (G_ "versions")
-                                                         #:size '(text-xs)
-                                                         #:color '(text-stone-700
+                                                         #:size '(text-sm)
+                                                         #:color '(text-onyx-300
                                                                    dark:text-stone-300)))))
                                            (assoc-ref song-version-count-alist
                                             (assoc-ref x "identifier"))))
@@ -129,19 +129,16 @@
                                         ,(icon-button #:icon 'arrow-right
                                                       #:content (G_ "next"))))
                                    '()))))
-         (body `(div (@ (class ,(mk-class '(container mx-auto))))
+         (body `(div (@ (class ,(mk-class '(px-4 md:px-8 py-2))))
                      (,(unless only-tiles
-                         `(h2 (@ (class ,(mk-class '(font-black text-onyx-300
-                                                     dark:text-stone-300
-                                                     text-2xl
-                                                     py-4
-                                                     px-1
-                                                     flex
-                                                     flex-row
-                                                     items-center
-                                                     gap-1))))
-                              ,(icon #:type 'music-notes-simple)
-                              ,(G_ "viewing songs"))) ,(unless only-tiles
+                         (h2 `(div (@ (class ,(mk-class '(flex flex-row
+                                                               items-center
+                                                               align-center
+                                                               gap-1))))
+                                   ,(icon #:type 'music-notes-simple)
+                                   ,(G_ "viewing songs"))
+                             #:weight '(font-light)
+                             #:family '(font-serif))) ,(unless only-tiles
                                                          `(div (@ (class ,(mk-class '
                                                                            (flex
                                                                             flex-wrap
@@ -284,7 +281,8 @@
                                                              #:user-alist
                                                              user-alist)))))
                             ,(render-external-sources G_ external-sources)
-                            (div (@ (class ,(mk-class '(px-4 py-6 container mx-auto))))
+                            (div (@ (class ,(mk-class '(px-4 py-6 container
+                                                             mx-auto))))
                                  (dl ,(render-if-nestring (lambda (tuning)
                                                             (list (dt (G_
                                                                        "tuning"))
@@ -314,8 +312,8 @@
                                      ,(render-if-nestring (lambda (album-link)
                                                             (list (dt (G_
                                                                        "album info link"))
-                                                                  (dd (a
-                                                                       (uri-decode album-link)))))
+                                                                  (dd (a (uri-decode
+                                                                          album-link)))))
                                                           (assoc-ref song
                                                            "album_info_link"))))
 

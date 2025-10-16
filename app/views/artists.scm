@@ -56,18 +56,15 @@
                                         ,(icon-button #:icon 'arrow-right
                                                       #:content (G_ "next"))))
                                    '()))))
-         (body `(div (@ (class ,(mk-class '(container mx-auto))))
-                     ((h2 (@ (class ,(mk-class '(font-black text-onyx-300
-                                                 dark:text-stone-300
-                                                 text-2xl
-                                                 py-4
-                                                 px-1
-                                                 flex
-                                                 flex-row
-                                                 items-center
-                                                 gap-1))))
-                          ,(icon #:type 'guitar)
-                          ,(G_ "viewing artists"))
+         (body `(div (@ (class ,(mk-class '(px-4 md:px-8 py-2))))
+                     (,(h2 `(div (@ (class ,(mk-class '(flex flex-row
+                                                               items-center
+                                                               align-center
+                                                               gap-1))))
+                                   ,(icon #:type 'guitar)
+                                   ,(G_ "viewing artists"))
+                             #:weight '(font-light)
+                             #:family '(font-serif))
                       (div (@ (class ,(mk-class '(flex flex-wrap flex-row
                                                        justify-between))))
                            (div (@ (class ,(mk-class '(flex flex-wrap flex-row

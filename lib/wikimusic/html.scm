@@ -64,12 +64,12 @@
                                                 justify-start items-center))))
                     ,(em (G_ "find the source code here"))
                     ,(a "https://codeberg.org/jjba23/wikimusic"
-                        #:size '(text-sm)))
+                        #:size '(text-md)))
                (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                                 align-center items-center))))
                     ,(em (G_ "find the manual here"))
                     ,(a "https://jointhefreeworld.org/manuals/wikimusic/"
-                        #:size '(text-sm)))
+                        #:size '(text-md)))
                ,(em (G_
                      "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"))
 
@@ -78,7 +78,7 @@
                     ,(em "version:")
                     ,(mono (format #f "~a"
                                    (get-short-commit-sha))
-                           #:size '(text-sm)
+                           #:size '(text-md)
                            #:weight '(font-light)))))))
 
 (define* (nav G_
@@ -106,13 +106,15 @@
 
                                                )) "&nbsp;"
                             (G_ "Wikimusic"))
+                      #:weight '(font-light)
                       #:color '(text-onyx-300 dark:text-stone-300
                                               hover:text-persia-pink-900
                                               hover:dark:text-persia-pink-300)
                       #:family '(font-serif)
+                      
                       #:size '(text-xl))))
          ,(if (not is-logged-in)
-              `((a (@ (class ,(mk-class '(text-sm lowercase
+              `((a (@ (class ,(mk-class '(text-md lowercase
                                                   text-white
                                                   dark:text-black
                                                   font-sans
@@ -123,11 +125,14 @@
                       (href "/login"))
                    ,(icon-button #:icon 'sign-in
                                  #:content (G_ "login")
-                                 #:size '(text-xs md:text-sm)
+                                     #:family '(font-serif)
+                          #:color '(text-onyx-900 dark:text-stone-100)
+                          #:weight '(font-light)
+                                 #:size '(text-sm md:text-md)
                                  #:extra-classes '(py-1 md:py-2 px-2 md:px-3
                                                         max-w-prose
                                                         cursor-pointer))))
-              `((a (@ (class ,(mk-class '(text-sm lowercase
+              `((a (@ (class ,(mk-class '(text-md lowercase
                                                   text-white
                                                   dark:text-black
                                                   font-sans
@@ -138,30 +143,46 @@
                       (href "/me"))
                    ,(icon-button #:icon 'user-circle
                                  #:content (G_ "me")
-                                 #:size '(text-xs lg:text-sm)
+                                     #:family '(font-serif)
+                          #:color '(text-onyx-900 dark:text-stone-100)
+                          #:weight '(font-light)
+                                 #:size '(text-sm lg:text-md)
                                  #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                         max-w-prose
                                                         cursor-pointer)))))
          (a (@ (href "/songs"))
             ,(icon-button #:icon 'music-notes-simple
                           #:content (G_ "songs")
-                          #:size '(text-xs lg:text-sm)
+                              #:family '(font-serif)
+                          #:color '(text-onyx-900 dark:text-stone-100)
+                          #:weight '(font-light)
+                          #:size '(text-sm lg:text-md)
                           #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                  max-w-prose cursor-pointer)))
          (a (@ (href "/genres"))
             ,(icon-button #:icon 'disc
                           #:content (G_ "genres")
-                          #:size '(text-xs lg:text-sm)
+                          #:size '(text-sm lg:text-md)
+                              #:family '(font-serif)
+                          #:color '(text-onyx-900 dark:text-stone-100)
+                          #:weight '(font-light)
                           #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                  max-w-prose cursor-pointer)))
          (a (@ (href "/artists"))
             ,(icon-button #:icon 'guitar
                           #:content (G_ "artists")
-                          #:size '(text-xs lg:text-sm)
+                          #:size '(text-sm lg:text-md)
+                          #:family '(font-serif)
+                          #:color '(text-onyx-900 dark:text-stone-100)
+                          #:weight '(font-light)
                           #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                  max-w-prose cursor-pointer)))
 
-         ,(ui-mode-button #:size '(text-xs lg:text-sm)
+         ,(ui-mode-button #:size '(text-sm lg:text-md)
+                                                   #:icon-css '(text-onyx-300 dark:text-stone-300 text-md)
+                                                       #:family '(font-serif)
+                          #:color '(text-onyx-900 dark:text-stone-100)
+                          #:weight '(font-light)
                           #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                  max-w-prose cursor-pointer)))))
 
@@ -270,26 +291,26 @@
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,extra-top-info)
                 (div (@ (class ,(mk-class '(pt-2 flex flex-row gap-2))))
-                     (span (@ (class ,(mk-class '(font-black text-green-800
-                                                  dark:text-green-600 text-xs))))
+                     (span (@ (class ,(mk-class '(font-black text-asparagus-900
+                                                  dark:text-asparagus-300 text-sm))))
                            ,(format #f "~a" likes))
-                     (span (@ (class ,(mk-class '(font-black text-red-800
-                                                  dark:text-red-600 text-xs))))
+                     (span (@ (class ,(mk-class '(font-black text-redwood-700
+                                                  dark:text-redwood-300 text-sm))))
                            ,(format #f "~a" dislikes)))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,(em (format #f "~a ~a"
                                   (assoc-ref x "views")
                                   (G_ "views"))
-                          #:size '(text-xs)
-                          #:color '(text-stone-700 dark:text-stone-300)))
+                          #:size '(text-sm)
+                          #:color '(text-onyx-300 dark:text-stone-300)))
                 (div (@ (class ,(mk-class '(flex flex-row gap-2))))
                      ,(em (format #f "~a"
                                   (length comments))
-                          #:size '(text-xs)
-                          #:color '(text-stone-700 dark:text-stone-300))
+                          #:size '(text-sm)
+                          #:color '(text-onyx-300 dark:text-stone-300))
                      ,(em (G_ "comments")
-                          #:size '(text-xs)
-                          #:color '(text-stone-700 dark:text-stone-300)))
+                          #:size '(text-sm)
+                          #:color '(text-onyx-300 dark:text-stone-300)))
                 ,extra-bot-info)))))
 
 (define* (render-visibility-status G_ status)
@@ -301,16 +322,16 @@
 (define* (render-comment G_ user-alist comment)
   `(div (@ (class "py-3"))
         ,(render-if-nempty (lambda (u)
-                             `(p (@ (class ,(mk-class '(text-xs text-stone-600))))
+                             `(p (@ (class ,(mk-class '(text-sm text-stone-600))))
                                  ,(format #f "~a (~a) &lt;~a&gt;"
                                           (assoc-ref u "display_name")
                                           (assoc-ref u "username")
                                           (assoc-ref u "email"))))
                            (car (assoc-ref user-alist
                                            (assoc-ref comment "created_by"))))
-        (p (@ (class ,(mk-class '(text-sm text-stone-900))))
+        (p (@ (class ,(mk-class '(text-md text-stone-900))))
            ,(assoc-ref comment "contents"))
-        (p (@ (class ,(mk-class '(text-xs text-stone-400 dark:text-stone-300))))
+        (p (@ (class ,(mk-class '(text-sm text-stone-400 dark:text-stone-300))))
            ,(assoc-ref comment "created_at"))))
 
 (define* (render-comments G_ user-alist parent-identifier comments)
@@ -351,7 +372,7 @@
                                                                  `(figcaption (@
                                                                                (class ,
                                                                                 (mk-class '
-                                                                                 (text-stone-700
+                                                                                 (text-onyx-300
                                                                                   dark:text-stone-300))))
                                                                               ,fc))
                                                                (assoc-ref art
@@ -386,15 +407,14 @@
                                                     (assoc-ref x "identifier"))))
                                        ,(icon-button #:icon 'thumbs-up
                                                      #:color '(text-stone-100)
-                                                     #:background '(bg-green-700)
-                                                     #:hover-background '(hover:bg-green-800)
-                                                     #:border-color '(border-stone-700
-                                                                      dark:border-stone-400)
+                                                     #:background '(bg-asparagus-500)
+                                                     #:hover-background '(hover:bg-asparagus-900)
                                                      #:type 'submit
+                                                     #:icon-css '(text-lg text-stone-300 dark:text-stone-300)                                                     
                                                      #:content `(div ,(G_
                                                                        "like")
                                                                      (span (@ (class
-                                                                               "font-light text-xs"))
+                                                                               "font-light text-sm"))
                                                                            ,(format
                                                                              #f
                                                                              " ( ~a ) "
@@ -406,26 +426,25 @@
                                                     (assoc-ref x "identifier"))))
                                        ,(icon-button #:icon 'thumbs-down
                                                      #:color '(text-stone-100)
-                                                     #:background '(bg-red-700)
-                                                     #:hover-background '(hover:bg-red-800)
-                                                     #:border-color '(border-stone-700
-                                                                      dark:border-stone-400)
+                                                     #:background '(bg-redwood-500)
+                                                     #:hover-background '(hover:bg-redwood-900)
                                                      #:type 'submit
+                                                     #:icon-css '(text-lg text-stone-300 dark:text-stone-300)
                                                      #:content `(div ,(G_
                                                                        "dislike")
 
                                                                      (span (@ (class ,
                                                                                (mk-class '
                                                                                 (font-light
-                                                                                 text-xs))))
+                                                                                 text-sm))))
                                                                            ,(format
                                                                              #f
                                                                              " ( ~a ) "
                                                                              dislike-count))))))))
          (maybe-description (render-if-nempty (lambda (description)
                                                 `(div (p (@ (class ,(mk-class '
-                                                                              (text-stone-700
-                                                                               dark:text-stone-400
+                                                                              (text-onyx-300
+                                                                               dark:text-stone-300
                                                                                font-bold))))
                                                          ,(G_ "description"))
                                                       (div (@ (class ,(mk-class '
@@ -481,7 +500,7 @@
                     ,(dd `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                             gap-4))))
                                 ,(mono (assoc-ref x "identifier")
-                                       #:size '(text-sm)
+                                       #:size '(text-md)
                                        #:color '(text-stone-600
                                                  dark:text-stone-400))
                                 ,(icon-button #:icon 'copy
