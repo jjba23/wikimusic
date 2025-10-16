@@ -57,34 +57,53 @@
                                         ,(icon-button #:icon 'arrow-right
                                                       #:content (G_ "next"))))
                                    '()))))
-         (body `(div (@ (class ,(mk-class '(px-4 md:px-8 py-2))))
-                     (,(h2 `(div (@ (class ,(mk-class '(flex flex-row
-                                                               items-center
-                                                               align-center
-                                                               gap-1))))
-                                   ,(icon #:type 'disc)
-                                   ,(G_ "viewing genres"))
+         (body `(div (@ (class ,(mk-class '(px-4 md:px-8
+                                                 py-2
+                                                 flex
+                                                 flex-col
+                                                 md:flex-row
+                                                 md:flex-wrap
+                                                 gap-3
+                                                 md:gap-5
+                                                 items-center
+                                                 align-center
+                                                 justify-center
+                                                 md:justify-between))))
+                     (,(sub-h2 `(div (@ (class ,(mk-class '(flex flex-row
+                                                                 items-center
+                                                                 align-center
+                                                                 gap-1))))
+                                   ,(G_ "viewing genres:"))
                              #:weight '(font-light)
+                              #:size '(text-4xl)
                              #:family '(font-serif))
-                      (div (@ (class ,(mk-class '(flex flex-wrap flex-row
-                                                       justify-between))))
-                           (div (@ (class ,(mk-class '(flex flex-wrap flex-row
-                                                            justify-start
-                                                            items-center))))
+                      (div (@ (class ,(mk-class '(flex
+                                                                         flex-wrap
+                                                                         flex-row
+                                                                         justify-center
+                                                                         gap-2))))
+                           (div (@ (class ,(mk-class '(flex
+                                                                              flex-wrap
+                                                                              flex-row
+                                                                              justify-start
+                                                                              items-center))))
                                 ,(sort-select G_
                                               #:entity 'genre
                                               #:user-sort user-sort))
-                           (div (@ (class ,(mk-class '(flex flex-wrap flex-row
-                                                            gap-3
-                                                            justify-right
-                                                            items-center))))
+                           (div (@ (class ,(mk-class '(flex
+                                                                              flex-wrap
+                                                                              flex-row
+                                                                              gap-3
+                                                                              justify-end
+                                                                              items-center))))
 
                                 ,(search-box G_
                                              #:search-query search-query)))
-                      (div (div (@ (class ,(mk-class '(grid gap-4
-                                                            sm:grid-cols-3
-                                                            md:grid-cols-4
-                                                            lg:grid-cols-5))))
+                      (div (div (@ (class ,(mk-class '(grid gap-3
+                                                            sm:grid-cols-2
+                                                            md:grid-cols-3
+                                                            lg:grid-cols-4
+                                                            xl:grid-cols-5))))
                                 ,(map (lambda (x)
                                         `(div ,(item-tile G_
                                                           'genre
@@ -117,7 +136,7 @@
                             is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `((div (@ (class ,(mk-class '(container mx-auto p-3
+                 #:body `((div (@ (class ,(mk-class '( p-3
                                                                 sm:p-1 md:p-0))))
                                (,(h2 (assoc-ref genre "display_name")) (div (div ,
                                                                              (entity-details
@@ -163,7 +182,7 @@
                                            #:order-value (assoc-ref a
                                                           "order_value"))))
                     artworks))
-         (body `(div (@ (class ,(mk-class '(container mx-auto))))
+         (body `(div (@ (class ,(mk-class '())))
                      ,(if (assoc-ref genre "identifier")
                           (h2 (format #f "~a: ~a"
                                       (G_ "editing genre")
@@ -246,7 +265,7 @@
                          #:key is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                 #:body `(div (@ (class ,(mk-class '())))
                               ,(genre-form G_))))
 
 (define* (genre-form G_

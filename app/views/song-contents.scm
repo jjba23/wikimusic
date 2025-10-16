@@ -33,10 +33,8 @@
 (define* (render-song-content G_ song song-contents ascii-size)
   `(div ,(hr)
         (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))
-             (span (@ (class ,(mk-class '(font-black text-2xl text-stone-700
-                                                     dark:text-stone-300 px-2
-                                                     py-6))))
-                   ,(G_ "musical contents"))
+             ,(sub-h2
+                   (G_ "musical contents:"))
              ,(ascii-size-select G_
                                  #:route (format #f "/~as/uuid/~a"
                                                  'song
@@ -92,8 +90,9 @@
                                              (class ,(mk-class '(my-6))))
                                           (summary (@ (class ,(mk-class '(text-xl
                                                                           font-bold
-                                                                          text-stone-700
+                                                                          text-onyx-300
                                                                           dark:text-stone-300
+
                                                                           cursor-pointer))))
                                                    ,(G_ "ascii legend"))
                                           (pre (@ (id ascii-legend-container)
@@ -104,11 +103,14 @@
                                                                               font-mono
                                                                               md:p-6
                                                                               shadow-md
-                                                                              bg-stone-300/55
+                                                                              bg-stone-300/50
                                                                               dark:bg-onyx-700
                                                                               text-black
                                                                               dark:text-white
                                                                               rounded-xl
+                                                                              border-2
+                                                                              border-persia-pink-100/25
+                                                                              dark:border-persia-pink-900/10
                                                                               white-space-pre
                                                                               overflow-x-scroll)))))
                                                ,ascii-legend))))
@@ -184,7 +186,7 @@
                                                                                (mk-class '
                                                                                 (text-xl
                                                                                  font-bold
-                                                                                 text-stone-700
+                                                                                 text-onyx-300
                                                                                  dark:text-stone-300
                                                                                  cursor-pointer))))
                                                                            ,(G_
@@ -208,6 +210,9 @@
                                                                               text-black
                                                                               dark:text-white
                                                                               rounded-xl
+                                                                              border-2
+                                                                              border-persia-pink-100/25
+                                                                              dark:border-persia-pink-900/10
                                                                               white-space-pre
                                                                               overflow-x-scroll)))))
                                                                        ,ascii-contents)))))
@@ -222,7 +227,7 @@
                                              (class ,(mk-class '(my-6))))
                                           (summary (@ (class ,(mk-class '(text-xl
                                                                           font-bold
-                                                                          text-stone-700
+                                                                          text-onyx-300
                                                                           dark:text-stone-300
                                                                           cursor-pointer))))
                                                    ,(G_ "PDF contents"))
@@ -233,7 +238,7 @@
                                                   cleaned-pdf-data)))
     `(,(hr) (details (@ (open true))
                      (summary (@ (class ,(mk-class '(text-xl font-bold
-                                                     text-stone-700
+                                                     text-onyx-300
                                                      dark:text-stone-300
                                                      cursor-pointer))))
                               ,v-name)
@@ -242,7 +247,7 @@
                           (div (@ (class ,(mk-class '(py-3))))
                                (details (summary (@ (class ,(mk-class '(cursor-pointer
                                                                         dark:text-stone-300
-                                                                        text-stone-700))))
+                                                                        text-onyx-300))))
                                                  ,(G_ "manage version"))
                                         ,version-management-section))
                           ,ascii-legend-section
@@ -257,7 +262,7 @@
                                    ""
                                    (html-unescape (assoc-ref song-contents
                                                              "pdf_contents")))))
-         (body `(div (@ (class ,(mk-class '(container mx-auto))))
+         (body `(div (@ (class ,(mk-class '())))
                      ((div ,(hr)
                            ,(song-content-form G_
                                                #:song-identifier (assoc-ref
@@ -294,7 +299,7 @@
                                 #:key song-identifier is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                 #:body `(div (@ (class ,(mk-class '())))
                               ,(song-content-form G_
                                                   #:song-identifier
                                                   song-identifier))))

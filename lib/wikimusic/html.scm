@@ -88,13 +88,17 @@
                                      gap-3
                                      p-3
                                      items-center
-                                     justify-start
+                                     justify-between
                                      w-full
                                      hover:text-china-violet-700
                                      bg-stone-300/50
-                                     dark:bg-onyx-700))))
+                                     dark:bg-onyx-700
+                                     shadow-md
+                                     ;;  border-persia-pink-300/10
+                                     ;;        dark:border-persia-pink-300/10
+                                            ))))
 
-         (div (@ (class ,(mk-class '(px-4 py-1 w-full md:w-min))))
+         (div (@ (class ,(mk-class '(px-4 py-1))))
               (a (@ (href "/")
                     (class ,(mk-class '(flex flex-row gap-2 items-center
                                              no-underline))))
@@ -111,80 +115,117 @@
                                               hover:text-persia-pink-900
                                               hover:dark:text-persia-pink-300)
                       #:family '(font-serif)
-                      
-                      #:size '(text-xl))))
-         ,(if (not is-logged-in)
-              `((a (@ (class ,(mk-class '(text-md lowercase
-                                                  text-white
-                                                  dark:text-black
-                                                  font-sans
-                                                  font-medium
-                                                  px-2
-                                                  flex-items-center
-                                                  gap-2)))
-                      (href "/login"))
-                   ,(icon-button #:icon 'sign-in
-                                 #:content (G_ "login")
-                                     #:family '(font-serif)
-                          #:color '(text-onyx-900 dark:text-stone-100)
-                          #:weight '(font-light)
-                                 #:size '(text-sm md:text-md)
-                                 #:extra-classes '(py-1 md:py-2 px-2 md:px-3
-                                                        max-w-prose
-                                                        cursor-pointer))))
-              `((a (@ (class ,(mk-class '(text-md lowercase
-                                                  text-white
-                                                  dark:text-black
-                                                  font-sans
-                                                  font-medium
-                                                  px-2
-                                                  flex-items-center
-                                                  gap-2)))
-                      (href "/me"))
-                   ,(icon-button #:icon 'user-circle
-                                 #:content (G_ "me")
-                                     #:family '(font-serif)
-                          #:color '(text-onyx-900 dark:text-stone-100)
-                          #:weight '(font-light)
-                                 #:size '(text-sm lg:text-md)
-                                 #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
-                                                        max-w-prose
-                                                        cursor-pointer)))))
-         (a (@ (href "/songs"))
-            ,(icon-button #:icon 'music-notes-simple
-                          #:content (G_ "songs")
-                              #:family '(font-serif)
-                          #:color '(text-onyx-900 dark:text-stone-100)
-                          #:weight '(font-light)
-                          #:size '(text-sm lg:text-md)
-                          #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
-                                                 max-w-prose cursor-pointer)))
-         (a (@ (href "/genres"))
-            ,(icon-button #:icon 'disc
-                          #:content (G_ "genres")
-                          #:size '(text-sm lg:text-md)
-                              #:family '(font-serif)
-                          #:color '(text-onyx-900 dark:text-stone-100)
-                          #:weight '(font-light)
-                          #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
-                                                 max-w-prose cursor-pointer)))
-         (a (@ (href "/artists"))
-            ,(icon-button #:icon 'guitar
-                          #:content (G_ "artists")
-                          #:size '(text-sm lg:text-md)
-                          #:family '(font-serif)
-                          #:color '(text-onyx-900 dark:text-stone-100)
-                          #:weight '(font-light)
-                          #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
-                                                 max-w-prose cursor-pointer)))
 
-         ,(ui-mode-button #:size '(text-sm lg:text-md)
-                                                   #:icon-css '(text-onyx-300 dark:text-stone-300 text-md)
-                                                       #:family '(font-serif)
-                          #:color '(text-onyx-900 dark:text-stone-100)
-                          #:weight '(font-light)
-                          #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
-                                                 max-w-prose cursor-pointer)))))
+                      #:size '(text-xl md:text-2xl))))
+         (div (@ (class ,(mk-class '(flex flex-row gap-3 flex-wrap
+                                          justify-center md:justify-start))))
+              (a (@ (href "/songs"))
+                 ,(icon-button #:icon 'music-notes-simple
+                               #:content (G_ "songs")
+                               #:family '(font-serif)
+                               #:color '(text-onyx-900 dark:text-stone-100)
+                               #:weight '(font-light)
+                               #:size '(text-md lg:text-lg)
+                                                                     #:icon-css '(text-md
+                                                                    lg:text-lg
+                                                                    text-onyx-300 dark:text-stone-300)
+                               #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
+                                                      max-w-prose
+                                                      cursor-pointer)))
+              (a (@ (href "/genres"))
+                 ,(icon-button #:icon 'disc
+                               #:content (G_ "genres")
+                               #:size '(text-md lg:text-lg)
+                               #:family '(font-serif)
+                               #:color '(text-onyx-900 dark:text-stone-100)
+                               #:weight '(font-light)
+                                                                     #:icon-css '(text-md
+                                                                    lg:text-lg
+                                                                    text-onyx-300 dark:text-stone-300)
+                               #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
+                                                      max-w-prose
+                                                      cursor-pointer)))
+              (a (@ (href "/artists"))
+                 ,(icon-button #:icon 'guitar
+                               #:content (G_ "artists")
+                               #:size '(text-md lg:text-lg)
+                               #:family '(font-serif)
+                               #:color '(text-onyx-900 dark:text-stone-100)
+                               #:weight '(font-light)
+                                                                     #:icon-css '(text-md
+                                                                    lg:text-lg
+                                                                    text-onyx-300 dark:text-stone-300)
+                               #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
+                                                      max-w-prose
+                                                      cursor-pointer)))
+
+              ,(if (not is-logged-in)
+                   `((a (@ (class ,(mk-class '(text-md lowercase
+                                                       text-white
+                                                       dark:text-black
+                                                       font-sans
+                                                       font-medium
+
+                                                       flex-items-center
+                                                       gap-2)))
+                           (href "/login"))
+                        ,(icon-button #:icon 'sign-in
+                                      #:content (G_ "login")
+                                      #:family '(font-serif)
+                                      #:color '(text-onyx-900
+                                                dark:text-stone-100)
+                                      #:weight '(font-light)
+                                      #:size '(text-md lg:text-lg)
+                                                                            #:icon-css '(text-md
+                                                                    lg:text-lg
+                                                                    text-onyx-300 dark:text-stone-300)
+                                      #:extra-classes '(py-1 py-1
+                                                             lg:py-2
+                                                             px-2
+                                                             lg:px-3
+                                                             max-w-prose
+                                                             cursor-pointer))))
+                   `((a (@ (class ,(mk-class '(text-md lowercase
+                                                       text-white
+                                                       dark:text-black
+                                                       font-sans
+                                                       font-medium
+
+                                                       flex-items-center
+                                                       gap-2)))
+                           (href "/me"))
+                        ,(icon-button #:icon 'user-circle
+                                      #:content (G_ "me")
+                                      #:family '(font-serif)
+                                      #:color '(text-onyx-900
+                                                dark:text-stone-100)
+                                      #:weight '(font-light)
+                                      #:size '(text-md lg:text-lg)
+                                      #:icon-css '(text-md
+                                                                    lg:text-lg
+                                                                    text-onyx-300 dark:text-stone-300)
+                                      #:extra-classes '(py-1 lg:py-2 px-2
+                                                             lg:px-3
+                                                             max-w-prose
+                                                             cursor-pointer)))))
+
+              ,(ui-mode-button #:icon "" #:size '(text-md lg:text-lg)
+                               #:icon-css '(text-onyx-300 dark:text-stone-300
+                                                          text-md)
+                               #:family '(font-serif)
+                               #:content `((div ,(icon #:type 'sun
+                                                       #:icon-css '(text-md
+                                                                    lg:text-lg
+                                                                    text-onyx-300 dark:text-stone-300))
+                                                ,(icon #:type 'moon
+                                                       #:icon-css '(text-md
+                                                                    lg:text-lg
+                                                                    text-onyx-300 dark:text-stone-300))))
+                               #:color '(text-onyx-900 dark:text-stone-100)
+                               #:weight '(font-light)
+                               #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
+                                                      max-w-prose
+                                                      cursor-pointer))))))
 
 (define* (html-template G_
                         #:key (title "WikiMusic") body
@@ -257,7 +298,10 @@
                                             (assoc-ref o "is_dislike")))
                                   opinions))))
     `((div (@ (class ,(mk-class '(bg-stone-300 dark:bg-onyx-700 rounded-2xl
-                                               shadow-md h-full))))
+                                               shadow-lg h-full
+                                               border-2
+                                            border-persia-pink-100/25
+                                            dark:border-persia-pink-900/10))))
            (div (@ (class ,(mk-class '(flex flex-col
                                             py-3
                                             px-3
@@ -287,29 +331,32 @@
                          #:href item-link
                          #:color '(text-onyx-300 dark:text-stone-100)
                          #:hover '(hover:text-persia-pink-500
-                                   dark:hover:text-persia-pink-300)))
+                                   hover:dark:text-persia-pink-300)))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,extra-top-info)
                 (div (@ (class ,(mk-class '(pt-2 flex flex-row gap-2))))
-                     (span (@ (class ,(mk-class '(font-black text-asparagus-900
-                                                  dark:text-asparagus-300 text-sm))))
+                     (span (@ (class ,(mk-class '(font-black
+                                                  text-asparagus-900
+                                                  dark:text-asparagus-300
+                                                  text-md))))
                            ,(format #f "~a" likes))
                      (span (@ (class ,(mk-class '(font-black text-redwood-700
-                                                  dark:text-redwood-300 text-sm))))
+                                                  dark:text-redwood-300
+                                                  text-md))))
                            ,(format #f "~a" dislikes)))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,(em (format #f "~a ~a"
                                   (assoc-ref x "views")
                                   (G_ "views"))
-                          #:size '(text-sm)
+                          #:size '(text-md)
                           #:color '(text-onyx-300 dark:text-stone-300)))
                 (div (@ (class ,(mk-class '(flex flex-row gap-2))))
                      ,(em (format #f "~a"
                                   (length comments))
-                          #:size '(text-sm)
+                          #:size '(text-md)
                           #:color '(text-onyx-300 dark:text-stone-300))
                      ,(em (G_ "comments")
-                          #:size '(text-sm)
+                          #:size '(text-md)
                           #:color '(text-onyx-300 dark:text-stone-300)))
                 ,extra-bot-info)))))
 
@@ -410,11 +457,13 @@
                                                      #:background '(bg-asparagus-500)
                                                      #:hover-background '(hover:bg-asparagus-900)
                                                      #:type 'submit
-                                                     #:icon-css '(text-lg text-stone-300 dark:text-stone-300)                                                     
+                                                     #:icon-css '(text-lg
+                                                                  text-stone-300
+                                                                  dark:text-stone-300)
                                                      #:content `(div ,(G_
                                                                        "like")
                                                                      (span (@ (class
-                                                                               "font-light text-sm"))
+                                                                               ,(mk-class '(font-light text-md))))
                                                                            ,(format
                                                                              #f
                                                                              " ( ~a ) "
@@ -429,7 +478,9 @@
                                                      #:background '(bg-redwood-500)
                                                      #:hover-background '(hover:bg-redwood-900)
                                                      #:type 'submit
-                                                     #:icon-css '(text-lg text-stone-300 dark:text-stone-300)
+                                                     #:icon-css '(text-lg
+                                                                  text-stone-300
+                                                                  dark:text-stone-300)
                                                      #:content `(div ,(G_
                                                                        "dislike")
 
@@ -603,9 +654,10 @@
          (select (@ (onchange "window.location.href=this.value;")
                     (name "sort-select")
                     (id "sort-select")
-                    (class ,(mk-class '(p-3 border-3
+                    (class ,(mk-class '(px-3 py-2 border-2
                                             border-persia-pink-300/25
                                             dark:border-persia-pink-300/25
+                                            font-serif
                                             bg-stone-300
                                             dark:bg-onyx-700
                                             text-onyx-300
@@ -651,7 +703,7 @@
          (select (@ (onchange "window.location.href=this.value;")
                     (name "ascii-size-select")
                     (id "ascii-size-select")
-                    (class ,(mk-class '(p-3 border-3
+                    (class ,(mk-class '(py-2 px-3 border-2
                                             border-persia-pink-300/25
                                             dark:border-persia-pink-300/25
                                             bg-stone-300
@@ -712,7 +764,10 @@ function addSearchQueryParam(form) {
     (div (@ (class ,(mk-class '(my-3))))
          (form (@ (onsubmit "addSearchQueryParam(this)"))
                (div (@ (class ,(mk-class '(flex flex-row align-center
-                                                items-center justify-start
+                                                flex-wrap
+                                                items-center
+                                                justify-center md:justify-start
+                                                
                                                 gap-2))))
                     ,(input #:label ""
                             #:name "search"
@@ -721,9 +776,9 @@ function addSearchQueryParam(form) {
                                        "")
                                       (else search-query))
                             #:placeholder (G_ "Search...")
-                            #:input-css '(p-3 max-w-prose
+                            #:input-css '(py-2 px-3 max-w-prose
                                               rounded-xl
-                                              border-3
+                                              border-2
                                               border-persia-pink-300/25
                                               dark:border-persia-pink-300/25
                                               bg-stone-300
@@ -738,6 +793,7 @@ function addSearchQueryParam(form) {
   (render-if-nestring (lambda (l)
                         `((div (@ (class ,(mk-class '(flex flex-row gap-1
                                                            items-center
+                                                           flex-wrap
                                                            align-center))))
                                ,(a `((div (@ (class ,(mk-class '(flex flex-row
                                                                  items-center
@@ -748,13 +804,13 @@ function addSearchQueryParam(form) {
                                                               text-2xl
                                                               dark:text-stone-400
                                                               hover:text-persia-pink-500
-                                                              dark:hover:text-persia-pink-300))))
+                                                              hover:dark:text-persia-pink-300))))
                                    #:href l
                                    #:size '(text-lg)
                                    #:color '(text-stone-600
                                              dark:text-stone-400)
                                    #:hover '(hover:text-persia-pink-500
-                                             dark:hover:text-persia-pink-300))
+                                             hover:dark:text-persia-pink-300))
 
                                ))) link))
 
@@ -762,10 +818,10 @@ function addSearchQueryParam(form) {
   `((div (@ (class ,(mk-class '(flex flex-row
                                      flex-wrap
                                      gap-6
-                                     py-12
+                                     py-2
                                      px-6
-                                     md:py-12
-                                     md:px-18
+                                     md:py-4
+                                     md:px-12
                                      w-full
                                      justify-center
                                      items-start
