@@ -38,7 +38,7 @@ Join us in building an ever-growing library of musical knowledge — where every
 
 ------
 
-Wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Tailwind CSS, GNU Make, Emacs
+Wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Olive CSS, GNU Make, Emacs
 
 Wikimusic and Artanis are written using GNU Guile, one of the best implementations of Scheme language.
 

@@ -47,12 +47,12 @@
                                                                            gap-2))))
                                                     ,(em (format #f "~a"
                                                                  (car vc))
-                                                         #:size '(text-xs)
-                                                         #:color '(text-stone-700
+                                                         #:size '(text-md)
+                                                         #:color '(text-onyx-300
                                                                    dark:text-stone-300))
                                                     ,(em (G_ "versions")
-                                                         #:size '(text-xs)
-                                                         #:color '(text-stone-700
+                                                         #:size '(text-md)
+                                                         #:color '(text-onyx-300
                                                                    dark:text-stone-300)))))
                                            (assoc-ref song-version-count-alist
                                             (assoc-ref x "identifier"))))
@@ -77,15 +77,15 @@
                                 ,(map (lambda (ar)
                                         (a (assoc-ref ar "display_name")
                                            #:weight '(font-light)
-                                           #:size '(text-md)
+                                           #:size '(text-lg)
                                            #:href (format #f
                                                           "/artists/uuid/~a"
                                                           (assoc-ref ar
                                                            "identifier"))
-                                           #:color '(text-stone-900
+                                           #:color '(text-onyx-300
                                                      dark:text-stone-100)
-                                           #:hover '(hover:text-purple-500
-                                                     dark:hover:text-purple-300)))
+                                           #:hover '(hover:text-persia-pink-900
+                                               hover:dark:text-persia-pink-300)))
                                       art))))
 
          )
@@ -129,31 +129,41 @@
                                         ,(icon-button #:icon 'arrow-right
                                                       #:content (G_ "next"))))
                                    '()))))
-         (body `(div (@ (class ,(mk-class '(container mx-auto))))
+         (body `(div (@ (class ,(mk-class '(px-4 md:px-8
+                                                 py-2
+                                                 flex
+                                                 flex-col
+                                                 md:flex-row
+                                                 md:flex-wrap
+                                                 gap-3
+                                                 md:gap-5
+                                                 items-center
+                                                 align-center
+                                                 justify-center
+                                                 md:justify-between))))
                      (,(unless only-tiles
-                         `(h2 (@ (class ,(mk-class '(font-black text-stone-800
-                                                     dark:text-stone-200
-                                                     text-2xl
-                                                     py-4
-                                                     px-1
-                                                     flex
-                                                     flex-row
-                                                     items-center
-                                                     gap-1))))
-                              ,(icon #:type 'music-notes-simple)
-                              ,(G_ "viewing songs"))) ,(unless only-tiles
+                         (sub-h2 `(div (@ (class ,(mk-class '(flex flex-row
+                                                               items-center
+                                                               align-center
+                                                               gap-1))))
+                                   ,(G_ "viewing songs:"))
+                             #:weight '(font-light)
+                             #:size '(text-4xl)
+                             
+                             #:family '(font-serif))) ,(unless only-tiles
                                                          `(div (@ (class ,(mk-class '
                                                                            (flex
-                                                                            flex-wrap
-                                                                            flex-row
-                                                                            justify-between))))
+                                                                         flex-wrap
+                                                                         flex-row
+                                                                         justify-center
+                                                                         gap-2))))
                                                                (div (@ (class ,
                                                                               (mk-class '
                                                                                (flex
-                                                                                flex-wrap
-                                                                                flex-row
-                                                                                justify-start
-                                                                                items-center))))
+                                                                              flex-wrap
+                                                                              flex-row
+                                                                              justify-start
+                                                                              items-center))))
                                                                     ,(sort-select
                                                                       G_
                                                                       #:entity 'song
@@ -219,10 +229,11 @@
                                     `((div ,(a (assoc-ref ar "display_name")
                                                #:size '(text-lg)
                                                #:weight '(font-light)
-                                               #:color '(text-stone-900
+                                               #:color '(text-onyx-300
                                                          dark:text-stone-100)
-                                               #:hover '(hover:text-purple-500
-                                                         dark:hover:text-purple-300)
+                                               #:hover '(hover:text-persia-pink-500
+                                                         hover:dark:text-persia-pink-300
+                                                         hover:underline)
                                                #:href (format #f
                                                        "/artists/uuid/~a"
 
@@ -233,10 +244,11 @@
                                    `((div ,(a (assoc-ref ar "display_name")
                                               #:size '(text-lg)
                                               #:weight '(font-light)
-                                              #:color '(text-stone-900
+                                              #:color '(text-onyx-300
                                                         dark:text-stone-100)
-                                              #:hover '(hover:text-purple-500
-                                                        dark:hover:text-purple-300)
+                                              #:hover '(hover:text-persia-pink-500
+                                                        hover:dark:text-persia-pink-300
+                                                        hover:underline)
                                               #:href (format #f
                                                       "/genres/uuid/~a"
 
@@ -245,7 +257,7 @@
                                  genres)))
     (html-template G_
                    #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class '(container mx-auto p-3
+                   #:body `((div (@ (class ,(mk-class '( p-3
                                                                   sm:p-1
                                                                   md:p-0))))
                                  ((div (@ (class ,(mk-class '(flex flex-col
@@ -284,7 +296,8 @@
                                                              #:user-alist
                                                              user-alist)))))
                             ,(render-external-sources G_ external-sources)
-                            (div (@ (class ,(mk-class '(px-4 py-6 container mx-auto))))
+                            (div (@ (class ,(mk-class '(px-4 py-6 container
+                                                             mx-auto))))
                                  (dl ,(render-if-nestring (lambda (tuning)
                                                             (list (dt (G_
                                                                        "tuning"))
@@ -314,8 +327,8 @@
                                      ,(render-if-nestring (lambda (album-link)
                                                             (list (dt (G_
                                                                        "album info link"))
-                                                                  (dd (a
-                                                                       (uri-decode album-link)))))
+                                                                  (dd (a (uri-decode
+                                                                          album-link)))))
                                                           (assoc-ref song
                                                            "album_info_link"))))
 
@@ -330,7 +343,7 @@
                          (genres '())
                          (external-sources '())
                          is-logged-in)
-  (let* ((html `(div (@ (class ,(mk-class '(container mx-auto))))
+  (let* ((html `(div (@ (class ,(mk-class '())))
                      ,(if (assoc-ref song "identifier")
                           (h2 (format #f "~a: ~a"
                                       (G_ "editing song")
@@ -338,8 +351,8 @@
                           (h2 (G_ "new song")))
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "edit artworks"))
@@ -375,8 +388,8 @@
                      (details (@ (open true)
                                  (class "cursor-pointer"))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md))))
                                        ,(G_ "new artwork"))
                               ,(artwork-form G_
@@ -387,8 +400,8 @@
                      ,(hr)
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "editing song"))
@@ -414,8 +427,8 @@
                      ,(hr)
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "editing external sources"))
@@ -448,8 +461,8 @@
                      (details (@ (open true)
                                  (class ,(mk-class '(py-6))))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "song's artists"))
@@ -504,8 +517,8 @@
                      (details (@ (open true)
                                  (class ,(mk-class '(py-6))))
                               (summary (@ (class ,(mk-class '(font-black
-                                                              text-stone-800
-                                                              dark:text-stone-200
+                                                              text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "song's genres"))
@@ -564,7 +577,7 @@
                         #:key is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                 #:body `(div (@ (class ,(mk-class '())))
                               ,(song-form G_))))
 
 (define* (song-form G_

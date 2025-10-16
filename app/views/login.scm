@@ -31,8 +31,8 @@
                      #:key is-logged-in)
   (let* ((login-form `(div (form (@ (action "/login")
                                     (class ,(mk-class '(w-full rounded-xl
-                                                        bg-stone-200/75
-                                                        dark:bg-stone-900
+                                                        bg-stone-300/50
+                                                        dark:bg-onyx-700
                                                         p-4
                                                         flex
                                                         flex-row
@@ -55,8 +55,8 @@
                                  (div ,(submit-button (G_ "login"))))))
          (reset-form `((form (@ (action "/password/reset")
                                 (class ,(mk-class '(w-full rounded-xl
-                                                    bg-stone-200/50
-                                                    dark:bg-stone-700/50
+                                                    bg-stone-300/50
+                                                        dark:bg-onyx-700
                                                     p-4
                                                     flex
                                                     flex-row
@@ -75,7 +75,7 @@
                                                 #:content (G_ "reset")))))))
     (html-template G_
                    #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                   #:body `((div (@ (class ,(mk-class '(px-4 md:px-8 py-2))))
                                  (div (@ (class ,(mk-class '(w-full flex
                                                                     flex-row
                                                                     flex-wrap
@@ -83,11 +83,15 @@
                                       (div (@ (class ,(mk-class '(flex
                                                                   flex-col
                                                                   gap-8))))
-                                           ,(h2 (G_ "login to wikimusic"))
+                                           ,(h2 (G_ "login to wikimusic")
+                                                 #:weight '(font-light)
+                                                #:family '(font-serif))
                                            (div ,login-form))
                                       (div (@ (class ,(mk-class '(flex
                                                                   flex-col
                                                                   gap-8))))
-                                           ,(h2 (G_ "reset password"))
+                                           ,(h2 (G_ "reset password")
+                                                #:weight '(font-light)
+                                                #:family '(font-serif))
                                            (div ,reset-form))))))))
 

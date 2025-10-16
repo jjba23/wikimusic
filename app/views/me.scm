@@ -81,7 +81,7 @@
     (html-template G_
                    #:title "wikimusic"
                    #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                   #:body `((div (@ (class ,(mk-class '())))
                                  (div (@ (class ,(mk-class '(flex flex-col
                                                                   gap-6))))
                                       ,user-details
@@ -164,7 +164,7 @@
   (html-template G_
                  #:title "wikimusic"
                  #:is-logged-in #t
-                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                 #:body `((div (@ (class ,(mk-class '())))
                                ,(h2 (G_ "User management"))
                                (div (@ (class ,(mk-class '(my-6))))
                                     (a (@ (href "/users/new"))
@@ -191,7 +191,7 @@
   (html-template G_
                  #:title "wikimusic"
                  #:is-logged-in #t
-                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                 #:body `((div (@ (class ,(mk-class '())))
                                (div ,(h2 (G_ "New User")))
                                (div (@ (class ,(mk-class '(flex flex-col
                                                            gap-4
@@ -265,7 +265,7 @@
   (html-template G_
                  #:title "wikimusic"
                  #:is-logged-in #t
-                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                 #:body `((div (@ (class ,(mk-class '())))
                                (div ,(h2 (G_ "Edit User")))
                                (div (@ (class ,(mk-class '(flex flex-col
                                                            gap-4
