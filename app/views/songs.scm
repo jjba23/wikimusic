@@ -361,7 +361,7 @@
                                                                            sm:w-36))))
                                                     (img (@ (loading "lazy")
                                                             (class
-                                                             "rounded-xl")
+                                                             ,(mk-class '(rounded-xl max-w-full)))
                                                             (src ,(uri-decode (assoc-ref
                                                                                a
                                                                                "content_url"))))))

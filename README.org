@@ -51,7 +51,7 @@ https://www.gnu.org/licenses/fdl-1.3.html
 I strive to provide proper and extensive documentation on Wikimusic, available at your convenience.
 
 - Online HTML: https://jointhefreeworld.org/manuals/wikimusic/index.html
-- Org format: [[file:docs/manual/en-GB.org]]
+- Org format: [[file:docs/manual/en.org]]
 
 ------
 
