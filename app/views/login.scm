@@ -55,15 +55,15 @@
                                  (div ,(submit-button (G_ "login"))))))
          (reset-form `((form (@ (action "/password/reset")
                                 (class ,(mk-class '(w-full rounded-xl
-                                                    bg-stone-300/50
-                                                        dark:bg-onyx-700
-                                                    p-4
-                                                    flex
-                                                    flex-row
-                                                    flex-wrap
-                                                    items-center
-                                                    gap-4
-                                                    shadow-md)))
+                                                           bg-stone-300/50
+                                                           dark:bg-onyx-700
+                                                           p-4
+                                                           flex
+                                                           flex-row
+                                                           flex-wrap
+                                                           items-center
+                                                           gap-4
+                                                           shadow-md)))
                                 (method POST))
                              ,(input #:label (G_ "account to reset (email)")
                                      #:name "email"
@@ -84,7 +84,7 @@
                                                                   flex-col
                                                                   gap-8))))
                                            ,(h2 (G_ "login to wikimusic")
-                                                 #:weight '(font-light)
+                                                #:weight '(font-light)
                                                 #:family '(font-serif))
                                            (div ,login-form))
                                       (div (@ (class ,(mk-class '(flex

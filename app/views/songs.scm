@@ -85,7 +85,7 @@
                                            #:color '(text-onyx-300
                                                      dark:text-stone-100)
                                            #:hover '(hover:text-persia-pink-900
-                                               hover:dark:text-persia-pink-300)))
+                                                     hover:dark:text-persia-pink-300)))
                                       art))))
 
          )
@@ -143,49 +143,51 @@
                                                  md:justify-between))))
                      (,(unless only-tiles
                          (sub-h2 `(div (@ (class ,(mk-class '(flex flex-row
-                                                               items-center
-                                                               align-center
-                                                               gap-1))))
-                                   ,(G_ "viewing songs:"))
-                             #:weight '(font-light)
-                             #:size '(text-4xl)
-                             
-                             #:family '(font-serif))) ,(unless only-tiles
-                                                         `(div (@ (class ,(mk-class '
-                                                                           (flex
-                                                                         flex-wrap
-                                                                         flex-row
-                                                                         justify-center
-                                                                         gap-2))))
-                                                               (div (@ (class ,
-                                                                              (mk-class '
-                                                                               (flex
+                                                              items-center
+                                                              align-center
+                                                              gap-1))))
+                                       ,(G_ "viewing songs:"))
+                                 #:weight '(font-light)
+                                 #:size '(text-4xl)
+
+                                 #:family '(font-serif))) ,(unless only-tiles
+                                                             `(div (@ (class ,
+                                                                             (mk-class '
+                                                                              (flex
+                                                                               flex-wrap
+                                                                               flex-row
+                                                                               justify-center
+                                                                               gap-2))))
+                                                                   (div (@ (class ,
+                                                                            (mk-class '
+                                                                             (flex
                                                                               flex-wrap
                                                                               flex-row
                                                                               justify-start
                                                                               items-center))))
-                                                                    ,(sort-select
-                                                                      G_
-                                                                      #:entity 'song
-                                                                      #:user-sort
-                                                                      user-sort))
-                                                               (div (@ (class ,
-                                                                              (mk-class '
-                                                                               (flex
-                                                                                flex-wrap
-                                                                                flex-row
-                                                                                gap-3
-                                                                                justify-right
-                                                                                items-center))))
+                                                                        ,(sort-select
+                                                                          G_
+                                                                          #:entity 'song
+                                                                          #:user-sort
+                                                                          user-sort))
+                                                                   (div (@ (class ,
+                                                                            (mk-class '
+                                                                             (flex
+                                                                              flex-wrap
+                                                                              flex-row
+                                                                              gap-3
+                                                                              justify-right
+                                                                              items-center))))
 
-                                                                    ,(search-box
-                                                                      G_
-                                                                      #:search-query
-                                                                      search-query))))
+                                                                        ,(search-box
+                                                                          G_
+                                                                          #:search-query
+                                                                          search-query))))
                       (div (div (@ (class ,(mk-class '(grid gap-4
-                                                            sm:grid-cols-3
-                                                            md:grid-cols-4
-                                                            lg:grid-cols-5))))
+                                                            sm:grid-cols-2
+                                                            md:grid-cols-3
+                                                            lg:grid-cols-4
+                                                            xl:grid-cols-5))))
                                 ,(map (lambda (x)
                                         (render-song-tile G_
                                          #:artworks artworks
@@ -257,9 +259,7 @@
                                  genres)))
     (html-template G_
                    #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class '( p-3
-                                                                  sm:p-1
-                                                                  md:p-0))))
+                   #:body `((div (@ (class ,(mk-class '(p-3 sm:p-1 md:p-0))))
                                  ((div (@ (class ,(mk-class '(flex flex-col
                                                                    gap-4))))
                                        ,(h2 (assoc-ref song "display_name"))
@@ -360,8 +360,9 @@
                                       `(div (figure (@ (class ,(mk-class '(py-3
                                                                            sm:w-36))))
                                                     (img (@ (loading "lazy")
-                                                            (class
-                                                             ,(mk-class '(rounded-xl max-w-full)))
+                                                            (class ,(mk-class '
+                                                                              (rounded-xl
+                                                                               max-w-full)))
                                                             (src ,(uri-decode (assoc-ref
                                                                                a
                                                                                "content_url"))))))

@@ -33,8 +33,7 @@
 (define* (render-song-content G_ song song-contents ascii-size)
   `(div ,(hr)
         (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))
-             ,(sub-h2
-                   (G_ "musical contents:"))
+             ,(sub-h2 (G_ "musical contents:"))
              ,(ascii-size-select G_
                                  #:route (format #f "/~as/uuid/~a"
                                                  'song

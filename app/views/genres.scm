@@ -73,32 +73,38 @@
                                                                  items-center
                                                                  align-center
                                                                  gap-1))))
-                                   ,(G_ "viewing genres:"))
-                             #:weight '(font-light)
-                              #:size '(text-4xl)
-                             #:family '(font-serif))
-                      (div (@ (class ,(mk-class '(flex
+                                     ,(G_ "viewing genres:"))
+                               #:weight '(font-light)
+                               #:size '(text-4xl)
+                               #:family '(font-serif)) (div (@ (class ,(mk-class '
+                                                                        (flex
                                                                          flex-wrap
                                                                          flex-row
                                                                          justify-center
                                                                          gap-2))))
-                           (div (@ (class ,(mk-class '(flex
+                                                            (div (@ (class ,(mk-class '
+                                                                             (flex
                                                                               flex-wrap
                                                                               flex-row
                                                                               justify-start
                                                                               items-center))))
-                                ,(sort-select G_
-                                              #:entity 'genre
-                                              #:user-sort user-sort))
-                           (div (@ (class ,(mk-class '(flex
+                                                                 ,(sort-select
+                                                                   G_
+                                                                   #:entity 'genre
+                                                                   #:user-sort
+                                                                   user-sort))
+                                                            (div (@ (class ,(mk-class '
+                                                                             (flex
                                                                               flex-wrap
                                                                               flex-row
                                                                               gap-3
                                                                               justify-end
                                                                               items-center))))
 
-                                ,(search-box G_
-                                             #:search-query search-query)))
+                                                                 ,(search-box
+                                                                   G_
+                                                                   #:search-query
+                                                                   search-query)))
                       (div (div (@ (class ,(mk-class '(grid gap-3
                                                             sm:grid-cols-2
                                                             md:grid-cols-3
@@ -136,8 +142,7 @@
                             is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `((div (@ (class ,(mk-class '( p-3
-                                                                sm:p-1 md:p-0))))
+                 #:body `((div (@ (class ,(mk-class '(p-3 sm:p-1 md:p-0))))
                                (,(h2 (assoc-ref genre "display_name")) (div (div ,
                                                                              (entity-details
                                                                               G_

@@ -170,8 +170,7 @@ more efficient, and more powerful code.")
      (list
       #:source-directory "src"))
     (home-page "https://codeberg.org/jjba23/bewaking")
-    (synopsis
-     "Authentication / Authorization library for Guile Scheme")
+    (synopsis "Authentication / Authorization library for Guile Scheme")
     (description
      "bewaking is a library that helps you with secure tokens.
 It allows you to create and verify lifetime-limited encrypted digital
@@ -198,6 +197,5 @@ user sessions on the web or authenticating API calls.")
                           guile-dbi
                           guile-dbd-sqlite3
                           watchexec
-                          emacs
-                          ))
+                          emacs))
 

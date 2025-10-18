@@ -94,9 +94,9 @@
                                      bg-stone-300/50
                                      dark:bg-onyx-700
                                      shadow-md
-                                     ;;  border-persia-pink-300/10
-                                     ;;        dark:border-persia-pink-300/10
-                                            ))))
+                                     ;; border-persia-pink-300/10
+                                     ;; dark:border-persia-pink-300/10
+                                     ))))
 
          (div (@ (class ,(mk-class '(px-4 py-1))))
               (a (@ (href "/")
@@ -126,9 +126,8 @@
                                #:color '(text-onyx-900 dark:text-stone-100)
                                #:weight '(font-light)
                                #:size '(text-md lg:text-lg)
-                                                                     #:icon-css '(text-md
-                                                                    lg:text-lg
-                                                                    text-onyx-300 dark:text-stone-300)
+                               #:icon-css '(text-md lg:text-lg text-onyx-300
+                                                    dark:text-stone-300)
                                #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                       max-w-prose
                                                       cursor-pointer)))
@@ -139,9 +138,8 @@
                                #:family '(font-serif)
                                #:color '(text-onyx-900 dark:text-stone-100)
                                #:weight '(font-light)
-                                                                     #:icon-css '(text-md
-                                                                    lg:text-lg
-                                                                    text-onyx-300 dark:text-stone-300)
+                               #:icon-css '(text-md lg:text-lg text-onyx-300
+                                                    dark:text-stone-300)
                                #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                       max-w-prose
                                                       cursor-pointer)))
@@ -152,9 +150,8 @@
                                #:family '(font-serif)
                                #:color '(text-onyx-900 dark:text-stone-100)
                                #:weight '(font-light)
-                                                                     #:icon-css '(text-md
-                                                                    lg:text-lg
-                                                                    text-onyx-300 dark:text-stone-300)
+                               #:icon-css '(text-md lg:text-lg text-onyx-300
+                                                    dark:text-stone-300)
                                #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
                                                       max-w-prose
                                                       cursor-pointer)))
@@ -176,9 +173,9 @@
                                                 dark:text-stone-100)
                                       #:weight '(font-light)
                                       #:size '(text-md lg:text-lg)
-                                                                            #:icon-css '(text-md
-                                                                    lg:text-lg
-                                                                    text-onyx-300 dark:text-stone-300)
+                                      #:icon-css '(text-md lg:text-lg
+                                                   text-onyx-300
+                                                   dark:text-stone-300)
                                       #:extra-classes '(py-1 py-1
                                                              lg:py-2
                                                              px-2
@@ -201,26 +198,29 @@
                                                 dark:text-stone-100)
                                       #:weight '(font-light)
                                       #:size '(text-md lg:text-lg)
-                                      #:icon-css '(text-md
-                                                                    lg:text-lg
-                                                                    text-onyx-300 dark:text-stone-300)
+                                      #:icon-css '(text-md lg:text-lg
+                                                   text-onyx-300
+                                                   dark:text-stone-300)
                                       #:extra-classes '(py-1 lg:py-2 px-2
                                                              lg:px-3
                                                              max-w-prose
                                                              cursor-pointer)))))
 
-              ,(ui-mode-button #:icon "" #:size '(text-md lg:text-lg)
+              ,(ui-mode-button #:icon ""
+                               #:size '(text-md lg:text-lg)
                                #:icon-css '(text-onyx-300 dark:text-stone-300
                                                           text-md)
                                #:family '(font-serif)
                                #:content `((div ,(icon #:type 'sun
                                                        #:icon-css '(text-md
                                                                     lg:text-lg
-                                                                    text-onyx-300 dark:text-stone-300))
+                                                                    text-onyx-300
+                                                                    dark:text-stone-300))
                                                 ,(icon #:type 'moon
                                                        #:icon-css '(text-md
                                                                     lg:text-lg
-                                                                    text-onyx-300 dark:text-stone-300))))
+                                                                    text-onyx-300
+                                                                    dark:text-stone-300))))
                                #:color '(text-onyx-900 dark:text-stone-100)
                                #:weight '(font-light)
                                #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
@@ -297,12 +297,15 @@
                                     (equal? 1
                                             (assoc-ref o "is_dislike")))
                                   opinions))))
-    `((div (@ (class ,(mk-class '(bg-stone-300 dark:bg-onyx-700 rounded-2xl
-                                               shadow-lg h-full
+    `((div (@ (class ,(mk-class '(bg-stone-300 dark:bg-onyx-700
+                                               rounded-2xl
+                                               shadow-lg
+                                               h-full
                                                border-2
-                                            border-persia-pink-100/25
-                                            dark:border-persia-pink-900/10))))
+                                               border-persia-pink-100/25
+                                               dark:border-persia-pink-900/10))))
            (div (@ (class ,(mk-class '(flex flex-col
+                                            gap-1
                                             py-3
                                             px-3
                                             justify-center
@@ -408,9 +411,11 @@
                                             (img (@ (loading lazy)
                                                     (class ,(mk-class '(rounded-xl
                                                                         shadow-md
-                                                                        w-56
-                                                                        sm:w-64
-                                                                        md:w-72
+                                                                        w-72
+                                                                        sm:w-96
+                                                                        md:w-96
+                                                                        lg:w-128
+                                                                        max-w-full
                                                                         h-auto)))
                                                     (src ,(uri-decode (assoc-ref
                                                                        art
@@ -462,8 +467,10 @@
                                                                   dark:text-stone-300)
                                                      #:content `(div ,(G_
                                                                        "like")
-                                                                     (span (@ (class
-                                                                               ,(mk-class '(font-light text-md))))
+                                                                     (span (@ (class ,
+                                                                               (mk-class '
+                                                                                (font-light
+                                                                                 text-md))))
                                                                            ,(format
                                                                              #f
                                                                              " ( ~a ) "
@@ -654,16 +661,17 @@
          (select (@ (onchange "window.location.href=this.value;")
                     (name "sort-select")
                     (id "sort-select")
-                    (class ,(mk-class '(px-3 py-2 border-2
-                                            border-persia-pink-300/25
-                                            dark:border-persia-pink-300/25
-                                            font-serif
-                                            bg-stone-300
-                                            dark:bg-onyx-700
-                                            text-onyx-300
-                                            dark:text-stone-300
-                                            rounded-xl
-                                            shadow-md))))
+                    (class ,(mk-class '(px-3 py-2
+                                             border-2
+                                             border-persia-pink-300/25
+                                             dark:border-persia-pink-300/25
+                                             font-serif
+                                             bg-stone-300
+                                             dark:bg-onyx-700
+                                             text-onyx-300
+                                             dark:text-stone-300
+                                             rounded-xl
+                                             shadow-md))))
                  (option ,(G_ "sort order"))
                  ,(map (lambda (s)
                          `((option (@ (value ,(format #f "/~as?sort=~a" entity
@@ -703,16 +711,17 @@
          (select (@ (onchange "window.location.href=this.value;")
                     (name "ascii-size-select")
                     (id "ascii-size-select")
-                    (class ,(mk-class '(py-2 px-3 border-2
-                                            border-persia-pink-300/25
-                                            dark:border-persia-pink-300/25
-                                            bg-stone-300
-                                            dark:bg-onyx-700
-                                            text-onyx-300
-                                            dark:text-stone-300
-                                            rounded-xl
-                                            max-w-72
-                                            shadow-md))))
+                    (class ,(mk-class '(py-2 px-3
+                                             border-2
+                                             border-persia-pink-300/25
+                                             dark:border-persia-pink-300/25
+                                             bg-stone-300
+                                             dark:bg-onyx-700
+                                             text-onyx-300
+                                             dark:text-stone-300
+                                             rounded-xl
+                                             max-w-72
+                                             shadow-md))))
                  (option ,(G_ "ascii size"))
                  ,(map (lambda (s)
                          `((option (@ (value ,(format #f "~a?ascii-size=~a"
@@ -763,11 +772,13 @@ function addSearchQueryParam(form) {
 ")
     (div (@ (class ,(mk-class '(my-3))))
          (form (@ (onsubmit "addSearchQueryParam(this)"))
-               (div (@ (class ,(mk-class '(flex flex-row align-center
+               (div (@ (class ,(mk-class '(flex flex-row
+                                                align-center
                                                 flex-wrap
                                                 items-center
-                                                justify-center md:justify-start
-                                                
+                                                justify-center
+                                                md:justify-start
+
                                                 gap-2))))
                     ,(input #:label ""
                             #:name "search"
@@ -776,16 +787,17 @@ function addSearchQueryParam(form) {
                                        "")
                                       (else search-query))
                             #:placeholder (G_ "Search...")
-                            #:input-css '(py-2 px-3 max-w-prose
-                                              rounded-xl
-                                              border-2
-                                              border-persia-pink-300/25
-                                              dark:border-persia-pink-300/25
-                                              bg-stone-300
-                                              dark:bg-onyx-700
-                                              dark:text-stone-300
-                                              text-onyx-300
-                                              shadow-md)
+                            #:input-css '(py-2 px-3
+                                               max-w-prose
+                                               rounded-xl
+                                               border-2
+                                               border-persia-pink-300/25
+                                               dark:border-persia-pink-300/25
+                                               bg-stone-300
+                                               dark:bg-onyx-700
+                                               dark:text-stone-300
+                                               text-onyx-300
+                                               shadow-md)
                             #:input-flex-css #f)
                     ,(submit-button (G_ "search")))))))
 

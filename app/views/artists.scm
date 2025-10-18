@@ -41,7 +41,8 @@
                            search-query
                            user-sort
                            is-logged-in)
-  (let* ((page-buttons `((div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-3 my-4))))
+  (let* ((page-buttons `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                          gap-3 my-4))))
                               ,(if (> offset 0)
                                    `((a (@ (href ,(format #f
                                                    "/artists?offset=~a&limit=~a"
@@ -80,8 +81,7 @@
                                                                          flex-wrap
                                                                          flex-row
                                                                          justify-center
-                                                                         gap-2
-                                                                         ))))
+                                                                         gap-2))))
                                                             (div (@ (class ,(mk-class '
                                                                              (flex
                                                                               flex-wrap

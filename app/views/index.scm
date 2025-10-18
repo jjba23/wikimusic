@@ -31,13 +31,15 @@
                        #:key is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `(div (div (@ (class ,(mk-class '(p-2 ))))
+                 #:body `(div (div (@ (class ,(mk-class '(p-2))))
                                    (div (@ (class ,(mk-class '(flex flex-row
-                                                                    flex-wrap
-                                                                    gap-5 px-3
-                                                                    align-center items-center
-                                                                    justify-center
-                                                                    py-6))))
+                                                               flex-wrap
+                                                               gap-5
+                                                               px-3
+                                                               align-center
+                                                               items-center
+                                                               justify-center
+                                                               py-6))))
                                         ,(wikimusic-explain G_))))))
 
 (define* (wikimusic-img)
@@ -60,8 +62,7 @@
                                "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg"))))))))
 
 (define* (wikimusic-explain G_)
-  `(
-    (div (@ (class ,(mk-class '(max-w-196 py-4
+  `((div (@ (class ,(mk-class '(max-w-196 py-4
                                           md:px-8
                                           xl:px-12
                                           px-6
@@ -81,8 +82,9 @@
                                           flex
                                           flex-col
                                           gap-4))))
-         (div (@(class ,(mk-class '(text-center)))) ,(sub-h3 (G_ "the free music knowledge encyclopaedia")
-                  #:family '(font-serif)))
+         (div (@ (class ,(mk-class '(text-center))))
+              ,(sub-h3 (G_ "the free music knowledge encyclopaedia")
+                       #:family '(font-serif)))
 
          (p ,(G_
               "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."))
@@ -111,7 +113,7 @@
               "The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively."))
          (p ,(G_
               "Join us in building an ever-growing library of musical knowledge — where every note tells a story.")))
-
+    
     ,(wikimusic-img)
 
     (div (@ (class ,(mk-class '(max-w-196 bg-stone-300/50
