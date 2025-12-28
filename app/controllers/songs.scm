@@ -483,8 +483,9 @@
                                                             "ascii-legend")))
                                (ascii_contents ,(html-escape (assoc-ref body
                                                               "ascii-contents")))
-                               (pdf_contents ,(html-escape (assoc-ref body
-                                                            "pdf-contents")))
+                               (pdf_contents ,(assoc-ref body "pdf-contents"))
+                               (guitarpro_contents ,(assoc-ref body
+                                                     "guitarpro-contents"))
                                (last_edited_at ,(current-time)))
                              (where #:identifier (params rc "version-uuid"))))
             (redirect-to rc
@@ -559,10 +560,9 @@
                                                          "ascii-legend"))
                             #:ascii_contents (html-escape (assoc-ref body
                                                            "ascii-contents"))
-                            #:pdf_contents (html-escape (assoc-ref body
-                                                         "pdf-contents"))
-                            #:guitarpro_contents (html-escape (assoc-ref body
-                                                               "guitarpro-contents"))
+                            #:pdf_contents (assoc-ref body "pdf-contents")
+                            #:guitarpro_contents (assoc-ref body
+                                                  "guitarpro-contents")
                             #:created_at (current-time))
 
             (redirect-to rc
