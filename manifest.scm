@@ -197,5 +197,5 @@ user sessions on the web or authenticating API calls.")
                           guile-dbi
                           guile-dbd-sqlite3
                           watchexec
-                          emacs))
+                          emacs-no-x))
 
