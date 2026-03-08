@@ -183,7 +183,7 @@ user sessions on the web or authenticating API calls.")
 
 (packages->manifest (list (specification->package "make")
                           (specification->package "gettext")
-                          guile-next
+                          guile-3.0-latest
                           guile-uuid
                           guile-ares-rs
                           artanis
