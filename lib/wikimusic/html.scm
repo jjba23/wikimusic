@@ -73,13 +73,23 @@
                ,(em (G_
                      "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"))
 
-               (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+               (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
                                                 align-center items-center))))
-                    ,(em "version:")
-                    ,(mono (format #f "~a"
-                                   (get-short-commit-sha))
-                           #:size '(text-md)
-                           #:weight '(font-light)))))))
+                    (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                                     align-center items-center))))
+                         (a (@ (href "javascript:void(0)")
+                               (class ,(mk-class '(no-underline text-onyx-500
+                                                   dark:text-stone-300 cursor-pointer font-light)))
+                               (onclick
+                                "window.scrollTo({ top: 0, behavior: 'smooth' })"))
+                            "⬆️ back to the top"))
+                    (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                                     align-center items-center))))
+                         ,(em "version:")
+                         ,(mono (format #f "~a"
+                                        (get-short-commit-sha))
+                                #:size '(text-md)
+                                #:weight '(font-light))))))))
 
 (define* (nav G_
               #:key is-logged-in)
@@ -93,10 +103,7 @@
                                      hover:text-china-violet-700
                                      bg-stone-300/50
                                      dark:bg-onyx-700
-                                     shadow-md
-                                     ;; border-persia-pink-300/10
-                                     ;; dark:border-persia-pink-300/10
-                                     ))))
+                                     shadow-md))))
 
          (div (@ (class ,(mk-class '(px-4 py-1))))
               (a (@ (href "/")
