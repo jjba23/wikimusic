@@ -232,7 +232,7 @@
                                                    ,(G_ "PDF contents"))
                                           (iframe (@ (src ,pdf-contents)
                                                      (width "100%")
-                                                     (class ,(mk-class '(min-h-screen)))))))))
+                                                     (class ,(mk-class '(min-h-screen)))) "")))))
          (pdf-content-section (render-if-nestring render-pdf-content
                                                   cleaned-pdf-data)))
     `(,(hr) (details (@ (open true))
