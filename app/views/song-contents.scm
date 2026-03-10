@@ -397,7 +397,7 @@
                                                                          bg-stone-200
                                                                          dark:bg-stone-700/75
                                                                          border-2
-                                                                         min-h-240
+                                                                         min-h-256
                                                                          text-sm
                                                                          shadow-md
                                                                          font-mono
