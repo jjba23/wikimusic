@@ -79,7 +79,8 @@
                                                      align-center items-center))))
                          (a (@ (href "javascript:void(0)")
                                (class ,(mk-class '(no-underline text-onyx-500
-                                                   dark:text-stone-300 cursor-pointer font-light)))
+                                                   dark:text-stone-300
+                                                   cursor-pointer font-light)))
                                (onclick
                                 "window.scrollTo({ top: 0, behavior: 'smooth' })"))
                             "⬆️ back to the top"))
@@ -312,13 +313,11 @@
                                                border-2
                                                border-persia-pink-100/25
                                                dark:border-persia-pink-900/10))))
-           (div (@ (class ,(mk-class '(flex flex-col
-                                            gap-1
+           (div (@ (class ,(mk-class '(flex flex-col                                            
                                             py-3
                                             px-3
                                             justify-center
                                             align-center
-
                                             h-full))))
                 ,(render-if-nempty (lambda (art)
                                      `(figure (@ (class ,(mk-class '(py-3
@@ -338,37 +337,44 @@
                                      (else (car artworks))))
                 (div (@ (class ,(mk-class '(text-center))))
                      ,(a (assoc-ref x "display_name")
-                         #:size '(text-xl)
+                         #:size (list 'text-2xl
+                                      'leading-9)
+                         #:weight '(font-light)
                          #:href item-link
                          #:color '(text-onyx-300 dark:text-stone-100)
                          #:hover '(hover:text-persia-pink-500
                                    hover:dark:text-persia-pink-300)))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,extra-top-info)
-                (div (@ (class ,(mk-class '(pt-2 flex flex-row gap-2))))
-                     (span (@ (class ,(mk-class '(font-black
-                                                  text-asparagus-900
-                                                  dark:text-asparagus-300
-                                                  text-md))))
-                           ,(format #f "~a" likes))
-                     (span (@ (class ,(mk-class '(font-black text-redwood-700
-                                                  dark:text-redwood-300
-                                                  text-md))))
-                           ,(format #f "~a" dislikes)))
-                (div (@ (class ,(mk-class '(pt-2))))
-                     ,(em (format #f "~a ~a"
-                                  (assoc-ref x "views")
-                                  (G_ "views"))
-                          #:size '(text-md)
-                          #:color '(text-onyx-300 dark:text-stone-300)))
-                (div (@ (class ,(mk-class '(flex flex-row gap-2))))
-                     ,(em (format #f "~a"
-                                  (length comments))
-                          #:size '(text-md)
-                          #:color '(text-onyx-300 dark:text-stone-300))
-                     ,(em (G_ "comments")
-                          #:size '(text-md)
-                          #:color '(text-onyx-300 dark:text-stone-300)))
+                ;; (div (@ (class ,(mk-class '(pt-2 flex flex-row gap-2))))
+                ;;      (span (@ (class ,(mk-class '(font-black
+                ;;                                   text-asparagus-900
+                ;;                                   dark:text-asparagus-300
+                ;;                                   text-md))))
+                ;;            ,(format #f "~a" likes))
+                ;;      (span (@ (class ,(mk-class '(font-black text-redwood-700
+                ;;                                   dark:text-redwood-300
+                ;;                                   text-md))))
+                ;;            ,(format #f "~a" dislikes)))
+                (div (@ (class ,(mk-class '(flex flex-row
+                                                 gap-2
+                                                 flex-wrap
+                                                 items-center
+                                                 align-center
+                                                 justify-center))))
+                     (div (@ (class ,(mk-class '())))
+                          ,(em (format #f "~a ~a"
+                                       (assoc-ref x "views")
+                                       (G_ "views"))
+                               #:size '(text-sm)
+                               #:color '(text-onyx-300 dark:text-stone-300)))
+                     ,(p "|" #:color '(text-onyx-500 dark:text-stone-700) #:weight '(font-light) #:size '(text-sm))
+                     (div (@ (class ,(mk-class '(flex flex-row gap-1))))
+                          ,(em (format #f "~a ~a"
+                                       (length comments)
+                                       (G_ "comments"))
+                               #:size '(text-sm)
+                               #:color '(text-onyx-300 dark:text-stone-300))))
                 ,extra-bot-info)))))
 
 (define* (render-visibility-status G_ status)

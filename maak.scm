@@ -222,3 +222,10 @@ for higher concurrent writes to SQLite 3."
   ($ '("curl --output \"./pub/css/wikimusic.olive.min.css\""
        "\"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/wikimusic.olive.min.css\"")))
 
+(define (import-production-database)
+  "Import production env's database to local workspace via SSH/SCP"
+  ($ '("scp wolk-jjba:/etc/byggsteg/job-clone/wikimusic/trunk/wikimusic.db* .")))
+
+(define (import-production-env)
+  "Import production env's database to local workspace via SSH/SCP"
+  ($ '("scp wolk-jjba:/etc/byggsteg/job-clone/wikimusic/trunk/env.scm .")))

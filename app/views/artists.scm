@@ -69,42 +69,40 @@
                                                  align-center
                                                  justify-center
                                                  md:justify-between))))
-                     (,(sub-h2 `(div (@ (class ,(mk-class '(flex flex-row
-                                                                 items-center
-                                                                 align-center
-                                                                 gap-1))))
-                                     ,(G_ "viewing artists:"))
-                               #:weight '(font-light)
-                               #:size '(text-4xl)
-                               #:family '(font-serif)) (div (@ (class ,(mk-class '
-                                                                        (flex
-                                                                         flex-wrap
-                                                                         flex-row
-                                                                         justify-center
-                                                                         gap-2))))
-                                                            (div (@ (class ,(mk-class '
+                     (,(h4 `(div (@ (class ,(mk-class '(flex flex-row
+                                                             items-center
+                                                             align-center
+                                                             gap-1))))
+                                 ,(G_ "viewing artists:"))
+                           #:weight '(font-light)
+                           #:size '(text-2xl)
+                           #:family '(font-serif)) (div (@ (class ,(mk-class '
                                                                              (flex
                                                                               flex-wrap
                                                                               flex-row
-                                                                              justify-start
-                                                                              items-center))))
-                                                                 ,(sort-select
-                                                                   G_
-                                                                   #:entity 'artist
-                                                                   #:user-sort
-                                                                   user-sort))
-                                                            (div (@ (class ,(mk-class '
-                                                                             (flex
-                                                                              flex-wrap
-                                                                              flex-row
-                                                                              gap-3
-                                                                              justify-end
-                                                                              items-center))))
+                                                                              justify-center
+                                                                              gap-2))))
+                                                        (div (@ (class ,(mk-class '
+                                                                         (flex
+                                                                          flex-wrap
+                                                                          flex-row
+                                                                          justify-start
+                                                                          items-center))))
+                                                             ,(sort-select G_
+                                                               #:entity 'artist
+                                                               #:user-sort
+                                                               user-sort))
+                                                        (div (@ (class ,(mk-class '
+                                                                         (flex
+                                                                          flex-wrap
+                                                                          flex-row
+                                                                          gap-3
+                                                                          justify-end
+                                                                          items-center))))
 
-                                                                 ,(search-box
-                                                                   G_
-                                                                   #:search-query
-                                                                   search-query)))
+                                                             ,(search-box G_
+                                                               #:search-query
+                                                               search-query)))
                       (div (div (@ (class ,(mk-class '(grid gap-3
                                                             sm:grid-cols-2
                                                             md:grid-cols-3
@@ -142,21 +140,20 @@
                              is-logged-in)
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `((div (@ (class ,(mk-class '(p-3 sm:p-1 md:p-0))))
-                               (,(h2 (assoc-ref artist "display_name")) (div (div ,
-                                                                              (entity-details
-                                                                               G_
-                                                                               #:entity 'artist
-                                                                               #:x
-                                                                               artist
-                                                                               #:artworks
-                                                                               artworks
-                                                                               #:opinions
-                                                                               opinions
-                                                                               #:comments
-                                                                               comments
-                                                                               #:user-alist
-                                                                               user-alist)))))
+                 #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
+                                                           md:py-4))))
+                               ((div (@ (class ,(mk-class '(py-4))))
+                                     ,(h2 (assoc-ref artist "display_name")
+                                          #:size '(text-3xl md:text-10)
+                                          #:weight '(font-light leading-10)))
+                                (div (div ,(entity-details G_
+                                                           #:entity 'artist
+                                                           #:x artist
+                                                           #:artworks artworks
+                                                           #:opinions opinions
+                                                           #:comments comments
+                                                           #:user-alist
+                                                           user-alist)))))
                           ,(render-external-sources G_ external-sources)
                           (div ,song-fragment))))
 

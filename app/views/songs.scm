@@ -44,14 +44,12 @@
   (let* ((extra-bot-info (render-if-nempty (lambda (vc)
                                              `((div (@ (class ,(mk-class '(flex
                                                                            flex-row
-                                                                           gap-2))))
-                                                    ,(em (format #f "~a"
-                                                                 (car vc))
-                                                         #:size '(text-md)
-                                                         #:color '(text-onyx-300
-                                                                   dark:text-stone-300))
-                                                    ,(em (G_ "versions")
-                                                         #:size '(text-md)
+                                                                           gap-2 justify-center align-center))))
+                                                    ,(em (format #f "~a ~a"
+                                                                 (car vc)
+                                                                 (G_
+                                                                  "versions"))
+                                                         #:size '(text-sm)
                                                          #:color '(text-onyx-300
                                                                    dark:text-stone-300)))))
                                            (assoc-ref song-version-count-alist
@@ -71,13 +69,13 @@
                                         (assoc-ref aaa "identifier")))
                               this-song-artists-relations)) artists))
 
-         (extra-top-info `((div (@ (class ,(mk-class '(text-center flex
-                                                       flex-col gap-2
-                                                       align-center))))
+         (extra-top-info `((div (@ (class ,(mk-class '(py-2 text-center flex
+                                                            flex-col gap-2
+                                                            align-center))))
                                 ,(map (lambda (ar)
                                         (a (assoc-ref ar "display_name")
                                            #:weight '(font-light)
-                                           #:size '(text-lg)
+                                           #:size '(text-md)
                                            #:href (format #f
                                                           "/artists/uuid/~a"
                                                           (assoc-ref ar
@@ -142,47 +140,46 @@
                                                  justify-center
                                                  md:justify-between))))
                      (,(unless only-tiles
-                         (sub-h2 `(div (@ (class ,(mk-class '(flex flex-row
-                                                              items-center
-                                                              align-center
-                                                              gap-1))))
-                                       ,(G_ "viewing songs:"))
-                                 #:weight '(font-light)
-                                 #:size '(text-4xl)
+                         (h4 `(div (@ (class ,(mk-class '(flex flex-row
+                                                               items-center
+                                                               align-center
+                                                               gap-1))))
+                                   ,(G_ "viewing songs:"))
+                             #:weight '(font-light)
+                             #:size '(text-2xl)
 
-                                 #:family '(font-serif))) ,(unless only-tiles
-                                                             `(div (@ (class ,
-                                                                             (mk-class '
-                                                                              (flex
-                                                                               flex-wrap
-                                                                               flex-row
-                                                                               justify-center
-                                                                               gap-2))))
-                                                                   (div (@ (class ,
-                                                                            (mk-class '
-                                                                             (flex
-                                                                              flex-wrap
-                                                                              flex-row
-                                                                              justify-start
-                                                                              items-center))))
-                                                                        ,(sort-select
-                                                                          G_
-                                                                          #:entity 'song
-                                                                          #:user-sort
-                                                                          user-sort))
-                                                                   (div (@ (class ,
-                                                                            (mk-class '
-                                                                             (flex
-                                                                              flex-wrap
-                                                                              flex-row
-                                                                              gap-3
-                                                                              justify-right
-                                                                              items-center))))
+                             #:family '(font-serif))) ,(unless only-tiles
+                                                         `(div (@ (class ,(mk-class '
+                                                                           (flex
+                                                                            flex-wrap
+                                                                            flex-row
+                                                                            justify-center
+                                                                            gap-2))))
+                                                               (div (@ (class ,
+                                                                              (mk-class '
+                                                                               (flex
+                                                                                flex-wrap
+                                                                                flex-row
+                                                                                justify-start
+                                                                                items-center))))
+                                                                    ,(sort-select
+                                                                      G_
+                                                                      #:entity 'song
+                                                                      #:user-sort
+                                                                      user-sort))
+                                                               (div (@ (class ,
+                                                                              (mk-class '
+                                                                               (flex
+                                                                                flex-wrap
+                                                                                flex-row
+                                                                                gap-3
+                                                                                justify-right
+                                                                                items-center))))
 
-                                                                        ,(search-box
-                                                                          G_
-                                                                          #:search-query
-                                                                          search-query))))
+                                                                    ,(search-box
+                                                                      G_
+                                                                      #:search-query
+                                                                      search-query))))
                       (div (div (@ (class ,(mk-class '(grid gap-4
                                                             sm:grid-cols-2
                                                             md:grid-cols-3
@@ -259,10 +256,16 @@
                                  genres)))
     (html-template G_
                    #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class '(p-3 sm:p-1 md:p-0))))
+                   #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
+                                                           md:py-4))))
                                  ((div (@ (class ,(mk-class '(flex flex-col
                                                                    gap-4))))
-                                       ,(h2 (assoc-ref song "display_name"))
+                                       (div (@ (class ,(mk-class '(py-4))))
+                                            ,(h2 (assoc-ref song
+                                                            "display_name")
+                                                 #:size '(text-3xl md:text-10)
+                                                 #:weight '(font-light
+                                                            leading-10)))
                                        ,(when (not (nil? artists))
                                           `((div (@ (class ,(mk-class '(flex
                                                                         flex-row
