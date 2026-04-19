@@ -31,13 +31,7 @@
                                 song-content-new-page song-content-form))
 
 (define* (render-song-content G_ song song-contents ascii-size)
-  `(div ,(hr)
-        (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))
-             ,(sub-h2 (G_ "musical contents:"))
-             ,(ascii-size-select G_
-                                 #:route (format #f "/~as/uuid/~a"
-                                                 'song
-                                                 (assoc-ref song "identifier")))
+  `(div (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))
              (div ,(map (lambda (version)
                           (render-version G_ song version ascii-size))
                         song-contents))
@@ -232,7 +226,8 @@
                                                    ,(G_ "PDF contents"))
                                           (iframe (@ (src ,pdf-contents)
                                                      (width "100%")
-                                                     (class ,(mk-class '(min-h-screen)))) "")))))
+                                                     (class ,(mk-class '(min-h-screen))))
+                                                  "")))))
          (pdf-content-section (render-if-nestring render-pdf-content
                                                   cleaned-pdf-data)))
     `(,(hr) (details (@ (open true))

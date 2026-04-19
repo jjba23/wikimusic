@@ -44,7 +44,9 @@
   (let* ((extra-bot-info (render-if-nempty (lambda (vc)
                                              `((div (@ (class ,(mk-class '(flex
                                                                            flex-row
-                                                                           gap-2 justify-center align-center))))
+                                                                           gap-2
+                                                                           justify-center
+                                                                           align-center))))
                                                     ,(em (format #f "~a ~a"
                                                                  (car vc)
                                                                  (G_
@@ -257,7 +259,7 @@
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
-                                                           md:py-4))))
+                                                             md:py-4))))
                                  ((div (@ (class ,(mk-class '(flex flex-col
                                                                    gap-4))))
                                        (div (@ (class ,(mk-class '(py-4))))
@@ -297,7 +299,16 @@
                                                              #:comments
                                                              comments
                                                              #:user-alist
-                                                             user-alist)))))
+                                                             user-alist))
+                                       (div ,(sub-h2 (G_ "musical contents:"))
+                                            ,(ascii-size-select G_
+                                                                #:route (format
+                                                                         #f
+                                                                         "/~as/uuid/~a"
+                                                                         'song
+                                                                         (assoc-ref
+                                                                          song
+                                                                          "identifier")))))))
                             ,(render-external-sources G_ external-sources)
                             (div (@ (class ,(mk-class '(px-4 py-6 container
                                                              mx-auto))))
