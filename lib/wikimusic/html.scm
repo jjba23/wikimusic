@@ -313,7 +313,7 @@
                                                border-2
                                                border-persia-pink-100/25
                                                dark:border-persia-pink-900/10))))
-           (div (@ (class ,(mk-class '(flex flex-col                                            
+           (div (@ (class ,(mk-class '(flex flex-col
                                             py-3
                                             px-3
                                             justify-center
@@ -337,9 +337,10 @@
                                      (else (car artworks))))
                 (div (@ (class ,(mk-class '(text-center))))
                      ,(a (assoc-ref x "display_name")
-                         #:size (list 'text-2xl
+                         #:size (list 'text-xl
                                       'leading-9)
                          #:weight '(font-light)
+                         #:family '(font-serif)
                          #:href item-link
                          #:color '(text-onyx-300 dark:text-stone-100)
                          #:hover '(hover:text-persia-pink-500
@@ -347,15 +348,15 @@
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,extra-top-info)
                 ;; (div (@ (class ,(mk-class '(pt-2 flex flex-row gap-2))))
-                ;;      (span (@ (class ,(mk-class '(font-black
-                ;;                                   text-asparagus-900
-                ;;                                   dark:text-asparagus-300
-                ;;                                   text-md))))
-                ;;            ,(format #f "~a" likes))
-                ;;      (span (@ (class ,(mk-class '(font-black text-redwood-700
-                ;;                                   dark:text-redwood-300
-                ;;                                   text-md))))
-                ;;            ,(format #f "~a" dislikes)))
+                ;; (span (@ (class ,(mk-class '(font-black
+                ;; text-asparagus-900
+                ;; dark:text-asparagus-300
+                ;; text-md))))
+                ;; ,(format #f "~a" likes))
+                ;; (span (@ (class ,(mk-class '(font-black text-redwood-700
+                ;; dark:text-redwood-300
+                ;; text-md))))
+                ;; ,(format #f "~a" dislikes)))
                 (div (@ (class ,(mk-class '(flex flex-row
                                                  gap-2
                                                  flex-wrap
@@ -368,7 +369,10 @@
                                        (G_ "views"))
                                #:size '(text-sm)
                                #:color '(text-onyx-300 dark:text-stone-300)))
-                     ,(p "|" #:color '(text-onyx-500 dark:text-stone-700) #:weight '(font-light) #:size '(text-sm))
+                     ,(p "|"
+                         #:color '(text-onyx-500 dark:text-stone-700)
+                         #:weight '(font-light)
+                         #:size '(text-sm))
                      (div (@ (class ,(mk-class '(flex flex-row gap-1))))
                           ,(em (format #f "~a ~a"
                                        (length comments)
@@ -826,15 +830,16 @@ function addSearchQueryParam(form) {
                                                                  gap-1))))
                                           (span ,label)
                                           ,(icon #:type 'link
-                                                 #:icon-css '(text-stone-600
-                                                              text-2xl
-                                                              dark:text-stone-400
+                                                 #:icon-css '(text-china-violet-700
+                                                              dark:text-china-violet-300
                                                               hover:text-persia-pink-500
-                                                              hover:dark:text-persia-pink-300))))
+                                                              hover:dark:text-persia-pink-300
+                                                              text-2xl))))
                                    #:href l
                                    #:size '(text-lg)
-                                   #:color '(text-stone-600
-                                             dark:text-stone-400)
+                                   #:weight '(font-light)
+                                   #:color '(text-china-violet-700
+                                             dark:text-china-violet-300)
                                    #:hover '(hover:text-persia-pink-500
                                              hover:dark:text-persia-pink-300))
 

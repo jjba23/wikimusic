@@ -255,62 +255,8 @@
 
                                                       (assoc-ref ar
                                                                  "identifier"))))))
-                                 genres)))
-    (html-template G_
-                   #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
-                                                             md:py-4))))
-                                 ((div (@ (class ,(mk-class '(flex flex-col
-                                                                   gap-4))))
-                                       (div (@ (class ,(mk-class '(py-4))))
-                                            ,(h2 (assoc-ref song
-                                                            "display_name")
-                                                 #:size '(text-3xl md:text-10)
-                                                 #:weight '(font-light
-                                                            leading-10)))
-                                       ,(when (not (nil? artists))
-                                          `((div (@ (class ,(mk-class '(flex
-                                                                        flex-row
-                                                                        flex-wrap
-                                                                        gap-4
-                                                                        items-center
-                                                                        align-center
-                                                                        justify-start))))
-                                                 ,(em "by:")
-                                                 ,artist-name-titles)))
-                                       ,(when (not (nil? genres))
-                                          `((div (@ (class ,(mk-class '(flex
-                                                                        flex-row
-                                                                        flex-wrap
-                                                                        gap-4
-                                                                        items-center
-                                                                        align-center
-                                                                        justify-start))))
-                                                 ,(em "genres:")
-                                                 ,genre-name-titles))))
-                                  
-                                  (div (div ,(entity-details G_
-                                                             #:entity 'song
-                                                             #:x song
-                                                             #:artworks
-                                                             artworks
-                                                             #:opinions
-                                                             opinions
-                                                             #:comments
-                                                             comments
-                                                             #:user-alist
-                                                             user-alist))
-                                       (div ,(sub-h2 (G_ "musical contents:"))
-                                            ,(ascii-size-select G_
-                                                                #:route (format
-                                                                         #f
-                                                                         "/~as/uuid/~a"
-                                                                         'song
-                                                                         (assoc-ref
-                                                                          song
-                                                                          "identifier")))))))
-                            ,(render-external-sources G_ external-sources)
-                            (div (@ (class ,(mk-class '(px-4 py-6 container
+                                 genres))
+         (song-attributes `((div (@ (class ,(mk-class '(px-4 py-6 container
                                                              mx-auto))))
                                  (dl ,(render-if-nestring (lambda (tuning)
                                                             (list (dt (G_
@@ -344,7 +290,63 @@
                                                                   (dd (a (uri-decode
                                                                           album-link)))))
                                                           (assoc-ref song
-                                                           "album_info_link"))))
+                                                           "album_info_link")))))))
+    (html-template G_
+                   #:is-logged-in is-logged-in
+                   #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
+                                                             md:py-4))))
+                                 ((div (@ (class ,(mk-class '(flex flex-col
+                                                                   gap-4))))
+                                       (div (@ (class ,(mk-class '(py-4))))
+                                            ,(h2 (assoc-ref song
+                                                            "display_name")
+                                                 #:size '(text-3xl md:text-10)
+                                                 #:family '(font-serif)
+                                                 #:weight '(font-light
+                                                            leading-10)))
+                                       ,(when (not (nil? artists))
+                                          `((div (@ (class ,(mk-class '(flex
+                                                                        flex-row
+                                                                        flex-wrap
+                                                                        gap-4
+                                                                        items-center
+                                                                        align-center
+                                                                        justify-start))))
+                                                 ,(em "by:")
+                                                 ,artist-name-titles)))
+                                       ,(when (not (nil? genres))
+                                          `((div (@ (class ,(mk-class '(flex
+                                                                        flex-row
+                                                                        flex-wrap
+                                                                        gap-4
+                                                                        items-center
+                                                                        align-center
+                                                                        justify-start))))
+                                                 ,(em "genres:")
+                                                 ,genre-name-titles))))
+                                  
+                                  (div (div ,(entity-details G_
+                                                             #:entity 'song
+                                                             #:x song
+                                                             #:artworks
+                                                             artworks
+                                                             #:opinions
+                                                             opinions
+                                                             #:comments
+                                                             comments
+                                                             #:user-alist
+                                                             user-alist)))))
+                            ,(render-external-sources G_ external-sources)
+                            (div song-attributes
+                                 (div (@ (class ,(mk-class '(py-1 px-5))))
+                                      ,(sub-h4 (G_ "musical content pref:"))
+                                      ,(ascii-size-select G_
+                                                          #:route (format #f
+                                                                   "/~as/uuid/~a"
+                                                                   'song
+                                                                   (assoc-ref
+                                                                    song
+                                                                    "identifier")))))
 
                             (div ,(render-song-content G_ song song-contents
                                                        ascii-size))))))

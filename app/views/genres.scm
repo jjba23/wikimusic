@@ -145,6 +145,7 @@
                                ((div (@ (class ,(mk-class '(py-4))))
                                      ,(h2 (assoc-ref genre "display_name")
                                           #:size '(text-3xl md:text-10)
+                                          #:family '(font-serif)
                                           #:weight '(font-light leading-10)))
                                 (div (div ,(entity-details G_
                                                            #:entity 'genre
