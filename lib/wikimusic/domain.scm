@@ -52,17 +52,17 @@
   (let* ((k (cond
               ((eq? entity
                     'artist)
-               "artist_identifier")
+               'artist-identifier)
               ((eq? entity
                     'genre)
-               "genre_identifier")
+               'genre-identifier)
               ((eq? entity
                     'song)
-               "song_identifier")
-              (else "song_identifier"))))
+               'song-identifier)
+              (else 'song-identifier))))
     (filter (lambda (related-entity)
-              (equal? (assoc-ref x "identifier")
-                      (assoc-ref related-entity k))) related-entities)))
+              (equal? (assq-ref x 'identifier)
+                      (assq-ref related-entity k))) related-entities)))
 
 (define-public (entity-sort-from-query user-sort)
   "Translates a user-provided sort query string into a database-friendly sort specification.

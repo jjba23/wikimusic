@@ -328,13 +328,10 @@
                                                                              w-full
                                                                              max-w-prose
                                                                              shadow-xl)))
-                                                         (src ,(uri-decode (assoc-ref
+                                                         (src ,(uri-decode (assq-ref
                                                                             art
-                                                                            "content_url"))))))))
-                                   (cond
-                                     ((nil? artworks)
-                                      '())
-                                     (else (car artworks))))
+                                                                            'content-url))))))))
+                                   artworks)
                 (div (@ (class ,(mk-class '(text-center))))
                      ,(a (assoc-ref x "display_name")
                          #:size (list 'text-xl
@@ -425,9 +422,9 @@
                                                                         lg:w-128
                                                                         max-w-full
                                                                         h-auto)))
-                                                    (src ,(uri-decode (assoc-ref
+                                                    (src ,(uri-decode (assq-ref
                                                                        art
-                                                                       "content_url")))))
+                                                                       'content-url)))))
                                             ,(render-if-nempty (lambda (fc)
                                                                  `(figcaption (@
                                                                                (class ,
@@ -435,8 +432,8 @@
                                                                                  (text-onyx-300
                                                                                   dark:text-stone-300))))
                                                                               ,fc))
-                                                               (assoc-ref art
-                                                                "content_caption"))))
+                                                               (assq-ref art
+                                                                'content-caption))))
                                  artworks))
          (rendered-comments (render-comments G_ user-alist #f comments))
          (like-count (length (filter (lambda (o)

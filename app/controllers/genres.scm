@@ -42,6 +42,8 @@
         (uuid generate)
         (wikimusic domain genre)
         (wikimusic sqlite genre)
+        (wikimusic domain genre-artwork)
+        (wikimusic sqlite genre-artwork)        
         (app views songs)
         (app views genres))
 
@@ -50,7 +52,8 @@
      #:i18n '(cookie "lang")
      #:cookies '(names wikimusic-genre-sort x-bewaking-wikimusic)
      (lambda (rc)
-       (let* ((user-search (cond
+       (let* ((genre-artwork-repo (make-sqlite-genre-artwork-repository rc))
+              (user-search (cond
                              ((equal? #f
                                       (get-from-qstr rc "search"))
                               #f)
@@ -83,45 +86,43 @@
                              ((not (nil? (get-from-qstr rc "limit")))
                               (string->number (get-from-qstr rc "limit")))
                              (else 40)))
-              (genres (DB-get-all-rows (DB-query (DB-open rc)
-                                                 (cond
-                                                   ((equal? #f user-search)
-                                                    (->sql select * from
-                                                           'genres
-                                                           (format #f
-                                                            " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
-                                                            (car query-sort)
-                                                            (cadr query-sort)
-                                                            query-limit
-                                                            query-offset)))
-                                                   (else (->sql select * from
-                                                                'genres
-                                                                (format #f
-                                                                 (string-join '
-                                                                  (" WHERE (display_name LIKE '%~a%' OR description LIKE '%~a%') "
-                                                                   " ORDER BY ~a ~a LIMIT ~a OFFSET ~a ")
-                                                                  " ")
-                                                                 (html-escape
-                                                                  user-search)
-                                                                 (html-escape
-                                                                  user-search)
-                                                                 (car
-                                                                  query-sort)
-                                                                 (cadr
-                                                                  query-sort)
-                                                                 query-limit
-                                                                 query-offset)))))))
+              (genres (get-genres genre-repo #:order-by (format #f "~a ~a"                                                             (car query-sort)
+                                                            (cadr query-sort))
+                                  #:limit query-limit
+                                  #:offset query-offset))
+              ;; (genres (DB-get-all-rows (DB-query (DB-open rc)
+              ;;                                    (cond
+              ;;                                      ((equal? #f user-search)
+              ;;                                       (->sql select * from
+              ;;                                              'genres
+              ;;                                              (format #f
+              ;;                                               " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
+
+              ;;                                               query-limit
+              ;;                                               query-offset)))
+              ;;                                      (else (->sql select * from
+              ;;                                                   'genres
+              ;;                                                   (format #f
+              ;;                                                    (string-join '
+              ;;                                                     (" WHERE (display_name LIKE '%~a%' OR description LIKE '%~a%') "
+              ;;                                                      " ORDER BY ~a ~a LIMIT ~a OFFSET ~a ")
+              ;;                                                     " ")
+              ;;                                                    (html-escape
+              ;;                                                     user-search)
+              ;;                                                    (html-escape
+              ;;                                                     user-search)
+              ;;                                                    (car
+              ;;                                                     query-sort)
+              ;;                                                    (cadr
+              ;;                                                     query-sort)
+              ;;                                                    query-limit
+              ;;                                                    query-offset)))))))
               (genre-ids (map (lambda (s)
                                 (assoc-ref s "identifier")) genres))
               (artworks (cond
                           ((nil? genre-ids)
                            '())
-                          (else ($genre_artworks 'get
-                                                 #:ret 'all
-                                                 #:order-by '(order_value asc)
-                                                 #:condition (where
-                                                                    #:genre_identifier
-                                                                    genre-ids)))))
+                          (else (get-genre-artworks-by-genre-ids genre-artwork-repo genre-ids))))
               (opinions (cond
                           ((nil? genre-ids)
                            '())
@@ -137,7 +138,7 @@
                                                  #:ret 'all
                                                  #:condition (where
                                                                     #:genre_identifier
-                                                                    genre-ids))))))
+                                                                    genre-ids))))) )
          (response-emit (:mime rc
                                (genre-list-page (:i18n rc)
                                                 #:genres genres
