@@ -43,7 +43,9 @@
         (app views song-contents)
         (app models users)
         (wikimusic sqlite song)
-        (wikimusic domain song)        
+        (wikimusic domain song)
+        (wikimusic sqlite artist)
+        (wikimusic domain artist)
         (app views songs))
 
 (get "/songs"
@@ -226,7 +228,9 @@
      #:cookies '(names wikimusic-ascii-size x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((song-repo (make-sqlite-song-repository rc))
-              (ssong (get-song-by-id song-repo (params rc "uuid")))
+              (artist-repo (make-sqlite-artist-repository rc))
+              (ssong (get-song-by-id song-repo
+                                     (params rc "uuid")))
               (_ (write ssong))
               (ascii-size (cond
                             ((not (equal? #f
@@ -306,17 +310,17 @@
                                  song-artists))
               (artists (if (nil? artist-uuids)
                            '()
-                           ($artists 'get
-                                     #:ret 'all
-                                     #:condition (where #:identifier
-                                                        artist-uuids)))))
+                           (get-artists-by-ids artist-repo artist-uuids)
+                           ;; ($artists 'get
+                           ;; #:ret 'all
+                           ;; #:condition (where #:identifier
+                           ;; artist-uuids))
+                           )))
          
          ;; do views update
-         (DB-query (DB-open rc)
-                   (->sql update
-                          'songs set
-                          `((views ,inc-v))
-                          (where #:identifier uuid)))
+         (update-song-by-id song-repo
+                            (params rc "uuid")
+                            `((views unquote inc-v)))
 
          ;; return rendered view
          (response-emit (:mime rc

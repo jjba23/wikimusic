@@ -82,7 +82,7 @@
       rows))
 
   (define (update-song-by-id id attrs)
-    (let* ((query (format #f "UPDATE song SET ~a WHERE identifier = ~a"
+    (let* ((query (format #f "UPDATE songs SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
                           (value->sql-literal id)))
            (_ (log-info "update-song-by-id query:\n\t~a\n" query)))
@@ -98,7 +98,7 @@
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
                       insert-columns))
-           (query (format #f "INSERT INTO song (~a) VALUES (~a)"
+           (query (format #f "INSERT INTO songs (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
            (_ (log-info "insert-song query:\n\t~a\n" query)))

@@ -72,8 +72,19 @@
                         (length rows))))
       rows))
 
+    (define (get-artists-by-ids ids)
+    (let* ((query (format #f "SELECT ~a FROM artists WHERE identifier IN(~a)"
+                          (symbols->sql-columns-list columns)
+                          (string-join (map value->sql-literal ids) ", ")))
+           (_ (log-info "get-artists-by-ids query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query conn query))))
+           (_ (log-info "get-artists-by-ids rows: ~a\n"
+                        (length rows))))
+      rows))
+
   (define (update-artist-by-id id attrs)
-    (let* ((query (format #f "UPDATE artist SET ~a WHERE identifier = ~a"
+    (let* ((query (format #f "UPDATE artists SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
                           (value->sql-literal id)))
            (_ (log-info "update-artist-by-id query:\n\t~a\n" query)))
@@ -89,13 +100,14 @@
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
                       insert-columns))
-           (query (format #f "INSERT INTO artist (~a) VALUES (~a)"
+           (query (format #f "INSERT INTO artists (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
            (_ (log-info "insert-artist query:\n\t~a\n" query)))
       (DB-query conn query)))
 
   (mk-artist-repository #:get-artist-by-id-proc get-artist-by-id
+                        #:get-artists-by-ids-proc get-artists-by-ids
                         #:get-artists-proc get-artists
                         #:insert-artist-proc insert-artist
                         #:delete-artist-by-id-proc delete-artist-by-id

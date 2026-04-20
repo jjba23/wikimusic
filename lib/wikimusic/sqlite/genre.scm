@@ -61,6 +61,17 @@
       (if (nil? rows) #f
           (car rows))))
 
+      (define (get-genres-by-ids ids)
+    (let* ((query (format #f "SELECT ~a FROM genres WHERE identifier IN(~a)"
+                          (symbols->sql-columns-list columns)
+                          (string-join (map value->sql-literal ids) ", ")))
+           (_ (log-info "get-genres-by-ids query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query conn query))))
+           (_ (log-info "get-genres-by-ids rows: ~a\n"
+                        (length rows))))
+      rows))
+
   (define (get-genres)
     (let* ((query (format #f "SELECT ~a FROM genres
                    ORDER BY display_name ASC"
@@ -73,7 +84,7 @@
       rows))
 
   (define (update-genre-by-id id attrs)
-    (let* ((query (format #f "UPDATE genre SET ~a WHERE identifier = ~a"
+    (let* ((query (format #f "UPDATE genres SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
                           (value->sql-literal id)))
            (_ (log-info "update-genre-by-id query:\n\t~a\n" query)))
@@ -89,13 +100,14 @@
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
                       insert-columns))
-           (query (format #f "INSERT INTO genre (~a) VALUES (~a)"
+           (query (format #f "INSERT INTO genres (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
            (_ (log-info "insert-genre query:\n\t~a\n" query)))
       (DB-query conn query)))
 
   (mk-genre-repository #:get-genre-by-id-proc get-genre-by-id
+                       #:get-genres-by-ids-proc get-genres-by-ids
                         #:get-genres-proc get-genres
                         #:insert-genre-proc insert-genre
                         #:delete-genre-by-id-proc delete-genre-by-id

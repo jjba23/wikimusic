@@ -19,7 +19,7 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (wikimusic domain repo)
-  #:export (get-genre-by-id get-genres insert-genre delete-genre-by-id
+  #:export (get-genre-by-id get-genres-by-ids get-genres insert-genre delete-genre-by-id
                            update-genre-by-id))
 
 ;; -- Record definition ---
@@ -28,6 +28,7 @@
                                           genre-repository?)
                        mk-genre-repository
                        (get-genre-by-id-proc repo-get-genre-by-id)
+                       (get-genres-by-ids-proc repo-get-genres-by-ids)                       
                        (get-genres-proc repo-get-genres)
                        (insert-genre-proc repo-insert-genre)
                        (delete-genre-by-id-proc repo-delete-genre-by-id)
@@ -37,6 +38,9 @@
 
 (define-repo-method get-genre-by-id repo-get-genre-by-id
                     "Retrieves a genre by their ID from the given REPO.")
+
+(define-repo-method get-genres-by-ids repo-get-genres-by-ids
+                    "Retrieves genres by their IDs from the given REPO.")
 
 (define-repo-method get-genres repo-get-genres
  "Retrieves a list of all active genres from the given REPO.")

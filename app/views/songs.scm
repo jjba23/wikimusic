@@ -227,7 +227,7 @@
                            is-logged-in)
   
   (let* ((artist-name-titles (map (lambda (ar)
-                                    `((div ,(a (assoc-ref ar "display_name")
+                                    `((div ,(a (assq-ref ar 'display-name)
                                                #:size '(text-lg)
                                                #:weight '(font-light)
                                                #:color '(text-onyx-300
@@ -238,8 +238,8 @@
                                                #:href (format #f
                                                        "/artists/uuid/~a"
 
-                                                       (assoc-ref ar
-                                                        "identifier"))))))
+                                                       (assq-ref ar
+                                                        'identifier))))))
                                   artists))
          (genre-name-titles (map (lambda (ar)
                                    `((div ,(a (assoc-ref ar "display_name")
