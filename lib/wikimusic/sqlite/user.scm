@@ -27,10 +27,12 @@
 ;; --- SQLite implementation ---
 (define (make-sqlite-user-repository rc)
   (define columns
-    '(id username email password salt permissions))
+    '(identifier username email password salt permissions))
 
   (define insert-columns
-    '(id username email password salt permissions))
+    '(identifier username email password salt permissions))
+
+  (define conn (DB-open rc))
 
   (define (get-id-to-username)
     (let* ((query (format #f "SELECT ~a FROM user
@@ -38,7 +40,7 @@
                           (symbols->sql-columns-list columns)))
            (_ (log-info "get-id-to-username query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+                      (DB-get-all-rows (DB-query conn query))))
            (mapped-rows (map (lambda (r)
                                (cons (assq-ref r
                                                'id)
@@ -54,19 +56,19 @@
                           (value->sql-literal email)))
            (_ (log-info "get-user-by-email query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+                      (DB-get-all-rows (DB-query conn query))))
            (_ (log-info "get-user-by-email rows: ~a\n"
                         (length rows))))
       (if (nil? rows) #f
           (car rows))))
 
   (define (get-user-by-id id)
-    (let* ((query (format #f "SELECT ~a FROM user WHERE id = ~a LIMIT 1"
+    (let* ((query (format #f "SELECT ~a FROM user WHERE identifier = ~a LIMIT 1"
                           (symbols->sql-columns-list columns)
                           (value->sql-literal id)))
            (_ (log-info "get-user-by-id query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+                      (DB-get-all-rows (DB-query conn query))))
            (_ (log-info "get-user-by-id rows: ~a\n"
                         (length rows))))
       (if (nil? rows) #f
@@ -78,23 +80,23 @@
                           (symbols->sql-columns-list columns)))
            (_ (log-info "get-users query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+                      (DB-get-all-rows (DB-query conn query))))
            (_ (log-info "get-users rows: ~a\n"
                         (length rows))))
       rows))
 
   (define (update-user-by-id id attrs)
-    (let* ((query (format #f "UPDATE user SET ~a WHERE id = ~a"
+    (let* ((query (format #f "UPDATE user SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
                           (value->sql-literal id)))
            (_ (log-info "update-user-by-id query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+      (DB-query conn query)))
 
   (define (delete-user-by-id id)
-    (let* ((query (format #f "DELETE FROM user WHERE id = ~a"
+    (let* ((query (format #f "DELETE FROM user WHERE identifier = ~a"
                           (value->sql-literal id)))
            (_ (log-info "delete-user-by-id query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+      (DB-query conn query)))
 
   (define (insert-user attrs)
     (let* ((vals (map (lambda (x)
@@ -104,7 +106,7 @@
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
            (_ (log-info "insert-user query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+      (DB-query conn query)))
 
   (mk-user-repository #:get-id-to-username-proc get-id-to-username
                       #:get-user-by-email-proc get-user-by-email
