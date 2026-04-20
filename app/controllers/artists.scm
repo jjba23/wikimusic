@@ -39,6 +39,8 @@
         (bewaking bewaking)
         (app models users)
         (app views songs)
+        (wikimusic domain artist)
+        (wikimusic sqlite artist)
         (app views artists))
 
 ;; ====== Data view GET routes ======
@@ -155,34 +157,34 @@
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
-       (let* ((uuid (params rc "uuid"))
-              (artist (car ($artists 'get
-                                     #:ret 'top
-                                     #:condition (where #:identifier uuid))))
+       (let* ((artist-id (params rc "uuid"))
+              (artist-repo (make-sqlite-artist-repository rc))
+              (artist (get-artist-by-id artist-repo artist-id))
               (inc-v (+ 1
-                        (assoc-ref artist "views")))
+                        (assq-ref artist
+                                  'views)))
               (artworks ($artist_artworks 'get
                                           #:ret 'all
                                           #:order-by '(order_value asc)
                                           #:condition (where
                                                              #:artist_identifier
-                                                             uuid)))
+                                                             artist-id)))
               (opinions ($artist_opinions 'get
                                           #:ret 'all
                                           #:condition (where
                                                              #:artist_identifier
-                                                             uuid)))
+                                                             artist-id)))
               (comments ($artist_comments 'get
                                           #:ret 'all
                                           #:order-by '(created_at asc)
                                           #:condition (where
                                                              #:artist_identifier
-                                                             uuid)))
+                                                             artist-id)))
               (raw-external-sources ($artist_external_sources 'get
                                                               #:ret 'top
                                                               #:condition (where
                                                                            #:artist_identifier
-                                                                           uuid)))
+                                                                           artist-id)))
               (external-sources (if (nil? raw-external-sources)
                                     '()
                                     (car raw-external-sources)))
@@ -218,7 +220,7 @@
                                                 (format #f
                                                  "SELECT * FROM songs WHERE identifier IN
                                                              (SELECT song_identifier FROM song_artists WHERE artist_identifier = '~a') ORDER BY ~a ~a"
-                                                 uuid
+                                                 artist-id
                                                  (car song-query-sort)
                                                  (cadr song-query-sort)))))
               (song-ids (map (lambda (s)
@@ -285,12 +287,8 @@
                                              #:offset 0
                                              #:search-query ""
                                              #:user-sort song-user-sort)))
-         ;; do views update
-         (DB-query (DB-open rc)
-                   (->sql update
-                          'artists set
-                          `((views ,inc-v))
-                          (where #:identifier uuid)))
+         (update-artist-by-id artist-repo artist-id
+                              `((views unquote inc-v)))
          (response-emit (:mime rc
                                (artist-detail-page (:i18n rc)
                                                    #:artist artist

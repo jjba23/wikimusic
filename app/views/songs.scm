@@ -298,8 +298,8 @@
                                  ((div (@ (class ,(mk-class '(flex flex-col
                                                                    gap-4))))
                                        (div (@ (class ,(mk-class '(py-4))))
-                                            ,(h2 (assoc-ref song
-                                                            "display_name")
+                                            ,(h2 (assq-ref song
+                                                            'display-name)
                                                  #:size '(text-3xl md:text-10)
                                                  #:family '(font-serif)
                                                  #:weight '(font-light

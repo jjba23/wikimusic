@@ -40,6 +40,8 @@
         (bewaking bewaking)
         (kracht prelude)
         (uuid generate)
+        (wikimusic domain genre)
+        (wikimusic sqlite genre)
         (app views songs)
         (app views genres))
 
@@ -165,31 +167,31 @@
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
-       (let* ((uuid (params rc "uuid"))
-              (genre (car ($genres 'get
-                                   #:ret 'top
-                                   #:condition (where #:identifier uuid))))
+       (let* ((genre-id (params rc "uuid"))
+              (genre-repo (make-sqlite-genre-repository rc))
+              (genre (get-genre-by-id genre-repo genre-id))
               (inc-v (+ 1
-                        (assoc-ref genre "views")))
+                        (assq-ref genre
+                                  'views)))
               (artworks ($genre_artworks 'get
                                          #:ret 'all
                                          #:order-by '(order_value asc)
                                          #:condition (where #:genre_identifier
-                                                            uuid)))
+                                                            genre-id)))
               (opinions ($genre_opinions 'get
                                          #:ret 'all
                                          #:condition (where #:genre_identifier
-                                                            uuid)))
+                                                            genre-id)))
               (comments ($genre_comments 'get
                                          #:ret 'all
                                          #:order-by '(created_at asc)
                                          #:condition (where #:genre_identifier
-                                                            uuid)))
+                                                            genre-id)))
               (raw-external-sources ($genre_external_sources 'get
                                                              #:ret 'top
                                                              #:condition (where
                                                                           #:genre_identifier
-                                                                          uuid)))
+                                                                          genre-id)))
               (external-sources (if (nil? raw-external-sources)
                                     '()
                                     (car raw-external-sources)))
@@ -224,7 +226,7 @@
                                                 (format #f
                                                  "SELECT * FROM songs WHERE identifier IN
                                                              (SELECT song_identifier FROM song_genres WHERE genre_identifier = '~a') ORDER BY ~a ~a"
-                                                 uuid
+                                                 genre-id
                                                  (car song-query-sort)
                                                  (cadr song-query-sort)))))
               (song-ids (map (lambda (s)
@@ -308,12 +310,8 @@
                                              #:offset 0
                                              #:search-query ""
                                              #:user-sort song-user-sort)))
-         ;; do views update
-         (DB-query (DB-open rc)
-                   (->sql update
-                          'genres set
-                          `((views ,inc-v))
-                          (where #:identifier uuid)))
+         (update-genre-by-id genre-repo genre-id
+                             `((views unquote inc-v)))
          (response-emit (:mime rc
                                (genre-detail-page (:i18n rc)
                                                   #:genre genre

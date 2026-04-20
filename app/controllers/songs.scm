@@ -229,9 +229,9 @@
      (lambda (rc)
        (let* ((song-repo (make-sqlite-song-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
-              (ssong (get-song-by-id song-repo
-                                     (params rc "uuid")))
-              (_ (write ssong))
+              (song-id (params rc "uuid"))              
+              (song (get-song-by-id song-repo
+                                     song-id))
               (ascii-size (cond
                             ((not (equal? #f
                                           (get-from-qstr rc "ascii-size")))
@@ -251,31 +251,27 @@
                                            "wikimusic-ascii-size")))
                              (:cookies-value rc "wikimusic-ascii-size"))
                             (else "text-sm")))
-              (uuid (params rc "uuid"))
-              (song (car ($songs 'get
-                                 #:ret 'top
-                                 #:condition (where #:identifier uuid))))
               (inc-v (+ 1
-                        (assoc-ref song "views")))
+                        (assq-ref song 'views)))
               (artworks ($song_artworks 'get
                                         #:ret 'all
                                         #:order-by '(order_value asc)
                                         #:condition (where #:song_identifier
-                                                           uuid)))
+                                                           song-id)))
               (opinions ($song_opinions 'get
                                         #:ret 'all
                                         #:condition (where #:song_identifier
-                                                           uuid)))
+                                                           song-id)))
               (comments ($song_comments 'get
                                         #:ret 'all
                                         #:order-by '(created_at asc)
                                         #:condition (where #:song_identifier
-                                                           uuid)))
+                                                           song-id)))
               (raw-external-sources ($song_external_sources 'get
                                                             #:ret 'top
                                                             #:condition (where
                                                                          #:song_identifier
-                                                                         uuid)))
+                                                                         song-id)))
               (external-sources (if (nil? raw-external-sources)
                                     '()
                                     (car raw-external-sources)))
@@ -287,11 +283,11 @@
                                              #:ret 'all
                                              #:condition (where
                                                                 #:song_identifier
-                                                                uuid)))
+                                                                song-id)))
               (song-genres ($song_genres 'get
                                          #:ret 'all
                                          #:condition (where #:song_identifier
-                                                            uuid)))
+                                                            song-id)))
               (genre-uuids (map (lambda (a)
                                   (assoc-ref a "genre_identifier"))
                                 song-genres))
@@ -304,22 +300,17 @@
                                            #:ret 'all
                                            #:condition (where
                                                               #:song_identifier
-                                                              uuid)))
+                                                              song-id)))
               (artist-uuids (map (lambda (a)
                                    (assoc-ref a "artist_identifier"))
                                  song-artists))
               (artists (if (nil? artist-uuids)
                            '()
-                           (get-artists-by-ids artist-repo artist-uuids)
-                           ;; ($artists 'get
-                           ;; #:ret 'all
-                           ;; #:condition (where #:identifier
-                           ;; artist-uuids))
-                           )))
+                           (get-artists-by-ids artist-repo artist-uuids)                           )))
          
          ;; do views update
          (update-song-by-id song-repo
-                            (params rc "uuid")
+                            song-id
                             `((views unquote inc-v)))
 
          ;; return rendered view
