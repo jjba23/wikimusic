@@ -45,8 +45,7 @@
                  content-url
                  content-caption
                  order-value
-                 created-at
-                 last-edited-at))
+                 created-at))
 
   (define conn
     (DB-open rc))

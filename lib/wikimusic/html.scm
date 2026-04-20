@@ -331,7 +331,9 @@
                                                          (src ,(uri-decode (assq-ref
                                                                             art
                                                                             'content-url))))))))
-                                   artworks)
+                                   (cond
+                                    ((nil? artworks) '())
+                                    (else (car artworks))))
                 (div (@ (class ,(mk-class '(text-center))))
                      ,(a (assoc-ref x "display_name")
                          #:size (list 'text-xl

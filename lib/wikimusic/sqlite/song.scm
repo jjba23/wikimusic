@@ -70,10 +70,11 @@
       (if (nil? rows) #f
           (car rows))))
 
-  (define (get-songs)
+  (define* (get-songs #:key (order-by "created_at DESC") (limit 50) (offset 0))
     (let* ((query (format #f "SELECT ~a FROM songs
-                   ORDER BY display_name ASC"
-                          (symbols->sql-columns-list columns)))
+                   ORDER BY ~a LIMIT ~a OFFSET ~a"
+                          (symbols->sql-columns-list columns)
+                          order-by limit offset))
            (_ (log-info "get-songs query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))

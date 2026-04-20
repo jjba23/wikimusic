@@ -46,7 +46,8 @@
                  views
                  description))
 
-  (define conn (DB-open rc))
+  (define conn
+    (DB-open rc))
 
   (define (get-genre-by-id id)
     (let* ((query (format #f
@@ -61,7 +62,7 @@
       (if (nil? rows) #f
           (car rows))))
 
-      (define (get-genres-by-ids ids)
+  (define (get-genres-by-ids ids)
     (let* ((query (format #f "SELECT ~a FROM genres WHERE identifier IN(~a)"
                           (symbols->sql-columns-list columns)
                           (string-join (map value->sql-literal ids) ", ")))
@@ -72,10 +73,11 @@
                         (length rows))))
       rows))
 
-  (define (get-genres)
+  (define* (get-genres #:key (order-by "created_at DESC") (limit 50) (offset 0))
     (let* ((query (format #f "SELECT ~a FROM genres
-                   ORDER BY display_name ASC"
-                          (symbols->sql-columns-list columns)))
+                   ORDER BY ~a LIMIT ~a OFFSET ~a"
+                          (symbols->sql-columns-list columns)
+                          order-by limit offset))
            (_ (log-info "get-genres query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
@@ -108,7 +110,7 @@
 
   (mk-genre-repository #:get-genre-by-id-proc get-genre-by-id
                        #:get-genres-by-ids-proc get-genres-by-ids
-                        #:get-genres-proc get-genres
-                        #:insert-genre-proc insert-genre
-                        #:delete-genre-by-id-proc delete-genre-by-id
-                        #:update-genre-by-id-proc update-genre-by-id))
+                       #:get-genres-proc get-genres
+                       #:insert-genre-proc insert-genre
+                       #:delete-genre-by-id-proc delete-genre-by-id
+                       #:update-genre-by-id-proc update-genre-by-id))
