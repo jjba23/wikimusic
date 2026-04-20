@@ -41,6 +41,8 @@
         (app views songs)
         (wikimusic domain artist)
         (wikimusic sqlite artist)
+        (wikimusic domain artist-artwork)
+        (wikimusic sqlite artist-artwork)
         (app views artists))
 
 ;; ====== Data view GET routes ======
@@ -50,7 +52,8 @@
      #:i18n '(cookie "lang")
      #:cookies '(names wikimusic-artist-sort x-bewaking-wikimusic)
      (lambda (rc)
-       (let* ((user-search (cond
+       (let* ((artist-artwork-repo (make-sqlite-artist-artwork-repository rc))
+              (user-search (cond
                              ((equal? #f
                                       (get-from-qstr rc "search"))
                               #f)
@@ -116,12 +119,8 @@
               (artworks (cond
                           ((nil? artist-ids)
                            '())
-                          (else ($artist_artworks 'get
-                                                  #:ret 'all
-                                                  #:order-by '(order_value asc)
-                                                  #:condition (where
-                                                               #:artist_identifier
-                                                               artist-ids)))))
+                          (else (get-artist-artworks-by-artist-ids
+                                 artist-artwork-repo artist-ids))))
               (opinions (cond
                           ((nil? artist-ids)
                            '())
