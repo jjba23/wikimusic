@@ -46,6 +46,8 @@
                  views
                  description))
 
+  (define conn (DB-open rc))
+
   (define (get-genre-by-id id)
     (let* ((query (format #f
                    "SELECT ~a FROM genres WHERE identifier = ~a LIMIT 1"
@@ -53,7 +55,7 @@
                    (value->sql-literal id)))
            (_ (log-info "get-genre-by-id query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+                      (DB-get-all-rows (DB-query conn query))))
            (_ (log-info "get-genre-by-id rows: ~a\n"
                         (length rows))))
       (if (nil? rows) #f
@@ -65,7 +67,7 @@
                           (symbols->sql-columns-list columns)))
            (_ (log-info "get-genres query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+                      (DB-get-all-rows (DB-query conn query))))
            (_ (log-info "get-genres rows: ~a\n"
                         (length rows))))
       rows))
@@ -75,13 +77,13 @@
                           (string-join (map pair->sql-assignment attrs) ", ")
                           (value->sql-literal id)))
            (_ (log-info "update-genre-by-id query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+      (DB-query conn query)))
 
   (define (delete-genre-by-id id)
     (let* ((query (format #f "DELETE FROM genres WHERE identifier = ~a"
                           (value->sql-literal id)))
            (_ (log-info "delete-genre-by-id query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+      (DB-query conn query)))
 
   (define (insert-genre attrs)
     (let* ((vals (map (lambda (x)
@@ -91,7 +93,7 @@
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
            (_ (log-info "insert-genre query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+      (DB-query conn query)))
 
   (mk-genre-repository #:get-genre-by-id-proc get-genre-by-id
                         #:get-genres-proc get-genres

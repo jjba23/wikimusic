@@ -55,6 +55,8 @@
                  views
                  description))
 
+    (define conn (DB-open rc))
+
   (define (get-song-by-id id)
     (let* ((query (format #f
                    "SELECT ~a FROM songs WHERE identifier = ~a LIMIT 1"
@@ -62,7 +64,7 @@
                    (value->sql-literal id)))
            (_ (log-info "get-song-by-id query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+                      (DB-get-all-rows (DB-query conn query))))
            (_ (log-info "get-song-by-id rows: ~a\n"
                         (length rows))))
       (if (nil? rows) #f
@@ -74,7 +76,7 @@
                           (symbols->sql-columns-list columns)))
            (_ (log-info "get-songs query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+                      (DB-get-all-rows (DB-query conn query))))
            (_ (log-info "get-songs rows: ~a\n"
                         (length rows))))
       rows))
@@ -84,13 +86,13 @@
                           (string-join (map pair->sql-assignment attrs) ", ")
                           (value->sql-literal id)))
            (_ (log-info "update-song-by-id query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+      (DB-query conn query)))
 
   (define (delete-song-by-id id)
     (let* ((query (format #f "DELETE FROM songs WHERE identifier = ~a"
                           (value->sql-literal id)))
            (_ (log-info "delete-song-by-id query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+      (DB-query conn query)))
 
   (define (insert-song attrs)
     (let* ((vals (map (lambda (x)
@@ -100,7 +102,7 @@
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
            (_ (log-info "insert-song query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+      (DB-query conn query)))
 
   (mk-song-repository #:get-song-by-id-proc get-song-by-id
                       #:get-songs-proc get-songs
