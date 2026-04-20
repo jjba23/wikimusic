@@ -42,6 +42,8 @@
         (bewaking bewaking)
         (app views song-contents)
         (app models users)
+        (wikimusic sqlite song)
+        (wikimusic domain song)        
         (app views songs))
 
 (get "/songs"
@@ -223,7 +225,10 @@
      #:i18n '(cookie "lang")
      #:cookies '(names wikimusic-ascii-size x-bewaking-wikimusic)
      (lambda (rc)
-       (let* ((ascii-size (cond
+       (let* ((song-repo (make-sqlite-song-repository rc))
+              (ssong (get-song-by-id song-repo (params rc "uuid")))
+              (_ (write ssong))
+              (ascii-size (cond
                             ((not (equal? #f
                                           (get-from-qstr rc "ascii-size")))
                              (:cookies-set! rc
