@@ -34,7 +34,7 @@
 ;; --- eDSL: Embedded Domain Specific Language ---
 
 (define-repo-method get-artworks-by-entity-ids repo-get-artworks-by-entity-ids
- "Retrieves artworks by their genre IDs from the given REPO.")
+ "Retrieves artworks by their entity IDs from the given REPO.")
 
 (define-repo-method insert-artwork repo-insert-artwork
                     "Inserts a artwork with ATTRS in the given REPO.")

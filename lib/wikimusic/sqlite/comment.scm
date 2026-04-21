@@ -26,48 +26,52 @@
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-comment-repository rc)
-  (define columns
-    '(identifier parent-identifier
-                 created-by
-                 visibility-status
-                 contents
-                 approved-by
-                 created-at
-                 last-edited-at))
+  (define (columns entity)
+    (append (list (string->symbol (format #f "~a_identifier" entity)))
+            '(identifier parent-identifier
+                         created-by
+                         visibility-status
+                         approved-by
+                         contents
+                         created-at
+                         last-edited-at)))
 
-  (define insert-columns
-    '(identifier parent-identifier
-                 created-by
-                 visibility-status
-                 contents
-                 approved-by
-                 created-at))
+  (define (insert-columns entity)
+    (append (list (string->symbol (format #f "~a_identifier" entity)))
+            '(identifier parent-identifier created-by
+                         visibility-status
+                         approved-by
+                         contents
+                         created-at)))
 
   (define conn
     (DB-open rc))
 
   (define (get-comments-by-entity-ids entity ids)
     (let* ((query (format #f
-                   "SELECT ~a FROM genre_comments WHERE genre_identifier IN(~a)"
-                   (symbols->sql-columns-list columns)
+                   "SELECT ~a FROM ~a_comments WHERE ~a_identifier IN(~a) ORDER BY created_at DESC"
+                   (symbols->sql-columns-list (columns entity))
+                   entity
+                   entity
                    (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-comments-by-ids query:\n\t~a\n" query))
+           (_ (log-info "get-comments-by-entity-ids query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-comments-by-ids rows: ~a\n"
+           (_ (log-info "get-comments-by-entity-ids rows: ~a\n"
                         (length rows))))
       rows))
 
   (define (update-comment-by-id entity id attrs)
-    (let* ((query (format #f
-                   "UPDATE genre_comments SET ~a WHERE identifier = ~a"
-                   (string-join (map pair->sql-assignment attrs) ", ")
-                   (value->sql-literal id)))
+    (let* ((query (format #f "UPDATE ~a_comments SET ~a WHERE identifier = ~a"
+                          entity
+                          (string-join (map pair->sql-assignment attrs) ", ")
+                          (value->sql-literal id)))
            (_ (log-info "update-comment-by-id query:\n\t~a\n" query)))
       (DB-query conn query)))
 
   (define (delete-comment-by-id entity id)
-    (let* ((query (format #f "DELETE FROM comments WHERE identifier = ~a"
+    (let* ((query (format #f "DELETE FROM ~a_comments WHERE identifier = ~a"
+                          entity
                           (value->sql-literal id)))
            (_ (log-info "delete-comment-by-id query:\n\t~a\n" query)))
       (DB-query conn query)))
@@ -76,8 +80,8 @@
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
                       insert-columns))
-           (query (format #f "INSERT INTO genre_comments (~a) VALUES (~a)"
-                          (symbols->sql-columns-list insert-columns)
+           (query (format #f "INSERT INTO ~a_comments (~a) VALUES (~a)" entity
+                          (symbols->sql-columns-list (insert-columns entity))
                           (string-join vals ", ")))
            (_ (log-info "insert-comment query:\n\t~a\n" query)))
       (DB-query conn query)))

@@ -34,7 +34,7 @@
 ;; --- eDSL: Embedded Domain Specific Language ---
 
 (define-repo-method get-comments-by-entity-ids repo-get-comments-by-entity-ids
- "Retrieves comments by their genre IDs from the given REPO.")
+ "Retrieves comments by their entity IDs from the given REPO.")
 
 (define-repo-method insert-comment repo-insert-comment
                     "Inserts a comment with ATTRS in the given REPO.")
