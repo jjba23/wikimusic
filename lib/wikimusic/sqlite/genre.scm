@@ -77,7 +77,8 @@
                        (limit 100)
                        (offset 0))
     (let* ((query (format #f
-                          "SELECT ~a FROM genres\n                   ORDER BY ~a LIMIT ~a OFFSET ~a"
+                          "SELECT ~a FROM genres
+                   ORDER BY ~a LIMIT ~a OFFSET ~a"
                           (symbols->sql-columns-list columns)
                           order-by
                           limit
@@ -95,7 +96,9 @@
                           (offset 0))
     (let* ((search (value->sql-literal (format #f "%~a%" s)))
            (query (format #f
-                   "SELECT ~a FROM genres\n                   WHERE (display_name LIKE ~a OR description LIKE ~a)\n                   ORDER BY ~a LIMIT ~a OFFSET ~a"
+                   "SELECT ~a FROM genres
+                   WHERE (display_name LIKE ~a OR description LIKE ~a)
+                   ORDER BY ~a LIMIT ~a OFFSET ~a"
                    (symbols->sql-columns-list columns)
                    search
                    search

@@ -28,12 +28,11 @@
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (artist-list-page artist-detail-page ))
+  #:export (artist-list-page artist-detail-page))
 
 (define* (artist-list-page G_
                            #:key artists
                            artworks
-                           opinions
                            comments
                            limit
                            offset

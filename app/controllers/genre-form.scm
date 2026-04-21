@@ -53,7 +53,6 @@
         (wikimusic domain external-source)
         (wikimusic sqlite external-source))
 
-
 (post "/genres/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
       #:i18n '(cookie "lang")

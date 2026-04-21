@@ -101,9 +101,9 @@
                                         hover:underline
                                         gap-3)))
                     (href "https://www.buymeacoffee.com/jjbigorra"))
-                 (span "\U01fa77")
+                 (span "🩷")
                  ,(G_ "donate what you can, by clicking here")
-                 (span "\U01fa77")))
+                 (span "🩷")))
          (p ,(G_
               "This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong."))
 

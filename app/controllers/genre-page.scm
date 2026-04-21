@@ -124,14 +124,6 @@
                            '())
                           (else (get-artworks-by-entity-ids artwork-repo
                                                             'genre genre-ids))))
-              (opinions (cond
-                          ((nil? genre-ids)
-                           '())
-                          (else ($genre_opinions 'get
-                                                 #:ret 'all
-                                                 #:condition (where
-                                                                    #:genre_identifier
-                                                                    genre-ids)))))
               (comments (cond
                           ((nil? genre-ids)
                            '())

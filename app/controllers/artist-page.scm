@@ -50,6 +50,8 @@
         (wikimusic sqlite external-source)
         (wikimusic domain song)
         (wikimusic sqlite song)
+        (wikimusic domain user)
+        (wikimusic sqlite user)
         (app views artist-view)
         (app views artist-edit)
         (app views song-view)
@@ -125,11 +127,6 @@
                            '())
                           (else (get-artworks-by-entity-ids artwork-repo
                                                             'artist artist-ids))))
-              (opinions (cond
-                          ((nil? artist-ids)
-                           '())
-                          (else (get-opinions-by-entity-ids opinion-repo
-                                                            'artist artist-ids))))
               (comments (cond
                           ((nil? artist-ids)
                            '())
@@ -139,7 +136,6 @@
                                (artist-list-page (:i18n rc)
                                                  #:artists artists
                                                  #:artworks artworks
-                                                 #:opinions opinions
                                                  #:comments comments
                                                  #:limit query-limit
                                                  #:offset query-offset
@@ -161,6 +157,7 @@
               (opinion-repo (make-sqlite-opinion-repository rc))
               (comment-repo (make-sqlite-comment-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
+              (user-repo (make-sqlite-user-repository rc))
               (song-repo (make-sqlite-song-repository rc))
               (inc-v (+ 1
                         (assq-ref artist
@@ -181,11 +178,10 @@
               (external-sources (if (nil? raw-external-sources)
                                     '()
                                     (car raw-external-sources)))
-              (users ($users 'get
-                             #:ret 'all
-                             #:order-by '(username asc)))
+              (users (get-users user-repo))
               (user-alist (map (lambda (u)
-                                 `(,(assoc-ref u "identifier") ,u)) users))
+                                 `(,(assq-ref u
+                                              'identifier) ,u)) users))
 
               ;; song-specific
               (song-user-sort (cond

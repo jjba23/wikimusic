@@ -36,8 +36,8 @@
     (DB-open rc))
 
   (define (get-id-to-username)
-    (let* ((query (format #f
-                          "SELECT ~a FROM user\n                   ORDER BY username ASC"
+    (let* ((query (format #f "SELECT ~a FROM users
+                   ORDER BY username ASC"
                           (symbols->sql-columns-list columns)))
            (_ (log-info "get-id-to-username query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
@@ -52,7 +52,7 @@
       mapped-rows))
 
   (define (get-user-by-email email)
-    (let* ((query (format #f "SELECT ~a FROM user WHERE email = ~a LIMIT 1"
+    (let* ((query (format #f "SELECT ~a FROM users WHERE email = ~a LIMIT 1"
                           (symbols->sql-columns-list columns)
                           (value->sql-literal email)))
            (_ (log-info "get-user-by-email query:\n\t~a\n" query))
@@ -65,9 +65,9 @@
 
   (define (get-user-by-id id)
     (let* ((query (format #f
-                          "SELECT ~a FROM user WHERE identifier = ~a LIMIT 1"
-                          (symbols->sql-columns-list columns)
-                          (value->sql-literal id)))
+                   "SELECT ~a FROM users WHERE identifier = ~a LIMIT 1"
+                   (symbols->sql-columns-list columns)
+                   (value->sql-literal id)))
            (_ (log-info "get-user-by-id query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
@@ -77,8 +77,8 @@
           (car rows))))
 
   (define (get-users)
-    (let* ((query (format #f
-                          "SELECT ~a FROM user\n                   ORDER BY username ASC"
+    (let* ((query (format #f "SELECT ~a FROM users
+                   ORDER BY username ASC"
                           (symbols->sql-columns-list columns)))
            (_ (log-info "get-users query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
@@ -88,14 +88,14 @@
       rows))
 
   (define (update-user-by-id id attrs)
-    (let* ((query (format #f "UPDATE user SET ~a WHERE identifier = ~a"
+    (let* ((query (format #f "UPDATE users SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
                           (value->sql-literal id)))
            (_ (log-info "update-user-by-id query:\n\t~a\n" query)))
       (DB-query conn query)))
 
   (define (delete-user-by-id id)
-    (let* ((query (format #f "DELETE FROM user WHERE identifier = ~a"
+    (let* ((query (format #f "DELETE FROM users WHERE identifier = ~a"
                           (value->sql-literal id)))
            (_ (log-info "delete-user-by-id query:\n\t~a\n" query)))
       (DB-query conn query)))
@@ -104,7 +104,7 @@
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
                       insert-columns))
-           (query (format #f "INSERT INTO user (~a) VALUES (~a)"
+           (query (format #f "INSERT INTO users (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
            (_ (log-info "insert-user query:\n\t~a\n" query)))

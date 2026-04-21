@@ -36,7 +36,19 @@
   #:use-module (artanis route))
 
 (define-public (relevant-entities entity related-entities x)
-  "Filters a list of related entities based on a matching identifier.\n\n  ENTITY: A symbol representing the type of the primary entity ('artist, 'genre, or 'song).\n  RELATED-ENTITIES: A list of association lists, where each association list\n                    represents a related entity and contains key-value pairs.\n  X: An association list representing the primary entity, containing an\n     'identifier' key.\n\n  Returns a new list containing only the related entities whose identifier\n  matches the identifier of the primary entity (X), based on the ENTITY type.\n  For 'artist', it compares against the 'artist_identifier' in related entities.\n  For 'genre', it compares against the 'genre_identifier'.\n  For 'song' (or any other ENTITY), it compares against the 'song_identifier'."
+  "Filters a list of related entities based on a matching identifier.
+
+  ENTITY: A symbol representing the type of the primary entity ('artist, 'genre, or 'song).
+  RELATED-ENTITIES: A list of association lists, where each association list
+                    represents a related entity and contains key-value pairs.
+  X: An association list representing the primary entity, containing an
+     'identifier' key.
+
+  Returns a new list containing only the related entities whose identifier
+  matches the identifier of the primary entity (X), based on the ENTITY type.
+  For 'artist', it compares against the 'artist_identifier' in related entities.
+  For 'genre', it compares against the 'genre_identifier'.
+  For 'song' (or any other ENTITY), it compares against the 'song_identifier'."
   (let* ((k (cond
               ((eq? entity
                     'artist)
@@ -54,7 +66,22 @@
                       (assq-ref related-entity k))) related-entities)))
 
 (define-public (entity-sort-from-query user-sort)
-  "Translates a user-provided sort query string into a database-friendly sort specification.\n\n  USER-SORT: A string representing the user's sorting preference.\n             Possible values include:\n               - created-at-desc\n               - created-at-asc\n               - last-edited-at-desc\n               - last-edited-at-asc\n               - display-name-desc\n               - display-name-asc\n               - views-desc\n               - views-asc\n             Any other string will default to sorting by 'last_edited_at' descending.\n\n  Returns a list containing two elements: the field to sort by (a symbol)\n  and the sort order (the symbol 'asc' for ascending or 'desc' for descending)."
+  "Translates a user-provided sort query string into a database-friendly sort specification.
+
+  USER-SORT: A string representing the user's sorting preference.
+             Possible values include:
+               - created-at-desc
+               - created-at-asc
+               - last-edited-at-desc
+               - last-edited-at-asc
+               - display-name-desc
+               - display-name-asc
+               - views-desc
+               - views-asc
+             Any other string will default to sorting by 'last_edited_at' descending.
+
+  Returns a list containing two elements: the field to sort by (a symbol)
+  and the sort order (the symbol 'asc' for ascending or 'desc' for descending)."
   (cond
     ((equal? "created-at-desc" user-sort)
      '(created_at desc))

@@ -28,7 +28,7 @@
   #:use-module (ice-9 i18n)
   #:use-module (srfi srfi-1)
   #:use-module (app views song-content-edit)
-  #:use-module (app views song-content-view)  
+  #:use-module (app views song-content-view)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
   #:export (render-song-tile song-list-page song-detail-page))

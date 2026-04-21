@@ -55,11 +55,13 @@
                    entity
                    entity
                    (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-external-sources-by-entity-ids query:\n\t~a\n"
-                        query))
+           (_ (log-info "get-external-sources-by-entity-ids query:
+	~a
+" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-external-sources-by-entity-ids rows: ~a\n"
+           (_ (log-info "get-external-sources-by-entity-ids rows: ~a
+"
                         (length rows))))
       rows))
 

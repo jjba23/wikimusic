@@ -75,7 +75,8 @@
                       (limit 100)
                       (offset 0))
     (let* ((query (format #f
-                          "SELECT ~a FROM songs\n                   ORDER BY ~a LIMIT ~a OFFSET ~a"
+                          "SELECT ~a FROM songs
+                   ORDER BY ~a LIMIT ~a OFFSET ~a"
                           (symbols->sql-columns-list columns)
                           order-by
                           limit
@@ -90,7 +91,10 @@
   (define* (get-songs-by-artist-id id
                                    #:key (order-by "display_name DESC"))
     (let* ((query (format #f
-                   "SELECT ~a FROM songs\n                   WHERE identifier IN (SELECT song_identifier FROM song_artists WHERE\n                    artist_identifier = ~a)\n                   ORDER BY ~a"
+                   "SELECT ~a FROM songs
+                   WHERE identifier IN (SELECT song_identifier FROM song_artists WHERE
+                    artist_identifier = ~a)
+                   ORDER BY ~a"
                    (symbols->sql-columns-list columns)
                    (value->sql-literal id) order-by))
            (_ (log-info "get-songs-by-artist-id query:\n\t~a\n" query))
@@ -103,7 +107,10 @@
   (define* (get-songs-by-genre-id id
                                   #:key (order-by "display_name DESC"))
     (let* ((query (format #f
-                   "SELECT ~a FROM songs\n                   WHERE identifier IN (SELECT song_identifier FROM song_genres WHERE\n                    genre_identifier = ~a)\n                   ORDER BY ~a"
+                   "SELECT ~a FROM songs
+                   WHERE identifier IN (SELECT song_identifier FROM song_genres WHERE
+                    genre_identifier = ~a)
+                   ORDER BY ~a"
                    (symbols->sql-columns-list columns)
                    (value->sql-literal id) order-by))
            (_ (log-info "get-songs-by-genre-id query:\n\t~a\n" query))
@@ -119,7 +126,9 @@
                          (offset 0))
     (let* ((search (value->sql-literal (format #f "%~a%" s)))
            (query (format #f
-                   "SELECT ~a FROM songs\n                   WHERE (display_name LIKE ~a OR description LIKE ~a)\n                   ORDER BY ~a LIMIT ~a OFFSET ~a"
+                   "SELECT ~a FROM songs
+                   WHERE (display_name LIKE ~a OR description LIKE ~a)
+                   ORDER BY ~a LIMIT ~a OFFSET ~a"
                    (symbols->sql-columns-list columns)
                    search
                    search

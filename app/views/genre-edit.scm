@@ -28,10 +28,7 @@
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export ( genre-edit-page genre-new-page
-                            genre-form))
-
-
+  #:export (genre-edit-page genre-new-page genre-form))
 
 (define* (genre-edit-page G_
                           #:key genre
@@ -61,14 +58,13 @@
                                                           "order_value"))))
                     artworks))
          (body `(div (@ (class ,(mk-class '(px-2 py-4))))
-                     (div (@(class ,(mk-class '(py-3))))
+                     (div (@ (class ,(mk-class '(py-3))))
                           ,(if (assoc-ref genre "identifier")
-                          (h2 (format #f "~a: ~a"
-                                      (G_ "editing genre")
-                                      (assoc-ref genre "display_name")))
-                          (h2 (G_ "new genre"))))
-                     (details 
-                              (summary (@ (class ,(mk-class '(font-black
+                               (h2 (format #f "~a: ~a"
+                                           (G_ "editing genre")
+                                           (assoc-ref genre "display_name")))
+                               (h2 (G_ "new genre"))))
+                     (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
                                                               dark:text-stone-300
                                                               text-md
@@ -76,8 +72,7 @@
                                        ,(G_ "edit artworks"))
                               ,arts)
                      ,(hr)
-                     (details 
-                              (summary (@ (class ,(mk-class '(font-black
+                     (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
                                                               dark:text-stone-300
                                                               text-md
@@ -104,8 +99,7 @@
                                            #:description (assoc-ref-or-empty-str
                                                           genre "description")))
                      ,(hr)
-                     (details 
-                              (summary (@ (class ,(mk-class '(font-black
+                     (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
                                                               dark:text-stone-300
                                                               text-md

@@ -38,10 +38,10 @@
         (app models song_genres)
         (app models song_external_sources)
         (uuid generate)
-                                (app views song-view)
+        (app views song-view)
         (app views song-edit)
-                                (app views song-content-view)
-        (app views song-content-edit)    
+        (app views song-content-view)
+        (app views song-content-edit)
         (bewaking bewaking)
         (app models users)
         (wikimusic sqlite song)
@@ -122,14 +122,6 @@
                            '())
                           (else (get-artworks-by-entity-ids artwork-repo
                                                             'song song-ids))))
-              (opinions (cond
-                          ((nil? song-ids)
-                           '())
-                          (else ($song_opinions 'get
-                                                #:ret 'all
-                                                #:condition (where
-                                                                   #:song_identifier
-                                                                   song-ids)))))
               (comments (cond
                           ((nil? song-ids)
                            '())
@@ -336,7 +328,9 @@
               (artwork-repo (make-sqlite-artwork-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (song (get-song-by-id song-repo song-id))
-              (artworks (get-artworks-by-entity-ids artwork-repo 'song (list song-id)))
+              (artworks (get-artworks-by-entity-ids artwork-repo
+                                                    'song
+                                                    (list song-id)))
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
@@ -368,7 +362,9 @@
                                      #:ret 'all
                                      #:condition (where #:identifier
                                                         artist-uuids))))
-              (e (get-external-sources-by-entity-ids external-source-repo 'song (list song-id)))              
+              (e (get-external-sources-by-entity-ids external-source-repo
+                                                     'song
+                                                     (list song-id)))
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '())))

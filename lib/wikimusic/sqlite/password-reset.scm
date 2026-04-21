@@ -48,7 +48,8 @@
                                                'ticket-id)
                                      (assq-ref r
                                                'user-id))) rows))
-           (_ (log-info "get-password-reset-by-token mapped-rows: ~a\n"
+           (_ (log-info "get-password-reset-by-token mapped-rows: ~a
+"
                         (length mapped-rows))))
       (if (nil? rows) #f
           (car rows))))
@@ -56,8 +57,9 @@
   (define (delete-password-reset-by-user-id user-id)
     (let* ((query (format #f "DELETE FROM password_reset WHERE user_id = ~a"
                           (value->sql-literal user-id)))
-           (_ (log-info "delete-password-reset-by-user-id query:\n\t~a\n"
-                        query)))
+           (_ (log-info "delete-password-reset-by-user-id query:
+	~a
+" query)))
       (DB-query conn query)))
 
   (define (insert-password-reset attrs)

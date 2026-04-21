@@ -27,7 +27,7 @@
   #:use-module (kracht prelude)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (render-song-content render-version ))
+  #:export (render-song-content render-version))
 
 (define* (render-song-content G_ song song-contents ascii-size)
   `(div (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))

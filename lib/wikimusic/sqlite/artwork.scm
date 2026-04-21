@@ -52,7 +52,8 @@
 
   (define (get-artworks-by-entity-ids entity ids)
     (let* ((query (format #f
-                   "SELECT ~a FROM ~a_artworks WHERE ~a_identifier IN(~a)\n                   ORDER BY order_value ASC"
+                   "SELECT ~a FROM ~a_artworks WHERE ~a_identifier IN(~a)
+                   ORDER BY order_value ASC"
                    (symbols->sql-columns-list (columns entity))
                    entity
                    entity

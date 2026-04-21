@@ -28,12 +28,11 @@
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (genre-list-page genre-detail-page ))
+  #:export (genre-list-page genre-detail-page))
 
 (define* (genre-list-page G_
                           #:key genres
                           artworks
-                          opinions
                           comments
                           limit
                           offset

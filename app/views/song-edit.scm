@@ -175,7 +175,7 @@
                                             (action ,(format #f
                                                       "/songs/uuid/~a/artists"
                                                       (assq-ref song
-                                                                 'identifier))))
+                                                                'identifier))))
                                          (div ,(input #:label "artist UUID"
                                                       #:name 'artist-identifier
                                                       #:value ""
@@ -190,11 +190,10 @@
                                                        application/x-www-form-urlencoded)
                                                       (action ,(format #f
                                                                 "/songs/uuid/~a/artists/~a/delete"
-                                                                (assq-ref
-                                                                 song
+                                                                (assq-ref song
                                                                  'identifier)
                                                                 (assq-ref a
-                                                                 'identifier))))
+                                                                          'identifier))))
                                                    (div (@ (class ,(mk-class '
                                                                              (flex
                                                                               flex-row
@@ -202,7 +201,7 @@
                                                                               gap-2
                                                                               items-center))))
                                                         ,(h4 (assq-ref a
-                                                              'display-name))
+                                                                       'display-name))
                                                         ,(icon-button #:icon 'trash
                                                                       #:content
                                                                       ""

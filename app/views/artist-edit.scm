@@ -28,10 +28,7 @@
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export ( artist-edit-page
-                             artist-new-page artist-form))
-
-
+  #:export (artist-edit-page artist-new-page artist-form))
 
 (define* (artist-edit-page G_
                            #:key artist
@@ -64,22 +61,20 @@
                                                                    "order_value"))))
                              artworks))
          (body `(div (@ (class ,(mk-class '(px-2 py-4))))
-(div (@(class ,(mk-class '(py-3))))
+                     (div (@ (class ,(mk-class '(py-3))))
                           ,(if (assoc-ref artist "identifier")
-                          (h2 (format #f "~a: ~a"
-                                      (G_ "editing artist")
-                                      (assoc-ref artist "display_name")))
-                          (h2 (G_ "new artist"))))
-                     (details 
-                              (summary (@ (class ,(mk-class '(font-black
+                               (h2 (format #f "~a: ~a"
+                                           (G_ "editing artist")
+                                           (assoc-ref artist "display_name")))
+                               (h2 (G_ "new artist"))))
+                     (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "edit artworks"))
                               ,artwork-forms)
                      ,(hr)
-                     (details 
-                              (summary (@ (class ,(mk-class '(font-black
+                     (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
                                                               dark:text-stone-300
                                                               text-md
@@ -107,8 +102,7 @@
                                                            artist
                                                            "description")))
                      ,(hr)
-                     (details 
-                              (summary (@ (class ,(mk-class '(font-black
+                     (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
                                                               dark:text-stone-300
                                                               text-md
