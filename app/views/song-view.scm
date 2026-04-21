@@ -242,7 +242,7 @@
                                                                  'identifier))))))
                                   artists))
          (genre-name-titles (map (lambda (ar)
-                                   `((div ,(a (assoc-ref ar "display_name")
+                                   `((div ,(a (assoc-ref ar 'display-name)
                                               #:size '(text-lg)
                                               #:weight '(font-light)
                                               #:color '(text-onyx-300
@@ -253,8 +253,8 @@
                                               #:href (format #f
                                                       "/genres/uuid/~a"
 
-                                                      (assoc-ref ar
-                                                                 "identifier"))))))
+                                                      (assq-ref ar
+                                                                 'identifier))))))
                                  genres))
          (song-attributes `((div (@ (class ,(mk-class '(px-4 py-6 container
                                                              mx-auto))))

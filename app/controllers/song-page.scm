@@ -56,6 +56,8 @@
         (wikimusic sqlite external-source)
         (wikimusic domain user)
         (wikimusic sqlite user)
+        (wikimusic domain genre)
+        (wikimusic sqlite genre)        
         (wikimusic sqlite artist)
         (wikimusic domain artist))
 
@@ -219,6 +221,7 @@
      (lambda (rc)
        (let* ((song-repo (make-sqlite-song-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
+              (genre-repo (make-sqlite-genre-repository rc))              
               (artwork-repo (make-sqlite-artwork-repository rc))
               (comment-repo (make-sqlite-comment-repository rc))
               (opinion-repo (make-sqlite-opinion-repository rc))
@@ -269,34 +272,20 @@
                                               'created-by)))
               (user-alist (list (cons (assq-ref user
                                                 'identifier) user)))
+
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
                                                                 #:song_identifier
                                                                 song-id)))
-              (song-genres ($song_genres 'get
-                                         #:ret 'all
-                                         #:condition (where #:song_identifier
-                                                            song-id)))
-              (genre-uuids (map (lambda (a)
-                                  (assoc-ref a "genre_identifier"))
-                                song-genres))
-              (genres (if (nil? genre-uuids)
+              (song-genres (get-song-genres-by-id song-repo song-id))
+              (genres (if (nil? song-genres)
                           '()
-                          ($genres 'get
-                                   #:ret 'all
-                                   #:condition (where #:identifier genre-uuids))))
-              (song-artists ($song_artists 'get
-                                           #:ret 'all
-                                           #:condition (where
-                                                              #:song_identifier
-                                                              song-id)))
-              (artist-uuids (map (lambda (a)
-                                   (assoc-ref a "artist_identifier"))
-                                 song-artists))
-              (artists (if (nil? artist-uuids)
+                          (get-genres-by-ids genre-repo song-genres)))
+              (song-artists (get-song-artists-by-id song-repo song-id))
+              (artists (if (nil? song-artists)
                            '()
-                           (get-artists-by-ids artist-repo artist-uuids))))
+                           (get-artists-by-ids artist-repo song-artists))))
          
          ;; do views update
          (update-song-by-id song-repo song-id

@@ -142,6 +142,34 @@
                         (length rows))))
       rows))
 
+    (define* (get-song-artists-by-id id)
+    (let* ((query (format #f "SELECT artist_identifier FROM song_artists
+                   WHERE song_identifier = ~a
+                   ORDER BY created_at DESC"
+                          (value->sql-literal id)))
+           (_ (log-info "get-song-artists-by-id query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query conn query))))
+           (_ (log-info "get-songs-artists-by-id rows: ~a\n"
+                        (length rows))))
+      (map (lambda (r)
+             (assq-ref r
+                   'artist-identifier)) rows)))
+    
+  (define* (get-song-genres-by-id id)
+    (let* ((query (format #f "SELECT genre_identifier FROM song_genres
+                   WHERE song_identifier = ~a
+                   ORDER BY created_at DESC"
+                          (value->sql-literal id)))
+           (_ (log-info "get-song-genres-by-id query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query conn query))))
+           (_ (log-info "get-songs-genres-by-id rows: ~a\n"
+                        (length rows))))
+      (map (lambda (r)
+             (assq-ref r
+                   'genre-identifier)) rows)))
+
   (define (update-song-by-id id attrs)
     (let* ((query (format #f "UPDATE songs SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
@@ -169,6 +197,8 @@
                       #:get-songs-proc get-songs
                       #:get-songs-by-artist-id-proc get-songs-by-artist-id
                       #:get-songs-by-genre-id-proc get-songs-by-genre-id
+                      #:get-song-genres-by-id-proc get-song-genres-by-id
+                      #:get-song-artists-by-id-proc get-song-artists-by-id                      
                       #:search-songs-proc search-songs
                       #:insert-song-proc insert-song
                       #:delete-song-by-id-proc delete-song-by-id
