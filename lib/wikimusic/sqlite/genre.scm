@@ -85,6 +85,21 @@
                         (length rows))))
       rows))
 
+    (define* (search-genres s #:key (order-by "created_at DESC") (limit 50) (offset 0))
+    (let* ((search (value->sql-literal (format #f "%~a%" s)))
+           (query (format #f "SELECT ~a FROM genres
+                   WHERE (display_name LIKE ~a OR description LIKE ~a)
+                   ORDER BY ~a LIMIT ~a OFFSET ~a"
+                          (symbols->sql-columns-list columns)
+                          search search
+                          order-by limit offset))
+           (_ (log-info "get-genres query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query conn query))))
+           (_ (log-info "get-genres rows: ~a\n"
+                        (length rows))))
+      rows))
+
   (define (update-genre-by-id id attrs)
     (let* ((query (format #f "UPDATE genres SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
@@ -111,6 +126,7 @@
   (mk-genre-repository #:get-genre-by-id-proc get-genre-by-id
                        #:get-genres-by-ids-proc get-genres-by-ids
                        #:get-genres-proc get-genres
+                       #:search-genres-proc search-genres
                        #:insert-genre-proc insert-genre
                        #:delete-genre-by-id-proc delete-genre-by-id
                        #:update-genre-by-id-proc update-genre-by-id))

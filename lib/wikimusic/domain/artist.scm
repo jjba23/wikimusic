@@ -19,7 +19,7 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (wikimusic domain repo)
-  #:export (get-artist-by-id get-artists insert-artist delete-artist-by-id
+  #:export (get-artist-by-id get-artists search-artists insert-artist delete-artist-by-id
                            update-artist-by-id get-artists-by-ids))
 
 ;; -- Record definition ---
@@ -29,6 +29,7 @@
                        mk-artist-repository
                        (get-artist-by-id-proc repo-get-artist-by-id)
                        (get-artists-by-ids-proc repo-get-artists-by-ids)
+                       (search-artists-proc repo-search-artists)
                        (get-artists-proc repo-get-artists)
                        (insert-artist-proc repo-insert-artist)
                        (delete-artist-by-id-proc repo-delete-artist-by-id)
@@ -44,6 +45,9 @@
 
 (define-repo-method get-artists repo-get-artists
  "Retrieves a list of all active artists from the given REPO.")
+
+(define-repo-method search-artists repo-search-artists
+ "Retrieves a search list of all active artists from the given REPO.")
 
 (define-repo-method insert-artist repo-insert-artist
                     "Inserts a artist with ATTRS in the given REPO.")

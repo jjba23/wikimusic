@@ -82,6 +82,21 @@
                         (length rows))))
       rows))
 
+    (define* (search-songs s #:key (order-by "created_at DESC") (limit 50) (offset 0))
+    (let* ((search (value->sql-literal (format #f "%~a%" s)))
+           (query (format #f "SELECT ~a FROM songs
+                   WHERE (display_name LIKE ~a OR description LIKE ~a)
+                   ORDER BY ~a LIMIT ~a OFFSET ~a"
+                          (symbols->sql-columns-list columns)
+                          search search
+                          order-by limit offset))
+           (_ (log-info "get-songs query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query conn query))))
+           (_ (log-info "get-songs rows: ~a\n"
+                        (length rows))))
+      rows))
+
   (define (update-song-by-id id attrs)
     (let* ((query (format #f "UPDATE songs SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
@@ -107,6 +122,7 @@
 
   (mk-song-repository #:get-song-by-id-proc get-song-by-id
                       #:get-songs-proc get-songs
+                      #:search-songs-proc search-songs
                       #:insert-song-proc insert-song
                       #:delete-song-by-id-proc delete-song-by-id
                       #:update-song-by-id-proc update-song-by-id))

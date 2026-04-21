@@ -87,39 +87,22 @@
                              ((not (nil? (get-from-qstr rc "limit")))
                               (string->number (get-from-qstr rc "limit")))
                              (else 40)))
-              (genres (get-genres genre-repo
+              (genres (cond
+                       ((equal? #f user-search)
+                        (get-genres genre-repo
                                   #:order-by (format #f "~a ~a"
                                                      (car query-sort)
                                                      (cadr query-sort))
                                   #:limit query-limit
                                   #:offset query-offset))
-              ;; (genres (DB-get-all-rows (DB-query (DB-open rc)
-              ;; (cond
-              ;; ((equal? #f user-search)
-              ;; (->sql select * from
-              ;; 'genres
-              ;; (format #f
-              ;; " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
-              
-              ;; query-limit
-              ;; query-offset)))
-              ;; (else (->sql select * from
-              ;; 'genres
-              ;; (format #f
-              ;; (string-join '
-              ;; (" WHERE (display_name LIKE '%~a%' OR description LIKE '%~a%') "
-              ;; " ORDER BY ~a ~a LIMIT ~a OFFSET ~a ")
-              ;; " ")
-              ;; (html-escape
-              ;; user-search)
-              ;; (html-escape
-              ;; user-search)
-              ;; (car
-              ;; query-sort)
-              ;; (cadr
-              ;; query-sort)
-              ;; query-limit
-              ;; query-offset)))))))
+                       (else
+                        (search-genres genre-repo
+                                       (html-escape user-search)
+                                  #:order-by (format #f "~a ~a"
+                                                     (car query-sort)
+                                                     (cadr query-sort))
+                                  #:limit query-limit
+                                  #:offset query-offset))))
               (genre-ids (map (lambda (s)
                                 (assq-ref s
                                           'identifier)) genres))

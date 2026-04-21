@@ -53,6 +53,7 @@
      #:cookies '(names wikimusic-artist-sort x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((artist-artwork-repo (make-sqlite-artist-artwork-repository rc))
+              (artist-repo (make-sqlite-artist-repository rc))
               (user-search (cond
                              ((equal? #f
                                       (get-from-qstr rc "search"))
@@ -86,36 +87,24 @@
                              ((not (nil? (get-from-qstr rc "limit")))
                               (string->number (get-from-qstr rc "limit")))
                              (else 40)))
-              (artists (DB-get-all-rows (DB-query (DB-open rc)
-                                                  (cond
-                                                    ((equal? #f user-search)
-                                                     (->sql select * from
-                                                            'artists
-                                                            (format #f
-                                                             " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
-                                                             (car query-sort)
-                                                             (cadr query-sort)
-                                                             query-limit
-                                                             query-offset)))
-                                                    (else (->sql select * from
-                                                                 'artists
-                                                                 (format #f
-                                                                  (string-join '
-                                                                   (" WHERE (display_name LIKE '%~a%' OR description LIKE '%~a%') "
-                                                                    " ORDER BY ~a ~a LIMIT ~a OFFSET ~a ")
-                                                                   " ")
-                                                                  (html-escape
-                                                                   user-search)
-                                                                  (html-escape
-                                                                   user-search)
-                                                                  (car
-                                                                   query-sort)
-                                                                  (cadr
-                                                                   query-sort)
-                                                                  query-limit
-                                                                  query-offset)))))))
+              (artists (cond
+                       ((equal? #f user-search)
+                        (get-artists artist-repo
+                                  #:order-by (format #f "~a ~a"
+                                                     (car query-sort)
+                                                     (cadr query-sort))
+                                  #:limit query-limit
+                                  #:offset query-offset))
+                       (else
+                        (search-artists artist-repo
+                                       (html-escape user-search)
+                                  #:order-by (format #f "~a ~a"
+                                                     (car query-sort)
+                                                     (cadr query-sort))
+                                  #:limit query-limit
+                                  #:offset query-offset))))
               (artist-ids (map (lambda (s)
-                                 (assoc-ref s "identifier")) artists))
+                                 (assq-ref s 'identifier)) artists))
               (artworks (cond
                           ((nil? artist-ids)
                            '())

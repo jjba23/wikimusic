@@ -56,6 +56,7 @@
      #:cookies '(names wikimusic-song-sort x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((song-artwork-repo (make-sqlite-song-artwork-repository rc))
+              (song-repo (make-sqlite-song-repository rc))
               (user-search (cond
                              ((equal? #f
                                       (get-from-qstr rc "search"))
@@ -89,36 +90,24 @@
                              ((not (nil? (get-from-qstr rc "limit")))
                               (string->number (get-from-qstr rc "limit")))
                              (else 40)))
-              (songs (DB-get-all-rows (DB-query (DB-open rc)
-                                                (cond
-                                                  ((equal? #f user-search)
-                                                   (->sql select * from
-                                                          'songs
-                                                          (format #f
-                                                           " ORDER BY ~a ~a LIMIT ~a OFFSET ~a"
-                                                           (car query-sort)
-                                                           (cadr query-sort)
-                                                           query-limit
-                                                           query-offset)))
-                                                  (else (->sql select * from
-                                                               'songs
-                                                               (format #f
-                                                                (string-join '
-                                                                 (" WHERE (display_name LIKE '%~a%' OR description LIKE '%~a%') "
-                                                                  " ORDER BY ~a ~a LIMIT ~a OFFSET ~a ")
-                                                                 " ")
-                                                                (html-escape
-                                                                 user-search)
-                                                                (html-escape
-                                                                 user-search)
-                                                                (car
-                                                                 query-sort)
-                                                                (cadr
-                                                                 query-sort)
-                                                                query-limit
-                                                                query-offset)))))))
+              (songs (cond
+                       ((equal? #f user-search)
+                        (get-songs song-repo
+                                  #:order-by (format #f "~a ~a"
+                                                     (car query-sort)
+                                                     (cadr query-sort))
+                                  #:limit query-limit
+                                  #:offset query-offset))
+                       (else
+                        (search-songs song-repo
+                                       (html-escape user-search)
+                                  #:order-by (format #f "~a ~a"
+                                                     (car query-sort)
+                                                     (cadr query-sort))
+                                  #:limit query-limit
+                                  #:offset query-offset))))
               (song-ids (map (lambda (s)
-                               (assoc-ref s "identifier")) songs))
+                               (assq-ref s 'identifier)) songs))
               (artworks (cond
                           ((nil? song-ids)
                            '())

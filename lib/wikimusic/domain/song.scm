@@ -19,7 +19,7 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (wikimusic domain repo)
-  #:export (get-song-by-id get-songs insert-song delete-song-by-id
+  #:export (get-song-by-id search-songs get-songs insert-song delete-song-by-id
                            update-song-by-id))
 
 ;; -- Record definition ---
@@ -29,6 +29,7 @@
                        mk-song-repository
                        (get-song-by-id-proc repo-get-song-by-id)
                        (get-songs-proc repo-get-songs)
+                       (search-songs-proc repo-search-songs)
                        (insert-song-proc repo-insert-song)
                        (delete-song-by-id-proc repo-delete-song-by-id)
                        (update-song-by-id-proc repo-update-song-by-id))
@@ -40,6 +41,9 @@
 
 (define-repo-method get-songs repo-get-songs
  "Retrieves a list of all active songs from the given REPO.")
+
+(define-repo-method search-songs repo-search-songs
+ "Retrieves a search list of all active songs from the given REPO.")
 
 (define-repo-method insert-song repo-insert-song
                     "Inserts a song with ATTRS in the given REPO.")

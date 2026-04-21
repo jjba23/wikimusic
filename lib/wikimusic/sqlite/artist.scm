@@ -73,6 +73,21 @@
                         (length rows))))
       rows))
 
+   (define* (search-artists s #:key (order-by "created_at DESC")(limit 50)(offset 0))
+    (let* ((search (value->sql-literal (format #f "%~a%" s)))
+           (query (format #f "SELECT ~a FROM artists
+                   WHERE (display_name LIKE ~a OR description LIKE ~a)
+                   ORDER BY ~a LIMIT ~a OFFSET ~a"
+                          (symbols->sql-columns-list columns)
+                          search search
+                          order-by limit offset))
+           (_ (log-info "get-artists query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query conn query))))
+           (_ (log-info "get-artists rows: ~a\n"
+                        (length rows))))
+      rows))
+
     (define (get-artists-by-ids ids)
     (let* ((query (format #f "SELECT ~a FROM artists WHERE identifier IN(~a)"
                           (symbols->sql-columns-list columns)
@@ -110,6 +125,7 @@
   (mk-artist-repository #:get-artist-by-id-proc get-artist-by-id
                         #:get-artists-by-ids-proc get-artists-by-ids
                         #:get-artists-proc get-artists
+                        #:search-artists-proc search-artists
                         #:insert-artist-proc insert-artist
                         #:delete-artist-by-id-proc delete-artist-by-id
                         #:update-artist-by-id-proc update-artist-by-id))
