@@ -54,6 +54,8 @@
         (wikimusic sqlite opinion)
         (wikimusic domain external-source)
         (wikimusic sqlite external-source)
+        (wikimusic domain user)
+        (wikimusic sqlite user)
         (wikimusic sqlite artist)
         (wikimusic domain artist))
 
@@ -221,6 +223,7 @@
               (comment-repo (make-sqlite-comment-repository rc))
               (opinion-repo (make-sqlite-opinion-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
+              (user-repo (make-sqlite-user-repository rc))
               (song-id (params rc "uuid"))
               (song (get-song-by-id song-repo song-id))
               (ascii-size (cond
@@ -261,10 +264,11 @@
               (external-sources (if (nil? raw-external-sources)
                                     '()
                                     (car raw-external-sources)))
-              (users ($users 'get
-                             #:ret 'all))
-              (user-alist (map (lambda (u)
-                                 `(,(assoc-ref u "identifier") ,u)) users))
+              (user (get-user-by-id user-repo
+                                    (assq-ref song
+                                              'created-by)))
+              (user-alist (list (cons (assq-ref user
+                                                'identifier) user)))
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where

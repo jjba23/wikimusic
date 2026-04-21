@@ -178,10 +178,11 @@
               (external-sources (if (nil? raw-external-sources)
                                     '()
                                     (car raw-external-sources)))
-              (users (get-users user-repo))
-              (user-alist (map (lambda (u)
-                                 `(,(assq-ref u
-                                              'identifier) ,u)) users))
+              (user (get-user-by-id user-repo
+                                    (assq-ref artist
+                                              'created-by)))
+              (user-alist (list (cons (assq-ref user
+                                                'identifier) user)))
 
               ;; song-specific
               (song-user-sort (cond

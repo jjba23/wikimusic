@@ -564,11 +564,11 @@
                     ,(dt (G_ "contributor"))
                     ,(dd (render-if-nempty (lambda (u)
                                              (format #f "~a &lt;~a&gt;"
-                                                     (assoc-ref u "username")
-                                                     (assoc-ref u "email")))
-                                           (car (assoc-ref user-alist
+                                                     (assq-ref u 'username)
+                                                     (assq-ref u 'email)))
+                                           (assoc-ref user-alist
                                                            (assq-ref x
-                                                                     'created-by)))))
+                                                                     'created-by))))
                     ,(dt (G_ "visibility"))
                     ,(dd (render-visibility-status G_
                                                    (assq-ref x

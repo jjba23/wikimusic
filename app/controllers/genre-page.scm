@@ -52,6 +52,8 @@
         (wikimusic sqlite opinion)
         (wikimusic domain external-source)
         (wikimusic sqlite external-source)
+        (wikimusic domain user)
+        (wikimusic sqlite user)
         (app views genre-view)
         (app views genre-edit)
         (app views song-view)
@@ -136,7 +138,6 @@
                                (genre-list-page (:i18n rc)
                                                 #:genres genres
                                                 #:artworks artworks
-                                                #:opinions opinions
                                                 #:comments comments
                                                 #:limit query-limit
                                                 #:offset query-offset
@@ -168,6 +169,7 @@
               (genre (get-genre-by-id genre-repo genre-id))
               (artwork-repo (make-sqlite-artwork-repository rc))
               (comment-repo (make-sqlite-comment-repository rc))
+              (user-repo (make-sqlite-user-repository rc))
               (song-repo (make-sqlite-song-repository rc))
               (inc-v (+ 1
                         (assq-ref genre
@@ -188,11 +190,11 @@
               (external-sources (if (nil? raw-external-sources)
                                     '()
                                     (car raw-external-sources)))
-              (users ($users 'get
-                             #:ret 'all
-                             #:order-by '(username asc)))
-              (user-alist (map (lambda (u)
-                                 `(,(assoc-ref u "identifier") ,u)) users))
+              (user (get-user-by-id user-repo
+                                    (assq-ref genre
+                                              'created-by)))
+              (user-alist (list (cons (assq-ref user
+                                                'identifier) user)))
               ;; song-specific
               (song-user-sort (cond
                                 ((not (equal? #f
