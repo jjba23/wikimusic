@@ -343,10 +343,7 @@
                                              (input (@ (type file)
                                                        (id pdf-upload)
                                                        (onchange
-                                                        "translateFileToBase64AddToInput(
-                                                                      document.getElementById('pdf-upload'),
-                                                                      document.getElementById('pdf-contents')
-                                                           )")
+                                                        "translateFileToBase64AddToInput(\n                                                                      document.getElementById('pdf-upload'),\n                                                                      document.getElementById('pdf-contents')\n                                                           )")
                                                        (class ,(mk-class '(bg-stone-200
                                                                            dark:bg-stone-900
                                                                            my-2

@@ -252,17 +252,7 @@
                                        (href "/css/wikimusic.olive.min.css"))
                                     "")
                               (script (@ (type speculationrules))
-                                      "
-{
-  \"prerender\": [
-    {
-      \"where\": {
-        \"selector_matches\": \"a\"
-      }
-    }
-  ]
-}
-")
+                                      "\n{\n  \"prerender\": [\n    {\n      \"where\": {\n        \"selector_matches\": \"a\"\n      }\n    }\n  ]\n}\n")
                               (script ,(assoc-ref asset-library
                                         "pub/js/song-chord-highlighter.js"))
                               (script ,(assoc-ref asset-library
@@ -761,27 +751,7 @@
 (define* (search-box G_
                      #:key search-query)
   `((script
-     "
-function addSearchQueryParam(form) {
-  const searchInput = document.getElementsByName('search')[0];
-
-  if (searchInput.value) {
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    var params = Object.fromEntries(urlSearchParams.entries());
-
-    params.search = encodeURIComponent(searchInput.value);
-
-    const q = Object.entries(params).map((k,_)=>`${k[0]}=${k[1]}`).reduce((a,b) => `${a}&${b}`);
-
-    console.log(q);
-    console.log(`${window.location.pathname}?${q}`);
-
-    window.location.href = `${window.location.pathname}?${q}`;
-    return false; // Prevent the default form submission
-  }
-  return true; // Allow default submission if the input is empty
-}
-")
+     "\nfunction addSearchQueryParam(form) {\n  const searchInput = document.getElementsByName('search')[0];\n\n  if (searchInput.value) {\n    const urlSearchParams = new URLSearchParams(window.location.search);\n    var params = Object.fromEntries(urlSearchParams.entries());\n\n    params.search = encodeURIComponent(searchInput.value);\n\n    const q = Object.entries(params).map((k,_)=>`${k[0]}=${k[1]}`).reduce((a,b) => `${a}&${b}`);\n\n    console.log(q);\n    console.log(`${window.location.pathname}?${q}`);\n\n    window.location.href = `${window.location.pathname}?${q}`;\n    return false; // Prevent the default form submission\n  }\n  return true; // Allow default submission if the input is empty\n}\n")
     (div (@ (class ,(mk-class '(my-3))))
          (form (@ (onsubmit "addSearchQueryParam(this)"))
                (div (@ (class ,(mk-class '(flex flex-row

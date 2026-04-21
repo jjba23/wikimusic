@@ -46,6 +46,12 @@
         (wikimusic sqlite artwork)
         (wikimusic domain song)
         (wikimusic sqlite song)
+        (wikimusic domain comment)
+        (wikimusic sqlite comment)
+        (wikimusic domain opinion)
+        (wikimusic sqlite opinion)
+        (wikimusic domain external-source)
+        (wikimusic sqlite external-source)
         (app views songs)
         (app views genres))
 
@@ -56,6 +62,8 @@
      (lambda (rc)
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (genre-repo (make-sqlite-genre-repository rc))
+              (opinion-repo (make-sqlite-opinion-repository rc))
+              (external-source-repo (make-sqlite-external-source-repository rc))
               (user-search (cond
                              ((equal? #f
                                       (get-from-qstr rc "search"))
@@ -161,8 +169,11 @@
      (lambda (rc)
        (let* ((genre-id (params rc "uuid"))
               (genre-repo (make-sqlite-genre-repository rc))
+              (opinion-repo (make-sqlite-opinion-repository rc))
+              (external-source-repo (make-sqlite-external-source-repository rc))
               (genre (get-genre-by-id genre-repo genre-id))
               (artwork-repo (make-sqlite-artwork-repository rc))
+              (comment-repo (make-sqlite-comment-repository rc))
               (song-repo (make-sqlite-song-repository rc))
               (inc-v (+ 1
                         (assq-ref genre
@@ -170,20 +181,16 @@
               (artworks (get-artworks-by-entity-ids artwork-repo
                                                     'genre
                                                     (list genre-id)))
-              (opinions ($genre_opinions 'get
-                                         #:ret 'all
-                                         #:condition (where #:genre_identifier
-                                                            genre-id)))
-              (comments ($genre_comments 'get
-                                         #:ret 'all
-                                         #:order-by '(created_at asc)
-                                         #:condition (where #:genre_identifier
-                                                            genre-id)))
-              (raw-external-sources ($genre_external_sources 'get
-                                                             #:ret 'top
-                                                             #:condition (where
-                                                                          #:genre_identifier
-                                                                          genre-id)))
+              (opinions (get-opinions-by-entity-ids opinion-repo
+                                                    'genre
+                                                    (list genre-id)))
+              (comments (get-comments-by-entity-ids comment-repo
+                                                    'genre
+                                                    (list genre-id)))
+              (raw-external-sources (get-external-sources-by-entity-ids
+                                     external-source-repo
+                                     'genre
+                                     (list genre-id)))
               (external-sources (if (nil? raw-external-sources)
                                     '()
                                     (car raw-external-sources)))

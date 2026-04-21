@@ -38,7 +38,8 @@
 
   (define (insert-columns entity)
     (append (list (string->symbol (format #f "~a_identifier" entity)))
-            '(identifier parent-identifier created-by
+            '(identifier parent-identifier
+                         created-by
                          visibility-status
                          approved-by
                          contents

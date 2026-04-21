@@ -36,8 +36,8 @@
     (DB-open rc))
 
   (define (get-id-to-username)
-    (let* ((query (format #f "SELECT ~a FROM user
-                   ORDER BY username ASC"
+    (let* ((query (format #f
+                          "SELECT ~a FROM user\n                   ORDER BY username ASC"
                           (symbols->sql-columns-list columns)))
            (_ (log-info "get-id-to-username query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
@@ -77,8 +77,8 @@
           (car rows))))
 
   (define (get-users)
-    (let* ((query (format #f "SELECT ~a FROM user
-                   ORDER BY username ASC"
+    (let* ((query (format #f
+                          "SELECT ~a FROM user\n                   ORDER BY username ASC"
                           (symbols->sql-columns-list columns)))
            (_ (log-info "get-users query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist

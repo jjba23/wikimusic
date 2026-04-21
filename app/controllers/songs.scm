@@ -46,6 +46,12 @@
         (wikimusic domain song)
         (wikimusic sqlite artwork)
         (wikimusic domain artwork)
+        (wikimusic domain comment)
+        (wikimusic sqlite comment)
+        (wikimusic domain opinion)
+        (wikimusic sqlite opinion)
+        (wikimusic domain external-source)
+        (wikimusic sqlite external-source)
         (wikimusic sqlite artist)
         (wikimusic domain artist)
         (app views songs))
@@ -57,6 +63,8 @@
      (lambda (rc)
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (song-repo (make-sqlite-song-repository rc))
+              (opinion-repo (make-sqlite-opinion-repository rc))
+              (external-source-repo (make-sqlite-external-source-repository rc))
               (user-search (cond
                              ((equal? #f
                                       (get-from-qstr rc "search"))
@@ -216,6 +224,10 @@
      (lambda (rc)
        (let* ((song-repo (make-sqlite-song-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
+              (artwork-repo (make-sqlite-artwork-repository rc))
+              (comment-repo (make-sqlite-comment-repository rc))
+              (opinion-repo (make-sqlite-opinion-repository rc))
+              (external-source-repo (make-sqlite-external-source-repository rc))
               (song-id (params rc "uuid"))
               (song (get-song-by-id song-repo song-id))
               (ascii-size (cond
@@ -240,25 +252,19 @@
               (inc-v (+ 1
                         (assq-ref song
                                   'views)))
-              (artworks ($song_artworks 'get
-                                        #:ret 'all
-                                        #:order-by '(order_value asc)
-                                        #:condition (where #:song_identifier
-                                                           song-id)))
-              (opinions ($song_opinions 'get
-                                        #:ret 'all
-                                        #:condition (where #:song_identifier
-                                                           song-id)))
-              (comments ($song_comments 'get
-                                        #:ret 'all
-                                        #:order-by '(created_at asc)
-                                        #:condition (where #:song_identifier
-                                                           song-id)))
-              (raw-external-sources ($song_external_sources 'get
-                                                            #:ret 'top
-                                                            #:condition (where
-                                                                         #:song_identifier
-                                                                         song-id)))
+              (artworks (get-artworks-by-entity-ids artwork-repo
+                                                    'song
+                                                    (list song-id)))
+              (opinions (get-opinions-by-entity-ids opinion-repo
+                                                    'song
+                                                    (list song-id)))
+              (comments (get-comments-by-entity-ids comment-repo
+                                                    'song
+                                                    (list song-id)))
+              (raw-external-sources (get-external-sources-by-entity-ids
+                                     external-source-repo
+                                     'song
+                                     (list song-id)))
               (external-sources (if (nil? raw-external-sources)
                                     '()
                                     (car raw-external-sources)))

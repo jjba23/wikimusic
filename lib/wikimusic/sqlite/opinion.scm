@@ -28,20 +28,12 @@
 (define (make-sqlite-opinion-repository rc)
   (define (columns entity)
     (append (list (string->symbol (format #f "~a_identifier" entity)))
-            '(identifier 
-                         created-by
-                         is-like
-                         is-dislike
-                         created-at
+            '(identifier created-by is-like is-dislike created-at
                          last-edited-at)))
 
   (define (insert-columns entity)
     (append (list (string->symbol (format #f "~a_identifier" entity)))
-            '(identifier 
-                         created-by
-                         is-like
-                         is-dislike
-                         created-at)))
+            '(identifier created-by is-like is-dislike created-at)))
 
   (define conn
     (DB-open rc))

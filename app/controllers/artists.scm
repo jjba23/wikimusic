@@ -43,6 +43,12 @@
         (wikimusic sqlite artist)
         (wikimusic domain artwork)
         (wikimusic sqlite artwork)
+        (wikimusic domain comment)
+        (wikimusic sqlite comment)
+        (wikimusic domain opinion)
+        (wikimusic sqlite opinion)
+        (wikimusic domain external-source)
+        (wikimusic sqlite external-source)
         (wikimusic domain song)
         (wikimusic sqlite song)
         (app views artists))
@@ -56,6 +62,9 @@
      (lambda (rc)
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
+              (comment-repo (make-sqlite-comment-repository rc))
+              (opinion-repo (make-sqlite-opinion-repository rc))
+              (external-source-repo (make-sqlite-external-source-repository rc))
               (user-search (cond
                              ((equal? #f
                                       (get-from-qstr rc "search"))
@@ -117,19 +126,13 @@
               (opinions (cond
                           ((nil? artist-ids)
                            '())
-                          (else ($artist_opinions 'get
-                                                  #:ret 'all
-                                                  #:condition (where
-                                                               #:artist_identifier
-                                                               artist-ids)))))
+                          (else (get-opinions-by-entity-ids opinion-repo
+                                                            'artist artist-ids))))
               (comments (cond
                           ((nil? artist-ids)
                            '())
-                          (else ($artist_comments 'get
-                                                  #:ret 'all
-                                                  #:condition (where
-                                                               #:artist_identifier
-                                                               artist-ids))))))
+                          (else (get-comments-by-entity-ids comment-repo
+                                                            'artist artist-ids)))))
          (response-emit (:mime rc
                                (artist-list-page (:i18n rc)
                                                  #:artists artists
@@ -153,6 +156,9 @@
               (artist-repo (make-sqlite-artist-repository rc))
               (artist (get-artist-by-id artist-repo artist-id))
               (artwork-repo (make-sqlite-artwork-repository rc))
+              (opinion-repo (make-sqlite-opinion-repository rc))
+              (comment-repo (make-sqlite-comment-repository rc))
+              (external-source-repo (make-sqlite-external-source-repository rc))
               (song-repo (make-sqlite-song-repository rc))
               (inc-v (+ 1
                         (assq-ref artist
@@ -160,22 +166,16 @@
               (artworks (get-artworks-by-entity-ids artwork-repo
                                                     'artist
                                                     (list artist-id)))
-              (opinions ($artist_opinions 'get
-                                          #:ret 'all
-                                          #:condition (where
-                                                             #:artist_identifier
-                                                             artist-id)))
-              (comments ($artist_comments 'get
-                                          #:ret 'all
-                                          #:order-by '(created_at asc)
-                                          #:condition (where
-                                                             #:artist_identifier
-                                                             artist-id)))
-              (raw-external-sources ($artist_external_sources 'get
-                                                              #:ret 'top
-                                                              #:condition (where
-                                                                           #:artist_identifier
-                                                                           artist-id)))
+              (opinions (get-opinions-by-entity-ids opinion-repo
+                                                    'artist
+                                                    (list artist-id)))
+              (comments (get-comments-by-entity-ids comment-repo
+                                                    'artist
+                                                    (list artist-id)))
+              (raw-external-sources (get-external-sources-by-entity-ids
+                                     external-source-repo
+                                     'artist
+                                     (list artist-id)))
               (external-sources (if (nil? raw-external-sources)
                                     '()
                                     (car raw-external-sources)))
