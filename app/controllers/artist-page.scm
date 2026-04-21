@@ -38,7 +38,6 @@
         (uuid generate)
         (bewaking bewaking)
         (app models users)
-        (app views songs)
         (wikimusic domain artist)
         (wikimusic sqlite artist)
         (wikimusic domain artwork)
@@ -51,7 +50,10 @@
         (wikimusic sqlite external-source)
         (wikimusic domain song)
         (wikimusic sqlite song)
-        (app views artists))
+        (app views artist-view)
+        (app views artist-edit)
+        (app views song-view)
+        (app views song-edit))
 
 ;; ====== Data view GET routes ======
 

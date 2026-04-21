@@ -36,11 +36,13 @@
         (kracht prelude)
         (app models song_artists)
         (app models song_genres)
+                                (app views song-view)
+        (app views song-edit)
+                                (app views song-content-view)
+        (app views song-content-edit)    
         (app models song_external_sources)
         (uuid generate)
-        (app views songs)
         (bewaking bewaking)
-        (app views song-contents)
         (app models users)
         (wikimusic sqlite song)
         (wikimusic domain song)
@@ -53,8 +55,7 @@
         (wikimusic domain external-source)
         (wikimusic sqlite external-source)
         (wikimusic sqlite artist)
-        (wikimusic domain artist)
-        (app views songs))
+        (wikimusic domain artist))
 
 (get "/songs"
      #:mime 'xml

@@ -38,7 +38,6 @@
         (uuid generate)
         (bewaking bewaking)
         (app models users)
-        (app views songs)
         (wikimusic domain artist)
         (wikimusic sqlite artist)
         (wikimusic domain artwork)
@@ -50,8 +49,7 @@
         (wikimusic domain external-source)
         (wikimusic sqlite external-source)
         (wikimusic domain song)
-        (wikimusic sqlite song)
-        (app views artists))
+        (wikimusic sqlite song))
 
 ;; ====== Data edit POST routes ======
 

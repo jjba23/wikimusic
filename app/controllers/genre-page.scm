@@ -52,8 +52,10 @@
         (wikimusic sqlite opinion)
         (wikimusic domain external-source)
         (wikimusic sqlite external-source)
-        (app views songs)
-        (app views genres))
+        (app views genre-view)
+        (app views genre-edit)
+        (app views song-view)
+        (app views song-edit))
 
 (get "/genres"
      #:mime 'xml

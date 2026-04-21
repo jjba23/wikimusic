@@ -51,9 +51,7 @@
         (wikimusic domain opinion)
         (wikimusic sqlite opinion)
         (wikimusic domain external-source)
-        (wikimusic sqlite external-source)
-        (app views songs)
-        (app views genres))
+        (wikimusic sqlite external-source))
 
 
 (post "/genres/uuid/:uuid/edit"

@@ -38,9 +38,11 @@
         (app models song_genres)
         (app models song_external_sources)
         (uuid generate)
-        (app views songs)
+                                (app views song-view)
+        (app views song-edit)
+                                (app views song-content-view)
+        (app views song-content-edit)    
         (bewaking bewaking)
-        (app views song-contents)
         (app models users)
         (wikimusic sqlite song)
         (wikimusic domain song)
@@ -53,8 +55,7 @@
         (wikimusic domain external-source)
         (wikimusic sqlite external-source)
         (wikimusic sqlite artist)
-        (wikimusic domain artist)
-        (app views songs))
+        (wikimusic domain artist))
 
 (get "/songs"
      #:mime 'xml
@@ -333,6 +334,7 @@
               (song-id (params rc "uuid"))
               (song-repo (make-sqlite-song-repository rc))
               (artwork-repo (make-sqlite-artwork-repository rc))
+              (external-source-repo (make-sqlite-external-source-repository rc))
               (song (get-song-by-id song-repo song-id))
               (artworks (get-artworks-by-entity-ids artwork-repo 'song (list song-id)))
               (song-contents ($song_contents 'get
@@ -366,10 +368,7 @@
                                      #:ret 'all
                                      #:condition (where #:identifier
                                                         artist-uuids))))
-              (e ($song_external_sources 'get
-                                         #:ret 'top
-                                         #:condition (where #:song_identifier
-                                                            song-id)))
+              (e (get-external-sources-by-entity-ids external-source-repo 'song (list song-id)))              
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '())))
