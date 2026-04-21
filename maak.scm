@@ -167,7 +167,8 @@ Args: update? represents whether we should update a template or create a new one
 
 (define (kill-server)
   "Kill any running HTTP server in the same port."
-  ($ (list (~ "fuser -k ~a/tcp || true" http-port))))
+  ($ (list (~ "fuser -k ~a/tcp || true" http-port)))
+  ($ '("sleep 2")))
 
 (define (server)
   "Target to start the wikimusic server with the default configuration."
