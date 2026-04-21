@@ -55,12 +55,12 @@
                                                          #:color '(text-onyx-300
                                                                    dark:text-stone-300)))))
                                            (assoc-ref song-version-count-alist
-                                            (assoc-ref x "identifier"))))
+                                            (assq-ref x 'identifier))))
          (this-song-artists-relations (map (lambda (aa)
                                              (assoc-ref aa "artist_identifier"))
                                            (filter (lambda (a)
-                                                     (equal? (assoc-ref x
-                                                              "identifier")
+                                                     (equal? (assq-ref x
+                                                              'identifier)
                                                              (assoc-ref a
                                                               "song_identifier")))
                                                    song-artists)))
@@ -68,20 +68,20 @@
          (art (filter (lambda (aaa)
                         (find (lambda (s)
                                 (equal? s
-                                        (assoc-ref aaa "identifier")))
+                                        (assq-ref aaa 'identifier)))
                               this-song-artists-relations)) artists))
 
          (extra-top-info `((div (@ (class ,(mk-class '(py-2 text-center flex
                                                             flex-col gap-2
                                                             align-center))))
                                 ,(map (lambda (ar)
-                                        (a (assoc-ref ar "display_name")
+                                        (a (assq-ref ar 'displayname)
                                            #:weight '(font-light)
                                            #:size '(text-md)
                                            #:href (format #f
                                                           "/artists/uuid/~a"
-                                                          (assoc-ref ar
-                                                           "identifier"))
+                                                          (assq-ref ar
+                                                           'identifier))
                                            #:color '(text-onyx-300
                                                      dark:text-stone-100)
                                            #:hover '(hover:text-persia-pink-900

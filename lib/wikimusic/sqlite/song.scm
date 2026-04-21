@@ -55,7 +55,8 @@
                  views
                  description))
 
-    (define conn (DB-open rc))
+  (define conn
+    (DB-open rc))
 
   (define (get-song-by-id id)
     (let* ((query (format #f
@@ -70,11 +71,16 @@
       (if (nil? rows) #f
           (car rows))))
 
-  (define* (get-songs #:key (order-by "created_at DESC") (limit 50) (offset 0))
-    (let* ((query (format #f "SELECT ~a FROM songs
+  (define* (get-songs #:key (order-by "created_at DESC")
+                      (limit 50)
+                      (offset 0))
+    (let* ((query (format #f
+                          "SELECT ~a FROM songs
                    ORDER BY ~a LIMIT ~a OFFSET ~a"
                           (symbols->sql-columns-list columns)
-                          order-by limit offset))
+                          order-by
+                          limit
+                          offset))
            (_ (log-info "get-songs query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
@@ -82,14 +88,37 @@
                         (length rows))))
       rows))
 
-    (define* (search-songs s #:key (order-by "created_at DESC") (limit 50) (offset 0))
+  (define* (get-songs-by-artist-id id
+                                   #:key (order-by "display_name DESC"))
+    (let* ((query (format #f
+                   "SELECT ~a FROM songs
+                   WHERE identifier IN (SELECT song_identifier FROM song_artists WHERE
+                    artist_identifier = ~a)
+                   ORDER BY ~a"
+                   (symbols->sql-columns-list columns)
+                   (value->sql-literal id) order-by))
+           (_ (log-info "get-songs-by-artist-id query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query conn query))))
+           (_ (log-info "get-songs-by-artist-id rows: ~a\n"
+                        (length rows))))
+      rows))
+
+  (define* (search-songs s
+                         #:key (order-by "created_at DESC")
+                         (limit 50)
+                         (offset 0))
     (let* ((search (value->sql-literal (format #f "%~a%" s)))
-           (query (format #f "SELECT ~a FROM songs
+           (query (format #f
+                   "SELECT ~a FROM songs
                    WHERE (display_name LIKE ~a OR description LIKE ~a)
                    ORDER BY ~a LIMIT ~a OFFSET ~a"
-                          (symbols->sql-columns-list columns)
-                          search search
-                          order-by limit offset))
+                   (symbols->sql-columns-list columns)
+                   search
+                   search
+                   order-by
+                   limit
+                   offset))
            (_ (log-info "get-songs query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
@@ -122,6 +151,7 @@
 
   (mk-song-repository #:get-song-by-id-proc get-song-by-id
                       #:get-songs-proc get-songs
+                      #:get-songs-by-artist-id-proc get-songs-by-artist-id
                       #:search-songs-proc search-songs
                       #:insert-song-proc insert-song
                       #:delete-song-by-id-proc delete-song-by-id

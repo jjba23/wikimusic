@@ -15,19 +15,19 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-module (wikimusic sqlite artist-comment)
+(define-module (wikimusic sqlite comment)
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
   #:use-module (wikimusic sqlite util)
-  #:use-module (wikimusic domain artist-comment)
-  #:export (make-sqlite-artist-comment-repository))
+  #:use-module (wikimusic domain comment)
+  #:export (make-sqlite-comment-repository))
 
 ;; --- SQLite implementation ---
-(define (make-sqlite-artist-comment-repository rc)
+(define (make-sqlite-comment-repository rc)
   (define columns
-    '(identifier parent-identifier artist-identifier
+    '(identifier parent-identifier 
                  created-by
                  visibility-status
                  contents
@@ -36,7 +36,7 @@
                  last-edited-at))
 
   (define insert-columns
-    '(identifier parent-identifier artist-identifier
+    '(identifier parent-identifier 
                  created-by
                  visibility-status
                  contents
@@ -46,46 +46,46 @@
   (define conn
     (DB-open rc))
 
-  (define (get-artist-comments-by-artist-ids ids)
+  (define (get-comments-by-entity-ids entity ids)
     (let* ((query (format #f
-                   "SELECT ~a FROM artist_comments WHERE artist_identifier IN(~a)"
+                   "SELECT ~a FROM genre_comments WHERE genre_identifier IN(~a)"
                    (symbols->sql-columns-list columns)
                    (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-artist-comments-by-artist-ids query:\n\t~a\n" query))
+           (_ (log-info "get-comments-by-ids query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-artist-comments-by-artist-ids rows: ~a\n"
+           (_ (log-info "get-comments-by-ids rows: ~a\n"
                         (length rows))))
       rows))
 
-  (define (update-artist-comment-by-id id attrs)
+  (define (update-comment-by-id entity id attrs)
     (let* ((query (format #f
-                   "UPDATE artist_comments SET ~a WHERE identifier = ~a"
+                   "UPDATE genre_comments SET ~a WHERE identifier = ~a"
                    (string-join (map pair->sql-assignment attrs) ", ")
                    (value->sql-literal id)))
-           (_ (log-info "update-artist-comment-by-id query:\n\t~a\n" query)))
+           (_ (log-info "update-comment-by-id query:\n\t~a\n" query)))
       (DB-query conn query)))
 
-  (define (delete-artist-comment-by-id id)
+  (define (delete-comment-by-id entity id)
     (let* ((query (format #f
-                          "DELETE FROM artist-comments WHERE identifier = ~a"
+                          "DELETE FROM comments WHERE identifier = ~a"
                           (value->sql-literal id)))
-           (_ (log-info "delete-artist-comment-by-id query:\n\t~a\n" query)))
+           (_ (log-info "delete-comment-by-id query:\n\t~a\n" query)))
       (DB-query conn query)))
 
-  (define (insert-artist-comment attrs)
+  (define (insert-comment entity attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
                       insert-columns))
-           (query (format #f "INSERT INTO artist_comments (~a) VALUES (~a)"
+           (query (format #f "INSERT INTO genre_comments (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
-           (_ (log-info "insert-artist-comment query:\n\t~a\n" query)))
+           (_ (log-info "insert-comment query:\n\t~a\n" query)))
       (DB-query conn query)))
 
-  (mk-artist-comment-repository #:get-artist-comments-by-artist-ids-proc
-                                get-artist-comments-by-artist-ids
-                                #:insert-artist-comment-proc
-                                insert-artist-comment
-                                #:delete-artist-comment-by-id-proc
-                                delete-artist-comment-by-id))
+  (mk-comment-repository #:get-comments-by-entity-ids-proc
+                                get-comments-by-entity-ids
+                                #:insert-comment-proc
+                                insert-comment
+                                #:delete-comment-by-id-proc
+                                delete-comment-by-id))

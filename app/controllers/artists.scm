@@ -41,8 +41,10 @@
         (app views songs)
         (wikimusic domain artist)
         (wikimusic sqlite artist)
-        (wikimusic domain artist-artwork)
-        (wikimusic sqlite artist-artwork)
+        (wikimusic domain artwork)
+        (wikimusic sqlite artwork)
+        (wikimusic domain song)
+        (wikimusic sqlite song)        
         (app views artists))
 
 ;; ====== Data view GET routes ======
@@ -52,7 +54,7 @@
      #:i18n '(cookie "lang")
      #:cookies '(names wikimusic-artist-sort x-bewaking-wikimusic)
      (lambda (rc)
-       (let* ((artist-artwork-repo (make-sqlite-artist-artwork-repository rc))
+       (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
               (user-search (cond
                              ((equal? #f
@@ -88,28 +90,30 @@
                               (string->number (get-from-qstr rc "limit")))
                              (else 40)))
               (artists (cond
-                       ((equal? #f user-search)
-                        (get-artists artist-repo
-                                  #:order-by (format #f "~a ~a"
-                                                     (car query-sort)
-                                                     (cadr query-sort))
-                                  #:limit query-limit
-                                  #:offset query-offset))
-                       (else
-                        (search-artists artist-repo
-                                       (html-escape user-search)
-                                  #:order-by (format #f "~a ~a"
-                                                     (car query-sort)
-                                                     (cadr query-sort))
-                                  #:limit query-limit
-                                  #:offset query-offset))))
+                         ((equal? #f user-search)
+                          (get-artists artist-repo
+                                       #:order-by (format #f "~a ~a"
+                                                          (car query-sort)
+                                                          (cadr query-sort))
+                                       #:limit query-limit
+                                       #:offset query-offset))
+                         (else (search-artists artist-repo
+                                               (html-escape user-search)
+                                               #:order-by (format #f "~a ~a"
+                                                                  (car
+                                                                   query-sort)
+                                                                  (cadr
+                                                                   query-sort))
+                                               #:limit query-limit
+                                               #:offset query-offset))))
               (artist-ids (map (lambda (s)
-                                 (assq-ref s 'identifier)) artists))
+                                 (assq-ref s
+                                           'identifier)) artists))
               (artworks (cond
                           ((nil? artist-ids)
                            '())
-                          (else (get-artist-artworks-by-artist-ids
-                                 artist-artwork-repo artist-ids))))
+                          (else (get-artworks-by-entity-ids artwork-repo
+                                                            'artist artist-ids))))
               (opinions (cond
                           ((nil? artist-ids)
                            '())
@@ -148,15 +152,14 @@
        (let* ((artist-id (params rc "uuid"))
               (artist-repo (make-sqlite-artist-repository rc))
               (artist (get-artist-by-id artist-repo artist-id))
+              (artwork-repo (make-sqlite-artwork-repository rc))
+              (song-repo (make-sqlite-song-repository rc))
               (inc-v (+ 1
                         (assq-ref artist
                                   'views)))
-              (artworks ($artist_artworks 'get
-                                          #:ret 'all
-                                          #:order-by '(order_value asc)
-                                          #:condition (where
-                                                             #:artist_identifier
-                                                             artist-id)))
+              (artworks (get-artworks-by-entity-ids artwork-repo
+                                                    'artist
+                                                    (list artist-id)))
               (opinions ($artist_opinions 'get
                                           #:ret 'all
                                           #:condition (where
@@ -203,26 +206,20 @@
                                  (:cookies-value rc "wikimusic-song-sort"))
                                 (else "display-name-asc")))
               (song-query-sort (entity-sort-from-query song-user-sort))
-
-              (songs (DB-get-all-rows (DB-query (DB-open rc)
-                                                (format #f
-                                                 "SELECT * FROM songs WHERE identifier IN
-                                                             (SELECT song_identifier FROM song_artists WHERE artist_identifier = '~a') ORDER BY ~a ~a"
-                                                 artist-id
-                                                 (car song-query-sort)
-                                                 (cadr song-query-sort)))))
+              (songs (get-songs-by-artist-id song-repo artist-id
+                                             #:order-by (format #f "~a ~a"
+                                                                (car
+                                                                 song-query-sort)
+                                                                (cadr
+                                                                 song-query-sort))))
               (song-ids (map (lambda (s)
-                               (assoc-ref s "identifier")) songs))
+                               (assq-ref s 'identifier)) songs))
               (song-artworks (cond
                                ((nil? song-ids)
                                 '())
-                               (else ($song_artworks 'get
-                                                     #:ret 'all
-                                                     #:order-by '(order_value
-                                                                  asc)
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
+                               (else (get-artworks-by-entity-ids artwork-repo
+                                                                 'song
+                                                                 song-ids))))
               (song-opinions (cond
                                ((nil? song-ids)
                                 '())

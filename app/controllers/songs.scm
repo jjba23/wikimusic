@@ -44,8 +44,8 @@
         (app models users)
         (wikimusic sqlite song)
         (wikimusic domain song)
-        (wikimusic sqlite song-artwork)
-        (wikimusic domain song-artwork)        
+        (wikimusic sqlite artwork)
+        (wikimusic domain artwork)        
         (wikimusic sqlite artist)
         (wikimusic domain artist)
         (app views songs))
@@ -55,7 +55,7 @@
      #:i18n '(cookie "lang")
      #:cookies '(names wikimusic-song-sort x-bewaking-wikimusic)
      (lambda (rc)
-       (let* ((song-artwork-repo (make-sqlite-song-artwork-repository rc))
+       (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (song-repo (make-sqlite-song-repository rc))
               (user-search (cond
                              ((equal? #f
@@ -111,7 +111,7 @@
               (artworks (cond
                           ((nil? song-ids)
                            '())
-                          (else (get-song-artworks-by-song-ids song-artwork-repo song-ids))))
+                          (else (get-artworks-by-entity-ids artwork-repo 'song song-ids))))
               (opinions (cond
                           ((nil? song-ids)
                            '())

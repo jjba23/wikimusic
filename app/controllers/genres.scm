@@ -42,8 +42,8 @@
         (uuid generate)
         (wikimusic domain genre)
         (wikimusic sqlite genre)
-        (wikimusic domain genre-artwork)
-        (wikimusic sqlite genre-artwork)
+        (wikimusic domain artwork)
+        (wikimusic sqlite artwork)
         (app views songs)
         (app views genres))
 
@@ -52,7 +52,7 @@
      #:i18n '(cookie "lang")
      #:cookies '(names wikimusic-genre-sort x-bewaking-wikimusic)
      (lambda (rc)
-       (let* ((genre-artwork-repo (make-sqlite-genre-artwork-repository rc))
+       (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (genre-repo (make-sqlite-genre-repository rc))
               (user-search (cond
                              ((equal? #f
@@ -109,8 +109,8 @@
               (artworks (cond
                           ((nil? genre-ids)
                            '())
-                          (else (get-genre-artworks-by-genre-ids
-                                 genre-artwork-repo genre-ids))))
+                          (else (get-artworks-by-entity-ids
+                                 artwork-repo 'genre genre-ids))))
               (opinions (cond
                           ((nil? genre-ids)
                            '())

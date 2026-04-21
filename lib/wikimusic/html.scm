@@ -298,7 +298,7 @@
                     #:key (extra-bot-info '())
                     (extra-top-info '()))
   (let ((item-link (format #f "/~as/uuid/~a" entity
-                           (assoc-ref x "identifier")))
+                           (assq-ref x 'identifier)))
         (likes (length (filter (lambda (o)
                                  (equal? 1
                                          (assoc-ref o "is_like"))) opinions)))
@@ -335,7 +335,7 @@
                                     ((nil? artworks) '())
                                     (else (car artworks))))
                 (div (@ (class ,(mk-class '(text-center))))
-                     ,(a (assoc-ref x "display_name")
+                     ,(a (assq-ref x 'display-name)
                          #:size (list 'text-xl
                                       'leading-9)
                          #:weight '(font-light)
@@ -354,7 +354,7 @@
                                                  justify-center))))
                      (div (@ (class ,(mk-class '())))
                           ,(em (format #f "~a ~a"
-                                       (assoc-ref x "views")
+                                       (assq-ref x 'views)
                                        (G_ "views"))
                                #:size '(text-sm)
                                #:color '(text-onyx-300 dark:text-stone-300)))
