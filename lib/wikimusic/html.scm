@@ -293,19 +293,12 @@
                     entity
                     x
                     artworks
-                    opinions
                     comments
                     #:key (extra-bot-info '())
                     (extra-top-info '()))
   (let ((item-link (format #f "/~as/uuid/~a" entity
-                           (assq-ref x 'identifier)))
-        (likes (length (filter (lambda (o)
-                                 (equal? 1
-                                         (assoc-ref o "is_like"))) opinions)))
-        (dislikes (length (filter (lambda (o)
-                                    (equal? 1
-                                            (assoc-ref o "is_dislike")))
-                                  opinions))))
+                           (assq-ref x
+                                     'identifier))))
     `((div (@ (class ,(mk-class '(bg-stone-300 dark:bg-onyx-700
                                                rounded-2xl
                                                shadow-lg
@@ -332,10 +325,12 @@
                                                                             art
                                                                             'content-url))))))))
                                    (cond
-                                    ((nil? artworks) '())
-                                    (else (car artworks))))
+                                     ((nil? artworks)
+                                      '())
+                                     (else (car artworks))))
                 (div (@ (class ,(mk-class '(text-center))))
-                     ,(a (assq-ref x 'display-name)
+                     ,(a (assq-ref x
+                                   'display-name)
                          #:size (list 'text-xl
                                       'leading-9)
                          #:weight '(font-light)
@@ -354,7 +349,8 @@
                                                  justify-center))))
                      (div (@ (class ,(mk-class '())))
                           ,(em (format #f "~a ~a"
-                                       (assq-ref x 'views)
+                                       (assq-ref x
+                                                 'views)
                                        (G_ "views"))
                                #:size '(text-sm)
                                #:color '(text-onyx-300 dark:text-stone-300)))
@@ -435,11 +431,12 @@
                                                                                   dark:text-stone-300))))
                                                                               ,fc))
                                                                (assq-ref art
-                                                                'content-caption))))
+                                                                         'content-caption))))
                                  artworks))
          (rendered-comments (render-comments G_ user-alist #f comments))
          (like-count (length (filter (lambda (o)
-                                       (and (equal? (assq-ref x 'identifier)
+                                       (and (equal? (assq-ref x
+                                                              'identifier)
                                                     (assoc-ref o
                                                                (format #f
                                                                 "~a_identifier"
@@ -449,7 +446,7 @@
                                      opinions)))
          (dislike-count (length (filter (lambda (o)
                                           (and (equal? (assq-ref x
-                                                        'identifier)
+                                                                 'identifier)
                                                        (assoc-ref o
                                                                   (format #f
                                                                    "~a_identifier"
@@ -463,7 +460,8 @@
                                  (form (@ (method POST)
                                           (action ,(format #f
                                                     "/~as/uuid/~a/like" entity
-                                                    (assq-ref x 'identifier))))
+                                                    (assq-ref x
+                                                              'identifier))))
                                        ,(icon-button #:icon 'thumbs-up
                                                      #:color '(text-stone-100)
                                                      #:background '(bg-asparagus-500)
@@ -486,7 +484,8 @@
                                           (action ,(format #f
                                                     "/~as/uuid/~a/dislike"
                                                     entity
-                                                    (assq-ref x 'identifier))))
+                                                    (assq-ref x
+                                                              'identifier))))
                                        ,(icon-button #:icon 'thumbs-down
                                                      #:color '(text-stone-100)
                                                      #:background '(bg-redwood-500)
@@ -518,35 +517,40 @@
                                                                         whitespace-break-spaces))))
                                                            ,(p description
                                                                #:weight '(font-light)))))
-                                              (assq-ref x 'description)))
+                                              (assq-ref x
+                                                        'description)))
          (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
                                                    `(,(dt (G_ "last edited")) ,
                                                      (dd (strftime "%c"
 
                                                                    (localtime (string->number
                                                                                last-edited-at))))))
-                                                 (assq-ref x 'last-edited-at)))
+                                                 (assq-ref x
+                                                           'last-edited-at)))
          (maybe-approved-by (render-if-nempty (lambda (approved-by)
                                                 `(,(dt (G_ "approved by")) ,(dd
                                                                              approved-by)))
-                                              (assq-ref x 'approved-by))))
+                                              (assq-ref x
+                                                        'approved-by))))
     
     `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
                      ,opinion-buttons
                      (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity
-                                          (assq-ref x 'identifier))))
+                                          (assq-ref x
+                                                    'identifier))))
                         ,(icon-button #:icon 'pencil
                                       #:content (G_ "edit"))))
                 ,maybe-description
                 (dl ,(dt (G_ "views"))
                     ,(dd (format #f "~a"
-                                 (assq-ref x 'views)))
+                                 (assq-ref x
+                                           'views)))
                     ,(dt (G_ "created"))
                     ,(dd (strftime "%c"
                                    (localtime (string->number (assq-ref x
-                                                               'created-at)))))
+                                                                        'created-at)))))
                     ,maybe-last-edited-at
                     ,(dt (G_ "contributor"))
                     ,(dd (render-if-nempty (lambda (u)
@@ -555,16 +559,17 @@
                                                      (assoc-ref u "email")))
                                            (car (assoc-ref user-alist
                                                            (assq-ref x
-                                                            'created-by)))))
+                                                                     'created-by)))))
                     ,(dt (G_ "visibility"))
                     ,(dd (render-visibility-status G_
                                                    (assq-ref x
-                                                    'visibility-status)))
+                                                             'visibility-status)))
                     ,maybe-approved-by
                     ,(dt (G_ "uuid"))
                     ,(dd `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                             gap-4))))
-                                ,(mono (assq-ref x 'identifier)
+                                ,(mono (assq-ref x
+                                                 'identifier)
                                        #:size '(text-md)
                                        #:color '(text-stone-600
                                                  dark:text-stone-400))

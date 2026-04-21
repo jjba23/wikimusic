@@ -45,7 +45,7 @@
         (wikimusic sqlite song)
         (wikimusic domain song)
         (wikimusic sqlite artwork)
-        (wikimusic domain artwork)        
+        (wikimusic domain artwork)
         (wikimusic sqlite artist)
         (wikimusic domain artist)
         (app views songs))
@@ -93,25 +93,26 @@
               (songs (cond
                        ((equal? #f user-search)
                         (get-songs song-repo
-                                  #:order-by (format #f "~a ~a"
-                                                     (car query-sort)
-                                                     (cadr query-sort))
-                                  #:limit query-limit
-                                  #:offset query-offset))
-                       (else
-                        (search-songs song-repo
-                                       (html-escape user-search)
-                                  #:order-by (format #f "~a ~a"
-                                                     (car query-sort)
-                                                     (cadr query-sort))
-                                  #:limit query-limit
-                                  #:offset query-offset))))
+                                   #:order-by (format #f "~a ~a"
+                                                      (car query-sort)
+                                                      (cadr query-sort))
+                                   #:limit query-limit
+                                   #:offset query-offset))
+                       (else (search-songs song-repo
+                                           (html-escape user-search)
+                                           #:order-by (format #f "~a ~a"
+                                                              (car query-sort)
+                                                              (cadr query-sort))
+                                           #:limit query-limit
+                                           #:offset query-offset))))
               (song-ids (map (lambda (s)
-                               (assq-ref s 'identifier)) songs))
+                               (assq-ref s
+                                         'identifier)) songs))
               (artworks (cond
                           ((nil? song-ids)
                            '())
-                          (else (get-artworks-by-entity-ids artwork-repo 'song song-ids))))
+                          (else (get-artworks-by-entity-ids artwork-repo
+                                                            'song song-ids))))
               (opinions (cond
                           ((nil? song-ids)
                            '())
@@ -175,7 +176,6 @@
                                                song-version-count-alist
                                                #:artists artists
                                                #:song-artists song-artists
-                                               #:opinions opinions
                                                #:comments comments
                                                #:limit query-limit
                                                #:offset query-offset
@@ -216,9 +216,8 @@
      (lambda (rc)
        (let* ((song-repo (make-sqlite-song-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
-              (song-id (params rc "uuid"))              
-              (song (get-song-by-id song-repo
-                                     song-id))
+              (song-id (params rc "uuid"))
+              (song (get-song-by-id song-repo song-id))
               (ascii-size (cond
                             ((not (equal? #f
                                           (get-from-qstr rc "ascii-size")))
@@ -239,7 +238,8 @@
                              (:cookies-value rc "wikimusic-ascii-size"))
                             (else "text-sm")))
               (inc-v (+ 1
-                        (assq-ref song 'views)))
+                        (assq-ref song
+                                  'views)))
               (artworks ($song_artworks 'get
                                         #:ret 'all
                                         #:order-by '(order_value asc)
@@ -293,11 +293,10 @@
                                  song-artists))
               (artists (if (nil? artist-uuids)
                            '()
-                           (get-artists-by-ids artist-repo artist-uuids)                           )))
+                           (get-artists-by-ids artist-repo artist-uuids))))
          
          ;; do views update
-         (update-song-by-id song-repo
-                            song-id
+         (update-song-by-id song-repo song-id
                             `((views unquote inc-v)))
 
          ;; return rendered view

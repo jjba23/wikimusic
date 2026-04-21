@@ -44,7 +44,7 @@
         (wikimusic domain artwork)
         (wikimusic sqlite artwork)
         (wikimusic domain song)
-        (wikimusic sqlite song)        
+        (wikimusic sqlite song)
         (app views artists))
 
 ;; ====== Data view GET routes ======
@@ -213,21 +213,14 @@
                                                                 (cadr
                                                                  song-query-sort))))
               (song-ids (map (lambda (s)
-                               (assq-ref s 'identifier)) songs))
+                               (assq-ref s
+                                         'identifier)) songs))
               (song-artworks (cond
                                ((nil? song-ids)
                                 '())
                                (else (get-artworks-by-entity-ids artwork-repo
                                                                  'song
                                                                  song-ids))))
-              (song-opinions (cond
-                               ((nil? song-ids)
-                                '())
-                               (else ($song_opinions 'get
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
               (song-comments (cond
                                ((nil? song-ids)
                                 '())
@@ -266,7 +259,6 @@
                                              song-version-count-alist
                                              #:artists '()
                                              #:song-artists '()
-                                             #:opinions song-opinions
                                              #:comments song-comments
                                              #:limit 0
                                              #:offset 0

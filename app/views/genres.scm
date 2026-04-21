@@ -110,12 +110,9 @@
                                                             xl:grid-cols-5))))
                                 ,(map (lambda (x)
                                         `(div ,(item-tile G_
-                                                          'genre
-                                                          x
+                                                          'genre x
                                                           (relevant-entities 'genre
                                                            artworks x)
-                                                          (relevant-entities 'genre
-                                                           opinions x)
                                                           (relevant-entities 'genre
                                                            comments x))))
                                       genres))
@@ -143,7 +140,8 @@
                  #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
                                                            md:py-4))))
                                ((div (@ (class ,(mk-class '(py-4))))
-                                     ,(h2 (assq-ref genre 'display-name)
+                                     ,(h2 (assq-ref genre
+                                                    'display-name)
                                           #:size '(text-3xl md:text-10)
                                           #:family '(font-serif)
                                           #:weight '(font-light leading-10)))

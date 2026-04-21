@@ -32,7 +32,8 @@
   (define insert-columns
     '(identifier username email password salt permissions))
 
-  (define conn (DB-open rc))
+  (define conn
+    (DB-open rc))
 
   (define (get-id-to-username)
     (let* ((query (format #f "SELECT ~a FROM user
@@ -63,7 +64,8 @@
           (car rows))))
 
   (define (get-user-by-id id)
-    (let* ((query (format #f "SELECT ~a FROM user WHERE identifier = ~a LIMIT 1"
+    (let* ((query (format #f
+                          "SELECT ~a FROM user WHERE identifier = ~a LIMIT 1"
                           (symbols->sql-columns-list columns)
                           (value->sql-literal id)))
            (_ (log-info "get-user-by-id query:\n\t~a\n" query))

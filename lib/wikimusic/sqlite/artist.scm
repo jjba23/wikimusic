@@ -46,7 +46,8 @@
                  views
                  description))
 
-    (define conn (DB-open rc))
+  (define conn
+    (DB-open rc))
 
   (define (get-artist-by-id id)
     (let* ((query (format #f
@@ -61,11 +62,16 @@
       (if (nil? rows) #f
           (car rows))))
 
-  (define* (get-artists #:key (order-by "created_at DESC")(limit 50)(offset 0))
-    (let* ((query (format #f "SELECT ~a FROM artists
+  (define* (get-artists #:key (order-by "created_at DESC")
+                        (limit 50)
+                        (offset 0))
+    (let* ((query (format #f
+                          "SELECT ~a FROM artists
                    ORDER BY ~a LIMIT ~a OFFSET ~a"
                           (symbols->sql-columns-list columns)
-                          order-by limit offset))
+                          order-by
+                          limit
+                          offset))
            (_ (log-info "get-artists query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
@@ -73,14 +79,21 @@
                         (length rows))))
       rows))
 
-   (define* (search-artists s #:key (order-by "created_at DESC")(limit 50)(offset 0))
+  (define* (search-artists s
+                           #:key (order-by "created_at DESC")
+                           (limit 50)
+                           (offset 0))
     (let* ((search (value->sql-literal (format #f "%~a%" s)))
-           (query (format #f "SELECT ~a FROM artists
+           (query (format #f
+                   "SELECT ~a FROM artists
                    WHERE (display_name LIKE ~a OR description LIKE ~a)
                    ORDER BY ~a LIMIT ~a OFFSET ~a"
-                          (symbols->sql-columns-list columns)
-                          search search
-                          order-by limit offset))
+                   (symbols->sql-columns-list columns)
+                   search
+                   search
+                   order-by
+                   limit
+                   offset))
            (_ (log-info "get-artists query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
@@ -88,7 +101,7 @@
                         (length rows))))
       rows))
 
-    (define (get-artists-by-ids ids)
+  (define (get-artists-by-ids ids)
     (let* ((query (format #f "SELECT ~a FROM artists WHERE identifier IN(~a)"
                           (symbols->sql-columns-list columns)
                           (string-join (map value->sql-literal ids) ", ")))

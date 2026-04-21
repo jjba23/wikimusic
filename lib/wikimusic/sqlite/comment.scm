@@ -27,7 +27,7 @@
 ;; --- SQLite implementation ---
 (define (make-sqlite-comment-repository rc)
   (define columns
-    '(identifier parent-identifier 
+    '(identifier parent-identifier
                  created-by
                  visibility-status
                  contents
@@ -36,7 +36,7 @@
                  last-edited-at))
 
   (define insert-columns
-    '(identifier parent-identifier 
+    '(identifier parent-identifier
                  created-by
                  visibility-status
                  contents
@@ -67,8 +67,7 @@
       (DB-query conn query)))
 
   (define (delete-comment-by-id entity id)
-    (let* ((query (format #f
-                          "DELETE FROM comments WHERE identifier = ~a"
+    (let* ((query (format #f "DELETE FROM comments WHERE identifier = ~a"
                           (value->sql-literal id)))
            (_ (log-info "delete-comment-by-id query:\n\t~a\n" query)))
       (DB-query conn query)))
@@ -84,8 +83,6 @@
       (DB-query conn query)))
 
   (mk-comment-repository #:get-comments-by-entity-ids-proc
-                                get-comments-by-entity-ids
-                                #:insert-comment-proc
-                                insert-comment
-                                #:delete-comment-by-id-proc
-                                delete-comment-by-id))
+                         get-comments-by-entity-ids
+                         #:insert-comment-proc insert-comment
+                         #:delete-comment-by-id-proc delete-comment-by-id))

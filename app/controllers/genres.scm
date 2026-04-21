@@ -44,6 +44,8 @@
         (wikimusic sqlite genre)
         (wikimusic domain artwork)
         (wikimusic sqlite artwork)
+        (wikimusic domain song)
+        (wikimusic sqlite song)
         (app views songs)
         (app views genres))
 
@@ -88,29 +90,30 @@
                               (string->number (get-from-qstr rc "limit")))
                              (else 40)))
               (genres (cond
-                       ((equal? #f user-search)
-                        (get-genres genre-repo
-                                  #:order-by (format #f "~a ~a"
-                                                     (car query-sort)
-                                                     (cadr query-sort))
-                                  #:limit query-limit
-                                  #:offset query-offset))
-                       (else
-                        (search-genres genre-repo
-                                       (html-escape user-search)
-                                  #:order-by (format #f "~a ~a"
-                                                     (car query-sort)
-                                                     (cadr query-sort))
-                                  #:limit query-limit
-                                  #:offset query-offset))))
+                        ((equal? #f user-search)
+                         (get-genres genre-repo
+                                     #:order-by (format #f "~a ~a"
+                                                        (car query-sort)
+                                                        (cadr query-sort))
+                                     #:limit query-limit
+                                     #:offset query-offset))
+                        (else (search-genres genre-repo
+                                             (html-escape user-search)
+                                             #:order-by (format #f "~a ~a"
+                                                                (car
+                                                                 query-sort)
+                                                                (cadr
+                                                                 query-sort))
+                                             #:limit query-limit
+                                             #:offset query-offset))))
               (genre-ids (map (lambda (s)
                                 (assq-ref s
                                           'identifier)) genres))
               (artworks (cond
                           ((nil? genre-ids)
                            '())
-                          (else (get-artworks-by-entity-ids
-                                 artwork-repo 'genre genre-ids))))
+                          (else (get-artworks-by-entity-ids artwork-repo
+                                                            'genre genre-ids))))
               (opinions (cond
                           ((nil? genre-ids)
                            '())
@@ -159,14 +162,14 @@
        (let* ((genre-id (params rc "uuid"))
               (genre-repo (make-sqlite-genre-repository rc))
               (genre (get-genre-by-id genre-repo genre-id))
+              (artwork-repo (make-sqlite-artwork-repository rc))
+              (song-repo (make-sqlite-song-repository rc))
               (inc-v (+ 1
                         (assq-ref genre
                                   'views)))
-              (artworks ($genre_artworks 'get
-                                         #:ret 'all
-                                         #:order-by '(order_value asc)
-                                         #:condition (where #:genre_identifier
-                                                            genre-id)))
+              (artworks (get-artworks-by-entity-ids artwork-repo
+                                                    'genre
+                                                    (list genre-id)))
               (opinions ($genre_opinions 'get
                                          #:ret 'all
                                          #:condition (where #:genre_identifier
@@ -211,33 +214,21 @@
                                 (else "display-name-asc")))
               (song-query-sort (entity-sort-from-query song-user-sort))
 
-              (songs (DB-get-all-rows (DB-query (DB-open rc)
-                                                (format #f
-                                                 "SELECT * FROM songs WHERE identifier IN
-                                                             (SELECT song_identifier FROM song_genres WHERE genre_identifier = '~a') ORDER BY ~a ~a"
-                                                 genre-id
-                                                 (car song-query-sort)
-                                                 (cadr song-query-sort)))))
+              (songs (get-songs-by-genre-id song-repo genre-id
+                                            #:order-by (format #f "~a ~a"
+                                                               (car
+                                                                song-query-sort)
+                                                               (cadr
+                                                                song-query-sort))))
               (song-ids (map (lambda (s)
-                               (assoc-ref s "identifier")) songs))
+                               (assq-ref s
+                                         'identifier)) songs))
               (song-artworks (cond
                                ((nil? song-ids)
                                 '())
-                               (else ($song_artworks 'get
-                                                     #:ret 'all
-                                                     #:order-by '(order_value
-                                                                  asc)
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
-              (song-opinions (cond
-                               ((nil? song-ids)
-                                '())
-                               (else ($song_opinions 'get
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
+                               (else (get-artworks-by-entity-ids artwork-repo
+                                                                 'song
+                                                                 song-ids))))
               (song-comments (cond
                                ((nil? song-ids)
                                 '())
@@ -293,7 +284,6 @@
                                              song-version-count-alist
                                              #:artists artists
                                              #:song-artists song-artists
-                                             #:opinions song-opinions
                                              #:comments song-comments
                                              #:limit 0
                                              #:offset 0

@@ -19,13 +19,17 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (wikimusic domain repo)
-  #:export (get-artist-by-id get-artists search-artists insert-artist delete-artist-by-id
-                           update-artist-by-id get-artists-by-ids))
+  #:export (get-artist-by-id get-artists
+                             search-artists
+                             insert-artist
+                             delete-artist-by-id
+                             update-artist-by-id
+                             get-artists-by-ids))
 
 ;; -- Record definition ---
 
 (define-record-with-kw (<artist-repository> %make-artist-repository
-                                          artist-repository?)
+                                            artist-repository?)
                        mk-artist-repository
                        (get-artist-by-id-proc repo-get-artist-by-id)
                        (get-artists-by-ids-proc repo-get-artists-by-ids)

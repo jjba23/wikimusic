@@ -61,7 +61,8 @@
                'song-identifier)
               (else 'song-identifier))))
     (filter (lambda (related-entity)
-              (equal? (assq-ref x 'identifier)
+              (equal? (assq-ref x
+                                'identifier)
                       (assq-ref related-entity k))) related-entities)))
 
 (define-public (entity-sort-from-query user-sort)

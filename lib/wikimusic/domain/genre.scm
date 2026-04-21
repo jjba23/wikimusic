@@ -19,16 +19,20 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (wikimusic domain repo)
-  #:export (get-genre-by-id get-genres-by-ids get-genres search-genres insert-genre delete-genre-by-id
-                           update-genre-by-id))
+  #:export (get-genre-by-id get-genres-by-ids
+                            get-genres
+                            search-genres
+                            insert-genre
+                            delete-genre-by-id
+                            update-genre-by-id))
 
 ;; -- Record definition ---
 
 (define-record-with-kw (<genre-repository> %make-genre-repository
-                                          genre-repository?)
+                                           genre-repository?)
                        mk-genre-repository
                        (get-genre-by-id-proc repo-get-genre-by-id)
-                       (get-genres-by-ids-proc repo-get-genres-by-ids)                       
+                       (get-genres-by-ids-proc repo-get-genres-by-ids)
                        (get-genres-proc repo-get-genres)
                        (search-genres-proc repo-search-genres)
                        (insert-genre-proc repo-insert-genre)

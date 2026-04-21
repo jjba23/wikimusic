@@ -26,7 +26,8 @@
 (define-record-with-kw (<artwork-repository> %make-artwork-repository
                                              artwork-repository?)
                        mk-artwork-repository
-                       (get-artworks-by-entity-ids-proc repo-get-artworks-by-entity-ids)
+                       (get-artworks-by-entity-ids-proc
+                        repo-get-artworks-by-entity-ids)
                        (insert-artwork-proc repo-insert-artwork)
                        (delete-artwork-by-id-proc repo-delete-artwork-by-id))
 

@@ -26,7 +26,8 @@
 (define-record-with-kw (<comment-repository> %make-comment-repository
                                              comment-repository?)
                        mk-comment-repository
-                       (get-comments-by-entity-ids-proc repo-get-comments-by-entity-ids)
+                       (get-comments-by-entity-ids-proc
+                        repo-get-comments-by-entity-ids)
                        (insert-comment-proc repo-insert-comment)
                        (delete-comment-by-id-proc repo-delete-comment-by-id))
 

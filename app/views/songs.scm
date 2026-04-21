@@ -36,7 +36,6 @@
 (define* (render-song-tile G_
                            #:key artworks
                            song-version-count-alist
-                           opinions
                            comments
                            artists
                            song-artists
@@ -55,12 +54,13 @@
                                                          #:color '(text-onyx-300
                                                                    dark:text-stone-300)))))
                                            (assoc-ref song-version-count-alist
-                                            (assq-ref x 'identifier))))
+                                            (assq-ref x
+                                                      'identifier))))
          (this-song-artists-relations (map (lambda (aa)
                                              (assoc-ref aa "artist_identifier"))
                                            (filter (lambda (a)
                                                      (equal? (assq-ref x
-                                                              'identifier)
+                                                                       'identifier)
                                                              (assoc-ref a
                                                               "song_identifier")))
                                                    song-artists)))
@@ -68,20 +68,22 @@
          (art (filter (lambda (aaa)
                         (find (lambda (s)
                                 (equal? s
-                                        (assq-ref aaa 'identifier)))
+                                        (assq-ref aaa
+                                                  'identifier)))
                               this-song-artists-relations)) artists))
 
          (extra-top-info `((div (@ (class ,(mk-class '(py-2 text-center flex
                                                             flex-col gap-2
                                                             align-center))))
                                 ,(map (lambda (ar)
-                                        (a (assq-ref ar 'displayname)
+                                        (a (assq-ref ar
+                                                     'displayname)
                                            #:weight '(font-light)
                                            #:size '(text-md)
                                            #:href (format #f
                                                           "/artists/uuid/~a"
                                                           (assq-ref ar
-                                                           'identifier))
+                                                                    'identifier))
                                            #:color '(text-onyx-300
                                                      dark:text-stone-100)
                                            #:hover '(hover:text-persia-pink-900
@@ -93,7 +95,6 @@
                        'song
                        x
                        (relevant-entities 'song artworks x)
-                       (relevant-entities 'song opinions x)
                        (relevant-entities 'song comments x)
                        #:extra-top-info extra-top-info
                        #:extra-bot-info extra-bot-info)))))
@@ -103,7 +104,6 @@
                          songs
                          artworks
                          song-version-count-alist
-                         opinions
                          comments
                          artists
                          song-artists
@@ -192,7 +192,6 @@
                                          #:artworks artworks
                                          #:song-version-count-alist
                                          song-version-count-alist
-                                         #:opinions opinions
                                          #:comments comments
                                          #:artists artists
                                          #:song-artists song-artists
@@ -227,7 +226,8 @@
                            is-logged-in)
   
   (let* ((artist-name-titles (map (lambda (ar)
-                                    `((div ,(a (assq-ref ar 'display-name)
+                                    `((div ,(a (assq-ref ar
+                                                         'display-name)
                                                #:size '(text-lg)
                                                #:weight '(font-light)
                                                #:color '(text-onyx-300
@@ -239,7 +239,7 @@
                                                        "/artists/uuid/~a"
 
                                                        (assq-ref ar
-                                                        'identifier))))))
+                                                                 'identifier))))))
                                   artists))
          (genre-name-titles (map (lambda (ar)
                                    `((div ,(a (assoc-ref ar "display_name")
@@ -299,7 +299,7 @@
                                                                    gap-4))))
                                        (div (@ (class ,(mk-class '(py-4))))
                                             ,(h2 (assq-ref song
-                                                            'display-name)
+                                                           'display-name)
                                                  #:size '(text-3xl md:text-10)
                                                  #:family '(font-serif)
                                                  #:weight '(font-light
