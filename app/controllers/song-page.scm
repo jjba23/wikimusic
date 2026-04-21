@@ -70,6 +70,7 @@
               (song-repo (make-sqlite-song-repository rc))
               (opinion-repo (make-sqlite-opinion-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
+              (comment-repo (make-sqlite-comment-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (user-search (cond
                              ((equal? #f
@@ -130,7 +131,7 @@
               (comments (cond
                           ((nil? song-ids)
                            '())
-                          (else (get-song-comments-by-ids song-repo song-ids))))
+                          (else (get-comments-by-entity-ids comment-repo 'song song-ids))))
               (song-contents (cond
                                ((nil? song-ids)
                                 '())
