@@ -311,23 +311,18 @@
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
-       (let* ((uuid (params rc "uuid"))
-              (genre (car ($genres 'get
-                                   #:ret 'top
-                                   #:condition (where #:identifier uuid))))
-              (e ($genre_external_sources 'get
-                                          #:ret 'top
-                                          #:condition (where
-                                                             #:genre_identifier
-                                                             uuid)))
+       (let* ((genre-id (params rc "uuid"))
+              (genre-repo (make-sqlite-genre-repository rc))
+              (genre (get-genre-by-id genre-repo genre-id))
+                            (artwork-repo (make-sqlite-artwork-repository rc))
+              (external-source-repo (make-sqlite-external-source-repository rc))
+              (e (get-external-sources-by-entity-ids external-source-repo 'genre (list genre-id)))
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '()))
-              (artworks ($genre_artworks 'get
-                                         #:ret 'all
-                                         #:order-by '(order_value asc)
-                                         #:condition (where #:genre_identifier
-                                                            uuid))))
+              (artworks (get-artworks-by-entity-ids artwork-repo
+                                                    'genre
+                                                    (list genre-id))))
          
          (response-emit (:mime rc
                                (genre-edit-page (:i18n rc)

@@ -37,32 +37,33 @@
                           is-logged-in)
   (let* ((arts (map (lambda (a)
                       `(div (figure (@ (class ,(mk-class '(py-3 sm:w-36))))
-                                    (img (@ (loading "lazy")
+                                    (img (@ (loading lazy)
                                             (class ,(mk-class '(rounded-xl)))
-                                            (src ,(uri-decode (assoc-ref a
-                                                               "content_url"))))))
+                                            (src ,(uri-decode (assq-ref a
+                                                               'content-url))))))
                             ,(artwork-form G_
                                            #:entity 'genre
-                                           #:entity-identifier (assoc-ref
+                                           #:entity-identifier (assq-ref
                                                                 genre
-                                                                "identifier")
-                                           #:artwork-identifier (assoc-ref a
-                                                                 "identifier")
-                                           #:content-url (uri-decode (assoc-ref
+                                                                'identifier)
+                                           #:artwork-identifier (assq-ref a
+                                                                 'identifier)
+                                           #:content-url (uri-decode (assq-ref
                                                                       a
-                                                                      "content_url"))
+                                                                      'content-url))
                                            #:content-caption (assoc-ref-or-empty-str
                                                               a
-                                                              "content_caption")
-                                           #:order-value (assoc-ref a
-                                                          "order_value"))))
+                                                              'content-caption)
+                                           #:order-value (assq-ref a
+                                                          'order-value))))
                     artworks))
          (body `(div (@ (class ,(mk-class '(px-2 py-4))))
                      (div (@ (class ,(mk-class '(py-3))))
-                          ,(if (assoc-ref genre "identifier")
+                          ,(if (assq-ref genre 'identifier)
                                (h2 (format #f "~a: ~a"
                                            (G_ "editing genre")
-                                           (assoc-ref genre "display_name")))
+                                           (assq-ref genre
+                                                     'display-name)))
                                (h2 (G_ "new genre"))))
                      (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
@@ -80,9 +81,9 @@
                                        ,(G_ "new artwork"))
                               ,(artwork-form G_
                                              #:entity 'genre
-                                             #:entity-identifier (assoc-ref
+                                             #:entity-identifier (assq-ref
                                                                   genre
-                                                                  "identifier")))
+                                                                  'identifier)))
                      ,(hr)
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
@@ -92,12 +93,12 @@
                                                               cursor-pointer))))
                                        ,(G_ "editing genre"))
                               ,(genre-form G_
-                                           #:identifier (assoc-ref genre
-                                                         "identifier")
-                                           #:display-name (assoc-ref genre
-                                                           "display_name")
+                                           #:identifier (assq-ref genre
+                                                                  'identifier)
+                                           #:display-name (assq-ref genre
+                                                                    'display-name)
                                            #:description (assoc-ref-or-empty-str
-                                                          genre "description")))
+                                                          genre 'description)))
                      ,(hr)
                      (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
@@ -107,29 +108,29 @@
                                        ,(G_ "editing external sources"))
                               ,(external-sources-form G_
                                                       #:entity 'genre
-                                                      #:entity-identifier (assoc-ref
+                                                      #:entity-identifier (assq-ref
                                                                            genre
-                                                                           "identifier")
+                                                                           'identifier)
                                                       #:external-sources-identifier
-                                                      (assoc-ref
+                                                      (assq-ref
                                                        external-sources
-                                                       "identifier")
+                                                       'identifier)
                                                       #:wikipedia-url (uri-decode
                                                                        (assoc-ref-or-empty-str
                                                                         external-sources
-                                                                        "wikipedia_url"))
+                                                                        'wikipedia-url))
                                                       #:spotify-url (uri-decode
                                                                      (assoc-ref-or-empty-str
                                                                       external-sources
-                                                                      "spotify_url"))
+                                                                      'spotify-url))
                                                       #:youtube-url (uri-decode
                                                                      (assoc-ref-or-empty-str
                                                                       external-sources
-                                                                      "youtube_url"))
+                                                                      'youtube-url))
                                                       #:soundcloud-url (uri-decode
                                                                         (assoc-ref-or-empty-str
                                                                          external-sources
-                                                                         "soundcloud_url")))))))
+                                                                         'soundcloud-url)))))))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:body body)))

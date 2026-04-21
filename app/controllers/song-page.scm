@@ -130,11 +130,7 @@
               (comments (cond
                           ((nil? song-ids)
                            '())
-                          (else ($song_comments 'get
-                                                #:ret 'all
-                                                #:condition (where
-                                                                   #:song_identifier
-                                                                   song-ids)))))
+                          (else (get-song-comments-by-ids song-repo song-ids))))
               (song-contents (cond
                                ((nil? song-ids)
                                 '())
@@ -278,8 +274,8 @@
                                                    (list song-id)))
               (genres (if (nil? song-genres)
                           '()
-                          (get-genres-by-ids genre-repo (map (lambda (a)
-                                                      (assq-ref a
+                          (get-genres-by-ids genre-repo (map (lambda (g)
+                                                      (assq-ref g
                                                                 'genre-identifier))
                                                     song-genres))))
               (song-artists (get-song-artists-by-ids song-repo
@@ -323,42 +319,31 @@
               (song-id (params rc "uuid"))
               (song-repo (make-sqlite-song-repository rc))
               (artwork-repo (make-sqlite-artwork-repository rc))
+              (artist-repo (make-sqlite-artist-repository rc))              
               (external-source-repo (make-sqlite-external-source-repository rc))
               (song (get-song-by-id song-repo song-id))
               (artworks (get-artworks-by-entity-ids artwork-repo
                                                     'song
                                                     (list song-id)))
+
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
                                                                 #:song_identifier
                                                                 song-id)))
-              (song-genres ($song_genres 'get
-                                         #:ret 'all
-                                         #:condition (where #:song_identifier
-                                                            song-id)))
-              (genre-uuids (map (lambda (a)
-                                  (assoc-ref a "genre_identifier"))
-                                song-genres))
-              (genres (if (nil? genre-uuids)
+              (song-genres (get-song-genres-by-ids song-repo
+                                                   (list song-id)))
+              (genres (if (nil? song-genres)
                           '()
-                          ($genres 'get
-                                   #:ret 'all
-                                   #:condition (where #:identifier genre-uuids))))
-              (song-artists ($song_artists 'get
-                                           #:ret 'all
-                                           #:condition (where
-                                                              #:song_identifier
-                                                              song-id)))
-              (artist-uuids (map (lambda (a)
-                                   (assoc-ref a "artist_identifier"))
-                                 song-artists))
-              (artists (if (nil? artist-uuids)
+                          (get-genres-by-ids genre-repo (map (lambda(g) (assq-ref g 'genre-identifier)) song-genres))))
+              (song-artists (get-song-artists-by-ids song-repo
+                                                     (list song-id)))
+              (artists (if (nil? song-artists)
                            '()
-                           ($artists 'get
-                                     #:ret 'all
-                                     #:condition (where #:identifier
-                                                        artist-uuids))))
+                           (get-artists-by-ids artist-repo (map (lambda (a)
+                                                      (assq-ref a
+                                                                'artist-identifier))
+                                                    song-artists))))
               (e (get-external-sources-by-entity-ids external-source-repo
                                                      'song
                                                      (list song-id)))
