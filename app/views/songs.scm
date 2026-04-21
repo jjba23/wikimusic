@@ -363,7 +363,7 @@
                      ,(if (assoc-ref song "identifier")
                           (h2 (format #f "~a: ~a"
                                       (G_ "editing song")
-                                      (assoc-ref song "display_name")))
+                                      (assoc-ref song 'display-name)))
                           (h2 (G_ "new song")))
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
@@ -375,31 +375,31 @@
                               ,(map (lambda (a)
                                       `(div (figure (@ (class ,(mk-class '(py-3
                                                                            sm:w-36))))
-                                                    (img (@ (loading "lazy")
+                                                    (img (@ (loading lazy)
                                                             (class ,(mk-class '
                                                                               (rounded-xl
                                                                                max-w-full)))
                                                             (src ,(uri-decode (assoc-ref
                                                                                a
-                                                                               "content_url"))))))
+                                                                               'content-url))))))
                                             ,(artwork-form G_
                                                            #:entity 'song
                                                            #:entity-identifier
                                                            (assoc-ref song
-                                                            "identifier")
+                                                            'identifier)
                                                            #:artwork-identifier
                                                            (assoc-ref a
-                                                            "identifier")
+                                                            'identifier)
                                                            #:content-url (uri-decode
                                                                           (assoc-ref
                                                                            a
-                                                                           "content_url"))
+                                                                           'content-url))
                                                            #:content-caption (assoc-ref-or-empty-str
                                                                               a
-                                                                              "content_caption")
+                                                                              'content-caption)
                                                            #:order-value (assoc-ref
                                                                           a
-                                                                          "order_value"))))
+                                                                          'order-value))))
                                     artworks))
                      ,(hr)
                      (details (@ (open true)

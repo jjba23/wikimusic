@@ -330,24 +330,20 @@
      #:i18n '(cookie "lang")
      (lambda (rc)
        (let* ((G_ (:i18n rc))
-              (uuid (params rc "uuid"))
-              (song (car ($songs 'get
-                                 #:ret 'top
-                                 #:condition (where #:identifier uuid))))
-              (artworks ($song_artworks 'get
-                                        #:ret 'all
-                                        #:order-by '(order_value asc)
-                                        #:condition (where #:song_identifier
-                                                           uuid)))
+              (song-id (params rc "uuid"))
+              (song-repo (make-sqlite-song-repository rc))
+              (artwork-repo (make-sqlite-artwork-repository rc))
+              (song (get-song-by-id song-repo song-id))
+              (artworks (get-artworks-by-entity-ids artwork-repo 'song (list song-id)))
               (song-contents ($song_contents 'get
                                              #:ret 'all
                                              #:condition (where
                                                                 #:song_identifier
-                                                                uuid)))
+                                                                song-id)))
               (song-genres ($song_genres 'get
                                          #:ret 'all
                                          #:condition (where #:song_identifier
-                                                            uuid)))
+                                                            song-id)))
               (genre-uuids (map (lambda (a)
                                   (assoc-ref a "genre_identifier"))
                                 song-genres))
@@ -360,7 +356,7 @@
                                            #:ret 'all
                                            #:condition (where
                                                               #:song_identifier
-                                                              uuid)))
+                                                              song-id)))
               (artist-uuids (map (lambda (a)
                                    (assoc-ref a "artist_identifier"))
                                  song-artists))
@@ -373,7 +369,7 @@
               (e ($song_external_sources 'get
                                          #:ret 'top
                                          #:condition (where #:song_identifier
-                                                            uuid)))
+                                                            song-id)))
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '())))
