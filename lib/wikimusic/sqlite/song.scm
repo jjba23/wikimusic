@@ -142,33 +142,29 @@
                         (length rows))))
       rows))
 
-    (define* (get-song-artists-by-id id)
-    (let* ((query (format #f "SELECT artist_identifier FROM song_artists
-                   WHERE song_identifier = ~a
+    (define* (get-song-artists-by-ids ids)
+    (let* ((query (format #f "SELECT song_identifier, artist_identifier FROM song_artists
+                   WHERE song_identifier IN(~a)
                    ORDER BY created_at DESC"
-                          (value->sql-literal id)))
+                          (string-join (map value->sql-literal ids) ", ")))
            (_ (log-info "get-song-artists-by-id query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
            (_ (log-info "get-songs-artists-by-id rows: ~a\n"
                         (length rows))))
-      (map (lambda (r)
-             (assq-ref r
-                   'artist-identifier)) rows)))
+      rows))
     
-  (define* (get-song-genres-by-id id)
-    (let* ((query (format #f "SELECT genre_identifier FROM song_genres
-                   WHERE song_identifier = ~a
+  (define* (get-song-genres-by-ids ids)
+    (let* ((query (format #f "SELECT song_identifier, genre_identifier FROM song_genres
+                   WHERE song_identifier IN(~a)
                    ORDER BY created_at DESC"
-                          (value->sql-literal id)))
+                          (string-join (map value->sql-literal ids) ", ")))
            (_ (log-info "get-song-genres-by-id query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query conn query))))
            (_ (log-info "get-songs-genres-by-id rows: ~a\n"
                         (length rows))))
-      (map (lambda (r)
-             (assq-ref r
-                   'genre-identifier)) rows)))
+      rows))
 
   (define (update-song-by-id id attrs)
     (let* ((query (format #f "UPDATE songs SET ~a WHERE identifier = ~a"
@@ -197,8 +193,8 @@
                       #:get-songs-proc get-songs
                       #:get-songs-by-artist-id-proc get-songs-by-artist-id
                       #:get-songs-by-genre-id-proc get-songs-by-genre-id
-                      #:get-song-genres-by-id-proc get-song-genres-by-id
-                      #:get-song-artists-by-id-proc get-song-artists-by-id                      
+                      #:get-song-genres-by-ids-proc get-song-genres-by-ids
+                      #:get-song-artists-by-ids-proc get-song-artists-by-ids
                       #:search-songs-proc search-songs
                       #:insert-song-proc insert-song
                       #:delete-song-by-id-proc delete-song-by-id

@@ -24,8 +24,8 @@
                            insert-song
                            get-songs-by-artist-id
                            get-songs-by-genre-id
-                           get-song-genres-by-id
-                           get-song-artists-by-id
+                           get-song-genres-by-ids
+                           get-song-artists-by-ids
                            delete-song-by-id
                            update-song-by-id))
 
@@ -39,8 +39,8 @@
                        (get-songs-by-artist-id-proc
                         repo-get-songs-by-artist-id)
                        (get-songs-by-genre-id-proc repo-get-songs-by-genre-id)
-                       (get-song-genres-by-id-proc repo-get-song-genres-by-id)
-                       (get-song-artists-by-id-proc repo-get-song-artists-by-id)
+                       (get-song-genres-by-ids-proc repo-get-song-genres-by-ids)
+                       (get-song-artists-by-ids-proc repo-get-song-artists-by-ids)
                        (search-songs-proc repo-search-songs)
                        (insert-song-proc repo-insert-song)
                        (delete-song-by-id-proc repo-delete-song-by-id)
@@ -60,11 +60,11 @@
 (define-repo-method get-songs-by-genre-id repo-get-songs-by-genre-id
  "Retrieves a list of all active songs by genre ID from the given REPO.")
 
-(define-repo-method get-song-genres-by-id repo-get-song-genres-by-id
- "Retrieves a list of song genres by ID from the given REPO.")
+(define-repo-method get-song-genres-by-ids repo-get-song-genres-by-ids
+ "Retrieves a list of song genres by IDS from the given REPO.")
 
-(define-repo-method get-song-artists-by-id repo-get-song-artists-by-id
- "Retrieves a list of song artists by ID from the given REPO.")
+(define-repo-method get-song-artists-by-ids repo-get-song-artists-by-ids
+ "Retrieves a list of song artists by IDS from the given REPO.")
 
 (define-repo-method search-songs repo-search-songs
  "Retrieves a search list of all active songs from the given REPO.")

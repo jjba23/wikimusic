@@ -54,6 +54,8 @@
         (wikimusic sqlite external-source)
         (wikimusic domain user)
         (wikimusic sqlite user)
+        (wikimusic domain artist)
+        (wikimusic sqlite artist)        
         (app views genre-view)
         (app views genre-edit)
         (app views song-view)
@@ -168,6 +170,7 @@
               (external-source-repo (make-sqlite-external-source-repository rc))
               (genre (get-genre-by-id genre-repo genre-id))
               (artwork-repo (make-sqlite-artwork-repository rc))
+              (artist-repo (make-sqlite-artist-repository rc))              
               (comment-repo (make-sqlite-comment-repository rc))
               (user-repo (make-sqlite-user-repository rc))
               (song-repo (make-sqlite-song-repository rc))
@@ -265,20 +268,14 @@
               (song-artists (cond
                               ((nil? song-ids)
                                '())
-                              (else ($song_artists 'get
-                                                   #:ret 'all
-                                                   #:condition (where
-                                                                #:song_identifier
-                                                                song-ids)))))
-              (artist-uuids (map (lambda (a)
-                                   (assoc-ref a "artist_identifier"))
-                                 song-artists))
-              (artists (if (nil? artist-uuids)
+                              (else (get-song-artists-by-ids song-repo
+                                                             song-ids))))
+              (artists (if (nil? song-artists)
                            '()
-                           ($artists 'get
-                                     #:ret 'all
-                                     #:condition (where #:identifier
-                                                        artist-uuids))))
+                           (get-artists-by-ids artist-repo (map (lambda (a)
+                                                      (assq-ref a
+                                                                'artist-identifier))
+                                                    song-artists))))
               (song-fragment (song-list-page (:i18n rc)
                                              #:only-tiles #t
                                              #:songs songs

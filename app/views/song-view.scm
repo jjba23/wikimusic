@@ -56,15 +56,16 @@
                                            (assoc-ref song-version-count-alist
                                             (assq-ref x
                                                       'identifier))))
+         (respective (filter (lambda (a)
+                               (equal? (assq-ref x
+                                                 'identifier)
+                                       (assq-ref a
+                                                 'song-identifier)))
+                             song-artists))
          (this-song-artists-relations (map (lambda (aa)
-                                             (assoc-ref aa "artist_identifier"))
-                                           (filter (lambda (a)
-                                                     (equal? (assq-ref x
-                                                                       'identifier)
-                                                             (assoc-ref a
-                                                              "song_identifier")))
-                                                   song-artists)))
-
+                                             (assq-ref aa
+                                                       'artist-identifier))
+                                           respective))
          (art (filter (lambda (aaa)
                         (find (lambda (s)
                                 (equal? s
@@ -77,7 +78,7 @@
                                                             align-center))))
                                 ,(map (lambda (ar)
                                         (a (assq-ref ar
-                                                     'displayname)
+                                                     'display-name)
                                            #:weight '(font-light)
                                            #:size '(text-md)
                                            #:href (format #f
@@ -242,7 +243,8 @@
                                                                  'identifier))))))
                                   artists))
          (genre-name-titles (map (lambda (ar)
-                                   `((div ,(a (assoc-ref ar 'display-name)
+                                   `((div ,(a (assoc-ref ar
+                                                         'display-name)
                                               #:size '(text-lg)
                                               #:weight '(font-light)
                                               #:color '(text-onyx-300
@@ -254,7 +256,7 @@
                                                       "/genres/uuid/~a"
 
                                                       (assq-ref ar
-                                                                 'identifier))))))
+                                                                'identifier))))))
                                  genres))
          (song-attributes `((div (@ (class ,(mk-class '(px-4 py-6 container
                                                              mx-auto))))
