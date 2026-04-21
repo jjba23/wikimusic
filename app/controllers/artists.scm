@@ -97,7 +97,7 @@
               (query-limit (cond
                              ((not (nil? (get-from-qstr rc "limit")))
                               (string->number (get-from-qstr rc "limit")))
-                             (else 40)))
+                             (else 100)))
               (artists (cond
                          ((equal? #f user-search)
                           (get-artists artist-repo

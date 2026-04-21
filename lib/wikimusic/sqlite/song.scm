@@ -72,7 +72,7 @@
           (car rows))))
 
   (define* (get-songs #:key (order-by "created_at DESC")
-                      (limit 50)
+                      (limit 100)
                       (offset 0))
     (let* ((query (format #f
                           "SELECT ~a FROM songs\n                   ORDER BY ~a LIMIT ~a OFFSET ~a"
@@ -115,7 +115,7 @@
 
   (define* (search-songs s
                          #:key (order-by "created_at DESC")
-                         (limit 50)
+                         (limit 100)
                          (offset 0))
     (let* ((search (value->sql-literal (format #f "%~a%" s)))
            (query (format #f

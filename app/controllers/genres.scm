@@ -96,7 +96,7 @@
               (query-limit (cond
                              ((not (nil? (get-from-qstr rc "limit")))
                               (string->number (get-from-qstr rc "limit")))
-                             (else 40)))
+                             (else 100)))
               (genres (cond
                         ((equal? #f user-search)
                          (get-genres genre-repo

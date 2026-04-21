@@ -293,31 +293,36 @@
                                                rounded-2xl
                                                shadow-lg
                                                h-full
+                                               flex
+                                               flex-col
+                                               overflow-hidden
                                                border-2
                                                border-persia-pink-100/25
                                                dark:border-persia-pink-900/10))))
+
+           ;; Top cover
+           ,(render-if-nempty (lambda (art)
+                                `(a (@ (href ,item-link)
+                                       (class ,(mk-class '(block w-full h-64
+                                                                 shrink-0))))
+                                    (img (@ (loading "lazy")
+                                            ;; object-cover acts like background-size: cover
+                                            (class ,(mk-class '(w-full h-full
+                                                                object-cover)))
+                                            (src ,(uri-decode (assq-ref art
+                                                                        'content-url)))))))
+                              (cond
+                                ((nil? artworks)
+                                 '())
+                                (else (car artworks))))
+
+           ;; Bottom padded section
            (div (@ (class ,(mk-class '(flex flex-col
-                                            py-3
+                                            flex-grow
+                                            py-4
                                             px-3
                                             justify-center
-                                            align-center
-                                            h-full))))
-                ,(render-if-nempty (lambda (art)
-                                     `(figure (@ (class ,(mk-class '(py-3
-                                                                     self-center))))
-                                              (a (@ (href ,item-link))
-                                                 (img (@ (loading "lazy")
-                                                         (class ,(mk-class '(rounded-xl
-                                                                             w-full
-                                                                             max-w-prose
-                                                                             shadow-xl)))
-                                                         (src ,(uri-decode (assq-ref
-                                                                            art
-                                                                            'content-url))))))))
-                                   (cond
-                                     ((nil? artworks)
-                                      '())
-                                     (else (car artworks))))
+                                            items-center))))
                 (div (@ (class ,(mk-class '(text-center))))
                      ,(a (assq-ref x
                                    'display-name)
@@ -331,12 +336,8 @@
                                    hover:dark:text-persia-pink-300)))
                 (div (@ (class ,(mk-class '(pt-2))))
                      ,extra-top-info)
-                (div (@ (class ,(mk-class '(flex flex-row
-                                                 gap-2
-                                                 flex-wrap
-                                                 items-center
-                                                 align-center
-                                                 justify-center))))
+                (div (@ (class ,(mk-class '(flex flex-row gap-2 flex-wrap
+                                                 items-center justify-center))))
                      (div (@ (class ,(mk-class '())))
                           ,(em (format #f "~a ~a"
                                        (assq-ref x
@@ -371,23 +372,28 @@
                                           (assoc-ref u "username")
                                           (assoc-ref u "email"))))
                            (car (assoc-ref user-alist
-                                           (assoc-ref comment "created_by"))))
+                                           (assq-ref comment
+                                                     'created-by))))
         (p (@ (class ,(mk-class '(text-md text-stone-900))))
-           ,(assoc-ref comment "contents"))
+           ,(assq-ref comment
+                      'contents))
         (p (@ (class ,(mk-class '(text-sm text-stone-400 dark:text-stone-300))))
-           ,(assoc-ref comment "created_at"))))
+           ,(assq-ref comment
+                      'created-at))))
 
 (define* (render-comments G_ user-alist parent-identifier comments)
   (let* ((top-nodes (filter (lambda (c)
                               (equal? parent-identifier
-                                      (assoc-ref c "parent_identifier")))
+                                      (assoc-ref c
+                                                 'parent-identifier)))
                             comments)))
     (map (lambda (comment)
            `((div (@ (class "max-w-prose"))
                   ,(render-comment G_ user-alist comment))
              (div (@ (class ,(mk-class '(max-w-prose pl-3))))
                   ,(render-comments G_ user-alist
-                                    (assoc-ref comment "identifier") comments))))
+                                    (assoc-ref comment
+                                               'identifier) comments))))
          top-nodes)))
 
 (define* (entity-details G_
@@ -428,22 +434,25 @@
                                        (and (equal? (assq-ref x
                                                               'identifier)
                                                     (assoc-ref o
-                                                               (format #f
-                                                                "~a_identifier"
-                                                                entity)))
+                                                               (string->symbol
+                                                                (format #f
+                                                                 "~a-identifier"
+                                                                 entity))))
                                             (equal? 1
-                                                    (assoc-ref o "is_like"))))
+                                                    (assq-ref o
+                                                              'is-like))))
                                      opinions)))
          (dislike-count (length (filter (lambda (o)
                                           (and (equal? (assq-ref x
                                                                  'identifier)
-                                                       (assoc-ref o
+                                                       (assq-ref o
+                                                                 (string->symbol
                                                                   (format #f
-                                                                   "~a_identifier"
-                                                                   entity)))
+                                                                   "~a-identifier"
+                                                                   entity))))
                                                (equal? 1
                                                        (assoc-ref o
-                                                        "is_dislike"))))
+                                                                  'is-dislike))))
                                         opinions)))
          (opinion-buttons `((div (@ (class ,(mk-class '(flex flex-row
                                                              flex-wrap gap-3))))
@@ -569,7 +578,7 @@
                                               #:on-click (format #f
                                                           "navigator.clipboard.writeText('~a')"
                                                           (assoc-ref x
-                                                           "identifier")))))))))
+                                                                     'identifier)))))))))
       (details (summary (@ (class ,(mk-class '(text-onyx-300
                                                dark:text-stone-300
                                                cursor-pointer))))
@@ -760,7 +769,6 @@
                                                 items-center
                                                 justify-center
                                                 md:justify-start
-
                                                 gap-2))))
                     ,(input #:label ""
                             #:name "search"
@@ -823,17 +831,17 @@
                                      align-end))))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
                                                     external-sources
-                                                    "wikipedia_url"))
+                                                    'wikipedia-url))
                                 #:label (G_ "Wikipedia"))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
                                                     external-sources
-                                                    "spotify_url"))
+                                                    'spotify-url))
                                 #:label (G_ "Spotify"))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
                                                     external-sources
-                                                    "youtube_url"))
+                                                    'youtube-url))
                                 #:label (G_ "Youtube"))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
                                                     external-sources
-                                                    "soundcloud_url"))
+                                                    'soundcloud-url))
                                 #:label (G_ "Soundcloud")))))
