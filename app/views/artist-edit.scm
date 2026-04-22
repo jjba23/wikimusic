@@ -38,37 +38,40 @@
   (let* ((artwork-forms (map (lambda (a)
                                `(div (figure (@ (class ,(mk-class '(py-3
                                                                     sm:w-36))))
-                                             (img (@ (loading "lazy")
-                                                     (class "rounded-xl")
-                                                     (src ,(uri-decode (assoc-ref
+                                             (img (@ (loading lazy)
+                                                     (class ,(mk-class '(rounded-xl)))
+                                                     (src ,(uri-decode (assq-ref
                                                                         a
-                                                                        "content_url"))))))
+                                                                        'content-url))))))
                                      ,(artwork-form G_
                                                     #:entity 'artist
-                                                    #:entity-identifier (assoc-ref
+                                                    #:entity-identifier (assq-ref
                                                                          artist
-                                                                         "identifier")
-                                                    #:artwork-identifier (assoc-ref
+                                                                         'identifier)
+                                                    #:artwork-identifier (assq-ref
                                                                           a
-                                                                          "identifier")
-                                                    #:content-url (uri-decode (assoc-ref
+                                                                          'identifier)
+                                                    #:content-url (uri-decode (assq-ref
                                                                                a
-                                                                               "content_url"))
+                                                                               'content-url))
                                                     #:content-caption (assoc-ref-or-empty-str
                                                                        a
-                                                                       "content_caption")
-                                                    #:order-value (assoc-ref a
-                                                                   "order_value"))))
+                                                                       'content-caption)
+                                                    #:order-value (assq-ref a
+                                                                            'order-value))))
                              artworks))
          (body `(div (@ (class ,(mk-class '(px-2 py-4))))
                      (div (@ (class ,(mk-class '(py-3))))
-                          ,(if (assoc-ref artist "identifier")
+                          ,(if (assq-ref artist
+                                         'identifier)
                                (h2 (format #f "~a: ~a"
                                            (G_ "editing artist")
-                                           (assoc-ref artist "display_name")))
+                                           (assq-ref artist
+                                                     'display-name)))
                                (h2 (G_ "new artist"))))
                      (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
+                                                              dark:text-stone-300
                                                               text-md
                                                               cursor-pointer))))
                                        ,(G_ "edit artworks"))
@@ -82,9 +85,9 @@
                                        ,(G_ "new artwork"))
                               ,(artwork-form G_
                                              #:entity 'artist
-                                             #:entity-identifier (assoc-ref
+                                             #:entity-identifier (assq-ref
                                                                   artist
-                                                                  "identifier")))
+                                                                  'identifier)))
                      ,(hr)
                      (details (@ (open true))
                               (summary (@ (class ,(mk-class '(font-black
@@ -94,13 +97,13 @@
                                                               cursor-pointer))))
                                        ,(G_ "editing artist"))
                               ,(artist-form G_
-                                            #:identifier (assoc-ref artist
-                                                          "identifier")
-                                            #:display-name (assoc-ref artist
-                                                            "display_name")
+                                            #:identifier (assq-ref artist
+                                                                   'identifier)
+                                            #:display-name (assq-ref artist
+                                                                     'display-name)
                                             #:description (assoc-ref-or-empty-str
                                                            artist
-                                                           "description")))
+                                                           'description)))
                      ,(hr)
                      (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
@@ -110,29 +113,29 @@
                                        ,(G_ "editing external sources"))
                               ,(external-sources-form G_
                                                       #:entity 'artist
-                                                      #:entity-identifier (assoc-ref
+                                                      #:entity-identifier (assq-ref
                                                                            artist
-                                                                           "identifier")
+                                                                           'identifier)
                                                       #:external-sources-identifier
-                                                      (assoc-ref
+                                                      (assq-ref
                                                        external-sources
-                                                       "identifier")
+                                                       'identifier)
                                                       #:wikipedia-url (uri-decode
                                                                        (assoc-ref-or-empty-str
                                                                         external-sources
-                                                                        "wikipedia_url"))
+                                                                        'wikipedia-url))
                                                       #:spotify-url (uri-decode
                                                                      (assoc-ref-or-empty-str
                                                                       external-sources
-                                                                      "spotify_url"))
+                                                                      'spotify-url))
                                                       #:youtube-url (uri-decode
                                                                      (assoc-ref-or-empty-str
                                                                       external-sources
-                                                                      "youtube_url"))
+                                                                      'youtube-url))
                                                       #:soundcloud-url (uri-decode
                                                                         (assoc-ref-or-empty-str
                                                                          external-sources
-                                                                         "soundcloud_url")))))))
+                                                                         'soundcloud-url)))))))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:body body)))

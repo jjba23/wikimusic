@@ -298,22 +298,15 @@
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
-       (let* ((uuid (params rc "uuid"))
-              (artist (car ($artists 'get
-                                     #:ret 'top
-                                     #:condition (where #:identifier uuid))))
-              (artist-external-sources '())
-              (artworks ($artist_artworks 'get
-                                          #:ret 'all
-                                          #:order-by '(order_value asc)
-                                          #:condition (where
-                                                             #:artist_identifier
-                                                             uuid)))
-              (e ($artist_external_sources 'get
-                                           #:ret 'top
-                                           #:condition (where
-                                                              #:artist_identifier
-                                                              uuid)))
+       (let* ((artist-id (params rc "uuid"))
+              (artwork-repo (make-sqlite-artwork-repository rc))
+              (artist-repo (make-sqlite-artist-repository rc))
+              (artist (get-artist-by-id artist-repo artist-id))
+              (external-source-repo (make-sqlite-external-source-repository rc))              
+              (artworks (get-artworks-by-entity-ids artwork-repo
+                                                    'artist
+                                                    (list artist-id)))
+              (e (get-external-sources-by-entity-ids external-source-repo 'artist (list artist-id)))
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '())))

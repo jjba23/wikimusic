@@ -63,7 +63,7 @@
                                                             (class ,(mk-class '
                                                                               (rounded-xl
                                                                                max-w-full)))
-                                                            (src ,(uri-decode (assoc-ref
+                                                            (src ,(uri-decode (assq-ref
                                                                                a
                                                                                'content-url))))))
                                             ,(artwork-form G_
@@ -75,13 +75,13 @@
                                                            (assoc-ref a
                                                                       'identifier)
                                                            #:content-url (uri-decode
-                                                                          (assoc-ref
+                                                                          (assq-ref
                                                                            a
                                                                            'content-url))
                                                            #:content-caption (assoc-ref-or-empty-str
                                                                               a
                                                                               'content-caption)
-                                                           #:order-value (assoc-ref
+                                                           #:order-value (assq-ref
                                                                           a
                                                                           'order-value))))
                                     artworks))
@@ -227,8 +227,8 @@
                                              application/x-www-form-urlencoded)
                                             (action ,(format #f
                                                       "/songs/uuid/~a/genres"
-                                                      (assoc-ref song
-                                                                 "identifier"))))
+                                                      (assq-ref song
+                                                                 'identifier))))
                                          (div ,(input #:label "genre UUID"
                                                       #:name 'genre-identifier
                                                       #:value ""
@@ -243,19 +243,19 @@
                                                        application/x-www-form-urlencoded)
                                                       (action ,(format #f
                                                                 "/songs/uuid/~a/genres/~a/delete"
-                                                                (assoc-ref
+                                                                (assq-ref
                                                                  song
-                                                                 "identifier")
-                                                                (assoc-ref a
-                                                                 "identifier"))))
+                                                                 'identifier)
+                                                                (assq-ref a
+                                                                 'identifier))))
                                                    (div (@ (class ,(mk-class '
                                                                              (flex
                                                                               flex-row
                                                                               flex-wrap
                                                                               gap-2
                                                                               items-center))))
-                                                        ,(h4 (assoc-ref a
-                                                              "display_name"))
+                                                        ,(h4 (assq-ref a
+                                                              'display-name))
                                                         ,(icon-button #:icon 'trash
                                                                       #:content
                                                                       ""
