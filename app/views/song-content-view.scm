@@ -35,42 +35,42 @@
                           (render-version G_ song version ascii-size))
                         song-contents))
              (a (@ (href ,(format #f "/songs/uuid/~a/contents/new"
-                                  (assoc-ref song "identifier"))))
+                                  (assq-ref song 'identifier))))
                 ,(icon-button #:icon 'plus
                               #:content (G_ "new version"))))))
 
 (define* (render-version G_ song version ascii-size)
   (let* ((v-name (render-if-nempty (lambda (version-name)
                                      (format #f "~a ~a" version-name
-                                             (assoc-ref version
-                                                        "instrument_type")))
-                                   (assoc-ref version "version_name")))
+                                             (assq-ref version
+                                                        'instrument-type)))
+                                   (assq-ref version 'version-name)))
          (version-management-section `((div (@ (class ,(mk-class '(flex
                                                                    flex-wrap
                                                                    flex-row
                                                                    gap-2))))
                                             (a (@ (href ,(format #f
                                                           "/songs/uuid/~a/contents/~a/edit"
-                                                          (assoc-ref song
-                                                           "identifier")
-                                                          (assoc-ref version
-                                                           "identifier"))))
+                                                          (assq-ref song
+                                                           'identifier)
+                                                          (assq-ref version
+                                                           'identifier))))
                                                ,(icon-button #:icon 'pencil
                                                              #:content (G_
                                                                         "edit version")))
                                             (form (@ (method POST)
                                                      (action ,(format #f
                                                                "/songs/uuid/~a/contents/~a/delete"
-                                                               (assoc-ref song
-                                                                "identifier")
-                                                               (assoc-ref
+                                                               (assq-ref song
+                                                                'identifier)
+                                                               (assq-ref
                                                                 version
-                                                                "identifier"))))
+                                                                'identifier))))
                                                   ,(icon-button #:icon 'trash
                                                                 #:background '
-                                                                (bg-red-700)
+                                                                (bg-redwood-700)
                                                                 #:hover-background '
-                                                                (hover:bg-red-800)
+                                                                (hover:bg-redwood-900)
                                                                 #:border-color '
                                                                 (border-stone-300
                                                                  dark:border-stone-700)
@@ -107,8 +107,8 @@
                                                                               overflow-x-scroll)))))
                                                ,ascii-legend))))
          (ascii-legend-section (render-if-nestring render-ascii-legend
-                                                   (assoc-ref version
-                                                              "ascii_legend")))
+                                                   (assq-ref version
+                                                              'ascii-legend)))
          (line-scroll-select (select #:id 'line-scroll
                                      #:name 'line-scroll
                                      #:options (list (option #:value 1
@@ -209,11 +209,11 @@
                                                                               overflow-x-scroll)))))
                                                                        ,ascii-contents)))))
          (ascii-content-section (render-if-nestring render-ascii-content
-                                                    (assoc-ref version
-                                                     "ascii_contents")))
+                                                    (assq-ref version
+                                                     'ascii-contents)))
          (cleaned-pdf-data (if (equal? (assoc-ref version "pdf_contents")
                                 "data:application/octet-stream;base64,") ""
-                               (assoc-ref version "pdf_contents")))
+                               (assq-ref version 'pdf-contents)))
          (render-pdf-content (lambda (pdf-contents)
                                `((details (@ (open true)
                                              (class ,(mk-class '(my-6))))

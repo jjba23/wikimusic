@@ -58,6 +58,8 @@
         (wikimusic sqlite user)
         (wikimusic domain genre)
         (wikimusic sqlite genre)
+        (wikimusic domain song-content)
+        (wikimusic sqlite song-content)        
         (wikimusic sqlite artist)
         (wikimusic domain artist))
 
@@ -71,6 +73,7 @@
               (opinion-repo (make-sqlite-opinion-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
               (comment-repo (make-sqlite-comment-repository rc))
+              (song-content-repo (make-sqlite-song-content-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (user-search (cond
                              ((equal? #f
@@ -132,17 +135,7 @@
                           ((nil? song-ids)
                            '())
                           (else (get-comments-by-entity-ids comment-repo 'song song-ids))))
-              (song-contents (cond
-                               ((nil? song-ids)
-                                '())
-                               (else ($song_contents 'get
-                                                     #:columns '(identifier
-                                                                 song_identifier)
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
-
+              (song-contents (get-song-content-ids-by-song-ids song-content-repo song-ids))
               (song-artists (cond
                               ((nil? song-ids)
                                '())
@@ -156,14 +149,14 @@
                                                                 'artist-identifier))
                                                     song-artists))))
               (song-version-count-alist (map (lambda (song)
-                                               `(,(assoc-ref song "identifier") ,
+                                               `(,(assq-ref song 'identifier) ,
                                                  (length (filter (lambda (sc)
                                                                    (equal? (assoc-ref
                                                                             sc
-                                                                            "song_identifier")
-                                                                           (assoc-ref
+                                                                            'song-identifier)
+                                                                           (assq-ref
                                                                             song
-                                                                            "identifier")))
+                                                                            'identifier)))
                                                           song-contents))))
                                              songs)))
          (response-emit (:mime rc
@@ -220,6 +213,7 @@
               (opinion-repo (make-sqlite-opinion-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (user-repo (make-sqlite-user-repository rc))
+              (song-content-repo (make-sqlite-song-content-repository rc))
               (song-id (params rc "uuid"))
               (song (get-song-by-id song-repo song-id))
               (ascii-size (cond
@@ -265,12 +259,7 @@
                                               'created-by)))
               (user-alist (list (cons (assq-ref user
                                                 'identifier) user)))
-
-              (song-contents ($song_contents 'get
-                                             #:ret 'all
-                                             #:condition (where
-                                                                #:song_identifier
-                                                                song-id)))
+              (song-contents (get-song-contents-by-song-ids song-content-repo (list song-id)))
               (song-genres (get-song-genres-by-ids song-repo
                                                    (list song-id)))
               (genres (if (nil? song-genres)
