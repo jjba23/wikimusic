@@ -52,8 +52,8 @@
                                                'ticket-id)
                                      (assq-ref r
                                                'user-id))) rows)))
-      (if (nil? rows) #f
-          (car rows))))
+      (if (nil? mapped-rows) #f
+          (car mapped-rows))))
 
   (define (delete-password-reset-by-user-id user-id)
     (let* ((query (format #f "DELETE FROM password_reset WHERE user_id = ~a"
