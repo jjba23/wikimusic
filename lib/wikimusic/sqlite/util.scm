@@ -27,8 +27,6 @@
                                       alist?
                                       value->sql-literal
                                       pair->sql-assignment
-                                      execute-write
-                                      execute-read
                                       db-read
                                       db-write))
 
