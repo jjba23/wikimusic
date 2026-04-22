@@ -32,12 +32,6 @@
   (define cols-sql
     (symbols->sql-columns-list columns))
 
-  (define insert-columns
-    (delq 'last-edited-at columns))
-
-  (define insert-cols-sql
-    (symbols->sql-columns-list insert-columns))
-
   (define conn
     (DB-open rc))
 
@@ -48,16 +42,9 @@
     (db-read conn))
 
   (define (get-id-to-username)
-    (let* ((query (format #f "SELECT ~a FROM users
-                   ORDER BY username ASC"
-                          cols-sql))
-           (rows (execute-read "get-id-to-username" query))
-           (mapped-rows (map (lambda (r)
-                               (cons (assq-ref r
-                                               'id)
-                                     (assq-ref r
-                                               'username))) rows)))
-      mapped-rows))
+    (let* ((query "SELECT id, username FROM users
+                   ORDER BY username ASC"))
+      (execute-read "get-id-to-username" query)))
 
   (define (get-user-by-email email)
     (let* ((query (format #f "SELECT ~a FROM users WHERE email = ~a LIMIT 1"
@@ -97,8 +84,7 @@
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
                       insert-columns))
-           (query (format #f "INSERT INTO users (~a) VALUES (~a)"
-                          insert-cols-sql
+           (query (format #f "INSERT INTO users (~a) VALUES (~a)" cols-sql
                           (string-join vals ", "))))
       (execute-write query)))
 
