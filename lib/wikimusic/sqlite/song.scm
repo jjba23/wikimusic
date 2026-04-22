@@ -41,33 +41,30 @@
                  views
                  description))
 
+  (define cols-sql
+    (symbols->sql-columns-list columns))
+
   (define insert-columns
-    '(identifier display-name
-                 music-key
-                 music-tuning
-                 music-creation-date
-                 album-name
-                 album-info-link
-                 created-by
-                 visibility-status
-                 approved-by
-                 created-at
-                 views
-                 description))
+    (delq 'last-edited-at columns))
+
+  (define insert-cols-sql
+    (symbols->sql-columns-list insert-columns))
 
   (define conn
     (DB-open rc))
 
+  (define execute-write
+    (db-write conn))
+
+  (define execute-select
+    (db-select conn))
+
   (define (get-song-by-id id)
     (let* ((query (format #f
                    "SELECT ~a FROM songs WHERE identifier = ~a LIMIT 1"
-                   (symbols->sql-columns-list columns)
+                   cols-sql
                    (value->sql-literal id)))
-           (_ (log-info "get-song-by-id query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-song-by-id rows: ~a\n"
-                        (length rows))))
+           (rows (execute-select "get-song-by-id" query)))
       (if (nil? rows) #f
           (car rows))))
 
@@ -77,16 +74,11 @@
     (let* ((query (format #f
                           "SELECT ~a FROM songs
                    ORDER BY ~a LIMIT ~a OFFSET ~a"
-                          (symbols->sql-columns-list columns)
+                          cols-sql
                           order-by
                           limit
-                          offset))
-           (_ (log-info "get-songs query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-songs rows: ~a\n"
-                        (length rows))))
-      rows))
+                          offset)))
+      (execute-select "get-songs" query)))
 
   (define* (get-songs-by-artist-id id
                                    #:key (order-by "display_name DESC"))
@@ -95,14 +87,9 @@
                    WHERE identifier IN (SELECT song_identifier FROM song_artists WHERE
                     artist_identifier = ~a)
                    ORDER BY ~a"
-                   (symbols->sql-columns-list columns)
-                   (value->sql-literal id) order-by))
-           (_ (log-info "get-songs-by-artist-id query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-songs-by-artist-id rows: ~a\n"
-                        (length rows))))
-      rows))
+                   cols-sql
+                   (value->sql-literal id) order-by)))
+      (execute-select "get-songs-by-artist-id" query)))
 
   (define* (get-songs-by-genre-id id
                                   #:key (order-by "display_name DESC"))
@@ -111,14 +98,9 @@
                    WHERE identifier IN (SELECT song_identifier FROM song_genres WHERE
                     genre_identifier = ~a)
                    ORDER BY ~a"
-                   (symbols->sql-columns-list columns)
-                   (value->sql-literal id) order-by))
-           (_ (log-info "get-songs-by-genre-id query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-songs-by-genre-id rows: ~a\n"
-                        (length rows))))
-      rows))
+                   cols-sql
+                   (value->sql-literal id) order-by)))
+      (execute-select "get-songs-by-genre-id" query)))
 
   (define* (search-songs s
                          #:key (order-by "created_at DESC")
@@ -129,65 +111,49 @@
                    "SELECT ~a FROM songs
                    WHERE (display_name LIKE ~a OR description LIKE ~a)
                    ORDER BY ~a LIMIT ~a OFFSET ~a"
-                   (symbols->sql-columns-list columns)
+                   cols-sql
                    search
                    search
                    order-by
                    limit
-                   offset))
-           (_ (log-info "get-songs query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-songs rows: ~a\n"
-                        (length rows))))
-      rows))
+                   offset)))
+      (execute-select "search-songs" query)))
 
-    (define* (get-song-artists-by-ids ids)
-    (let* ((query (format #f "SELECT song_identifier, artist_identifier FROM song_artists
+  (define* (get-song-artists-by-ids ids)
+    (let* ((query (format #f
+                   "SELECT song_identifier, artist_identifier FROM song_artists
                    WHERE song_identifier IN(~a)
                    ORDER BY created_at DESC"
-                          (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-song-artists-by-id query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-songs-artists-by-id rows: ~a\n"
-                        (length rows))))
-      rows))
-    
+                   (string-join (map value->sql-literal ids) ", "))))
+      (execute-select "get-song-artists-by-ids" query)))
+
   (define* (get-song-genres-by-ids ids)
-    (let* ((query (format #f "SELECT song_identifier, genre_identifier FROM song_genres
+    (let* ((query (format #f
+                   "SELECT song_identifier, genre_identifier FROM song_genres
                    WHERE song_identifier IN(~a)
                    ORDER BY created_at DESC"
-                          (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-song-genres-by-id query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-songs-genres-by-id rows: ~a\n"
-                        (length rows))))
-      rows))
+                   (string-join (map value->sql-literal ids) ", "))))
+      (execute-select "get-song-genres-by-ids" query)))
 
   (define (update-song-by-id id attrs)
     (let* ((query (format #f "UPDATE songs SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id)))
-           (_ (log-info "update-song-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "update-song-by-id" query)))
 
   (define (delete-song-by-id id)
     (let* ((query (format #f "DELETE FROM songs WHERE identifier = ~a"
-                          (value->sql-literal id)))
-           (_ (log-info "delete-song-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "delete-song-by-id" query)))
 
   (define (insert-song attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
                       insert-columns))
            (query (format #f "INSERT INTO songs (~a) VALUES (~a)"
-                          (symbols->sql-columns-list insert-columns)
-                          (string-join vals ", ")))
-           (_ (log-info "insert-song query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          insert-cols-sql
+                          (string-join vals ", "))))
+      (execute-write "insert-song" query)))
 
   (mk-song-repository #:get-song-by-id-proc get-song-by-id
                       #:get-songs-proc get-songs

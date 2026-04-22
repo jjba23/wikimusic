@@ -27,7 +27,7 @@
 ;; --- SQLite implementation ---
 (define (make-sqlite-artwork-repository rc)
   (define (columns entity)
-    (append (list (string->symbol (format #f "~a_identifier" entity)))
+    (append (list (string->symbol (format #f "~a-identifier" entity)))
             '(identifier created-by
                          visibility-status
                          approved-by
@@ -75,7 +75,7 @@
   (define (insert-artwork entity attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
+                      (insert-columns entity)))
            (query (format #f "INSERT INTO ~a_artworks (~a) VALUES (~a)" entity
                           (symbols->sql-columns-list (insert-columns entity))
                           (string-join vals ", "))))

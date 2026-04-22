@@ -36,42 +36,38 @@
                  views
                  description))
 
+  (define cols-sql
+    (symbols->sql-columns-list columns))
+
   (define insert-columns
-    '(identifier display-name
-                 created-by
-                 visibility-status
-                 approved-by
-                 created-at
-                 last-edited-at
-                 views
-                 description))
+    (delq 'last-edited-at columns))
+
+  (define insert-cols-sql
+    (symbols->sql-columns-list insert-columns))
 
   (define conn
     (DB-open rc))
 
+  (define execute-write
+    (db-write conn))
+
+  (define execute-select
+    (db-select conn))
+
   (define (get-genre-by-id id)
     (let* ((query (format #f
                    "SELECT ~a FROM genres WHERE identifier = ~a LIMIT 1"
-                   (symbols->sql-columns-list columns)
+                   cols-sql
                    (value->sql-literal id)))
-           (_ (log-info "get-genre-by-id query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-genre-by-id rows: ~a\n"
-                        (length rows))))
+           (rows (execute-select "get-genre-by-id" query)))
       (if (nil? rows) #f
           (car rows))))
 
   (define (get-genres-by-ids ids)
     (let* ((query (format #f "SELECT ~a FROM genres WHERE identifier IN(~a)"
-                          (symbols->sql-columns-list columns)
-                          (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-genres-by-ids query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-genres-by-ids rows: ~a\n"
-                        (length rows))))
-      rows))
+                          cols-sql
+                          (string-join (map value->sql-literal ids) ", "))))
+      (execute-select "get-genres-by-ids" query)))
 
   (define* (get-genres #:key (order-by "created_at DESC")
                        (limit 100)
@@ -79,16 +75,11 @@
     (let* ((query (format #f
                           "SELECT ~a FROM genres
                    ORDER BY ~a LIMIT ~a OFFSET ~a"
-                          (symbols->sql-columns-list columns)
+                          cols-sql
                           order-by
                           limit
-                          offset))
-           (_ (log-info "get-genres query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-genres rows: ~a\n"
-                        (length rows))))
-      rows))
+                          offset)))
+      (execute-select "get-genres" query)))
 
   (define* (search-genres s
                           #:key (order-by "created_at DESC")
@@ -99,41 +90,33 @@
                    "SELECT ~a FROM genres
                    WHERE (display_name LIKE ~a OR description LIKE ~a)
                    ORDER BY ~a LIMIT ~a OFFSET ~a"
-                   (symbols->sql-columns-list columns)
+                   cols-sql
                    search
                    search
                    order-by
                    limit
-                   offset))
-           (_ (log-info "get-genres query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-genres rows: ~a\n"
-                        (length rows))))
-      rows))
+                   offset)))
+      (execute-select "search-genres" query)))
 
   (define (update-genre-by-id id attrs)
     (let* ((query (format #f "UPDATE genres SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id)))
-           (_ (log-info "update-genre-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "update-genre-by-id" query)))
 
   (define (delete-genre-by-id id)
     (let* ((query (format #f "DELETE FROM genres WHERE identifier = ~a"
-                          (value->sql-literal id)))
-           (_ (log-info "delete-genre-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "delete-genre-by-id" query)))
 
   (define (insert-genre attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
+                      insert-cols))
            (query (format #f "INSERT INTO genres (~a) VALUES (~a)"
-                          (symbols->sql-columns-list insert-columns)
-                          (string-join vals ", ")))
-           (_ (log-info "insert-genre query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          insert-cols-sql
+                          (string-join vals ", "))))
+      (execute-write "insert-genre" query)))
 
   (mk-genre-repository #:get-genre-by-id-proc get-genre-by-id
                        #:get-genres-by-ids-proc get-genres-by-ids

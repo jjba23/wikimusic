@@ -27,17 +27,7 @@
 ;; --- SQLite implementation ---
 (define (make-sqlite-comment-repository rc)
   (define (columns entity)
-    (append (list (string->symbol (format #f "~a_identifier" entity)))
-            '(identifier parent-identifier
-                         created-by
-                         visibility-status
-                         approved-by
-                         contents
-                         created-at
-                         last-edited-at)))
-
-  (define (insert-columns entity)
-    (append (list (string->symbol (format #f "~a_identifier" entity)))
+    (append (list (string->symbol (format #f "~a-identifier" entity)))
             '(identifier parent-identifier
                          created-by
                          visibility-status
@@ -45,8 +35,18 @@
                          contents
                          created-at)))
 
+  (define (insert-columns entity)
+    (delq 'last-edited-at
+          (columns entity)))
+
   (define conn
     (DB-open rc))
+
+  (define execute-write
+    (db-write conn))
+
+  (define execute-select
+    (db-select conn))
 
   (define (get-comments-by-entity-ids entity ids)
     (let* ((query (format #f
@@ -54,38 +54,30 @@
                    (symbols->sql-columns-list (columns entity))
                    entity
                    entity
-                   (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-comments-by-entity-ids query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-comments-by-entity-ids rows: ~a\n"
-                        (length rows))))
-      rows))
+                   (string-join (map value->sql-literal ids) ", "))))
+      (execute-select "get-comments-by-entity-ids" query)))
 
   (define (update-comment-by-id entity id attrs)
     (let* ((query (format #f "UPDATE ~a_comments SET ~a WHERE identifier = ~a"
                           entity
                           (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id)))
-           (_ (log-info "update-comment-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "update-comment-by-id" query)))
 
   (define (delete-comment-by-id entity id)
     (let* ((query (format #f "DELETE FROM ~a_comments WHERE identifier = ~a"
                           entity
-                          (value->sql-literal id)))
-           (_ (log-info "delete-comment-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "delete-comment-by-id" query)))
 
   (define (insert-comment entity attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
+                      (insert-columns entity)))
            (query (format #f "INSERT INTO ~a_comments (~a) VALUES (~a)" entity
                           (symbols->sql-columns-list (insert-columns entity))
-                          (string-join vals ", ")))
-           (_ (log-info "insert-comment query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (string-join vals ", "))))
+      (insert-comment "insert-comment" query)))
 
   (mk-comment-repository #:get-comments-by-entity-ids-proc
                          get-comments-by-entity-ids

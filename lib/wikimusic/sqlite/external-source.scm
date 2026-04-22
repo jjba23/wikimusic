@@ -27,26 +27,27 @@
 ;; --- SQLite implementation ---
 (define (make-sqlite-external-source-repository rc)
   (define (columns entity)
-    (append (list (string->symbol (format #f "~a_identifier" entity)))
+    (append (list (string->symbol (format #f "~a-identifier" entity)))
             '(identifier created-by
-                         spotify_url
-                         youtube_url
-                         soundcloud_url
-                         wikipedia_url
+                         spotify-url
+                         youtube-url
+                         soundcloud-url
+                         wikipedia-url
                          created-at
                          last-edited-at)))
 
   (define (insert-columns entity)
-    (append (list (string->symbol (format #f "~a_identifier" entity)))
-            '(identifier created-by
-                         spotify_url
-                         youtube_url
-                         soundcloud_url
-                         wikipedia_url
-                         created-at)))
+    (delq 'last-edited-at
+          (columns entity)))
 
   (define conn
     (DB-open rc))
+
+  (define execute-write
+    (db-write conn))
+
+  (define execute-select
+    (db-select conn))
 
   (define (get-external-sources-by-entity-ids entity ids)
     (let* ((query (format #f
@@ -54,45 +55,34 @@
                    (symbols->sql-columns-list (columns entity))
                    entity
                    entity
-                   (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-external-sources-by-entity-ids query:
-	~a
-" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-external-sources-by-entity-ids rows: ~a
-"
-                        (length rows))))
-      rows))
+                   (string-join (map value->sql-literal ids) ", "))))
+      (execute-select "get-external-sources-by-entity-ids" query)))
 
   (define (update-external-source-by-id entity id attrs)
     (let* ((query (format #f
                    "UPDATE ~a_external_sources SET ~a WHERE identifier = ~a"
                    entity
                    (string-join (map pair->sql-assignment attrs) ", ")
-                   (value->sql-literal id)))
-           (_ (log-info "update-external-source-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                   (value->sql-literal id))))
+      (execute-write "update-external-source-by-id" query)))
 
   (define (delete-external-source-by-id entity id)
     (let* ((query (format #f
                    "DELETE FROM ~a_external_sources WHERE identifier = ~a"
                    entity
-                   (value->sql-literal id)))
-           (_ (log-info "delete-external-source-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                   (value->sql-literal id))))
+      (execute-write "delete-external-source-by-id" query)))
 
   (define (insert-external-source entity attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
+                      (insert-columns entity)))
            (query (format #f
                           "INSERT INTO ~a_external_sources (~a) VALUES (~a)"
                           entity
                           (symbols->sql-columns-list (insert-columns entity))
-                          (string-join vals ", ")))
-           (_ (log-info "insert-external-source query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (string-join vals ", "))))
+      (execute-write "insert-external-source" query)))
 
   (mk-external-source-repository #:get-external-sources-by-entity-ids-proc
                                  get-external-sources-by-entity-ids

@@ -32,11 +32,17 @@
                          last-edited-at)))
 
   (define (insert-columns entity)
-    (append (list (string->symbol (format #f "~a_identifier" entity)))
-            '(identifier created-by is-like is-dislike created-at)))
+    (delq 'last-edited-at
+          (columns entity)))
 
   (define conn
     (DB-open rc))
+
+  (define execute-write
+    (db-write conn))
+
+  (define execute-select
+    (db-select conn))
 
   (define (get-opinions-by-entity-ids entity ids)
     (let* ((query (format #f
@@ -44,38 +50,30 @@
                    (symbols->sql-columns-list (columns entity))
                    entity
                    entity
-                   (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-opinions-by-entity-ids query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-opinions-by-entity-ids rows: ~a\n"
-                        (length rows))))
-      rows))
+                   (string-join (map value->sql-literal ids) ", "))))
+      (execute-select "get-opinions-by-entity-ids" query)))
 
   (define (update-opinion-by-id entity id attrs)
     (let* ((query (format #f "UPDATE ~a_opinions SET ~a WHERE identifier = ~a"
                           entity
                           (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id)))
-           (_ (log-info "update-opinion-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "update-opinion-by-id" query)))
 
   (define (delete-opinion-by-id entity id)
     (let* ((query (format #f "DELETE FROM ~a_opinions WHERE identifier = ~a"
                           entity
-                          (value->sql-literal id)))
-           (_ (log-info "delete-opinion-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "delete-opinion-by-id" query)))
 
   (define (insert-opinion entity attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
+                      (insert-columns entity)))
            (query (format #f "INSERT INTO ~a_opinions (~a) VALUES (~a)" entity
                           (symbols->sql-columns-list (insert-columns entity))
-                          (string-join vals ", ")))
-           (_ (log-info "insert-opinion query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (string-join vals ", "))))
+      (execute-write "insert-opinion" query)))
 
   (mk-opinion-repository #:get-opinions-by-entity-ids-proc
                          get-opinions-by-entity-ids

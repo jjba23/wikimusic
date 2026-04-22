@@ -28,7 +28,7 @@
 (define (make-sqlite-song-content-repository rc)
   (define columns
     '(identifier song-identifier
-                 version-name                 
+                 version-name
                  created-by
                  visibility-status
                  approved-by
@@ -40,71 +40,66 @@
                  created-at
                  last-edited-at))
 
+  (define cols-sql
+    (symbols->sql-columns-list columns))
+
   (define insert-columns
-    '(identifier song-identifier
-                 version-name                 
-                 created-by
-                 visibility-status
-                 approved-by
-                 instrument-type
-                 ascii-legend
-                 ascii-contents
-                 pdf-contents
-                 guitarpro-contents
-                 created-at))
+    (delq 'last-edited-at columns))
+
+  (define insert-cols-sql
+    (symbols->sql-columns-list insert-columns))
 
   (define conn
     (DB-open rc))
 
-  (define (get-song-contents-by-song-ids ids)
-    (let* ((query (format #f "SELECT ~a FROM song_contents WHERE song_identifier IN(~a)
-                            ORDER BY version_name DESC"
-                          (symbols->sql-columns-list columns)
-                          (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-song-contents-by-ids query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-song-contents-by-ids rows: ~a\n"
-                        (length rows))))
-      rows))
+  (define execute-write
+    (db-write conn))
 
-    (define (get-song-content-ids-by-song-ids ids)
-    (let* ((query (format #f "SELECT identifier, song_identifier FROM song_contents WHERE song_identifier IN(~a)"
-                          (symbols->sql-columns-list columns)
-                          (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-song-content-ids-by-ids query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-song-content-ids-by-ids rows: ~a\n"
-                        (length rows))))
-      rows))
+  (define execute-select
+    (db-select conn))
+
+  (define (get-song-contents-by-song-ids ids)
+    (let* ((query (format #f
+                   "SELECT ~a FROM song_contents WHERE song_identifier IN(~a)
+                            ORDER BY version_name DESC"
+                   cols-sql
+                   (string-join (map value->sql-literal ids) ", "))))
+      (execute-select "get-song-contents-by-song-ids" query)))
+
+  (define (get-song-content-ids-by-song-ids ids)
+    (let* ((query (format #f
+                   "SELECT identifier, song_identifier FROM song_contents WHERE song_identifier IN(~a)"
+                   cols-sql
+                   (string-join (map value->sql-literal ids) ", "))))
+      (execute-select "get-song-content-ids-by-song-ids" query)))
 
   (define (update-song-content-by-id id attrs)
-    (let* ((query (format #f "UPDATE song_contents SET ~a WHERE identifier = ~a"
+    (let* ((query (format #f
+                          "UPDATE song_contents SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id)))
-           (_ (log-info "update-song-content-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "update-song-content-by-id" query)))
 
   (define (delete-song-content-by-id id)
     (let* ((query (format #f "DELETE FROM song_contents WHERE identifier = ~a"
-                          (value->sql-literal id)))
-           (_ (log-info "delete-song-content-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "delete-song-content-by-id" query)))
 
   (define (insert-song-content attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
                       insert-columns))
            (query (format #f "INSERT INTO song_contents (~a) VALUES (~a)"
-                          (symbols->sql-columns-list insert-columns)
-                          (string-join vals ", ")))
-           (_ (log-info "insert-song-content query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          insert-cols-sql
+                          (string-join vals ", "))))
+      (execute-write "insert-song-content" query)))
 
-  (mk-song-content-repository 
-                        #:get-song-contents-by-song-ids-proc get-song-contents-by-song-ids
-                        #:get-song-content-ids-by-song-ids-proc get-song-content-ids-by-song-ids
-                        #:insert-song-content-proc insert-song-content
-                        #:delete-song-content-by-id-proc delete-song-content-by-id
-                        #:update-song-content-by-id-proc update-song-content-by-id))
+  (mk-song-content-repository #:get-song-contents-by-song-ids-proc
+                              get-song-contents-by-song-ids
+                              #:get-song-content-ids-by-song-ids-proc
+                              get-song-content-ids-by-song-ids
+                              #:insert-song-content-proc insert-song-content
+                              #:delete-song-content-by-id-proc
+                              delete-song-content-by-id
+                              #:update-song-content-by-id-proc
+                              update-song-content-by-id))
