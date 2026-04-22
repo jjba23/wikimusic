@@ -211,7 +211,7 @@
          (ascii-content-section (render-if-nestring render-ascii-content
                                                     (assq-ref version
                                                      'ascii-contents)))
-         (cleaned-pdf-data (if (equal? (assoc-ref version "pdf_contents")
+         (cleaned-pdf-data (if (equal? (assq-ref version 'pdf-contents)
                                 "data:application/octet-stream;base64,") ""
                                (assq-ref version 'pdf-contents)))
          (render-pdf-content (lambda (pdf-contents)

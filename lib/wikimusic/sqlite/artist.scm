@@ -17,6 +17,7 @@
 
 (define-module (wikimusic sqlite artist)
   #:declarative? #t
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
@@ -36,48 +37,43 @@
                  views
                  description))
 
+  (define cols-sql
+    (symbols->sql-columns-list columns))
+
   (define insert-columns
-    '(identifier display-name
-                 created-by
-                 visibility-status
-                 approved-by
-                 created-at
-                 last-edited-at
-                 views
-                 description))
+    (delq 'last-edited-at columns))
+
+  (define insert-cols-sql
+    (symbols->sql-columns-list insert-columns))
 
   (define conn
     (DB-open rc))
 
+  (define execute-write
+    (db-write conn))
+
+  (define execute-select
+    (db-select conn))
+
   (define (get-artist-by-id id)
     (let* ((query (format #f
                    "SELECT ~a FROM artists WHERE identifier = ~a LIMIT 1"
-                   (symbols->sql-columns-list columns)
+                   cols-sql
                    (value->sql-literal id)))
-           (_ (log-info "get-artist-by-id query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-artist-by-id rows: ~a\n"
-                        (length rows))))
+           (rows (execute-select "get-artist-by-id" query)))
       (if (nil? rows) #f
           (car rows))))
 
   (define* (get-artists #:key (order-by "created_at DESC")
                         (limit 100)
                         (offset 0))
-    (let* ((query (format #f
-                          "SELECT ~a FROM artists
-                   ORDER BY ~a LIMIT ~a OFFSET ~a"
-                          (symbols->sql-columns-list columns)
-                          order-by
-                          limit
-                          offset))
-           (_ (log-info "get-artists query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-artists rows: ~a\n"
-                        (length rows))))
-      rows))
+    (let ((query (format #f
+                  "SELECT ~a FROM artists ORDER BY ~a LIMIT ~a OFFSET ~a"
+                  cols-sql
+                  order-by
+                  limit
+                  offset)))
+      (execute-select "get-artists" query)))
 
   (define* (search-artists s
                            #:key (order-by "created_at DESC")
@@ -85,55 +81,40 @@
                            (offset 0))
     (let* ((search (value->sql-literal (format #f "%~a%" s)))
            (query (format #f
-                   "SELECT ~a FROM artists
-                   WHERE (display_name LIKE ~a OR description LIKE ~a)
+                   "SELECT ~a FROM artists WHERE (display_name LIKE ~a OR description LIKE ~a)
                    ORDER BY ~a LIMIT ~a OFFSET ~a"
-                   (symbols->sql-columns-list columns)
+                   cols-sql
                    search
                    search
                    order-by
                    limit
-                   offset))
-           (_ (log-info "get-artists query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-artists rows: ~a\n"
-                        (length rows))))
-      rows))
+                   offset)))
+      (execute-select "search-artists" query)))
 
   (define (get-artists-by-ids ids)
     (let* ((query (format #f "SELECT ~a FROM artists WHERE identifier IN(~a)"
-                          (symbols->sql-columns-list columns)
-                          (string-join (map value->sql-literal ids) ", ")))
-           (_ (log-info "get-artists-by-ids query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query conn query))))
-           (_ (log-info "get-artists-by-ids rows: ~a\n"
-                        (length rows))))
-      rows))
+                          cols-sql
+                          (string-join (map value->sql-literal ids) ", "))))
+      (execute-select "get-artists-by-ids" query)))
 
   (define (update-artist-by-id id attrs)
     (let* ((query (format #f "UPDATE artists SET ~a WHERE identifier = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id)))
-           (_ (log-info "update-artist-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "update-artist-by-id" query)))
 
   (define (delete-artist-by-id id)
     (let* ((query (format #f "DELETE FROM artists WHERE identifier = ~a"
-                          (value->sql-literal id)))
-           (_ (log-info "delete-artist-by-id query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          (value->sql-literal id))))
+      (execute-write "delete-artist-by-id" query)))
 
   (define (insert-artist attrs)
     (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
+                        (value->sql-literal (assq-ref attrs x))) columns))
            (query (format #f "INSERT INTO artists (~a) VALUES (~a)"
-                          (symbols->sql-columns-list insert-columns)
-                          (string-join vals ", ")))
-           (_ (log-info "insert-artist query:\n\t~a\n" query)))
-      (DB-query conn query)))
+                          insert-cols-sql
+                          (string-join vals ", "))))
+      (execute-write "insert-artist" query)))
 
   (mk-artist-repository #:get-artist-by-id-proc get-artist-by-id
                         #:get-artists-by-ids-proc get-artists-by-ids
