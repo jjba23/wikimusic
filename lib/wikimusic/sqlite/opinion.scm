@@ -41,8 +41,8 @@
   (define execute-write
     (db-write conn))
 
-  (define execute-select
-    (db-select conn))
+  (define execute-read
+    (db-read conn))
 
   (define (get-opinions-by-entity-ids entity ids)
     (let* ((query (format #f
@@ -51,7 +51,7 @@
                    entity
                    entity
                    (string-join (map value->sql-literal ids) ", "))))
-      (execute-select "get-opinions-by-entity-ids" query)))
+      (execute-read "get-opinions-by-entity-ids" query)))
 
   (define (update-opinion-by-id entity id attrs)
     (let* ((query (format #f "UPDATE ~a_opinions SET ~a WHERE identifier = ~a"

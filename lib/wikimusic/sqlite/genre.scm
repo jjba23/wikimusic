@@ -51,15 +51,15 @@
   (define execute-write
     (db-write conn))
 
-  (define execute-select
-    (db-select conn))
+  (define execute-read
+    (db-read conn))
 
   (define (get-genre-by-id id)
     (let* ((query (format #f
                    "SELECT ~a FROM genres WHERE identifier = ~a LIMIT 1"
                    cols-sql
                    (value->sql-literal id)))
-           (rows (execute-select "get-genre-by-id" query)))
+           (rows (execute-read "get-genre-by-id" query)))
       (if (nil? rows) #f
           (car rows))))
 
@@ -67,7 +67,7 @@
     (let* ((query (format #f "SELECT ~a FROM genres WHERE identifier IN(~a)"
                           cols-sql
                           (string-join (map value->sql-literal ids) ", "))))
-      (execute-select "get-genres-by-ids" query)))
+      (execute-read "get-genres-by-ids" query)))
 
   (define* (get-genres #:key (order-by "created_at DESC")
                        (limit 100)
@@ -79,7 +79,7 @@
                           order-by
                           limit
                           offset)))
-      (execute-select "get-genres" query)))
+      (execute-read "get-genres" query)))
 
   (define* (search-genres s
                           #:key (order-by "created_at DESC")
@@ -96,7 +96,7 @@
                    order-by
                    limit
                    offset)))
-      (execute-select "search-genres" query)))
+      (execute-read "search-genres" query)))
 
   (define (update-genre-by-id id attrs)
     (let* ((query (format #f "UPDATE genres SET ~a WHERE identifier = ~a"

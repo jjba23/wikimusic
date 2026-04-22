@@ -27,7 +27,9 @@
                                       alist?
                                       value->sql-literal
                                       pair->sql-assignment
-                                      db-select
+                                      execute-write
+                                      execute-read
+                                      db-read
                                       db-write))
 
 (define (symbol->sql-column x)
@@ -85,7 +87,7 @@
      "0")
     (else (format #f "'~a'" a))))
 
-(define (db-select conn)
+(define (db-read conn)
   (lambda (name query)
     (log-info "~a query:\n\t~a\n" name query)
     (let ((rows (map sql-row->scheme-alist

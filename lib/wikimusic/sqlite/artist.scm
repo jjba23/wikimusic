@@ -52,15 +52,15 @@
   (define execute-write
     (db-write conn))
 
-  (define execute-select
-    (db-select conn))
+  (define execute-read
+    (db-read conn))
 
   (define (get-artist-by-id id)
     (let* ((query (format #f
                    "SELECT ~a FROM artists WHERE identifier = ~a LIMIT 1"
                    cols-sql
                    (value->sql-literal id)))
-           (rows (execute-select "get-artist-by-id" query)))
+           (rows (execute-read "get-artist-by-id" query)))
       (if (nil? rows) #f
           (car rows))))
 
@@ -73,7 +73,7 @@
                   order-by
                   limit
                   offset)))
-      (execute-select "get-artists" query)))
+      (execute-read "get-artists" query)))
 
   (define* (search-artists s
                            #:key (order-by "created_at DESC")
@@ -89,13 +89,13 @@
                    order-by
                    limit
                    offset)))
-      (execute-select "search-artists" query)))
+      (execute-read "search-artists" query)))
 
   (define (get-artists-by-ids ids)
     (let* ((query (format #f "SELECT ~a FROM artists WHERE identifier IN(~a)"
                           cols-sql
                           (string-join (map value->sql-literal ids) ", "))))
-      (execute-select "get-artists-by-ids" query)))
+      (execute-read "get-artists-by-ids" query)))
 
   (define (update-artist-by-id id attrs)
     (let* ((query (format #f "UPDATE artists SET ~a WHERE identifier = ~a"

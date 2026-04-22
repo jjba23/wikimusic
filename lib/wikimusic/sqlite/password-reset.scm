@@ -38,15 +38,15 @@
   (define execute-write
     (db-write conn))
 
-  (define execute-select
-    (db-select conn))
+  (define execute-read
+    (db-read conn))
 
   (define (get-password-reset-by-token token)
     (let* ((query (format #f
                    "SELECT ~a FROM password_reset WHERE reset_token = ~a LIMIT 1"
                    cols-sql
                    (value->sql-literal token)))
-           (rows (execute-select "get-password-reset-by-token" query))
+           (rows (execute-read "get-password-reset-by-token" query))
            (mapped-rows (map (lambda (r)
                                (cons (assq-ref r
                                                'ticket-id)

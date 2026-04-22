@@ -45,8 +45,8 @@
   (define execute-write
     (db-write conn))
 
-  (define execute-select
-    (db-select conn))
+  (define execute-read
+    (db-read conn))
 
   (define (get-comments-by-entity-ids entity ids)
     (let* ((query (format #f
@@ -55,7 +55,7 @@
                    entity
                    entity
                    (string-join (map value->sql-literal ids) ", "))))
-      (execute-select "get-comments-by-entity-ids" query)))
+      (execute-read "get-comments-by-entity-ids" query)))
 
   (define (update-comment-by-id entity id attrs)
     (let* ((query (format #f "UPDATE ~a_comments SET ~a WHERE identifier = ~a"
@@ -77,7 +77,7 @@
            (query (format #f "INSERT INTO ~a_comments (~a) VALUES (~a)" entity
                           (symbols->sql-columns-list (insert-columns entity))
                           (string-join vals ", "))))
-      (insert-comment "insert-comment" query)))
+      (execute-write "insert-comment" query)))
 
   (mk-comment-repository #:get-comments-by-entity-ids-proc
                          get-comments-by-entity-ids

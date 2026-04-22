@@ -56,15 +56,15 @@
   (define execute-write
     (db-write conn))
 
-  (define execute-select
-    (db-select conn))
+  (define execute-read
+    (db-read conn))
 
   (define (get-song-by-id id)
     (let* ((query (format #f
                    "SELECT ~a FROM songs WHERE identifier = ~a LIMIT 1"
                    cols-sql
                    (value->sql-literal id)))
-           (rows (execute-select "get-song-by-id" query)))
+           (rows (execute-read "get-song-by-id" query)))
       (if (nil? rows) #f
           (car rows))))
 
@@ -78,7 +78,7 @@
                           order-by
                           limit
                           offset)))
-      (execute-select "get-songs" query)))
+      (execute-read "get-songs" query)))
 
   (define* (get-songs-by-artist-id id
                                    #:key (order-by "display_name DESC"))
@@ -89,7 +89,7 @@
                    ORDER BY ~a"
                    cols-sql
                    (value->sql-literal id) order-by)))
-      (execute-select "get-songs-by-artist-id" query)))
+      (execute-read "get-songs-by-artist-id" query)))
 
   (define* (get-songs-by-genre-id id
                                   #:key (order-by "display_name DESC"))
@@ -100,7 +100,7 @@
                    ORDER BY ~a"
                    cols-sql
                    (value->sql-literal id) order-by)))
-      (execute-select "get-songs-by-genre-id" query)))
+      (execute-read "get-songs-by-genre-id" query)))
 
   (define* (search-songs s
                          #:key (order-by "created_at DESC")
@@ -117,7 +117,7 @@
                    order-by
                    limit
                    offset)))
-      (execute-select "search-songs" query)))
+      (execute-read "search-songs" query)))
 
   (define* (get-song-artists-by-ids ids)
     (let* ((query (format #f
@@ -125,7 +125,7 @@
                    WHERE song_identifier IN(~a)
                    ORDER BY created_at DESC"
                    (string-join (map value->sql-literal ids) ", "))))
-      (execute-select "get-song-artists-by-ids" query)))
+      (execute-read "get-song-artists-by-ids" query)))
 
   (define* (get-song-genres-by-ids ids)
     (let* ((query (format #f
@@ -133,7 +133,7 @@
                    WHERE song_identifier IN(~a)
                    ORDER BY created_at DESC"
                    (string-join (map value->sql-literal ids) ", "))))
-      (execute-select "get-song-genres-by-ids" query)))
+      (execute-read "get-song-genres-by-ids" query)))
 
   (define (update-song-by-id id attrs)
     (let* ((query (format #f "UPDATE songs SET ~a WHERE identifier = ~a"

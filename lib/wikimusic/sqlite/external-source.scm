@@ -46,8 +46,8 @@
   (define execute-write
     (db-write conn))
 
-  (define execute-select
-    (db-select conn))
+  (define execute-read
+    (db-read conn))
 
   (define (get-external-sources-by-entity-ids entity ids)
     (let* ((query (format #f
@@ -56,7 +56,7 @@
                    entity
                    entity
                    (string-join (map value->sql-literal ids) ", "))))
-      (execute-select "get-external-sources-by-entity-ids" query)))
+      (execute-read "get-external-sources-by-entity-ids" query)))
 
   (define (update-external-source-by-id entity id attrs)
     (let* ((query (format #f

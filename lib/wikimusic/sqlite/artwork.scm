@@ -38,16 +38,17 @@
                          last-edited-at)))
 
   (define (insert-columns entity)
-    (delq 'last-edited-at (columns entity)))
+    (delq 'last-edited-at
+          (columns entity)))
 
   (define conn
     (DB-open rc))
 
-   (define execute-write
+  (define execute-write
     (db-write conn))
 
-  (define execute-select
-    (db-select conn))
+  (define execute-read
+    (db-read conn))
 
   (define (get-artworks-by-entity-ids entity ids)
     (let* ((query (format #f
@@ -57,7 +58,7 @@
                    entity
                    entity
                    (string-join (map value->sql-literal ids) ", "))))
-      (execute-select "get-artworks-by-entity-ids" query)))
+      (execute-read "get-artworks-by-entity-ids" query)))
 
   (define (update-artwork-by-id entity id attrs)
     (let* ((query (format #f "UPDATE ~a_artworks SET ~a WHERE identifier = ~a"

@@ -55,8 +55,8 @@
   (define execute-write
     (db-write conn))
 
-  (define execute-select
-    (db-select conn))
+  (define execute-read
+    (db-read conn))
 
   (define (get-song-contents-by-song-ids ids)
     (let* ((query (format #f
@@ -64,14 +64,14 @@
                             ORDER BY version_name DESC"
                    cols-sql
                    (string-join (map value->sql-literal ids) ", "))))
-      (execute-select "get-song-contents-by-song-ids" query)))
+      (execute-read "get-song-contents-by-song-ids" query)))
 
   (define (get-song-content-ids-by-song-ids ids)
     (let* ((query (format #f
                    "SELECT identifier, song_identifier FROM song_contents WHERE song_identifier IN(~a)"
                    cols-sql
                    (string-join (map value->sql-literal ids) ", "))))
-      (execute-select "get-song-content-ids-by-song-ids" query)))
+      (execute-read "get-song-content-ids-by-song-ids" query)))
 
   (define (update-song-content-by-id id attrs)
     (let* ((query (format #f
