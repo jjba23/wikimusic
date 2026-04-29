@@ -198,14 +198,15 @@
                                          #:song-artists song-artists
                                          #:x x)) songs))
                            ,page-buttons
-                           ,(hr)
+
                            ,(unless only-tiles
-                              `(div (@ (class ,(mk-class '(flex flex-row
-                                                                flex-wrap
-                                                                gap-2
-                                                                justify-end))))
-                                    (a (@ (href "/songs/new"))
-                                       ,(button (G_ "new song"))))))))))
+                              `(,(hr) (div (@ (class ,(mk-class '(flex
+                                                                  flex-row
+                                                                  flex-wrap
+                                                                  gap-2
+                                                                  justify-end))))
+                                           (a (@ (href "/songs/new"))
+                                              ,(button (G_ "new song")))))))))))
     (if only-tiles body
         (html-template G_
                        #:is-logged-in is-logged-in
@@ -352,4 +353,3 @@
 
                             (div ,(render-song-content G_ song song-contents
                                                        ascii-size))))))
-
