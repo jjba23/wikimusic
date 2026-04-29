@@ -24,20 +24,9 @@
         (wikimusic env)
         (wikimusic auth)
         (wikimusic domain)
-        (app models artists)
-        (app models artist_artworks)
-        (app models artist_opinions)
-        (app models artist_external_sources)
-        (app models artist_comments)
-        (app models songs)
-        (app models song_artworks)
-        (app models song_opinions)
-        (app models song_comments)
-        (app models song_contents)
         (kracht prelude)
         (uuid generate)
         (bewaking bewaking)
-        (app models users)
         (wikimusic domain artist)
         (wikimusic sqlite artist)
         (wikimusic domain artwork)
@@ -50,6 +39,8 @@
         (wikimusic sqlite external-source)
         (wikimusic domain song)
         (wikimusic sqlite song)
+        (wikimusic domain song-content)
+        (wikimusic sqlite song-content)
         (wikimusic domain user)
         (wikimusic sqlite user)
         (app views artist-view)
@@ -156,6 +147,7 @@
               (artwork-repo (make-sqlite-artwork-repository rc))
               (opinion-repo (make-sqlite-opinion-repository rc))
               (comment-repo (make-sqlite-comment-repository rc))
+              (song-content-repo (make-sqlite-song-content-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (user-repo (make-sqlite-user-repository rc))
               (song-repo (make-sqlite-song-repository rc))
@@ -223,22 +215,14 @@
               (song-comments (cond
                                ((nil? song-ids)
                                 '())
-                               (else ($song_comments 'get
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
+                               (else (get-comments-by-entity-ids comment-repo
+                                                                 'song
+                                                                 song-ids))))
               (song-contents (cond
                                ((nil? song-ids)
                                 '())
-                               (else ($song_contents 'get
-                                                     #:columns '(identifier
-                                                                 song_identifier)
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
-
+                               (else (get-song-contents-by-song-ids
+                                      song-content-repo song-ids))))
               (song-version-count-alist (map (lambda (song)
                                                `(,(assoc-ref song "identifier") ,
                                                  (length (filter (lambda (sc)
@@ -302,11 +286,13 @@
               (artwork-repo (make-sqlite-artwork-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
               (artist (get-artist-by-id artist-repo artist-id))
-              (external-source-repo (make-sqlite-external-source-repository rc))              
+              (external-source-repo (make-sqlite-external-source-repository rc))
               (artworks (get-artworks-by-entity-ids artwork-repo
                                                     'artist
                                                     (list artist-id)))
-              (e (get-external-sources-by-entity-ids external-source-repo 'artist (list artist-id)))
+              (e (get-external-sources-by-entity-ids external-source-repo
+                                                     'artist
+                                                     (list artist-id)))
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '())))
@@ -320,4 +306,3 @@
                                                  #:is-logged-in (:cookies-value
                                                                  rc
                                                                  "x-bewaking-wikimusic")))))))
-
