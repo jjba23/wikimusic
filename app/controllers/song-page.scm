@@ -59,7 +59,7 @@
         (wikimusic domain genre)
         (wikimusic sqlite genre)
         (wikimusic domain song-content)
-        (wikimusic sqlite song-content)        
+        (wikimusic sqlite song-content)
         (wikimusic sqlite artist)
         (wikimusic domain artist))
 
@@ -151,7 +151,7 @@
               (song-version-count-alist (map (lambda (song)
                                                `(,(assq-ref song 'identifier) ,
                                                  (length (filter (lambda (sc)
-                                                                   (equal? (assoc-ref
+                                                                   (equal? (assq-ref
                                                                             sc
                                                                             'song-identifier)
                                                                            (assq-ref
@@ -276,7 +276,7 @@
                                                       (assq-ref a
                                                                 'artist-identifier))
                                                     song-artists)))))
-         
+
          ;; do views update
          (update-song-by-id song-repo song-id
                             `((views unquote inc-v)))
@@ -309,7 +309,7 @@
               (song-id (params rc "uuid"))
               (song-repo (make-sqlite-song-repository rc))
               (artwork-repo (make-sqlite-artwork-repository rc))
-              (artist-repo (make-sqlite-artist-repository rc))              
+              (artist-repo (make-sqlite-artist-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (song (get-song-by-id song-repo song-id))
               (artworks (get-artworks-by-entity-ids artwork-repo
@@ -340,7 +340,7 @@
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '())))
-         
+
          (response-emit (:mime rc
                                (song-edit-page (:i18n rc)
                                                #:song song
@@ -369,7 +369,7 @@
                                                   #:condition (where
                                                                #:identifier
                                                                version-uuid)))))
-         
+
          (response-emit (:mime rc
                                (song-content-edit-page (:i18n rc)
                                                        #:song song
@@ -378,4 +378,3 @@
                                                        #:is-logged-in (:cookies-value
                                                                        rc
                                                                        "x-bewaking-wikimusic")))))))
-

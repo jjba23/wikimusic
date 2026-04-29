@@ -24,19 +24,6 @@
         (wikimusic controller)
         (wikimusic domain)
         (ice-9 string-fun)
-        (app models artists)
-        (app models song_artists)
-        (app models songs)
-        (app models song_artworks)
-        (app models song_contents)
-        (app models song_opinions)
-        (app models genre_external_sources)
-        (app models song_comments)
-        (app models genres)
-        (app models genre_artworks)
-        (app models genre_comments)
-        (app models genre_opinions)
-        (app models users)
         (bewaking bewaking)
         (kracht prelude)
         (uuid generate)
@@ -46,6 +33,8 @@
         (wikimusic sqlite artwork)
         (wikimusic domain song)
         (wikimusic sqlite song)
+        (wikimusic domain song-content)
+        (wikimusic sqlite song-content)
         (wikimusic domain comment)
         (wikimusic sqlite comment)
         (wikimusic domain opinion)
@@ -55,7 +44,7 @@
         (wikimusic domain user)
         (wikimusic sqlite user)
         (wikimusic domain artist)
-        (wikimusic sqlite artist)        
+        (wikimusic sqlite artist)
         (app views genre-view)
         (app views genre-edit)
         (app views song-view)
@@ -69,6 +58,7 @@
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (genre-repo (make-sqlite-genre-repository rc))
               (opinion-repo (make-sqlite-opinion-repository rc))
+              (comment-repo (make-sqlite-comment-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (user-search (cond
                              ((equal? #f
@@ -131,11 +121,7 @@
               (comments (cond
                           ((nil? genre-ids)
                            '())
-                          (else ($genre_comments 'get
-                                                 #:ret 'all
-                                                 #:condition (where
-                                                                    #:genre_identifier
-                                                                    genre-ids))))))
+                          (else (get-comments-by-entity-ids comment-repo 'genre genre-ids)))))
          (response-emit (:mime rc
                                (genre-list-page (:i18n rc)
                                                 #:genres genres
@@ -170,8 +156,9 @@
               (external-source-repo (make-sqlite-external-source-repository rc))
               (genre (get-genre-by-id genre-repo genre-id))
               (artwork-repo (make-sqlite-artwork-repository rc))
-              (artist-repo (make-sqlite-artist-repository rc))              
+              (artist-repo (make-sqlite-artist-repository rc))
               (comment-repo (make-sqlite-comment-repository rc))
+              (song-content-repo (make-sqlite-song-content-repository rc))
               (user-repo (make-sqlite-user-repository rc))
               (song-repo (make-sqlite-song-repository rc))
               (inc-v (+ 1
@@ -238,31 +225,21 @@
               (song-comments (cond
                                ((nil? song-ids)
                                 '())
-                               (else ($song_comments 'get
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
+                               (else (get-comments-by-entity-ids comment-repo 'song song-ids))))
               (song-contents (cond
                                ((nil? song-ids)
                                 '())
-                               (else ($song_contents 'get
-                                                     #:columns '(identifier
-                                                                 song_identifier)
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
+                               (else (get-song-contents-by-song-ids song-content-repo song-ids))))
 
               (song-version-count-alist (map (lambda (song)
-                                               `(,(assoc-ref song "identifier") ,
+                                               `(,(assq-ref song 'identifier) ,
                                                  (length (filter (lambda (sc)
-                                                                   (equal? (assoc-ref
+                                                                   (equal? (assq-ref
                                                                             sc
-                                                                            "song_identifier")
-                                                                           (assoc-ref
+                                                                            'song-identifier)
+                                                                           (assq-ref
                                                                             song
-                                                                            "identifier")))
+                                                                            'identifier)))
                                                           song-contents))))
                                              songs))
               (song-artists (cond
@@ -323,7 +300,7 @@
               (artworks (get-artworks-by-entity-ids artwork-repo
                                                     'genre
                                                     (list genre-id))))
-         
+
          (response-emit (:mime rc
                                (genre-edit-page (:i18n rc)
                                                 #:genre genre
@@ -333,4 +310,3 @@
                                                 #:is-logged-in (:cookies-value
                                                                 rc
                                                                 "x-bewaking-wikimusic")))))))
-
