@@ -35,35 +35,35 @@
                                (if (equal? x
                                     "data:application/octet-stream;base64,")
                                    ""
-                                   (html-unescape (assoc-ref song-contents
-                                                             "pdf_contents")))))
+                                   (html-unescape (assq-ref song-contents
+                                                             'pdf-contents)))))
          (body `(div (@ (class ,(mk-class '(px-2 py-6))))
                      ((div ,(hr)
                            ,(song-content-form G_
-                                               #:song-identifier (assoc-ref
+                                               #:song-identifier (assq-ref
                                                                   song
-                                                                  "identifier")
-                                               #:song-content-identifier (assoc-ref
+                                                                  'identifier)
+                                               #:song-content-identifier (assq-ref
                                                                           song-contents
-                                                                          "identifier")
+                                                                          'identifier)
                                                #:instrument-type (html-unescape
-                                                                  (assoc-ref
+                                                                  (assq-ref
                                                                    song-contents
-                                                                   "instrument_type"))
-                                               #:version-name (html-unescape (assoc-ref
+                                                                   'instrument-type))
+                                               #:version-name (html-unescape (assq-ref
                                                                               song-contents
-                                                                              "version_name"))
-                                               #:ascii-legend (html-unescape (assoc-ref
+                                                                              'version-name))
+                                               #:ascii-legend (html-unescape (assq-ref
                                                                               song-contents
-                                                                              "ascii_legend"))
+                                                                              'ascii-legend))
                                                #:ascii-contents (html-unescape
-                                                                 (assoc-ref
+                                                                 (assq-ref
                                                                   song-contents
-                                                                  "ascii_contents"))
+                                                                  'ascii-contents))
                                                #:guitarpro-contents (html-unescape
-                                                                     (assoc-ref
+                                                                     (assq-ref
                                                                       song-contents
-                                                                      "guitarpro_contents"))
+                                                                      'guitarpro-contents))
                                                #:pdf-contents
                                                clean-pdf-contents))))))
     (html-template G_
@@ -135,11 +135,11 @@
                           #:value (html-unescape ascii-legend)
                           #:required #f
                           #:textarea-css '(p-3 rounded-xl
-                                               border-stone-200
+                                               border-stone-300
                                                dark:border-stone-700
                                                dark:text-stone-300
-                                               bg-stone-200
-                                               dark:bg-stone-700/75
+                                               bg-stone-300
+                                               dark:bg-onyx-700/75
                                                border-2
                                                min-h-72
                                                shadow-md
@@ -151,11 +151,11 @@
                           #:value (html-unescape ascii-contents)
                           #:required #f
                           #:textarea-css '(p-3 rounded-xl
-                                               border-stone-200
+                                               border-stone-300
                                                dark:border-stone-700
                                                dark:text-stone-300
-                                               bg-stone-200
-                                               dark:bg-stone-700/75
+                                               bg-stone-300
+                                               dark:bg-onyx-700/75
                                                border-2
                                                min-h-256
                                                text-sm
@@ -170,4 +170,3 @@
           (div ,(submit-button (if song-content-identifier
                                    (G_ "edit")
                                    (G_ "create")))))))
-

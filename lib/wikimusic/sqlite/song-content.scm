@@ -58,6 +58,14 @@
   (define execute-read
     (db-read conn))
 
+    (define (get-song-contents-by-ids ids)
+    (let* ((query (format #f
+                   "SELECT ~a FROM song_contents WHERE identifier IN(~a)
+                            ORDER BY version_name DESC"
+                   cols-sql
+                   (string-join (map value->sql-literal ids) ", "))))
+      (execute-read "get-song-contents-by-ids" query)))
+
   (define (get-song-contents-by-song-ids ids)
     (let* ((query (format #f
                    "SELECT ~a FROM song_contents WHERE song_identifier IN(~a)
@@ -96,6 +104,8 @@
 
   (mk-song-content-repository #:get-song-contents-by-song-ids-proc
                               get-song-contents-by-song-ids
+                              #:get-song-contents-by-ids-proc
+                              get-song-contents-by-ids
                               #:get-song-content-ids-by-song-ids-proc
                               get-song-content-ids-by-song-ids
                               #:insert-song-content-proc insert-song-content

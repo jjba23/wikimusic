@@ -17,8 +17,7 @@
 
 (define-artanis-controller song-page)
 
-(import
-        (app views song-content-edit)
+(import (app views song-content-edit)
         (app views song-content-view)
         (app views song-edit)
         (app views song-view)
@@ -122,8 +121,10 @@
               (comments (cond
                           ((nil? song-ids)
                            '())
-                          (else (get-comments-by-entity-ids comment-repo 'song song-ids))))
-              (song-contents (get-song-content-ids-by-song-ids song-content-repo song-ids))
+                          (else (get-comments-by-entity-ids comment-repo
+                                                            'song song-ids))))
+              (song-contents (get-song-content-ids-by-song-ids
+                              song-content-repo song-ids))
               (song-artists (cond
                               ((nil? song-ids)
                                '())
@@ -137,15 +138,20 @@
                                                                 'artist-identifier))
                                                     song-artists))))
               (song-version-count-alist (map (lambda (song)
-                                               `(,(assq-ref song 'identifier) ,
-                                                 (length (filter (lambda (sc)
-                                                                   (equal? (assq-ref
-                                                                            sc
-                                                                            'song-identifier)
-                                                                           (assq-ref
-                                                                            song
-                                                                            'identifier)))
-                                                          song-contents))))
+                                               `(,(assq-ref song
+                                                            'identifier) ,(length
+                                                                           (filter (lambda
+                                                                                           (sc)
+
+                                                                                     (equal?
+                                                                                      (assq-ref
+                                                                                       sc
+                                                                                       'song-identifier)
+
+                                                                                      (assq-ref
+                                                                                       song
+                                                                                       'identifier)))
+                                                                            song-contents))))
                                              songs)))
          (response-emit (:mime rc
                                (song-list-page (:i18n rc)
@@ -247,20 +253,23 @@
                                               'created-by)))
               (user-alist (list (cons (assq-ref user
                                                 'identifier) user)))
-              (song-contents (get-song-contents-by-song-ids song-content-repo (list song-id)))
+              (song-contents (get-song-contents-by-song-ids song-content-repo
+                                                            (list song-id)))
               (song-genres (get-song-genres-by-ids song-repo
                                                    (list song-id)))
               (genres (if (nil? song-genres)
                           '()
-                          (get-genres-by-ids genre-repo (map (lambda (g)
-                                                      (assq-ref g
-                                                                'genre-identifier))
-                                                    song-genres))))
+                          (get-genres-by-ids genre-repo
+                                             (map (lambda (g)
+                                                    (assq-ref g
+                                                              'genre-identifier))
+                                                  song-genres))))
               (song-artists (get-song-artists-by-ids song-repo
                                                      (list song-id)))
               (artists (if (nil? song-artists)
                            '()
-                           (get-artists-by-ids artist-repo (map (lambda (a)
+                           (get-artists-by-ids artist-repo
+                                               (map (lambda (a)
                                                       (assq-ref a
                                                                 'artist-identifier))
                                                     song-artists)))))
@@ -298,27 +307,31 @@
               (song-repo (make-sqlite-song-repository rc))
               (artwork-repo (make-sqlite-artwork-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
+              (genre-repo (make-sqlite-genre-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
+              (song-content-repo (make-sqlite-song-content-repository rc))
               (song (get-song-by-id song-repo song-id))
               (artworks (get-artworks-by-entity-ids artwork-repo
                                                     'song
                                                     (list song-id)))
 
-              (song-contents ($song_contents 'get
-                                             #:ret 'all
-                                             #:condition (where
-                                                                #:song_identifier
-                                                                song-id)))
+              (song-contents (get-song-contents-by-song-ids song-content-repo
+                                                            (list song-id)))
               (song-genres (get-song-genres-by-ids song-repo
                                                    (list song-id)))
               (genres (if (nil? song-genres)
                           '()
-                          (get-genres-by-ids genre-repo (map (lambda(g) (assq-ref g 'genre-identifier)) song-genres))))
+                          (get-genres-by-ids genre-repo
+                                             (map (lambda (g)
+                                                    (assq-ref g
+                                                              'genre-identifier))
+                                                  song-genres))))
               (song-artists (get-song-artists-by-ids song-repo
                                                      (list song-id)))
               (artists (if (nil? song-artists)
                            '()
-                           (get-artists-by-ids artist-repo (map (lambda (a)
+                           (get-artists-by-ids artist-repo
+                                               (map (lambda (a)
                                                       (assq-ref a
                                                                 'artist-identifier))
                                                     song-artists))))
@@ -347,16 +360,13 @@
      #:i18n '(cookie "lang")
      (lambda (rc)
        (let* ((G_ (:i18n rc))
-              (uuid (params rc "uuid"))
-              (song (car ($songs 'get
-                                 #:ret 'top
-                                 #:condition (where #:identifier uuid))))
-              (version-uuid (params rc "version-uuid"))
-              (song-contents (car ($song_contents 'get
-                                                  #:ret 'top
-                                                  #:condition (where
-                                                               #:identifier
-                                                               version-uuid)))))
+              (song-repo (make-sqlite-song-repository rc))
+              (song-content-repo (make-sqlite-song-content-repository rc))
+              (song (get-song-by-id song-repo
+                                    (params rc "uuid")))
+              (song-contents (car (get-song-contents-by-ids song-content-repo
+                                                            (list (params rc
+                                                                   "version-uuid"))))))
 
          (response-emit (:mime rc
                                (song-content-edit-page (:i18n rc)

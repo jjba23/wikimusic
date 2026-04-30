@@ -20,6 +20,7 @@
   #:use-module (srfi srfi-9)
   #:use-module (wikimusic domain repo)
   #:export (get-song-contents-by-song-ids insert-song-content
+                                          get-song-contents-by-ids
                                           get-song-content-ids-by-song-ids
                                           delete-song-content-by-id
                                           update-song-content-by-id))
@@ -31,6 +32,8 @@
                        mk-song-content-repository
                        (get-song-contents-by-song-ids-proc
                         repo-get-song-contents-by-song-ids)
+                       (get-song-contents-by-ids-proc
+                        repo-get-song-contents-by-ids)
                        (get-song-content-ids-by-song-ids-proc
                         repo-get-song-content-ids-by-song-ids)
                        (insert-song-content-proc repo-insert-song-content)
@@ -44,6 +47,10 @@
 (define-repo-method get-song-contents-by-song-ids
  repo-get-song-contents-by-song-ids
  "Retrieves song-contents by their song IDs from the given REPO.")
+
+(define-repo-method get-song-contents-by-ids
+ repo-get-song-contents-by-ids
+ "Retrieves song-contents by their IDs from the given REPO.")
 
 (define-repo-method get-song-content-ids-by-song-ids
  repo-get-song-content-ids-by-song-ids
