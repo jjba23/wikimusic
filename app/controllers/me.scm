@@ -46,7 +46,7 @@
                             #:ret 'top
                             #:condition (where #:identifier (assoc-ref t
                                                                        'owner-id)))))
-         
+
          (catch #t
                 (lambda ()
                   (response-emit (:mime rc
@@ -331,7 +331,7 @@
                                                      (current-myhost)
                                                      reset-token)))
                          (sender-name . "No Reply - Wikimusic")
-                         (sender-address . "noreply@wikimusic.jointhefreeworld.org")
+                         (sender-address . "noreply@mail.jointhefreeworld.org")
                          (subject . "Wikimusic - Password Reset")
                          (recipients . #(((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email"))))))))
     (send-to-pingwing #:body mail-payload)))
@@ -361,7 +361,7 @@
                       ($users 'get
                               #:ret 'top
                               #:condition (where #:email email)))))
-          
+
           (request-password-reset u)
           (redirect-to rc
                        (string->uri (format #f "~a/?sent-password-reset=true"
