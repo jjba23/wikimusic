@@ -151,7 +151,7 @@
                              #:weight '(font-light)
                              #:size '(text-2xl)
 
-                             #:family '(font-serif))) ,(unless only-tiles
+                             #:family '(font-sans))) ,(unless only-tiles
                                                          `(div (@ (class ,(mk-class '
                                                                            (flex
                                                                             flex-wrap
@@ -226,7 +226,7 @@
                            (ascii-size 'text-md)
                            external-sources
                            is-logged-in)
-  
+
   (let* ((artist-name-titles (map (lambda (ar)
                                     `((div ,(a (assq-ref ar
                                                          'display-name)
@@ -304,7 +304,7 @@
                                             ,(h2 (assq-ref song
                                                            'display-name)
                                                  #:size '(text-3xl md:text-10)
-                                                 #:family '(font-serif)
+                                                 #:family '(font-sans)
                                                  #:weight '(font-light
                                                             leading-10)))
                                        ,(when (not (nil? artists))
@@ -327,7 +327,7 @@
                                                                         justify-start))))
                                                  ,(em "genres:")
                                                  ,genre-name-titles))))
-                                  
+
                                   (div (div ,(entity-details G_
                                                              #:entity 'song
                                                              #:x song

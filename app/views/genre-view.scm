@@ -74,7 +74,7 @@
                                  ,(G_ "viewing genres:"))
                            #:weight '(font-light)
                            #:size '(text-2xl)
-                           #:family '(font-serif)) (div (@ (class ,(mk-class '
+                           #:family '(font-sans)) (div (@ (class ,(mk-class '
                                                                              (flex
                                                                               flex-wrap
                                                                               flex-row
@@ -141,7 +141,7 @@
                                      ,(h2 (assq-ref genre
                                                     'display-name)
                                           #:size '(text-3xl md:text-10)
-                                          #:family '(font-serif)
+                                          #:family '(font-sans)
                                           #:weight '(font-light leading-10)))
                                 (div (div ,(entity-details G_
                                                            #:entity 'genre
@@ -153,4 +153,3 @@
                                                            user-alist)))))
                           ,(render-external-sources G_ external-sources)
                           ,song-fragment)))
-

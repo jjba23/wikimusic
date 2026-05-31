@@ -122,7 +122,7 @@
                       #:color '(text-onyx-300 dark:text-stone-300
                                               hover:text-persia-pink-900
                                               hover:dark:text-persia-pink-300)
-                      #:family '(font-serif)
+                      #:family '(font-sans)
 
                       #:size '(text-xl md:text-2xl))))
          (div (@ (class ,(mk-class '(flex flex-row gap-3 flex-wrap
@@ -130,7 +130,7 @@
               (a (@ (href "/songs"))
                  ,(icon-button #:icon 'music-notes-simple
                                #:content (G_ "songs")
-                               #:family '(font-serif)
+                               #:family '(font-sans)
                                #:color '(text-onyx-900 dark:text-stone-100)
                                #:weight '(font-light)
                                #:size '(text-md lg:text-lg)
@@ -143,7 +143,7 @@
                  ,(icon-button #:icon 'disc
                                #:content (G_ "genres")
                                #:size '(text-md lg:text-lg)
-                               #:family '(font-serif)
+                               #:family '(font-sans)
                                #:color '(text-onyx-900 dark:text-stone-100)
                                #:weight '(font-light)
                                #:icon-css '(text-md lg:text-lg text-onyx-300
@@ -155,7 +155,7 @@
                  ,(icon-button #:icon 'guitar
                                #:content (G_ "artists")
                                #:size '(text-md lg:text-lg)
-                               #:family '(font-serif)
+                               #:family '(font-sans)
                                #:color '(text-onyx-900 dark:text-stone-100)
                                #:weight '(font-light)
                                #:icon-css '(text-md lg:text-lg text-onyx-300
@@ -176,7 +176,7 @@
                            (href "/login"))
                         ,(icon-button #:icon 'sign-in
                                       #:content (G_ "login")
-                                      #:family '(font-serif)
+                                      #:family '(font-sans)
                                       #:color '(text-onyx-900
                                                 dark:text-stone-100)
                                       #:weight '(font-light)
@@ -201,7 +201,7 @@
                            (href "/me"))
                         ,(icon-button #:icon 'user-circle
                                       #:content (G_ "me")
-                                      #:family '(font-serif)
+                                      #:family '(font-sans)
                                       #:color '(text-onyx-900
                                                 dark:text-stone-100)
                                       #:weight '(font-light)
@@ -218,7 +218,7 @@
                                #:size '(text-md lg:text-lg)
                                #:icon-css '(text-onyx-300 dark:text-stone-300
                                                           text-md)
-                               #:family '(font-serif)
+                               #:family '(font-sans)
                                #:content `((div ,(icon #:type 'sun
                                                        #:icon-css '(text-md
                                                                     lg:text-lg
@@ -350,7 +350,7 @@
                          #:size (list 'text-xl
                                       'leading-9)
                          #:weight '(font-light)
-                         #:family '(font-serif)
+                         #:family '(font-sans)
                          #:href item-link
                          #:color '(text-onyx-300 dark:text-stone-100)
                          #:hover '(hover:text-persia-pink-500
@@ -699,7 +699,7 @@
                                              border-2
                                              border-persia-pink-300/25
                                              dark:border-persia-pink-300/25
-                                             font-serif
+                                             font-sans
                                              bg-stone-300
                                              dark:bg-onyx-700
                                              text-onyx-300

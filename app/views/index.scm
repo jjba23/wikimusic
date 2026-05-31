@@ -68,7 +68,7 @@
                                           px-6
                                           md:px-12
                                           xl:px-18
-                                          font-serif
+                                          font-sans
                                           text-justify
                                           bg-stone-300/50
                                           dark:bg-onyx-700
@@ -84,7 +84,7 @@
                                           gap-4))))
          (div (@ (class ,(mk-class '(text-center))))
               ,(sub-h3 (G_ "the free music knowledge encyclopaedia")
-                       #:family '(font-serif)))
+                       #:family '(font-sans)))
 
          (p ,(G_
               "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."))
@@ -113,7 +113,7 @@
               "The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively."))
          (p ,(G_
               "Join us in building an ever-growing library of musical knowledge — where every note tells a story.")))
-    
+
     ,(wikimusic-img)
 
     (div (@ (class ,(mk-class '(max-w-196 bg-stone-300/50
@@ -125,7 +125,7 @@
                                           border-persia-pink-500/25
                                           border-3
                                           leading-6
-                                          font-serif
+                                          font-sans
                                           text-justify
                                           flex
                                           flex-col
