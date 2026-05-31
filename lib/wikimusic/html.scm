@@ -743,8 +743,8 @@
                             #:key route)
   `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-min))))
          (select (@ (onchange "window.location.href=this.value;")
-                    (name "ascii-size-select")
-                    (id "ascii-size-select")
+                    (name ascii-size-select)
+                    (id ascii-size-select)
                     (class ,(mk-class '(py-2 px-3
                                              border-2
                                              border-persia-pink-300/25

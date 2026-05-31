@@ -347,9 +347,9 @@
                                                           #:route (format #f
                                                                    "/~as/uuid/~a"
                                                                    'song
-                                                                   (assoc-ref
+                                                                   (assq-ref
                                                                     song
-                                                                    "identifier")))))
+                                                                    'identifier)))))
 
                             (div ,(render-song-content G_ song song-contents
                                                        ascii-size))))))
