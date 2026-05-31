@@ -238,10 +238,21 @@
 (define* (html-template G_
                         #:key (title "WikiMusic") body
                         (is-logged-in #f))
-  
+
+  (define custom-fonts
+    `((link (@ (rel preconnect)
+               (href "https://fonts.googleapis.com")))
+      (link (@ (rel preconnect)
+               (href "https://fonts.gstatic.com")
+               (crossorigin "")))
+      (link (@ (rel stylesheet)
+               (href
+                "https://fonts.googleapis.com/css2?family=Intel+One+Mono:ital,wght@0,300..700;1,300..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap")))))
+
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
-                              ,(hygguile-recommended-resources)
+                              ,(hygguile-recommended-resources #:fonts
+                                                               custom-fonts)
                               (link (@ (rel "shortcut icon")
                                        (href "/favicon.ico")
                                        (type "image/x-icon")) "")
@@ -541,7 +552,7 @@
                                                                              approved-by)))
                                               (assq-ref x
                                                         'approved-by))))
-    
+
     `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
@@ -564,11 +575,13 @@
                     ,(dt (G_ "contributor"))
                     ,(dd (render-if-nempty (lambda (u)
                                              (format #f "~a &lt;~a&gt;"
-                                                     (assq-ref u 'username)
-                                                     (assq-ref u 'email)))
+                                                     (assq-ref u
+                                                               'username)
+                                                     (assq-ref u
+                                                               'email)))
                                            (assoc-ref user-alist
-                                                           (assq-ref x
-                                                                     'created-by))))
+                                                      (assq-ref x
+                                                                'created-by))))
                     ,(dt (G_ "visibility"))
                     ,(dd (render-visibility-status G_
                                                    (assq-ref x
