@@ -59,14 +59,44 @@
 
 
 (post "/songs/new"
-     #:mime 'xml
-     #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
-     (lambda (rc)
-       (response-emit (:mime rc
-                             (song-new-page (:i18n rc)
-                                            #:is-logged-in (:cookies-value rc
-                                                            "x-bewaking-wikimusic"))))))
+      #:cookies '(names x-bewaking-wikimusic)
+      #:i18n '(cookie "lang")
+      (lambda (rc)
+        (define (do-new)
+          (let* ((G_ (:i18n rc))
+                 (t (decrypt-token #:token (:cookies-value rc
+                                            "x-bewaking-wikimusic")
+                                   #:encryption-key encryption-key
+                                   #:signing-key signing-key))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (new-uuid (generate-string-uuid))
+                 (user-identifier (assoc-ref t
+                                             'owner-id)))
+            ($songs 'set
+                     #:identifier new-uuid
+                     #:display_name (html-escape (assoc-ref body
+                                                            "display-name"))
+                     #:description (html-escape (assoc-ref body "description"))
+                     #:music_key (html-escape (assoc-ref body "music-key"))
+                     #:music_tuning (html-escape (assoc-ref body "music-tuning"))
+                     #:music_creation_date (html-escape (assoc-ref body "music-creation-date"))
+                     #:album_name (html-escape (assoc-ref body "album-name"))
+                     #:album_info_link (html-escape (assoc-ref body "album-info-link"))
+                     #:created_by user-identifier
+                     #:visibility_status 0
+                     #:views 0
+                     #:created_at (current-time))
+
+            (redirect-to rc
+                         (string->uri (format #f "~a/genres/uuid/~a"
+                                              (current-myhost) new-uuid))
+                         #:status 302)))
+
+        (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
+                           #:needed-permissions '(wikimusic:genre-create)
+                           #:rc rc
+                           #:happy-flow do-new
+                           #:unhappy-flow back-to-login)))
 
 (post "/songs/uuid/:uuid/contents/new"
      #:mime 'xml
@@ -82,113 +112,6 @@
                                                                     rc
                                                                     "x-bewaking-wikimusic"))))))
 
-(post "/songs/uuid/:uuid"
-     #:mime 'xml
-     #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-ascii-size x-bewaking-wikimusic)
-     (lambda (rc)
-       (let* ((song-repo (make-sqlite-song-repository rc))
-              (artist-repo (make-sqlite-artist-repository rc))
-              (artwork-repo (make-sqlite-artwork-repository rc))
-              (comment-repo (make-sqlite-comment-repository rc))
-              (opinion-repo (make-sqlite-opinion-repository rc))
-              (external-source-repo (make-sqlite-external-source-repository rc))
-              (song-id (params rc "uuid"))
-              (song (get-song-by-id song-repo song-id))
-              (ascii-size (cond
-                            ((not (equal? #f
-                                          (get-from-qstr rc "ascii-size")))
-                             (:cookies-set! rc
-                                            'wikimusic-ascii-size
-                                            "wikimusic-ascii-size"
-                                            (get-from-qstr rc "ascii-size"))
-                             (:cookies-setattr! rc
-                                                'wikimusic-ascii-size
-                                                #:expires 12000000
-                                                #:path "/"
-                                                #:secure #t
-                                                #:http-only #t)
-                             (get-from-qstr rc "ascii-size"))
-                            ((not (equal? #f
-                                          (:cookies-value rc
-                                           "wikimusic-ascii-size")))
-                             (:cookies-value rc "wikimusic-ascii-size"))
-                            (else "text-sm")))
-              (inc-v (+ 1
-                        (assq-ref song
-                                  'views)))
-              (artworks (get-artworks-by-entity-ids artwork-repo
-                                                    'song
-                                                    (list song-id)))
-              (opinions (get-opinions-by-entity-ids opinion-repo
-                                                    'song
-                                                    (list song-id)))
-              (comments (get-comments-by-entity-ids comment-repo
-                                                    'song
-                                                    (list song-id)))
-              (raw-external-sources (get-external-sources-by-entity-ids
-                                     external-source-repo
-                                     'song
-                                     (list song-id)))
-              (external-sources (if (nil? raw-external-sources)
-                                    '()
-                                    (car raw-external-sources)))
-              (users ($users 'get
-                             #:ret 'all))
-              (user-alist (map (lambda (u)
-                                 `(,(assoc-ref u "identifier") ,u)) users))
-              (song-contents ($song_contents 'get
-                                             #:ret 'all
-                                             #:condition (where
-                                                                #:song_identifier
-                                                                song-id)))
-              (song-genres ($song_genres 'get
-                                         #:ret 'all
-                                         #:condition (where #:song_identifier
-                                                            song-id)))
-              (genre-uuids (map (lambda (a)
-                                  (assoc-ref a "genre_identifier"))
-                                song-genres))
-              (genres (if (nil? genre-uuids)
-                          '()
-                          ($genres 'get
-                                   #:ret 'all
-                                   #:condition (where #:identifier genre-uuids))))
-              (song-artists ($song_artists 'get
-                                           #:ret 'all
-                                           #:condition (where
-                                                              #:song_identifier
-                                                              song-id)))
-              (artist-uuids (map (lambda (a)
-                                   (assoc-ref a "artist_identifier"))
-                                 song-artists))
-              (artists (if (nil? artist-uuids)
-                           '()
-                           (get-artists-by-ids artist-repo artist-uuids))))
-
-         ;; do views update
-         (update-song-by-id song-repo song-id
-                            `((views unquote inc-v)))
-
-         ;; return rendered view
-         (response-emit (:mime rc
-                               (song-detail-page (:i18n rc)
-                                                 #:song song
-                                                 #:artworks artworks
-                                                 #:song-contents song-contents
-                                                 #:song-artists song-artists
-                                                 #:artists artists
-                                                 #:song-genres song-genres
-                                                 #:genres genres
-                                                 #:opinions opinions
-                                                 #:comments comments
-                                                 #:user-alist user-alist
-                                                 #:ascii-size ascii-size
-                                                 #:external-sources
-                                                 external-sources
-                                                 #:is-logged-in (:cookies-value
-                                                                 rc
-                                                                 "x-bewaking-wikimusic")))))))
 
 (post "/songs/uuid/:uuid/edit"
      #:mime 'xml
