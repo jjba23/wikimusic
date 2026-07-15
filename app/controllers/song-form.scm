@@ -57,144 +57,8 @@
         (wikimusic sqlite artist)
         (wikimusic domain artist))
 
-(get "/songs"
-     #:mime 'xml
-     #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-song-sort x-bewaking-wikimusic)
-     (lambda (rc)
-       (let* ((artwork-repo (make-sqlite-artwork-repository rc))
-              (song-repo (make-sqlite-song-repository rc))
-              (opinion-repo (make-sqlite-opinion-repository rc))
-              (external-source-repo (make-sqlite-external-source-repository rc))
-              (user-search (cond
-                             ((equal? #f
-                                      (get-from-qstr rc "search"))
-                              #f)
-                             (else (html-escape (get-from-qstr rc "search")))))
-              (user-sort (cond
-                           ((not (equal? #f
-                                         (get-from-qstr rc "sort")))
-                            (:cookies-set! rc
-                                           'wikimusic-song-sort
-                                           "wikimusic-song-sort"
-                                           (get-from-qstr rc "sort"))
-                            (:cookies-setattr! rc
-                                               'wikimusic-song-sort
-                                               #:expires 12000000
-                                               #:path "/"
-                                               #:secure #t
-                                               #:http-only #t)
-                            (get-from-qstr rc "sort"))
-                           ((not (equal? #f
-                                         (:cookies-value rc
-                                          "wikimusic-song-sort")))
-                            (:cookies-value rc "wikimusic-song-sort"))
-                           (else "display-name-asc")))
-              (query-sort (entity-sort-from-query user-sort))
-              (query-offset (cond
-                              ((not (nil? (get-from-qstr rc "offset")))
-                               (string->number (get-from-qstr rc "offset")))
-                              (else 0)))
-              (query-limit (cond
-                             ((not (nil? (get-from-qstr rc "limit")))
-                              (string->number (get-from-qstr rc "limit")))
-                             (else 100)))
-              (songs (cond
-                       ((equal? #f user-search)
-                        (get-songs song-repo
-                                   #:order-by (format #f "~a ~a"
-                                                      (car query-sort)
-                                                      (cadr query-sort))
-                                   #:limit query-limit
-                                   #:offset query-offset))
-                       (else (search-songs song-repo
-                                           (html-escape user-search)
-                                           #:order-by (format #f "~a ~a"
-                                                              (car query-sort)
-                                                              (cadr query-sort))
-                                           #:limit query-limit
-                                           #:offset query-offset))))
-              (song-ids (map (lambda (s)
-                               (assq-ref s
-                                         'identifier)) songs))
-              (artworks (cond
-                          ((nil? song-ids)
-                           '())
-                          (else (get-artworks-by-entity-ids artwork-repo
-                                                            'song song-ids))))
-              (opinions (cond
-                          ((nil? song-ids)
-                           '())
-                          (else ($song_opinions 'get
-                                                #:ret 'all
-                                                #:condition (where
-                                                                   #:song_identifier
-                                                                   song-ids)))))
-              (comments (cond
-                          ((nil? song-ids)
-                           '())
-                          (else ($song_comments 'get
-                                                #:ret 'all
-                                                #:condition (where
-                                                                   #:song_identifier
-                                                                   song-ids)))))
-              (song-contents (cond
-                               ((nil? song-ids)
-                                '())
-                               (else ($song_contents 'get
-                                                     #:columns '(identifier
-                                                                 song_identifier)
-                                                     #:ret 'all
-                                                     #:condition (where
-                                                                  #:song_identifier
-                                                                  song-ids)))))
 
-              (song-artists (cond
-                              ((nil? song-ids)
-                               '())
-                              (else ($song_artists 'get
-                                                   #:ret 'all
-                                                   #:condition (where
-                                                                #:song_identifier
-                                                                song-ids)))))
-              (artist-uuids (map (lambda (a)
-                                   (assoc-ref a "artist_identifier"))
-                                 song-artists))
-              (artists (if (nil? artist-uuids)
-                           '()
-                           ($artists 'get
-                                     #:ret 'all
-                                     #:condition (where #:identifier
-                                                        artist-uuids))))
-              (song-version-count-alist (map (lambda (song)
-                                               `(,(assoc-ref song "identifier") ,
-                                                 (length (filter (lambda (sc)
-                                                                   (equal? (assoc-ref
-                                                                            sc
-                                                                            "song_identifier")
-                                                                           (assoc-ref
-                                                                            song
-                                                                            "identifier")))
-                                                          song-contents))))
-                                             songs)))
-         (response-emit (:mime rc
-                               (song-list-page (:i18n rc)
-                                               #:songs songs
-                                               #:artworks artworks
-                                               #:song-version-count-alist
-                                               song-version-count-alist
-                                               #:artists artists
-                                               #:song-artists song-artists
-                                               #:comments comments
-                                               #:limit query-limit
-                                               #:offset query-offset
-                                               #:search-query user-search
-                                               #:user-sort user-sort
-                                               #:is-logged-in (:cookies-value
-                                                               rc
-                                                               "x-bewaking-wikimusic")))))))
-
-(get "/songs/new"
+(post "/songs/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-wikimusic)
@@ -204,7 +68,7 @@
                                             #:is-logged-in (:cookies-value rc
                                                             "x-bewaking-wikimusic"))))))
 
-(get "/songs/uuid/:uuid/contents/new"
+(post "/songs/uuid/:uuid/contents/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-wikimusic)
@@ -218,7 +82,7 @@
                                                                     rc
                                                                     "x-bewaking-wikimusic"))))))
 
-(get "/songs/uuid/:uuid"
+(post "/songs/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names wikimusic-ascii-size x-bewaking-wikimusic)
@@ -301,7 +165,7 @@
               (artists (if (nil? artist-uuids)
                            '()
                            (get-artists-by-ids artist-repo artist-uuids))))
-         
+
          ;; do views update
          (update-song-by-id song-repo song-id
                             `((views unquote inc-v)))
@@ -326,7 +190,7 @@
                                                                  rc
                                                                  "x-bewaking-wikimusic")))))))
 
-(get "/songs/uuid/:uuid/edit"
+(post "/songs/uuid/:uuid/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
@@ -378,7 +242,7 @@
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '())))
-         
+
          (response-emit (:mime rc
                                (song-edit-page (:i18n rc)
                                                #:song song
@@ -392,7 +256,7 @@
                                                                rc
                                                                "x-bewaking-wikimusic")))))))
 
-(get "/songs/uuid/:uuid/contents/:version-uuid/edit"
+(post "/songs/uuid/:uuid/contents/:version-uuid/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
@@ -407,7 +271,7 @@
                                                   #:condition (where
                                                                #:identifier
                                                                version-uuid)))))
-         
+
          (response-emit (:mime rc
                                (song-content-edit-page (:i18n rc)
                                                        #:song song
@@ -416,4 +280,3 @@
                                                        #:is-logged-in (:cookies-value
                                                                        rc
                                                                        "x-bewaking-wikimusic")))))))
-
