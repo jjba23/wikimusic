@@ -239,7 +239,7 @@
 (define* (html-template G_
                         #:key (title "WikiMusic") body
                         (is-logged-in #f))
-
+  
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
                               ,(hygguile-recommended-resources #:fonts (custom-fonts))
@@ -542,7 +542,7 @@
                                                                              approved-by)))
                                               (assq-ref x
                                                         'approved-by))))
-
+    
     `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
