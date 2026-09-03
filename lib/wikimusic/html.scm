@@ -111,14 +111,15 @@
                     (class ,(mk-class '(flex flex-row gap-2 items-center
                                              no-underline))))
                  ,(h1 (list (icon #:type 'music-note
+
                                   #:icon-css '(text-xl text-onyx-300
                                                dark:text-stone-300
                                                hover:text-persia-pink-900
                                                hover:dark:text-persia-pink-300
 
                                                )) "&nbsp;"
-                            (G_ "Wikimusic"))
-                      #:weight '(font-light)
+                            (G_ "WikiMusic"))
+                      #:weight '(font-medium italic)
                       #:color '(text-onyx-300 dark:text-stone-300
                                               hover:text-persia-pink-900
                                               hover:dark:text-persia-pink-300)
@@ -239,20 +240,9 @@
                         #:key (title "WikiMusic") body
                         (is-logged-in #f))
 
-  (define custom-fonts
-    `((link (@ (rel preconnect)
-               (href "https://fonts.googleapis.com")))
-      (link (@ (rel preconnect)
-               (href "https://fonts.gstatic.com")
-               (crossorigin "")))
-      (link (@ (rel stylesheet)
-               (href
-                "https://fonts.googleapis.com/css2?family=Intel+One+Mono:ital,wght@0,300..700;1,300..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap")))))
-
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
-                              ,(hygguile-recommended-resources #:fonts
-                                                               custom-fonts)
+                              ,(hygguile-recommended-resources #:fonts (custom-fonts))
                               (link (@ (rel "shortcut icon")
                                        (href "/favicon.ico")
                                        (type "image/x-icon")) "")
