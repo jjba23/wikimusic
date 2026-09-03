@@ -104,7 +104,7 @@
                                                                               border-persia-pink-100/25
                                                                               dark:border-persia-pink-900/10
                                                                               white-space-pre
-                                                                              overflow-x-scroll)))))
+                                                                              overflow-x-auto)))))
                                                ,ascii-legend))))
          (ascii-legend-section (render-if-nestring render-ascii-legend
                                                    (assq-ref version
@@ -246,4 +246,3 @@
                           ,ascii-legend-section
                           ,ascii-content-section
                           ,pdf-content-section)))))
-
