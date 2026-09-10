@@ -43,7 +43,7 @@
         || document.querySelector('script[src*="symbanta"]');
 
     // Read config options from the <script> tag attributes
-    const SYMBANTA_ENDPOINT = scriptTag?.getAttribute("data-endpoint") || "http://localhost:8080/v1/events/register";
+    const SYMBANTA_ENDPOINT = scriptTag?.getAttribute("data-endpoint") || "https://api.symbanta.jointhefreeworld.org/v1/events/register";
     const DOMAIN_NAME = scriptTag?.getAttribute("data-domain") || window.location.hostname;
 
     // Safer integer parsing to avoid NaN bypassing the default fallback
