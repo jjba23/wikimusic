@@ -54,6 +54,7 @@
 
 (define* asset-library
   (build-asset-library '("pub/js/song-auto-scroll.js"
+                         "pub/js/symbanta.js"
                          "pub/js/song-chord-highlighter.js"
                          "pub/js/file-base64.js")))
 
@@ -239,7 +240,7 @@
 (define* (html-template G_
                         #:key (title "WikiMusic") body
                         (is-logged-in #f))
-  
+
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
                               ,(hygguile-recommended-resources #:fonts (custom-fonts))
@@ -268,6 +269,8 @@
                                         "pub/js/song-chord-highlighter.js"))
                               (script ,(assoc-ref asset-library
                                         "pub/js/song-auto-scroll.js"))
+                              (script ,(assoc-ref asset-library
+                                        "pub/js/symbanta.js"))
                               (script ,(assoc-ref asset-library
                                                   "pub/js/file-base64.js")))
                         (body (@ (class ,(mk-class '(bg-stone-100
@@ -542,7 +545,7 @@
                                                                              approved-by)))
                                               (assq-ref x
                                                         'approved-by))))
-    
+
     `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
