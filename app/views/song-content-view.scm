@@ -30,6 +30,41 @@
   #:use-module (ice-9 string-fun)
   #:export (render-song-content render-version))
 
+(define (render-chord-pill pair)
+  "Helper to render a single chord pill badge."
+  (let ((chord (car pair))
+        (fingering (cdr pair)))
+    `(div (@(class ,(mk-class '(   border
+                                       rounded-xl
+                                             border-stone-300
+                                             dark:border-onyx-500 shadow-md))))
+      (div (@ (class ,(mk-class '(inline-flex items-center
+                                             gap-2
+                                             px-3
+                                             py-2
+                                             bg-stone-100
+                                             dark:bg-onyx-500
+                                             transition-all
+                                             hover:scale-105))))
+          (span (@ (class ,(mk-class '(font-bold text-sm text-onyx-900
+                                                 dark:text-stone-100))))
+                ,chord)
+          (span (@ (class ,(mk-class '(font-mono text-md
+                                                 px-3
+                                                 py-2
+                                                 rounded-full
+                                                 bg-stone-300
+                                                 dark:bg-onyx-900
+                                                 text-onyx-700
+                                                 dark:text-stone-500))))
+                ,fingering)))))
+
+(define (render-chord-guide chord-pairs)
+  "Helper to render the flex row container for all chord pills"
+  (if (null? chord-pairs) ""
+      `(div (@ (class ,(mk-class '(flex flex-wrap gap-3 py-6 items-center align-center))))
+            ,@(map render-chord-pill chord-pairs))))
+
 (define* (render-song-content G_ song song-contents ascii-size)
   `(div (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))
              (div ,(map (lambda (version)
@@ -102,13 +137,8 @@
 (define (render-ascii-content G_ ascii-size ascii-contents)
   (let* ((guitar-chord-guide-contents (generate-guitar-chord-guide
                                        ascii-contents)))
-    `(,(ascii-button-section G_) (span (@ (class ,(mk-class '(text-xl
-                                                              font-bold
-                                                              text-onyx-300
-                                                              dark:text-stone-300
-                                                              ))))
-                                       ,(format #f "~a"
-                                                guitar-chord-guide-contents))
+    `(,(ascii-button-section G_) ,(render-chord-guide
+                                   guitar-chord-guide-contents)
       (details (@ (open true)
                   (class ,(mk-class '(my-6))))
                (summary (@ (class ,(mk-class '(text-xl font-bold text-onyx-300

@@ -52,26 +52,22 @@
   (let ((entry (assoc guitar-chord
                       (guitar-chord-database))))
     (if entry
-        (cdr entry) "xxxxxx")))
+        (cdr entry) "???")))
 ; Default/unknown representation
 
-(define (format-fretboard guitar-chord fingering)
-  "Renders a guitar-chord and its string fingering into a readable text format."
-  (string-append guitar-chord " -> " fingering))
-
 (define (generate-guitar-chord-guide text)
-  "Main function: extracts guitar-chords from ASCII text and prints guitar playing guide."
-  (let* ((guitar-chords (extract-guitar-chords text))
-         (fingerings (map (lambda (c)
-                            (cons c
-                                  (guitar-chord->fingering c))) guitar-chords)))
-    (map (lambda (pair)
-           (format-fretboard (car pair)
-                             (cdr pair))) fingerings)))
+  "Main function: extracts guitar-chords from ASCII text and returns a list of (chord . fingering) pairs."
+  (let* ((guitar-chords (extract-guitar-chords text)))
+    (map (lambda (c)
+           (cons c
+                 (guitar-chord->fingering c))) guitar-chords)))
 
-;; Dictionary mapping chord names to fret positions
+;; === Dictionary mapping chord names to fret positions ===
 (define guitar-chord-database
-  (make-parameter '(("C" . "x32010") ("Cm" . "x35543")
+  (make-parameter '( ;C chords
+                     ("C" . "x32010")
+                    ("Cm" . "x35543")
+                    ("C5" . "x355xx")
                     ("C7" . "x32310")
                     ("Cmaj7" . "x32000")
                     ("Cm7" . "x35343")
@@ -92,9 +88,14 @@
                     ("Csus2" . "x30010")
                     ("Csus4" . "x33010")
                     ("C7sus4" . "x33311")
+                    ("C/G" . "332010")
+                    ("C/B" . "x20010")
+                    ("C/E" . "032010")
 
+                    ;; C# / Db chords
                     ("C#" . "x46664")
                     ("C#m" . "x46654")
+                    ("C#5" . "x466xx")
                     ("C#7" . "x46464")
                     ("C#maj7" . "x46564")
                     ("C#m7" . "x46454")
@@ -116,6 +117,7 @@
 
                     ("Db" . "x46664")
                     ("Dbm" . "x46654")
+                    ("Db5" . "x466xx")
                     ("Db7" . "x46464")
                     ("Dbmaj7" . "x46564")
                     ("Dbm7" . "x46454")
@@ -135,8 +137,10 @@
                     ("Dbsus4" . "x46674")
                     ("Db7sus4" . "x46677")
 
+                    ;; D chords
                     ("D" . "xx0232")
                     ("Dm" . "xx0231")
+                    ("D5" . "xx023x")
                     ("D7" . "xx0212")
                     ("Dmaj7" . "xx0222")
                     ("Dm7" . "xx0211")
@@ -157,9 +161,15 @@
                     ("Dsus2" . "xx0230")
                     ("Dsus4" . "xx0233")
                     ("D7sus4" . "xx0213")
+                    ("D/F#" . "2x0232")
+                    ("D/A" . "x00232")
+                    ("D/C" . "x30232")
+                    ("D/B" . "x20232")
 
+                    ;; D# / Eb chords
                     ("D#" . "x68886")
                     ("D#m" . "x68876")
+                    ("D#5" . "x688xx")
                     ("D#7" . "x68686")
                     ("D#maj7" . "x68786")
                     ("D#m7" . "x68676")
@@ -181,6 +191,7 @@
 
                     ("Eb" . "x68886")
                     ("Ebm" . "x68876")
+                    ("Eb5" . "x688xx")
                     ("Eb7" . "x68686")
                     ("Ebmaj7" . "x68786")
                     ("Ebm7" . "x68676")
@@ -200,8 +211,10 @@
                     ("Ebsus4" . "x68896")
                     ("Eb7sus4" . "x68899")
 
+                    ;; E chords
                     ("E" . "022100")
                     ("Em" . "022000")
+                    ("E5" . "022xxx")
                     ("E7" . "020100")
                     ("Emaj7" . "021100")
                     ("Em7" . "020000")
@@ -223,9 +236,15 @@
                     ("Esus4" . "022200")
                     ("E7sus4" . "020200")
                     ("E7#9" . "07678x")
+                    ("E/G#" . "4x2100")
+                    ("Em/D" . "xx0000")
+                    ("Em/C" . "x32000")
+                    ("Em/B" . "x22000")
 
+                    ;; F chords
                     ("F" . "133211")
                     ("Fm" . "133111")
+                    ("F5" . "133xxx")
                     ("F7" . "131211")
                     ("Fmaj7" . "132211")
                     ("Fm7" . "131111")
@@ -246,9 +265,14 @@
                     ("Fsus2" . "133011")
                     ("Fsus4" . "133311")
                     ("F7sus4" . "131311")
+                    ("F/A" . "x03211")
+                    ("F/C" . "x33211")
+                    ("F/E" . "033211")
 
+                    ;; F# chords
                     ("F#" . "244322")
                     ("F#m" . "244222")
+                    ("F#5" . "244xxx")
                     ("F#7" . "242322")
                     ("F#maj7" . "243322")
                     ("F#m7" . "242222")
@@ -269,9 +293,12 @@
                     ("F#sus2" . "244022")
                     ("F#sus4" . "244422")
                     ("F#7sus4" . "242422")
+                    ("F#/A#" . "x1432x")
 
+                    ;; G chords
                     ("G" . "320003")
                     ("Gm" . "355333")
+                    ("G5" . "355xxx")
                     ("G7" . "320001")
                     ("Gmaj7" . "320002")
                     ("Gm7" . "353333")
@@ -292,9 +319,15 @@
                     ("Gsus2" . "300033")
                     ("Gsus4" . "320013")
                     ("G7sus4" . "320011")
+                    ("G5/A" . "x00033")
+                    ("G/B" . "x20003")
+                    ("G/F#" . "200003")
+                    ("G/D" . "xx0003")
 
+                    ;; G# / Ab chords
                     ("G#" . "466544")
                     ("G#m" . "466444")
+                    ("G#5" . "466xxx")
                     ("G#7" . "464544")
                     ("G#maj7" . "465544")
                     ("G#m7" . "464444")
@@ -318,6 +351,7 @@
 
                     ("Ab" . "466544")
                     ("Abm" . "466444")
+                    ("Ab5" . "466xxx")
                     ("Ab7" . "464544")
                     ("Abmaj7" . "465544")
                     ("Abm7" . "464444")
@@ -339,8 +373,10 @@
                     ("Absus4" . "466644")
                     ("Ab7sus4" . "464644")
 
+                    ;; A chords
                     ("A" . "x02220")
                     ("Am" . "x02210")
+                    ("A5" . "x022xx")
                     ("A7" . "x02020")
                     ("Amaj7" . "x02120")
                     ("Am7" . "x02010")
@@ -361,8 +397,16 @@
                     ("Asus2" . "x02200")
                     ("Asus4" . "x02230")
                     ("A7sus4" . "x02030")
+                    ("A/C#" . "x42220")
+                    ("A/E" . "002220")
+                    ("Am/G" . "302210")
+                    ("Am/F#" . "202210")
+                    ("Am/E" . "002210")
+
+                    ;; A# / Bb chords
                     ("A#" . "x13331")
                     ("A#m" . "x13321")
+                    ("A#5" . "x133xx")
                     ("A#7" . "x13131")
                     ("A#maj7" . "x13231")
                     ("A#m7" . "x13121")
@@ -386,6 +430,7 @@
 
                     ("Bb" . "x13331")
                     ("Bbm" . "x13321")
+                    ("Bb5" . "x133xx")
                     ("Bb7" . "x13131")
                     ("Bbmaj7" . "x13231")
                     ("Bbm7" . "x13121")
@@ -406,9 +451,13 @@
                     ("Bbsus2" . "x13311")
                     ("Bbsus4" . "x13341")
                     ("Bb7sus4" . "x13141")
+                    ("Bb/F" . "113331")
+                    ("Bb/D" . "xx0331")
 
+                    ;; B chords
                     ("B" . "x24442")
                     ("Bm" . "x24432")
+                    ("B5" . "x244xx")
                     ("B7" . "x21202")
                     ("Bmaj7" . "x24342")
                     ("Bm7" . "x20202")
@@ -428,4 +477,6 @@
                     ("B13" . "x21224")
                     ("Bsus2" . "x24422")
                     ("Bsus4" . "x24452")
-                    ("B7sus4" . "x24252"))))
+                    ("B7sus4" . "x24252")
+                    ("B/F#" . "224442")
+                    ("B/A" . "x04442"))))
