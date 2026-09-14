@@ -99,6 +99,7 @@
                                                                               dark:bg-onyx-700
                                                                               text-black
                                                                               dark:text-white
+                                                                              leading-5
                                                                               rounded-xl
                                                                               border-2
                                                                               border-persia-pink-100/25
@@ -201,6 +202,7 @@
                                                                               dark:bg-onyx-700
                                                                               text-black
                                                                               dark:text-white
+                                                                              leading-5
                                                                               rounded-xl
                                                                               border-2
                                                                               border-persia-pink-100/25
