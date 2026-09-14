@@ -89,6 +89,17 @@
                                    "highlightChords('ascii-content-container');"
                                    "highlightChords('ascii-legend-container');")))))
 
+(define (format-chord-legend-ascii chord-alist)
+  (if (or (not chord-alist) (null? chord-alist))
+      ""
+      (string-append
+       "Chords:\n\n"
+       (string-join (map (lambda (pair)
+                           (format #f "~a (~a)" (car pair) (cdr pair)))
+                         chord-alist)
+                    "  |  ")
+       "\n\n")))
+
 (define (render-ascii-content G_ ascii-size ascii-contents)
   (let* ((guitar-chord-guide-contents (map (lambda (c)
                                              (cons c
@@ -97,7 +108,7 @@
                                             ascii-contents)))
          (guitar-chords (if (not guitar-chord-guide-contents)
                             '()
-                            (list (format #f "~a" guitar-chord-guide-contents)))))
+                            (list (format-chord-legend-ascii guitar-chord-guide-contents)))))
     `(,(ascii-button-section G_) (details (@ (open true)
                                              (class ,(mk-class '(my-6))))
                                           (summary (@ (class ,(mk-class '(text-xl
@@ -119,7 +130,6 @@
                                                                               dark:bg-onyx-700
                                                                               text-black
                                                                               dark:text-white
-                                                                              leading-5
                                                                               rounded-xl
                                                                               border-2
                                                                               border-persia-pink-100/25
@@ -193,7 +203,6 @@
                                                                               dark:bg-onyx-700
                                                                               text-black
                                                                               dark:text-white
-                                                                              leading-5
                                                                               rounded-xl
                                                                               border-2
                                                                               border-persia-pink-100/25
