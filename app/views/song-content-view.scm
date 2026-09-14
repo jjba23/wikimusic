@@ -34,30 +34,16 @@
   "Helper to render a single chord pill badge."
   (let ((chord (car pair))
         (fingering (cdr pair)))
-    `(div (@(class ,(mk-class '(   border
-                                       rounded-xl
-                                             border-stone-300
-                                             dark:border-onyx-500 shadow-md))))
-      (div (@ (class ,(mk-class '(inline-flex items-center
-                                             gap-2
-                                             px-3
-                                             py-2
-                                             bg-stone-100
-                                             dark:bg-onyx-500
-                                             transition-all
-                                             hover:scale-105))))
-          (span (@ (class ,(mk-class '(font-bold text-sm text-onyx-900
-                                                 dark:text-stone-100))))
+    `(div (@ (class ,(mk-class '(inline-flex items-center gap-2 px-4 py-3
+                                 rounded-xl border border-stone-300 dark:border-onyx-500
+                                 bg-stone-300 dark:bg-onyx-500 shadow-md
+                                 transition-all))))
+          (span (@ (class ,(mk-class '(font-bold text-md text-onyx-900 dark:text-stone-100))))
                 ,chord)
-          (span (@ (class ,(mk-class '(font-mono text-md
-                                                 px-3
-                                                 py-2
-                                                 rounded-full
-                                                 bg-stone-300
-                                                 dark:bg-onyx-900
-                                                 text-onyx-700
-                                                 dark:text-stone-500))))
-                ,fingering)))))
+          (span (@ (class ,(mk-class '(font-mono text-md px-3 py-2
+                                       bg-stone-100 dark:bg-onyx-900 rounded-xl
+                                       text-onyx-700 dark:text-stone-300))))
+                ,fingering))))
 
 (define (render-chord-guide chord-pairs)
   "Helper to render the flex row container for all chord pills"
