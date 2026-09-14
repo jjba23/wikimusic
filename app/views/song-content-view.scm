@@ -35,7 +35,8 @@
                           (render-version G_ song version ascii-size))
                         song-contents))
              (a (@ (href ,(format #f "/songs/uuid/~a/contents/new"
-                                  (assq-ref song 'identifier))))
+                                  (assq-ref song
+                                            'identifier))))
                 ,(icon-button #:icon 'plus
                               #:content (G_ "new version"))))))
 
@@ -43,8 +44,9 @@
   (let* ((v-name (render-if-nempty (lambda (version-name)
                                      (format #f "~a ~a" version-name
                                              (assq-ref version
-                                                        'instrument-type)))
-                                   (assq-ref version 'version-name)))
+                                                       'instrument-type)))
+                                   (assq-ref version
+                                             'version-name)))
          (version-management-section `((div (@ (class ,(mk-class '(flex
                                                                    flex-wrap
                                                                    flex-row
@@ -52,9 +54,9 @@
                                             (a (@ (href ,(format #f
                                                           "/songs/uuid/~a/contents/~a/edit"
                                                           (assq-ref song
-                                                           'identifier)
+                                                                    'identifier)
                                                           (assq-ref version
-                                                           'identifier))))
+                                                                    'identifier))))
                                                ,(icon-button #:icon 'pencil
                                                              #:content (G_
                                                                         "edit version")))
@@ -62,7 +64,7 @@
                                                      (action ,(format #f
                                                                "/songs/uuid/~a/contents/~a/delete"
                                                                (assq-ref song
-                                                                'identifier)
+                                                                         'identifier)
                                                                (assq-ref
                                                                 version
                                                                 'identifier))))
@@ -109,7 +111,7 @@
                                                ,ascii-legend))))
          (ascii-legend-section (render-if-nestring render-ascii-legend
                                                    (assq-ref version
-                                                              'ascii-legend)))
+                                                             'ascii-legend)))
          (line-scroll-select (select #:id 'line-scroll
                                      #:name 'line-scroll
                                      #:options (list (option #:value 1
@@ -209,13 +211,29 @@
                                                                               dark:border-persia-pink-900/10
                                                                               white-space-pre
                                                                               overflow-x-scroll)))))
+                                                                       ,(string-join
+                                                                         (list
+                                                                          (map (lambda
+                                                                                       (c)
+
+                                                                                 (cons
+                                                                                  c
+
+                                                                                  (guitar-chord->fingering
+                                                                                   c)))
+                                                                           (extract-guitar-chords
+                                                                            ascii-contents))
+                                                                          ascii-contents)
+                                                                         "\n\n")
                                                                        ,ascii-contents)))))
          (ascii-content-section (render-if-nestring render-ascii-content
                                                     (assq-ref version
-                                                     'ascii-contents)))
-         (cleaned-pdf-data (if (equal? (assq-ref version 'pdf-contents)
+                                                              'ascii-contents)))
+         (cleaned-pdf-data (if (equal? (assq-ref version
+                                                 'pdf-contents)
                                 "data:application/octet-stream;base64,") ""
-                               (assq-ref version 'pdf-contents)))
+                               (assq-ref version
+                                         'pdf-contents)))
          (render-pdf-content (lambda (pdf-contents)
                                `((details (@ (open true)
                                              (class ,(mk-class '(my-6))))
