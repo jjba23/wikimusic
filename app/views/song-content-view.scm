@@ -90,57 +90,49 @@
                                    "highlightChords('ascii-legend-container');")))))
 
 (define (format-chord-legend-ascii chord-alist)
-  (if (or (not chord-alist) (null? chord-alist))
-      ""
-      (string-append
-       "Chords:\n\n"
-       (string-join (map (lambda (pair)
-                           (format #f "~a (~a)" (car pair) (cdr pair)))
-                         chord-alist)
-                    "  |  ")
-       "\n\n")))
+  (if (or (not chord-alist)
+          (null? chord-alist)) ""
+      (string-append "Chords:\n\n"
+                     (string-join (map (lambda (pair)
+                                         (format #f "~a (~a)"
+                                                 (car pair)
+                                                 (cdr pair))) chord-alist)
+                                  "  |  ") "\n\n")))
 
 (define (render-ascii-content G_ ascii-size ascii-contents)
-  (let* ((guitar-chord-guide-contents (map (lambda (c)
-                                             (cons c
-                                                   (guitar-chord->fingering c)))
-                                           (extract-guitar-chords
-                                            ascii-contents)))
-         (guitar-chords (if (not guitar-chord-guide-contents)
-                            '()
-                            (list (format-chord-legend-ascii guitar-chord-guide-contents)))))
-    `(,(ascii-button-section G_) (details (@ (open true)
-                                             (class ,(mk-class '(my-6))))
-                                          (summary (@ (class ,(mk-class '(text-xl
-                                                                          font-bold
-                                                                          text-onyx-300
-                                                                          dark:text-stone-300
-                                                                          cursor-pointer))))
-                                                   ,(G_ "ascii contents"))
+  (let* ((guitar-chord-guide-contents (generate-guitar-chord-guide
+                                       ascii-contents)))
+    `(,(ascii-button-section G_) (span (@ (class ,(mk-class '(text-xl
+                                                              font-bold
+                                                              text-onyx-300
+                                                              dark:text-stone-300
+                                                              ))))
+                                       ,(format #f "~a"
+                                                guitar-chord-guide-contents))
+      (details (@ (open true)
+                  (class ,(mk-class '(my-6))))
+               (summary (@ (class ,(mk-class '(text-xl font-bold text-onyx-300
+                                                       dark:text-stone-300
+                                                       cursor-pointer))))
+                        ,(G_ "ascii contents"))
 
-                                          (pre (@ (id ascii-content-container)
-                                                  (class ,(mk-class (append (list
-                                                                             (string->symbol
-                                                                              ascii-size))
-                                                                            '(p-4
-                                                                              md:p-6
-                                                                              shadow-md
-                                                                              font-mono
-                                                                              bg-stone-300/75
-                                                                              dark:bg-onyx-700
-                                                                              text-black
-                                                                              dark:text-white
-                                                                              rounded-xl
-                                                                              border-2
-                                                                              border-persia-pink-100/25
-                                                                              dark:border-persia-pink-900/10
-                                                                              white-space-pre
-                                                                              overflow-x-scroll)))))
-                                               ,(string-join (append
-                                                              guitar-chords
-                                                              (list
-                                                               ascii-contents))
-                                                             "\n\n"))))))
+               (pre (@ (id ascii-content-container)
+                       (class ,(mk-class (append (list (string->symbol
+                                                        ascii-size))
+                                                 '(p-4 md:p-6
+                                                   shadow-md
+                                                   font-mono
+                                                   bg-stone-300/75
+                                                   dark:bg-onyx-700
+                                                   text-black
+                                                   dark:text-white
+                                                   rounded-xl
+                                                   border-2
+                                                   border-persia-pink-100/25
+                                                   dark:border-persia-pink-900/10
+                                                   white-space-pre
+                                                   overflow-x-scroll)))))
+                    ,ascii-contents)))))
 
 (define* (render-version G_ song version ascii-size)
   (let* ((v-name (render-if-nempty (lambda (version-name)

@@ -18,27 +18,34 @@
 (define-module (wikimusic domain guitar-chord-guide)
   #:use-module (ice-9 regex)
   #:use-module (srfi srfi-1)
-  #:export (extract-guitar-chords guitar-chord->fingering format-fretboard
+  #:export (extract-guitar-chords guitar-chord->fingering
+                                  format-fretboard
                                   generate-guitar-chord-guide
-                                  guitar-chord-database guitar-chord-pattern))
+                                  guitar-tab-line-pattern
+                                  guitar-chord-database
+                                  guitar-chord-pattern))
 
-;; Regex pattern matching standard guitar-chord names (e.g., C, F#, Bm7, Emaj9, Ab)
+(define guitar-tab-line-pattern
+  (make-parameter (make-regexp "^[[:space:]]*[A-G][[:space:]]*\\|")))
+
 (define guitar-chord-pattern
-  (make-parameter (make-regexp "[A-G][b#]?(maj|min|m|dim|aug|sus)?[0-9]*")))
+  (make-parameter (make-regexp
+                   "(^|[[:space:]])[A-G][b#]?(maj|min|m|dim|aug|sus)?[0-9]*(/[A-G][b#]?)?($|[[:space:]])")))
 
 (define (extract-guitar-chords text)
   "Parses ASCII text and extracts a list of unique guitar-chord names."
   (let loop
     ((start 0)
      (acc '()))
-    (let ((match (regexp-exec (guitar-chord-pattern) text start)
-            ))
-      (if (not match)
+    (let ((match-tab-line (regexp-exec (guitar-tab-line-pattern) text start))
+          (match-chord (regexp-exec (guitar-chord-pattern) text start)))
+      (if (or match-tab-line
+              (not match-chord))
           (delete-duplicates (reverse acc))
-          (let ((guitar-chord (match:substring match 0))
-                (next-start (match:end match)))
+          (let ((guitar-chord (match:substring match-chord 0))
+                (next-start (match:end match-chord)))
             (loop next-start
-                  (cons guitar-chord acc)))))))
+                  (cons (string-trim-both guitar-chord) acc)))))))
 
 (define (guitar-chord->fingering guitar-chord)
   "Looks up 6-string fret positions for a given guitar-chord symbol."
@@ -50,25 +57,7 @@
 
 (define (format-fretboard guitar-chord fingering)
   "Renders a guitar-chord and its string fingering into a readable text format."
-  (string-append guitar-chord
-                 " -> "
-                 "E:"
-                 (string (string-ref fingering 0))
-                 " "
-                 "A:"
-                 (string (string-ref fingering 1))
-                 " "
-                 "D:"
-                 (string (string-ref fingering 2))
-                 " "
-                 "G:"
-                 (string (string-ref fingering 3))
-                 " "
-                 "B:"
-                 (string (string-ref fingering 4))
-                 " "
-                 "e:"
-                 (string (string-ref fingering 5))))
+  (string-append guitar-chord " -> " fingering))
 
 (define (generate-guitar-chord-guide text)
   "Main function: extracts guitar-chords from ASCII text and prints guitar playing guide."
