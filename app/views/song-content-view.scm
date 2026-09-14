@@ -18,6 +18,7 @@
 (define-module (app views song-content-view)
   #:use-module (wikimusic html)
   #:use-module (wikimusic domain)
+  #:use-module (wikimusic domain guitar-chord-guide)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -39,6 +40,97 @@
                                             'identifier))))
                 ,(icon-button #:icon 'plus
                               #:content (G_ "new version"))))))
+
+(define (line-scroll-select G_)
+  (select #:id 'line-scroll
+          #:name 'line-scroll
+          #:options (list (option #:value 1
+                                  #:content (G_ "1 line"))
+                          (option #:value 2
+                                  #:content (G_ "2 line"))
+                          (option #:value 4
+                                  #:content (G_ "4 line")
+                                  #:selected-value 4)
+                          (option #:value 8
+                                  #:content (G_ "8 line"))
+                          (option #:value 16
+                                  #:content (G_ "16 line"))
+                          (option #:value 32
+                                  #:content (G_ "32 line")))))
+(define (second-scroll-select G_)
+  (select #:id 'second-scroll
+          #:name 'second-scroll
+          #:options (list (option #:value 1
+                                  #:content (G_ "1 second"))
+                          (option #:value 2
+                                  #:content (G_ "2 second"))
+                          (option #:value 4
+                                  #:content (G_ "4 second"))
+                          (option #:value 8
+                                  #:content (G_ "8 second"))
+                          (option #:value 16
+                                  #:content (G_ "16 second"))
+                          (option #:value 32
+                                  #:content (G_ "32 second")))))
+
+(define (ascii-button-section G_)
+  `((div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4 items-center
+                                     justify-center))))
+         ,(sub-h3 (G_ "auto-scrolling:"))
+         ,(icon-button #:id 'start-autoscroll
+                       #:icon 'mouse-scroll
+                       #:content (G_ "scroll")
+                       #:on-click "startSongAutoScroll()")
+         ,(line-scroll-select G_)
+         ,(second-scroll-select G_)
+         ,(icon-button #:icon 'music-notes-simple
+                       #:content (G_ "highlight chords")
+                       #:on-click (string-append
+                                   "highlightChords('ascii-content-container');"
+                                   "highlightChords('ascii-legend-container');")))))
+
+(define (render-ascii-content G_ ascii-size ascii-contents)
+  (let* ((guitar-chord-guide-contents (map (lambda (c)
+                                             (cons c
+                                                   (guitar-chord->fingering c)))
+                                           (extract-guitar-chords
+                                            ascii-contents)))
+         (guitar-chords (if (not guitar-chord-guide-contents)
+                            '()
+                            (list (format #f "~a" guitar-chord-guide-contents)))))
+    `(,(ascii-button-section G_) (details (@ (open true)
+                                             (class ,(mk-class '(my-6))))
+                                          (summary (@ (class ,(mk-class '(text-xl
+                                                                          font-bold
+                                                                          text-onyx-300
+                                                                          dark:text-stone-300
+                                                                          cursor-pointer))))
+                                                   ,(G_ "ascii contents"))
+
+                                          (pre (@ (id ascii-content-container)
+                                                  (class ,(mk-class (append (list
+                                                                             (string->symbol
+                                                                              ascii-size))
+                                                                            '(p-4
+                                                                              md:p-6
+                                                                              shadow-md
+                                                                              font-mono
+                                                                              bg-stone-300/75
+                                                                              dark:bg-onyx-700
+                                                                              text-black
+                                                                              dark:text-white
+                                                                              leading-5
+                                                                              rounded-xl
+                                                                              border-2
+                                                                              border-persia-pink-100/25
+                                                                              dark:border-persia-pink-900/10
+                                                                              white-space-pre
+                                                                              overflow-x-scroll)))))
+                                               ,(string-join (append
+                                                              guitar-chords
+                                                              (list
+                                                               ascii-contents))
+                                                             "\n\n"))))))
 
 (define* (render-version G_ song version ascii-size)
   (let* ((v-name (render-if-nempty (lambda (version-name)
@@ -112,121 +204,10 @@
          (ascii-legend-section (render-if-nestring render-ascii-legend
                                                    (assq-ref version
                                                              'ascii-legend)))
-         (line-scroll-select (select #:id 'line-scroll
-                                     #:name 'line-scroll
-                                     #:options (list (option #:value 1
-                                                             #:content (G_
-                                                                        "1 line"))
-                                                     (option #:value 2
-                                                             #:content (G_
-                                                                        "2 line"))
-                                                     (option #:value 4
-                                                             #:content (G_
-                                                                        "4 line")
-                                                             #:selected-value
-                                                             4)
-                                                     (option #:value 8
-                                                             #:content (G_
-                                                                        "8 line"))
-                                                     (option #:value 16
-                                                             #:content (G_
-                                                                        "16 line"))
-                                                     (option #:value 32
-                                                             #:content (G_
-                                                                        "32 line")))))
-         (second-scroll-select (select #:id 'second-scroll
-                                       #:name 'second-scroll
-                                       #:options (list (option #:value 1
-                                                               #:content (G_
-                                                                          "1 second"))
-                                                       (option #:value 2
-                                                               #:content (G_
-                                                                          "2 second"))
-                                                       (option #:value 4
-                                                               #:content (G_
-                                                                          "4 second"))
-                                                       (option #:value 8
-                                                               #:content (G_
-                                                                          "8 second"))
-                                                       (option #:value 16
-                                                               #:content (G_
-                                                                          "16 second"))
-                                                       (option #:value 32
-                                                               #:content (G_
-                                                                          "32 second")))))
-         (ascii-button-section `((div (@ (class ,(mk-class '(flex flex-row
-                                                             flex-wrap gap-4
-                                                             items-center
-                                                             justify-center))))
-                                      ,(sub-h3 (G_ "auto-scrolling:"))
-                                      ,(icon-button #:id 'start-autoscroll
-                                                    #:icon 'mouse-scroll
-                                                    #:content (G_ "scroll")
-                                                    #:on-click
-                                                    "startSongAutoScroll()")
-                                      ,line-scroll-select
-                                      ,second-scroll-select
-                                      ,(icon-button #:icon 'music-notes-simple
-                                                    #:content (G_
-                                                               "highlight chords")
-                                                    #:on-click (string-append
-                                                                "highlightChords('ascii-content-container');"
-                                                                "highlightChords('ascii-legend-container');")))))
-         (render-ascii-content (lambda (ascii-contents)
-                                 `(,ascii-button-section (details (@ (open
-                                                                      true)
-                                                                     (class ,(mk-class '
-                                                                              (my-6))))
-                                                                  (summary (@ (class ,
-                                                                               (mk-class '
-                                                                                (text-xl
-                                                                                 font-bold
-                                                                                 text-onyx-300
-                                                                                 dark:text-stone-300
-                                                                                 cursor-pointer))))
-                                                                           ,(G_
-                                                                             "ascii contents"))
 
-                                                                  (pre (@ (id
-                                                                           ascii-content-container)
-                                                                          (class ,
-                                                                           (mk-class
-                                                                            (append
-                                                                             (list
-                                                                              (string->symbol
-                                                                               ascii-size))
-                                                                             '
-                                                                             (p-4
-                                                                              md:p-6
-                                                                              shadow-md
-                                                                              font-mono
-                                                                              bg-stone-300/75
-                                                                              dark:bg-onyx-700
-                                                                              text-black
-                                                                              dark:text-white
-                                                                              leading-5
-                                                                              rounded-xl
-                                                                              border-2
-                                                                              border-persia-pink-100/25
-                                                                              dark:border-persia-pink-900/10
-                                                                              white-space-pre
-                                                                              overflow-x-scroll)))))
-                                                                       ,(string-join
-                                                                         (list
-                                                                          (map (lambda
-                                                                                       (c)
-
-                                                                                 (cons
-                                                                                  c
-
-                                                                                  (guitar-chord->fingering
-                                                                                   c)))
-                                                                           (extract-guitar-chords
-                                                                            ascii-contents))
-                                                                          ascii-contents)
-                                                                         "\n\n")
-                                                                       ,ascii-contents)))))
-         (ascii-content-section (render-if-nestring render-ascii-content
+         (ascii-content-section (render-if-nestring (lambda (c)
+                                                      (render-ascii-content G_
+                                                       ascii-size c))
                                                     (assq-ref version
                                                               'ascii-contents)))
          (cleaned-pdf-data (if (equal? (assq-ref version
