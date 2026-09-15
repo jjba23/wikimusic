@@ -340,7 +340,7 @@
                 (div (@ (class ,(mk-class '(text-center))))
                      ,(a (assq-ref x
                                    'display-name)
-                         #:size (list 'text-xl
+                         #:size (list 'text-lg
                                       'leading-9)
                          #:weight '(font-light)
                          #:family '(font-sans)
