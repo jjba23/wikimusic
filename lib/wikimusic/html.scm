@@ -698,7 +698,8 @@
                                              dark:text-stone-300
                                              rounded-xl
                                              shadow-md))))
-                 (option ,(G_ "sort order"))
+                 (option (@ (disabled "true"))
+                         ,(G_ "sort order"))
                  ,(map (lambda (s)
                          `((option (@ (value ,(format #f "/~as?sort=~a" entity
                                                       (car s)))
