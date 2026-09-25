@@ -53,8 +53,7 @@
                           render-external-sources))
 
 (define* asset-library
-  (build-asset-library '("pub/js/song-auto-scroll.js"
-                         "pub/js/symbanta.js"
+  (build-asset-library '("pub/js/song-auto-scroll.js" "pub/js/symbanta.js"
                          "pub/js/song-chord-highlighter.js"
                          "pub/js/file-base64.js")))
 
@@ -135,7 +134,7 @@
                                #:family '(font-sans)
                                #:color '(text-onyx-900 dark:text-stone-100)
                                #:weight '(font-light)
-                               #:size '(text-md lg:text-lg)
+                               #:size '(text-md)
                                #:icon-css '(text-md lg:text-lg text-onyx-300
                                                     dark:text-stone-300)
                                #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
@@ -144,7 +143,7 @@
               (a (@ (href "/genres"))
                  ,(icon-button #:icon 'disc
                                #:content (G_ "genres")
-                               #:size '(text-md lg:text-lg)
+                               #:size '(text-md)
                                #:family '(font-sans)
                                #:color '(text-onyx-900 dark:text-stone-100)
                                #:weight '(font-light)
@@ -156,7 +155,7 @@
               (a (@ (href "/artists"))
                  ,(icon-button #:icon 'guitar
                                #:content (G_ "artists")
-                               #:size '(text-md lg:text-lg)
+                               #:size '(text-md)
                                #:family '(font-sans)
                                #:color '(text-onyx-900 dark:text-stone-100)
                                #:weight '(font-light)
@@ -182,7 +181,7 @@
                                       #:color '(text-onyx-900
                                                 dark:text-stone-100)
                                       #:weight '(font-light)
-                                      #:size '(text-md lg:text-lg)
+                                      #:size '(text-md)
                                       #:icon-css '(text-md lg:text-lg
                                                    text-onyx-300
                                                    dark:text-stone-300)
@@ -207,7 +206,7 @@
                                       #:color '(text-onyx-900
                                                 dark:text-stone-100)
                                       #:weight '(font-light)
-                                      #:size '(text-md lg:text-lg)
+                                      #:size '(text-md)
                                       #:icon-css '(text-md lg:text-lg
                                                    text-onyx-300
                                                    dark:text-stone-300)
@@ -217,7 +216,7 @@
                                                              cursor-pointer)))))
 
               ,(ui-mode-button #:icon ""
-                               #:size '(text-md lg:text-lg)
+                               #:size '(text-md)
                                #:icon-css '(text-onyx-300 dark:text-stone-300
                                                           text-md)
                                #:family '(font-sans)
@@ -240,7 +239,7 @@
 (define* (html-template G_
                         #:key (title "WikiMusic") body
                         (is-logged-in #f))
-
+  
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
                               ,(hygguile-recommended-resources #:fonts (custom-fonts))
@@ -270,7 +269,7 @@
                               (script ,(assoc-ref asset-library
                                         "pub/js/song-auto-scroll.js"))
                               (script ,(assoc-ref asset-library
-                                        "pub/js/symbanta.js"))
+                                                  "pub/js/symbanta.js"))
                               (script ,(assoc-ref asset-library
                                                   "pub/js/file-base64.js")))
                         (body (@ (class ,(mk-class '(bg-stone-100
@@ -340,7 +339,7 @@
                 (div (@ (class ,(mk-class '(text-center))))
                      ,(a (assq-ref x
                                    'display-name)
-                         #:size (list 'text-xl
+                         #:size (list 'text-lg
                                       'leading-9)
                          #:weight '(font-light)
                          #:family '(font-sans)
@@ -545,7 +544,7 @@
                                                                              approved-by)))
                                               (assq-ref x
                                                         'approved-by))))
-
+    
     `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
