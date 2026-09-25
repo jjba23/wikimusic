@@ -35,6 +35,8 @@
   #:use-module (artanis i18n locale)
   #:use-module (hygguile hygguile)
   #:use-module (srfi srfi-19)
+  #:use-module (orgwebalchemy html)
+  #:use-module (kracht prelude)
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route)
   #:export (asset-library page-footer
@@ -46,6 +48,7 @@
                           render-comments
                           entity-details
                           artwork-form
+                          org2html
                           external-sources-form
                           sort-select
                           ascii-size-select
@@ -239,7 +242,7 @@
 (define* (html-template G_
                         #:key (title "WikiMusic") body
                         (is-logged-in #f))
-  
+
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
                               ,(hygguile-recommended-resources #:fonts (custom-fonts))
@@ -529,8 +532,8 @@
                                                                         whitespace-break-spaces))))
                                                            ,(p description
                                                                #:weight '(font-light)))))
-                                              (assq-ref x
-                                                        'description)))
+                                              (org2html (html-unescape (assq-ref x
+                                                                  'description)))))
          (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
                                                    `(,(dt (G_ "last edited")) ,
                                                      (dd (strftime "%c"
@@ -544,7 +547,7 @@
                                                                              approved-by)))
                                               (assq-ref x
                                                         'approved-by))))
-    
+
     `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
@@ -584,7 +587,7 @@
                                                             gap-4))))
                                 ,(mono (assq-ref x
                                                  'identifier)
-                                       #:size '(text-md)
+                                       #:size '(text-sm)
                                        #:color '(text-stone-600
                                                  dark:text-stone-400))
                                 ,(icon-button #:icon 'copy
@@ -881,3 +884,81 @@ function addSearchQueryParam(form) {
                                                     external-sources
                                                     'soundcloud-url))
                                 #:label (G_ "Soundcloud")))))
+
+(define (org2html org)
+  (parameterize ((link-classes '(dark:text-china-violet-300
+                                 hover:dark:text-persia-pink-300
+                                 hover:text-persia-pink-500
+                                 text-china-violet-700
+                                 hover:underline
+                                 font-bold))
+                 (italic-classes '(italic))
+                 (ordered-list-classes '(list-decimal ml-3))
+                 (ordered-list-item-classes '(font-sans text-onyx-500
+                                                        dark:text-stone-500
+                                                        text-md leading-7))
+                 (unordered-list-classes '(list-disc ml-3))
+                 (unordered-list-item-classes '(font-sans text-onyx-500
+                                                          dark:text-stone-500
+                                                          text-md leading-7))
+                 (heading-classes (lambda (level)
+                                    (case level
+                                      ((1)
+                                       '(my-2 text-4xl font-bold text-onyx-300
+                                              dark:text-stone-300))
+                                      ((2)
+                                       '(my-2 text-3xl font-bold text-onyx-300
+                                              dark:text-stone-300))
+                                      ((3)
+                                       '(my-2 text-2xl font-bold text-onyx-300
+                                              dark:text-stone-300))
+                                      (else '(my-2 text-xl font-bold
+                                                   text-onyx-300
+                                                   dark:text-stone-300)))))
+                 (separator-classes '(my-8 mx-4 border-2 border-stone-500/50
+                                           dark:border-onyx-100/50))
+                 (paragraph-classes '(font-sans text-onyx-500
+                                                dark:text-stone-500
+                                                text-md
+                                                leading-7
+                                                max-w-196
+                                                break-words))
+                 (bold-classes '(font-bold text-onyx-500 dark:text-stone-500))
+                 (example-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
+                                                          text-onyx-700
+                                                          dark:text-stone-300
+                                                          rounded-lg
+                                                          my-3
+                                                          py-2
+                                                          px-3
+                                                          whitespace-pre
+                                                          font-mono
+                                                          overflow-x-scroll))
+                 (quote-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
+                                                        text-onyx-700
+                                                        dark:text-stone-300
+                                                        rounded-lg
+                                                        my-3
+                                                        py-2
+                                                        px-3
+                                                        whitespace-pre
+                                                        font-sans
+                                                        overflow-x-scroll))
+                 (code-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
+                                                       text-onyx-700
+                                                       dark:text-stone-300
+                                                       rounded-lg
+                                                       my-3
+                                                       py-2
+                                                       px-3
+                                                       whitespace-pre
+                                                       font-mono
+                                                       overflow-x-scroll))
+                 (code-classes '(rounded-lg bg-stone-300/75
+                                            dark:bg-onyx-700/75
+                                            text-onyx-700
+                                            px-2
+                                            py-1
+                                            font-mono
+                                            dark:text-stone-300)))
+    (org->html org)))
