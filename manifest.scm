@@ -45,7 +45,7 @@
 (define-public guile-hygguile
   (package
     (name "guile-hygguile")
-    (version "2.2.1")
+    (version "2.2.2")
     (source
      (origin
        (method git-fetch)
@@ -54,7 +54,7 @@
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0lzz7hfrsrbxfja20qwzs3rmglpjjdbwg09df2fhxncrhkmdki8y"))))
+        (base32 "1b6m1nli9xlcnivqk5cwai96v7pygk65wh004hpblddwby8aw00s"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -104,7 +104,7 @@ more efficient, and more powerful code.")
 (define-public guile-orgwebalchemy
   (package
     (name "guile-orgwebalchemy")
-    (version "0.1.0")
+    (version "1.0.9")
     (source
      (origin
        (method git-fetch)
@@ -113,7 +113,7 @@ more efficient, and more powerful code.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0mzm3rbldfhzlj5mg70w11v2givpgl0bzlpw513vw1cg85l7vkf9"))))
+        (base32 "1kgq4ck9nwk9mqqxr968m4bcijkf1xwlkcn0vlg97fk55pizdkcr"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -129,7 +129,7 @@ more efficient, and more powerful code.")
 (define-public guile-bewaking
   (package
     (name "guile-bewaking")
-    (version "0.1.5")
+    (version "0.2.3")
     (source
      (origin
        (method git-fetch)
@@ -138,7 +138,7 @@ more efficient, and more powerful code.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "15yz25b8bfi58lrb1kgfg5sq84pim04rfjqs87qzl655rfifxjq3"))))
+        (base32 "1i63n0c6bbwrs8skxvbpcbgjwci97ry1qgvzc4vxvfjc3dijk29c"))))
     (build-system guile-build-system)
     (native-inputs (list guile-uuid guile-gcrypt guile-3.0))
     (propagated-inputs (list openssl xxd))
