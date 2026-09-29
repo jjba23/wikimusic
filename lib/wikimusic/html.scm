@@ -255,7 +255,7 @@
 (define* (html-template G_
                         #:key (title "WikiMusic") body
                         (is-logged-in #f))
-
+  
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
                               ,(hygguile-recommended-resources #:fonts (custom-fonts))
@@ -380,11 +380,8 @@
                                            ,info)) extra-top-info)
 
                 ;; Statistics
-                (div (@ (class ,(mk-class '(mt-2 flex
-                                                 flex-wrap
-                                                 items-center
-                                                 justify-center
-                                                 gap-1))))
+                (div (@ (class ,(mk-class '(mt-2 flex flex-wrap items-center
+                                                 justify-center gap-1))))
                      (div ,(em (format #f "~a ~a"
                                        (assq-ref x
                                                  'views)
@@ -562,11 +559,11 @@
                                                                        (max-w-prose
                                                                         pl-3
                                                                         whitespace-break-spaces))))
-                                                           ,(p description
+                                                           ,(p (org2html (html-unescape
+                                                                          description))
                                                                #:weight '(font-light)))))
-                                              (org2html (html-unescape (assq-ref
-                                                                        x
-                                                                        'description)))))
+                                              (assq-ref x
+                                                        'description)))
          (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
                                                    `(,(dt (G_ "last edited")) ,
                                                      (dd (strftime "%c"
@@ -580,7 +577,7 @@
                                                                              approved-by)))
                                               (assq-ref x
                                                         'approved-by))))
-
+    
     `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
