@@ -255,7 +255,7 @@
 (define* (html-template G_
                         #:key (title "WikiMusic") body
                         (is-logged-in #f))
-  
+
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
                               ,(hygguile-recommended-resources #:fonts (custom-fonts))
@@ -384,8 +384,7 @@
                                                  flex-wrap
                                                  items-center
                                                  justify-center
-                                                 gap-x-2
-                                                 gap-y-1))))
+                                                 gap-1))))
                      (div ,(em (format #f "~a ~a"
                                        (assq-ref x
                                                  'views)
@@ -581,7 +580,7 @@
                                                                              approved-by)))
                                               (assq-ref x
                                                         'approved-by))))
-    
+
     `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
