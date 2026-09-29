@@ -72,7 +72,9 @@
 
 (define* (page-footer G_)
   `(,(footer `(,(em (G_ "the free music knowledge encyclopaedia")) ,(em (G_
-                                                                         "wikimusic is free software, available under the GNU AGPL v3 or newer"))
+                                                                         "wikimusic is free software, available under the GNU AGPL v3 or newer")
+                                                                        #:size '
+                                                                        (text-sm))
                (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                                 justify-start items-center))))
                     ,(em (G_ "find the source code here"))
@@ -84,7 +86,8 @@
                     ,(a "https://jointhefreeworld.org/manuals/wikimusic/"
                         #:size '(text-md)))
                ,(em (G_
-                     "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"))
+                     "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;")
+                    #:size '(text-sm))
 
                (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
                                                 align-center items-center))))
@@ -252,7 +255,7 @@
 (define* (html-template G_
                         #:key (title "WikiMusic") body
                         (is-logged-in #f))
-
+  
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
                               ,(hygguile-recommended-resources #:fonts (custom-fonts))
@@ -362,8 +365,7 @@
                 (div (@ (class ,(mk-class '(min-w-0 text-center))))
                      ,(a (assq-ref x
                                    'display-name)
-                         #:size '(text-md
-                                  sm:text-md md:text-lg)
+                         #:size '(text-md sm:text-md md:text-lg)
                          #:weight '(font-light)
                          #:family '(font-sans)
                          #:href item-link
@@ -579,7 +581,7 @@
                                                                              approved-by)))
                                               (assq-ref x
                                                         'approved-by))))
-
+    
     `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
