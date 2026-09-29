@@ -53,7 +53,17 @@
                           sort-select
                           ascii-size-select
                           search-box
-                          render-external-sources))
+                          render-external-sources
+                          item-tile-grid-face))
+
+(define item-tile-grid-face
+  (mk-class '(grid grid-cols-2
+                   gap-2
+                   sm:gap-3
+                   sm:grid-cols-3
+                   md:grid-cols-4
+                   lg:grid-cols-5
+                   xl:grid-cols-6)))
 
 (define* asset-library
   (build-asset-library '("pub/js/song-auto-scroll.js" "pub/js/symbanta.js"
@@ -306,25 +316,33 @@
                            (assq-ref x
                                      'identifier))))
     `((div (@ (class ,(mk-class '(bg-stone-300 dark:bg-onyx-700
-                                               rounded-2xl
-                                               shadow-lg
+                                               rounded-xl
+                                               sm:rounded-2xl
+                                               shadow-md
+                                               hover:shadow-lg
+                                               transition-shadow
+                                               duration-200
                                                h-full
                                                flex
                                                flex-col
                                                overflow-hidden
-                                               border-2
+                                               border
                                                border-persia-pink-100/25
                                                dark:border-persia-pink-900/10))))
 
-           ;; Top cover
+           ;; Cover
            ,(render-if-nempty (lambda (art)
                                 `(a (@ (href ,item-link)
-                                       (class ,(mk-class '(block w-full h-64
-                                                                 shrink-0))))
+                                       (class ,(mk-class '(block w-full
+                                                           aspect-square
+                                                           shrink-0
+                                                           overflow-hidden))))
                                     (img (@ (loading "lazy")
-                                            ;; object-cover acts like background-size: cover
                                             (class ,(mk-class '(w-full h-full
-                                                                object-cover)))
+                                                                object-cover
+                                                                transition-transform
+                                                                duration-200
+                                                                hover:scale-105)))
                                             (src ,(uri-decode (assq-ref art
                                                                         'content-url)))))))
                               (cond
@@ -332,45 +350,58 @@
                                  '())
                                 (else (car artworks))))
 
-           ;; Bottom padded section
+           ;; Content
            (div (@ (class ,(mk-class '(flex flex-col
                                             flex-grow
-                                            py-4
-                                            px-3
-                                            justify-center
-                                            items-center))))
-                (div (@ (class ,(mk-class '(text-center))))
+                                            min-w-0
+                                            p-2
+                                            sm:p-3
+                                            md:p-4))))
+
+                ;; Name
+                (div (@ (class ,(mk-class '(min-w-0 text-center))))
                      ,(a (assq-ref x
                                    'display-name)
-                         #:size (list 'text-lg
-                                      'leading-9)
+                         #:size '(text-md
+                                  sm:text-md md:text-lg)
                          #:weight '(font-light)
                          #:family '(font-sans)
                          #:href item-link
                          #:color '(text-onyx-300 dark:text-stone-100)
                          #:hover '(hover:text-persia-pink-500
                                    hover:dark:text-persia-pink-300)))
-                (div (@ (class ,(mk-class '(pt-2))))
-                     ,extra-top-info)
-                (div (@ (class ,(mk-class '(flex flex-row gap-2 flex-wrap
-                                                 items-center justify-center))))
-                     (div (@ (class ,(mk-class '())))
-                          ,(em (format #f "~a ~a"
+
+                ;; Extra information
+                ,(render-if-nempty (lambda (info)
+                                     `(div (@ (class ,(mk-class '(pt-1 sm:pt-2
+                                                                  text-center))))
+                                           ,info)) extra-top-info)
+
+                ;; Statistics
+                (div (@ (class ,(mk-class '(mt-2 flex
+                                                 flex-wrap
+                                                 items-center
+                                                 justify-center
+                                                 gap-x-2
+                                                 gap-y-1))))
+                     (div ,(em (format #f "~a ~a"
                                        (assq-ref x
                                                  'views)
                                        (G_ "views"))
                                #:size '(text-sm)
                                #:color '(text-onyx-300 dark:text-stone-300)))
-                     ,(p "|"
-                         #:color '(text-onyx-500 dark:text-stone-700)
-                         #:weight '(font-light)
-                         #:size '(text-sm))
-                     (div (@ (class ,(mk-class '(flex flex-row gap-1))))
+
+                     (span ,(p "·"
+                               #:color '(text-onyx-500 dark:text-stone-700)
+                               #:size '(text-sm)))
+
+                     (div (@ (class ,(mk-class '(min-w-0))))
                           ,(em (format #f "~a ~a"
                                        (length comments)
                                        (G_ "comments"))
                                #:size '(text-sm)
                                #:color '(text-onyx-300 dark:text-stone-300))))
+
                 ,extra-bot-info)))))
 
 (define* (render-visibility-status G_ status)
@@ -532,8 +563,9 @@
                                                                         whitespace-break-spaces))))
                                                            ,(p description
                                                                #:weight '(font-light)))))
-                                              (org2html (html-unescape (assq-ref x
-                                                                  'description)))))
+                                              (org2html (html-unescape (assq-ref
+                                                                        x
+                                                                        'description)))))
          (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
                                                    `(,(dt (G_ "last edited")) ,
                                                      (dd (strftime "%c"
@@ -889,8 +921,7 @@ function addSearchQueryParam(form) {
   (parameterize ((link-classes '(dark:text-china-violet-300
                                  hover:dark:text-persia-pink-300
                                  hover:text-persia-pink-500
-                                 text-china-violet-700
-                                 hover:underline
+                                 text-china-violet-700 hover:underline
                                  font-bold))
                  (italic-classes '(italic))
                  (ordered-list-classes '(list-decimal ml-3))

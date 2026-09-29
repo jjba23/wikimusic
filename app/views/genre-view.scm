@@ -101,11 +101,7 @@
                                                              ,(search-box G_
                                                                #:search-query
                                                                search-query)))
-                      (div (div (@ (class ,(mk-class '(grid gap-3
-                                                            sm:grid-cols-2
-                                                            md:grid-cols-3
-                                                            lg:grid-cols-4
-                                                            xl:grid-cols-6))))
+                      (div (div (@ (class ,item-tile-grid-face))
                                 ,(map (lambda (x)
                                         `(div ,(item-tile G_
                                                           'genre x
