@@ -117,147 +117,159 @@
 
 (define* (nav G_
               #:key is-logged-in)
-  `((div (@ (class ,(mk-class '(flex flex-row
-                                     flex-wrap
-                                     gap-3
-                                     p-3
-                                     items-center
-                                     justify-between
-                                     w-full
-                                     hover:text-china-violet-700
-                                     bg-stone-300/50
-                                     dark:bg-onyx-700
-                                     shadow-md))))
-
-         (div (@ (class ,(mk-class '(px-4 py-1))))
-              (a (@ (href "/")
-                    (class ,(mk-class '(flex flex-row gap-2 items-center
-                                             no-underline))))
-                 ,(h1 (list (icon #:type 'music-note
-
-                                  #:icon-css '(text-xl text-onyx-300
-                                               dark:text-stone-300
-                                               hover:text-persia-pink-900
-                                               hover:dark:text-persia-pink-300
-
-                                               )) "&nbsp;"
-                            (G_ "WikiMusic"))
-                      #:weight '(font-medium italic)
-                      #:color '(text-onyx-300 dark:text-stone-300
-                                              hover:text-persia-pink-900
-                                              hover:dark:text-persia-pink-300)
-                      #:family '(font-sans)
-
-                      #:size '(text-xl md:text-2xl))))
-         (div (@ (class ,(mk-class '(flex flex-row gap-3 flex-wrap
-                                          justify-center md:justify-start))))
-              (a (@ (href "/songs"))
-                 ,(icon-button #:icon 'music-notes-simple
-                               #:content (G_ "songs")
-                               #:family '(font-sans)
-                               #:color '(text-onyx-900 dark:text-stone-100)
-                               #:weight '(font-light)
-                               #:size '(text-md)
-                               #:icon-css '(text-md lg:text-lg text-onyx-300
-                                                    dark:text-stone-300)
-                               #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
-                                                      max-w-prose
-                                                      cursor-pointer)))
-              (a (@ (href "/genres"))
-                 ,(icon-button #:icon 'disc
-                               #:content (G_ "genres")
-                               #:size '(text-md)
-                               #:family '(font-sans)
-                               #:color '(text-onyx-900 dark:text-stone-100)
-                               #:weight '(font-light)
-                               #:icon-css '(text-md lg:text-lg text-onyx-300
-                                                    dark:text-stone-300)
-                               #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
-                                                      max-w-prose
-                                                      cursor-pointer)))
-              (a (@ (href "/artists"))
-                 ,(icon-button #:icon 'guitar
-                               #:content (G_ "artists")
-                               #:size '(text-md)
-                               #:family '(font-sans)
-                               #:color '(text-onyx-900 dark:text-stone-100)
-                               #:weight '(font-light)
-                               #:icon-css '(text-md lg:text-lg text-onyx-300
-                                                    dark:text-stone-300)
-                               #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
-                                                      max-w-prose
-                                                      cursor-pointer)))
-
-              ,(if (not is-logged-in)
-                   `((a (@ (class ,(mk-class '(text-md lowercase
-                                                       text-white
-                                                       dark:text-black
-                                                       font-sans
-                                                       font-medium
-
-                                                       flex-items-center
-                                                       gap-2)))
-                           (href "/login"))
-                        ,(icon-button #:icon 'sign-in
-                                      #:content (G_ "login")
+  (let ((nav-link (lambda (href icon content)
+                    `(a (@ (href ,href)
+                           (class ,(mk-class '(shrink-0 no-underline))))
+                        ,(icon-button #:icon icon
+                                      #:content (G_ content)
                                       #:family '(font-sans)
                                       #:color '(text-onyx-900
                                                 dark:text-stone-100)
                                       #:weight '(font-light)
-                                      #:size '(text-md)
-                                      #:icon-css '(text-md lg:text-lg
-                                                   text-onyx-300
+                                      #:size '(text-sm sm:text-md)
+                                      #:icon-css '(text-sm sm:text-md
+                                                   lg:text-lg text-onyx-300
                                                    dark:text-stone-300)
-                                      #:extra-classes '(py-1 py-1
-                                                             lg:py-2
-                                                             px-2
-                                                             lg:px-3
-                                                             max-w-prose
-                                                             cursor-pointer))))
-                   `((a (@ (class ,(mk-class '(text-md lowercase
-                                                       text-white
-                                                       dark:text-black
-                                                       font-sans
-                                                       font-medium
+                                      #:extra-classes '(py-1 px-2
+                                                        sm:py-1
+                                                        sm:px-2
+                                                        md:py-2
+                                                        md:px-3
+                                                        cursor-pointer
+                                                        whitespace-nowrap))))))
+    `((div (@ (class ,(mk-class '(flex flex-col
+                                       lg:flex-row
+                                       lg:items-center
+                                       lg:justify-between
+                                       gap-2
+                                       sm:gap-3
+                                       w-full
+                                       p-2
+                                       sm:p-3
+                                       bg-stone-300/50
+                                       dark:bg-onyx-700
+                                       shadow-md
+                                       hover:text-china-violet-700))))
 
-                                                       flex-items-center
-                                                       gap-2)))
-                           (href "/me"))
-                        ,(icon-button #:icon 'user-circle
-                                      #:content (G_ "me")
-                                      #:family '(font-sans)
-                                      #:color '(text-onyx-900
-                                                dark:text-stone-100)
-                                      #:weight '(font-light)
-                                      #:size '(text-md)
-                                      #:icon-css '(text-md lg:text-lg
-                                                   text-onyx-300
-                                                   dark:text-stone-300)
-                                      #:extra-classes '(py-1 lg:py-2 px-2
-                                                             lg:px-3
-                                                             max-w-prose
-                                                             cursor-pointer)))))
+           ;; Logo
+           (div (@ (class ,(mk-class '(flex items-center
+                                            justify-center
+                                            md:justify-start
+                                            w-full
+                                            md:w-auto
+                                            min-w-0
+                                            px-1
+                                            sm:px-2))))
+                (a (@ (href "/")
+                      (class ,(mk-class '(flex items-center
+                                               justify-center
+                                               gap-1
+                                               sm:gap-2
+                                               min-w-0
+                                               no-underline))))
+                   ,(h1 (list (icon #:type 'music-note
+                                    #:icon-css '(shrink-0 text-lg
+                                                 sm:text-xl
+                                                 text-onyx-300
+                                                 dark:text-stone-300
+                                                 hover:text-persia-pink-900
+                                                 hover:dark:text-persia-pink-300))
+                              (G_ "WikiMusic"))
+                        #:weight '(font-medium italic)
+                        #:color '(text-onyx-300 dark:text-stone-300
+                                  hover:text-persia-pink-900
+                                  hover:dark:text-persia-pink-300)
+                        #:family '(font-sans)
+                        #:size '(text-lg sm:text-xl md:text-2xl))))
 
-              ,(ui-mode-button #:icon ""
-                               #:size '(text-md)
-                               #:icon-css '(text-onyx-300 dark:text-stone-300
-                                                          text-md)
-                               #:family '(font-sans)
-                               #:content `((div ,(icon #:type 'sun
-                                                       #:icon-css '(text-md
-                                                                    lg:text-lg
-                                                                    text-onyx-300
-                                                                    dark:text-stone-300))
-                                                ,(icon #:type 'moon
-                                                       #:icon-css '(text-md
-                                                                    lg:text-lg
-                                                                    text-onyx-300
-                                                                    dark:text-stone-300))))
-                               #:color '(text-onyx-900 dark:text-stone-100)
-                               #:weight '(font-light)
-                               #:extra-classes '(py-1 lg:py-2 px-2 lg:px-3
-                                                      max-w-prose
-                                                      cursor-pointer))))))
+           ;; Navigation / account / theme
+           (div (@ (class ,(mk-class '(flex flex-wrap
+                                            items-center
+                                            justify-center
+                                            md:justify-end
+                                            gap-1
+                                            sm:gap-2
+                                            w-full
+                                            md:w-auto))))
+
+                ,(nav-link "/songs"
+                           'music-notes-simple "songs")
+
+                ,(nav-link "/genres"
+                           'disc "genres")
+
+                ,(nav-link "/artists"
+                           'guitar "artists")
+
+                ;; Login / profile
+                ,(if (not is-logged-in)
+                     `(a (@ (href "/login")
+                            (class ,(mk-class '(shrink-0 no-underline))))
+                         ,(icon-button #:icon 'sign-in
+                                       #:content (G_ "login")
+                                       #:family '(font-sans)
+                                       #:color '(text-onyx-900
+                                                 dark:text-stone-100)
+                                       #:weight '(font-light)
+                                       #:size '(text-sm sm:text-md)
+                                       #:icon-css '(text-sm sm:text-md
+                                                    lg:text-lg text-onyx-300
+                                                    dark:text-stone-300)
+                                       #:extra-classes '(py-1 px-2
+                                                         sm:py-1
+                                                         sm:px-2
+                                                         md:py-2
+                                                         md:px-3
+                                                         cursor-pointer
+                                                         whitespace-nowrap)))
+                     `(a (@ (href "/me")
+                            (class ,(mk-class '(shrink-0 no-underline))))
+                         ,(icon-button #:icon 'user-circle
+                                       #:content (G_ "me")
+                                       #:family '(font-sans)
+                                       #:color '(text-onyx-900
+                                                 dark:text-stone-100)
+                                       #:weight '(font-light)
+                                       #:size '(text-sm sm:text-md)
+                                       #:icon-css '(text-sm sm:text-md
+                                                    lg:text-lg text-onyx-300
+                                                    dark:text-stone-300)
+                                       #:extra-classes '(py-1 px-2
+                                                         sm:py-1
+                                                         sm:px-2
+                                                         md:py-2
+                                                         md:px-3
+                                                         cursor-pointer
+                                                         whitespace-nowrap))))
+
+                ;; Theme switch
+                ,(ui-mode-button #:icon ""
+                                 #:size '(text-sm sm:text-md)
+                                 #:icon-css '(text-onyx-300
+                                              dark:text-stone-300 text-sm
+                                              sm:text-md)
+                                 #:family '(font-sans)
+                                 #:content `((div ,(icon #:type 'sun
+                                                         #:icon-css '(text-sm
+                                                                      sm:text-md
+                                                                      lg:text-lg
+                                                                      text-onyx-300
+                                                                      dark:text-stone-300))
+                                                  ,(icon #:type 'moon
+                                                         #:icon-css '(text-sm
+                                                                      sm:text-md
+                                                                      lg:text-lg
+                                                                      text-onyx-300
+                                                                      dark:text-stone-300))))
+                                 #:color '(text-onyx-900 dark:text-stone-100)
+                                 #:weight '(font-light)
+                                 #:extra-classes '(shrink-0 py-1
+                                                            px-2
+                                                            sm:py-1
+                                                            sm:px-2
+                                                            md:py-2
+                                                            md:px-3
+                                                            cursor-pointer)))))))
 
 (define* (html-template G_
                         #:key (title "WikiMusic") body
@@ -266,15 +278,19 @@
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
                               ,(hygguile-recommended-resources #:fonts (custom-fonts))
+
                               (link (@ (rel "shortcut icon")
                                        (href "/favicon.ico")
                                        (type "image/x-icon")) "")
+
                               (link (@ (rel "icon")
                                        (href "/favicon.ico")
                                        (type "image/x-icon")) "")
+
                               (link (@ (rel stylesheet)
                                        (href "/css/wikimusic.olive.min.css"))
                                     "")
+
                               (script (@ (type speculationrules))
                                       "
 {
@@ -287,32 +303,51 @@
   ]
 }
 ")
+
                               (script ,(assoc-ref asset-library
                                         "pub/js/song-chord-highlighter.js"))
+
                               (script ,(assoc-ref asset-library
                                         "pub/js/song-auto-scroll.js"))
+
                               (script ,(assoc-ref asset-library
                                                   "pub/js/symbanta.js"))
+
                               (script ,(assoc-ref asset-library
                                                   "pub/js/file-base64.js")))
+
                         (body (@ (class ,(mk-class '(bg-stone-100
                                                      dark:bg-onyx-900
-                                                     font-sans))))
+                                                     font-sans min-h-screen))))
+
                               ,notification-tray
-                              ,(with-footer #:main `((div (@ (class ,(mk-class '
-                                                                      (flex
-                                                                       flex-col
-                                                                       justify-between
-                                                                       min-h-96))))
-                                                          (div (@ (class ,(mk-class '
-                                                                           (flex
-                                                                            flex-col
-                                                                            gap-8
-                                                                            justify-start))))
-                                                               ,(nav G_
+
+                              ,(with-footer #:main `((main (@ (class ,(mk-class '
+                                                                       (flex
+                                                                        flex-col
+                                                                        justify-start
+                                                                        min-h-96
+                                                                        w-full
+                                                                        min-w-0))))
+
+                                                           ,(nav G_
                                                                  #:is-logged-in
                                                                  is-logged-in)
-                                                               ,body)))
+
+                                                           ;; Content gets its own responsive container.
+                                                           (div (@ (class ,(mk-class '
+                                                                            (w-full
+                                                                             min-w-0
+                                                                             px-2
+                                                                             sm:px-3
+                                                                             md:px-4
+                                                                             lg:px-6
+                                                                             py-3
+                                                                             sm:py-4
+                                                                             md:py-6))))
+
+                                                                ,body)))
+
                                             #:footer (page-footer G_))))))
 
 (define* (item-tile G_
