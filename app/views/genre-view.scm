@@ -74,33 +74,32 @@
                                  ,(G_ "viewing genres:"))
                            #:weight '(font-light)
                            #:size '(text-2xl)
-                           #:family '(font-sans)) (div (@ (class ,(mk-class '
-                                                                             (flex
+                           #:family '(font-sans)) (div (@ (class ,(mk-class '(flex
                                                                               flex-wrap
                                                                               flex-row
                                                                               justify-center
                                                                               gap-2))))
-                                                        (div (@ (class ,(mk-class '
-                                                                         (flex
-                                                                          flex-wrap
-                                                                          flex-row
-                                                                          justify-start
-                                                                          items-center))))
-                                                             ,(sort-select G_
-                                                               #:entity 'genre
-                                                               #:user-sort
-                                                               user-sort))
-                                                        (div (@ (class ,(mk-class '
-                                                                         (flex
-                                                                          flex-wrap
-                                                                          flex-row
-                                                                          gap-3
-                                                                          justify-end
-                                                                          items-center))))
+                                                       (div (@ (class ,(mk-class '
+                                                                        (flex
+                                                                         flex-wrap
+                                                                         flex-row
+                                                                         justify-start
+                                                                         items-center))))
+                                                            ,(sort-select G_
+                                                              #:entity 'genre
+                                                              #:user-sort
+                                                              user-sort))
+                                                       (div (@ (class ,(mk-class '
+                                                                        (flex
+                                                                         flex-wrap
+                                                                         flex-row
+                                                                         gap-3
+                                                                         justify-end
+                                                                         items-center))))
 
-                                                             ,(search-box G_
-                                                               #:search-query
-                                                               search-query)))
+                                                            ,(search-box G_
+                                                              #:search-query
+                                                              search-query)))
                       (div (div (@ (class ,item-tile-grid-face))
                                 ,(map (lambda (x)
                                         `(div ,(item-tile G_

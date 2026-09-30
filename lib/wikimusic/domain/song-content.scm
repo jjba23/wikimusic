@@ -48,8 +48,7 @@
  repo-get-song-contents-by-song-ids
  "Retrieves song-contents by their song IDs from the given REPO.")
 
-(define-repo-method get-song-contents-by-ids
- repo-get-song-contents-by-ids
+(define-repo-method get-song-contents-by-ids repo-get-song-contents-by-ids
  "Retrieves song-contents by their IDs from the given REPO.")
 
 (define-repo-method get-song-content-ids-by-song-ids

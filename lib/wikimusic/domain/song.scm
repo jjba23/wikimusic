@@ -39,8 +39,10 @@
                        (get-songs-by-artist-id-proc
                         repo-get-songs-by-artist-id)
                        (get-songs-by-genre-id-proc repo-get-songs-by-genre-id)
-                       (get-song-genres-by-ids-proc repo-get-song-genres-by-ids)
-                       (get-song-artists-by-ids-proc repo-get-song-artists-by-ids)
+                       (get-song-genres-by-ids-proc
+                        repo-get-song-genres-by-ids)
+                       (get-song-artists-by-ids-proc
+                        repo-get-song-artists-by-ids)
                        (search-songs-proc repo-search-songs)
                        (insert-song-proc repo-insert-song)
                        (delete-song-by-id-proc repo-delete-song-by-id)

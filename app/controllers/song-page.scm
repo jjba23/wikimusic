@@ -140,14 +140,16 @@
               (song-version-count-alist (map (lambda (song)
                                                `(,(assq-ref song
                                                             'identifier) ,(length
-                                                                           (filter (lambda
+                                                                           (filter (lambda 
                                                                                            (sc)
-
+                                                                                     
+                                                                                     
                                                                                      (equal?
                                                                                       (assq-ref
                                                                                        sc
                                                                                        'song-identifier)
 
+                                                                                      
                                                                                       (assq-ref
                                                                                        song
                                                                                        'identifier)))
@@ -273,7 +275,7 @@
                                                       (assq-ref a
                                                                 'artist-identifier))
                                                     song-artists)))))
-
+         
          ;; do views update
          (update-song-by-id song-repo song-id
                             `((views unquote inc-v)))
@@ -341,7 +343,7 @@
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '())))
-
+         
          (response-emit (:mime rc
                                (song-edit-page (:i18n rc)
                                                #:song song
@@ -367,7 +369,7 @@
               (song-contents (car (get-song-contents-by-ids song-content-repo
                                                             (list (params rc
                                                                    "version-uuid"))))))
-
+         
          (response-emit (:mime rc
                                (song-content-edit-page (:i18n rc)
                                                        #:song song

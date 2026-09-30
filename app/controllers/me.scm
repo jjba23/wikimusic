@@ -46,7 +46,7 @@
                             #:ret 'top
                             #:condition (where #:identifier (assoc-ref t
                                                                        'owner-id)))))
-
+         
          (catch #t
                 (lambda ()
                   (response-emit (:mime rc
@@ -361,7 +361,7 @@
                       ($users 'get
                               #:ret 'top
                               #:condition (where #:email email)))))
-
+          
           (request-password-reset u)
           (redirect-to rc
                        (string->uri (format #f "~a/?sent-password-reset=true"

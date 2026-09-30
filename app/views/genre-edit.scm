@@ -40,14 +40,13 @@
                                     (img (@ (loading lazy)
                                             (class ,(mk-class '(rounded-xl)))
                                             (src ,(uri-decode (assq-ref a
-                                                               'content-url))))))
+                                                                        'content-url))))))
                             ,(artwork-form G_
                                            #:entity 'genre
-                                           #:entity-identifier (assq-ref
-                                                                genre
+                                           #:entity-identifier (assq-ref genre
                                                                 'identifier)
                                            #:artwork-identifier (assq-ref a
-                                                                 'identifier)
+                                                                          'identifier)
                                            #:content-url (uri-decode (assq-ref
                                                                       a
                                                                       'content-url))
@@ -55,11 +54,12 @@
                                                               a
                                                               'content-caption)
                                            #:order-value (assq-ref a
-                                                          'order-value))))
+                                                                   'order-value))))
                     artworks))
          (body `(div (@ (class ,(mk-class '(px-2 py-4))))
                      (div (@ (class ,(mk-class '(py-3))))
-                          ,(if (assq-ref genre 'identifier)
+                          ,(if (assq-ref genre
+                                         'identifier)
                                (h2 (format #f "~a: ~a"
                                            (G_ "editing genre")
                                            (assq-ref genre
@@ -98,7 +98,8 @@
                                            #:display-name (assq-ref genre
                                                                     'display-name)
                                            #:description (assoc-ref-or-empty-str
-                                                          genre 'description)))
+                                                          genre
+                                                          'description)))
                      ,(hr)
                      (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300

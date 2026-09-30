@@ -110,7 +110,8 @@
 
   (define (insert-artist attrs)
     (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x))) insert-columns))
+                        (value->sql-literal (assq-ref attrs x)))
+                      insert-columns))
            (query (format #f "INSERT INTO artists (~a) VALUES (~a)"
                           insert-cols-sql
                           (string-join vals ", "))))

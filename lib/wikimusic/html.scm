@@ -75,15 +75,22 @@
                                                                          "wikimusic is free software, available under the GNU AGPL v3 or newer")
                                                                         #:size '
                                                                         (text-sm))
-               (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                justify-start items-center))))
-                    ,(em (G_ "find the source code here"))
-                    ,(a "https://codeberg.org/jjba23/wikimusic"
+               (div (@ (class ,(mk-class '(flex flex-row
+                                                flex-wrap
+                                                gap-2
+                                                justify-start
+                                                break-words
+                                                items-center))))
+                    ,(em (G_ "find here the:"))
+                    ,(a "source code"
+                        #:href "https://codeberg.org/jjba23/wikimusic"
                         #:size '(text-md)))
                (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                                 align-center items-center))))
-                    ,(em (G_ "find the manual here"))
-                    ,(a "https://jointhefreeworld.org/manuals/wikimusic/"
+                    ,(em (G_ "find here the:"))
+                    ,(a "manual"
+                        #:href
+                        "https://jointhefreeworld.org/manuals/wikimusic/"
                         #:size '(text-md)))
                ,(em (G_
                      "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;")
@@ -549,23 +556,21 @@
                                                                              #f
                                                                              " ( ~a ) "
                                                                              dislike-count))))))))
-         (maybe-description (render-if-nempty (lambda (description)
-                                                `(div (p (@ (class ,(mk-class '
-                                                                              (text-onyx-300
-                                                                               dark:text-stone-300
-                                                                               font-bold))))
-                                                         ,(G_ "description"))
-                                                      (div (@ (class ,(mk-class '
-                                                                       (max-w-prose
-                                                                        pl-3
-                                                                        whitespace-break-spaces))))
-                                                           ,(p (org2html (html-unescape
-                                                                          description))
-                                                               #:weight '(font-light)))))
-                                              (assq-ref x
-                                                        'description)))
+         (maybe-description (render-if-nestring (lambda (description)
+                                                  (dl (list (dt (G_
+                                                                 "description")
+                                                                #:dt-classes '
+                                                                (pt-3 sm:pt-4
+                                                                      pb-1))
+                                                            (dd (org2html (html-unescape
+                                                                           description))))))
+                                                (assq-ref x
+                                                          'description)))
          (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
-                                                   `(,(dt (G_ "last edited")) ,
+                                                   `(,(dt (G_ "last edited")
+                                                          #:dt-classes '(pt-3
+                                                                         sm:pt-4
+                                                                         pb-1)) ,
                                                      (dd (strftime "%c"
 
                                                                    (localtime (string->number
@@ -573,8 +578,11 @@
                                                  (assq-ref x
                                                            'last-edited-at)))
          (maybe-approved-by (render-if-nempty (lambda (approved-by)
-                                                `(,(dt (G_ "approved by")) ,(dd
-                                                                             approved-by)))
+                                                `(,(dt (G_ "approved by")
+                                                       #:dt-classes '(pt-3
+                                                                      sm:pt-4
+                                                                      pb-1)) ,
+                                                  (dd approved-by)))
                                               (assq-ref x
                                                         'approved-by))))
     
@@ -588,16 +596,19 @@
                         ,(icon-button #:icon 'pencil
                                       #:content (G_ "edit"))))
                 ,maybe-description
-                (dl ,(dt (G_ "views"))
+                (dl ,(dt (G_ "views")
+                         #:dt-classes '(pt-3 sm:pt-4 pb-1))
                     ,(dd (format #f "~a"
                                  (assq-ref x
                                            'views)))
-                    ,(dt (G_ "created"))
+                    ,(dt (G_ "created")
+                         #:dt-classes '(pt-3 sm:pt-4 pb-1))
                     ,(dd (strftime "%c"
                                    (localtime (string->number (assq-ref x
                                                                         'created-at)))))
                     ,maybe-last-edited-at
-                    ,(dt (G_ "contributor"))
+                    ,(dt (G_ "contributor")
+                         #:dt-classes '(pt-3 sm:pt-4 pb-1))
                     ,(dd (render-if-nempty (lambda (u)
                                              (format #f "~a &lt;~a&gt;"
                                                      (assq-ref u
@@ -607,12 +618,14 @@
                                            (assoc-ref user-alist
                                                       (assq-ref x
                                                                 'created-by))))
-                    ,(dt (G_ "visibility"))
+                    ,(dt (G_ "visibility")
+                         #:dt-classes '(pt-3 sm:pt-4 pb-1))
                     ,(dd (render-visibility-status G_
                                                    (assq-ref x
                                                              'visibility-status)))
                     ,maybe-approved-by
-                    ,(dt (G_ "uuid"))
+                    ,(dt (G_ "uuid")
+                         #:dt-classes '(pt-3 sm:pt-4 pb-1))
                     ,(dd `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                             gap-4))))
                                 ,(mono (assq-ref x

@@ -36,7 +36,7 @@
                                     "data:application/octet-stream;base64,")
                                    ""
                                    (html-unescape (assq-ref song-contents
-                                                             'pdf-contents)))))
+                                                            'pdf-contents)))))
          (body `(div (@ (class ,(mk-class '(px-2 py-6))))
                      ((div ,(hr)
                            ,(song-content-form G_

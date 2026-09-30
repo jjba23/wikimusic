@@ -224,15 +224,20 @@
                                (else (get-song-contents-by-song-ids
                                       song-content-repo song-ids))))
               (song-version-count-alist (map (lambda (song)
-                                               `(,(assq-ref song 'identifier) ,
-                                                 (length (filter (lambda (sc)
-                                                                   (equal? (assq-ref
-                                                                            sc
-                                                                            'song-identifier)
-                                                                           (assq-ref
-                                                                            song
-                                                                            'identifier)))
-                                                          song-contents))))
+                                               `(,(assq-ref song
+                                                            'identifier) ,(length
+                                                                           (filter (lambda 
+                                                                                           (sc)
+                                                                                     
+                                                                                     (equal?
+                                                                                      (assq-ref
+                                                                                       sc
+                                                                                       'song-identifier)
+                                                                                      
+                                                                                      (assq-ref
+                                                                                       song
+                                                                                       'identifier)))
+                                                                            song-contents))))
                                              songs))
               (song-fragment (song-list-page (:i18n rc)
                                              #:only-tiles #t
@@ -296,7 +301,7 @@
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '())))
-
+         
          (response-emit (:mime rc
                                (artist-edit-page (:i18n rc)
                                                  #:artist artist

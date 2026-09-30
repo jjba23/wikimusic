@@ -58,7 +58,7 @@
   (define execute-read
     (db-read conn))
 
-    (define (get-song-contents-by-ids ids)
+  (define (get-song-contents-by-ids ids)
     (let* ((query (format #f
                    "SELECT ~a FROM song_contents WHERE identifier IN(~a)
                             ORDER BY version_name DESC"

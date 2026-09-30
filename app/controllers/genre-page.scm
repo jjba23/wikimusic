@@ -121,7 +121,8 @@
               (comments (cond
                           ((nil? genre-ids)
                            '())
-                          (else (get-comments-by-entity-ids comment-repo 'genre genre-ids)))))
+                          (else (get-comments-by-entity-ids comment-repo
+                                                            'genre genre-ids)))))
          (response-emit (:mime rc
                                (genre-list-page (:i18n rc)
                                                 #:genres genres
@@ -225,22 +226,30 @@
               (song-comments (cond
                                ((nil? song-ids)
                                 '())
-                               (else (get-comments-by-entity-ids comment-repo 'song song-ids))))
+                               (else (get-comments-by-entity-ids comment-repo
+                                                                 'song
+                                                                 song-ids))))
               (song-contents (cond
                                ((nil? song-ids)
                                 '())
-                               (else (get-song-contents-by-song-ids song-content-repo song-ids))))
+                               (else (get-song-contents-by-song-ids
+                                      song-content-repo song-ids))))
 
               (song-version-count-alist (map (lambda (song)
-                                               `(,(assq-ref song 'identifier) ,
-                                                 (length (filter (lambda (sc)
-                                                                   (equal? (assq-ref
-                                                                            sc
-                                                                            'song-identifier)
-                                                                           (assq-ref
-                                                                            song
-                                                                            'identifier)))
-                                                          song-contents))))
+                                               `(,(assq-ref song
+                                                            'identifier) ,(length
+                                                                           (filter (lambda 
+                                                                                           (sc)
+                                                                                     
+                                                                                     (equal?
+                                                                                      (assq-ref
+                                                                                       sc
+                                                                                       'song-identifier)
+                                                                                      
+                                                                                      (assq-ref
+                                                                                       song
+                                                                                       'identifier)))
+                                                                            song-contents))))
                                              songs))
               (song-artists (cond
                               ((nil? song-ids)
@@ -249,7 +258,8 @@
                                                              song-ids))))
               (artists (if (nil? song-artists)
                            '()
-                           (get-artists-by-ids artist-repo (map (lambda (a)
+                           (get-artists-by-ids artist-repo
+                                               (map (lambda (a)
                                                       (assq-ref a
                                                                 'artist-identifier))
                                                     song-artists))))
@@ -291,16 +301,18 @@
        (let* ((genre-id (params rc "uuid"))
               (genre-repo (make-sqlite-genre-repository rc))
               (genre (get-genre-by-id genre-repo genre-id))
-                            (artwork-repo (make-sqlite-artwork-repository rc))
+              (artwork-repo (make-sqlite-artwork-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
-              (e (get-external-sources-by-entity-ids external-source-repo 'genre (list genre-id)))
+              (e (get-external-sources-by-entity-ids external-source-repo
+                                                     'genre
+                                                     (list genre-id)))
               (external-sources (if (not (nil? e))
                                     (car e)
                                     '()))
               (artworks (get-artworks-by-entity-ids artwork-repo
                                                     'genre
                                                     (list genre-id))))
-
+         
          (response-emit (:mime rc
                                (genre-edit-page (:i18n rc)
                                                 #:genre genre

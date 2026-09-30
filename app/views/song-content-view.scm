@@ -34,21 +34,36 @@
   "Helper to render a single chord pill badge."
   (let ((chord (car pair))
         (fingering (cdr pair)))
-    `(div (@ (class ,(mk-class '(inline-flex items-center gap-2 px-4 py-3
-                                 rounded-xl border border-stone-300 dark:border-onyx-500
-                                 bg-stone-300 dark:bg-onyx-500 shadow-md
-                                 transition-all))))
-          (span (@ (class ,(mk-class '(font-bold text-md text-onyx-900 dark:text-stone-100))))
+    `(div (@ (class ,(mk-class '(inline-flex items-center
+                                             gap-2
+                                             px-4
+                                             py-3
+                                             rounded-xl
+                                             border
+                                             border-stone-300
+                                             dark:border-onyx-500
+                                             bg-stone-300
+                                             dark:bg-onyx-500
+                                             shadow-md
+                                             transition-all))))
+          (span (@ (class ,(mk-class '(font-bold text-md text-onyx-900
+                                                 dark:text-stone-100))))
                 ,chord)
-          (span (@ (class ,(mk-class '(font-mono text-md px-3 py-2
-                                       bg-stone-100 dark:bg-onyx-900 rounded-xl
-                                       text-onyx-700 dark:text-stone-300))))
+          (span (@ (class ,(mk-class '(font-mono text-md
+                                                 px-3
+                                                 py-2
+                                                 bg-stone-100
+                                                 dark:bg-onyx-900
+                                                 rounded-xl
+                                                 text-onyx-700
+                                                 dark:text-stone-300))))
                 ,fingering))))
 
 (define (render-chord-guide chord-pairs)
   "Helper to render the flex row container for all chord pills"
   (if (null? chord-pairs) ""
-      `(div (@ (class ,(mk-class '(flex flex-wrap gap-3 py-6 items-center align-center))))
+      `(div (@ (class ,(mk-class '(flex flex-wrap gap-3 py-6 items-center
+                                        align-center))))
             ,@(map render-chord-pill chord-pairs))))
 
 (define* (render-song-content G_ song song-contents ascii-size)

@@ -111,8 +111,7 @@
 
   (define (insert-genre attrs)
     (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x)))
-                      insert-cols))
+                        (value->sql-literal (assq-ref attrs x))) insert-cols))
            (query (format #f "INSERT INTO genres (~a) VALUES (~a)"
                           insert-cols-sql
                           (string-join vals ", "))))

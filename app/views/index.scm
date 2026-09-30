@@ -113,7 +113,7 @@
               "The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively."))
          (p ,(G_
               "Join us in building an ever-growing library of musical knowledge — where every note tells a story.")))
-
+    
     ,(wikimusic-img)
 
     (div (@ (class ,(mk-class '(max-w-196 bg-stone-300/50
