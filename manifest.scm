@@ -141,7 +141,6 @@ more efficient, and more powerful code.")
         (base32 "0d04h1jfza549c3jqayi7cw3cppvhlkl2pkjj7bgxb5yi4f1p8ms"))))
     (build-system guile-build-system)
     (native-inputs (list guile-uuid guile-gcrypt guile-3.0))
-    (propagated-inputs (list openssl xxd))
     (arguments
      (list
       #:source-directory "src"))
