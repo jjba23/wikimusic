@@ -68,11 +68,15 @@
                                                clean-pdf-contents))))))
     (html-template G_
                    #:is-logged-in is-logged-in
+                   #:title "Edit a song version · WikiMusic"
+                   #:robots "noindex, nofollow"
                    #:body body)))
 
 (define* (song-content-new-page G_
                                 #:key song-identifier is-logged-in)
   (html-template G_
+                 #:title "New song version · WikiMusic"
+                 #:robots "noindex, nofollow"
                  #:is-logged-in is-logged-in
                  #:body `(div (@ (class ,(mk-class '())))
                               ,(song-content-form G_

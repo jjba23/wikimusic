@@ -79,7 +79,8 @@
                                                                      token
                                                                      'token-expires-at)))))))))
     (html-template G_
-                   #:title "wikimusic"
+                   #:title "Your account · WikiMusic"
+                   #:robots "noindex, nofollow"
                    #:is-logged-in is-logged-in
                    #:body `((div (@ (class ,(mk-class '())))
                                  (div (@ (class ,(mk-class '(flex flex-col
@@ -162,7 +163,8 @@
 (define* (users-page G_
                      #:key users)
   (html-template G_
-                 #:title "wikimusic"
+                 #:title "Your account · WikiMusic"
+                 #:robots "noindex, nofollow"
                  #:is-logged-in #t
                  #:body `((div (@ (class ,(mk-class '())))
                                ,(h2 (G_ "User management"))
@@ -189,7 +191,8 @@
 
 (define* (new-user-page G_)
   (html-template G_
-                 #:title "wikimusic"
+                 #:title "Your account · WikiMusic"
+                 #:robots "noindex, nofollow"
                  #:is-logged-in #t
                  #:body `((div (@ (class ,(mk-class '())))
                                (div ,(h2 (G_ "New User")))
@@ -263,7 +266,8 @@
 
 (define* (edit-user-page G_ u)
   (html-template G_
-                 #:title "wikimusic"
+                 #:title "Your account · WikiMusic"
+                 #:robots "noindex, nofollow"
                  #:is-logged-in #t
                  #:body `((div (@ (class ,(mk-class '())))
                                (div ,(h2 (G_ "Edit User")))
@@ -329,6 +333,8 @@
 (define* (reset-password-page G_
                               #:key token email)
   (html-template G_
+                 #:title "Choose a new password · WikiMusic"
+                 #:robots "noindex, nofollow"
                  #:is-logged-in #f
                  #:body `((div (@ (class ,(mk-class '(py-6 px-4))))
                                ,(h2 (G_ "Reset your password"))

@@ -177,6 +177,10 @@ invited to sign in again."
                                        (if (< status 500) 400 500))))))
     (html-template G_
                    #:title (format #f "~a · WikiMusic" status)
+                   ;; A refusal is nothing to index and nothing to preview; the
+                   ;; links back to what is still there are followed so that a
+                   ;; stale address still leads a crawler somewhere real.
+                   #:robots "noindex, follow"
                    #:is-logged-in is-logged-in
                    #:body `((div (@ (class ,(mk-class
                                              '(w-full flex flex-col

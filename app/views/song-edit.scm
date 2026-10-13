@@ -268,11 +268,17 @@
                                          genres))))))
     (html-template G_
                    #:is-logged-in is-logged-in
+                   ;; A form is written by a contributor, not read by a
+                   ;; visitor, so it is kept out of the index entirely.
+                   #:title "Edit a song · WikiMusic"
+                   #:robots "noindex, nofollow"
                    #:body html)))
 
 (define* (song-new-page G_
                         #:key is-logged-in)
   (html-template G_
+                 #:title "New song · WikiMusic"
+                 #:robots "noindex, nofollow"
                  #:is-logged-in is-logged-in
                  #:body `(div (@ (class ,(mk-class '())))
                               ,(song-form G_))))

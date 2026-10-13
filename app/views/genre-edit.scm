@@ -134,11 +134,15 @@
                                                                          'soundcloud-url)))))))
     (html-template G_
                    #:is-logged-in is-logged-in
+                   #:title "Edit a genre · WikiMusic"
+                   #:robots "noindex, nofollow"
                    #:body body)))
 
 (define* (genre-new-page G_
                          #:key is-logged-in)
   (html-template G_
+                 #:title "New genre · WikiMusic"
+                 #:robots "noindex, nofollow"
                  #:is-logged-in is-logged-in
                  #:body `(div (@ (class ,(mk-class '())))
                               ,(genre-form G_))))

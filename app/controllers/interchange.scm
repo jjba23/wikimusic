@@ -146,6 +146,11 @@ rendered from Org."
           (:mime rc
                  (html-template G_
                    #:title "wikimusic export"
+                   ;; The archive is a copy of every page this instance serves,
+                   ;; so it is a copy of their content under one address: it is
+                   ;; linked from the footer and followed, but the pages
+                   ;; themselves are what should answer a search.
+                   #:robots "noindex, follow"
                    #:body
                    `(div (@ (class "px-4 md:px-8 py-4 max-w-prose"))
                          (h1 "wikimusic export")

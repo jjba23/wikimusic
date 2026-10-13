@@ -138,11 +138,15 @@
                                                                          'soundcloud-url)))))))
     (html-template G_
                    #:is-logged-in is-logged-in
+                   #:title "Edit an artist · WikiMusic"
+                   #:robots "noindex, nofollow"
                    #:body body)))
 
 (define* (artist-new-page G_
                           #:key is-logged-in)
   (html-template G_
+                 #:title "New artist · WikiMusic"
+                 #:robots "noindex, nofollow"
                  #:is-logged-in is-logged-in
                  #:body `(div (@ (class ""))
                               ,(artist-form G_))))

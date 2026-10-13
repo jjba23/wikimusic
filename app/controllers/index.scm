@@ -34,5 +34,7 @@
                                            #:is-logged-in (:cookies-value rc
                                                            "x-bewaking-wikimusic"))))))
 
-(get "/robots.txt" static-page-emitter)
+;; `/robots.txt' and `/sitemap.xml' are served by the controller in
+;; `app/controllers/seo.scm': both state this instance's own address, which is
+;; not something a file checked into the tree can know.
 (get "/favicon.ico" static-page-emitter)

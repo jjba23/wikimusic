@@ -37,6 +37,7 @@
   #:use-module (hygguile abstraction)
   #:use-module (srfi srfi-19)
   #:use-module (orgwebalchemy html)
+  #:use-module (wikimusic seo)
   #:use-module (kracht prelude)
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route)
@@ -58,6 +59,8 @@
                           ascii-size-select
                           search-box
                           render-external-sources
+                          artwork-social-image
+                          metronome-widget
                           item-tile-grid-face))
 
 ;; The tile grid's shape, chosen by the reader and remembered in a cookie.  A
@@ -275,6 +278,7 @@ the menu with @code{for}, so it reaches assistive technology as well."
   (build-asset-library '("pub/js/song-auto-scroll.js" "pub/js/symbanta.js"
                          "pub/js/song-chord-highlighter.js"
                          "pub/js/file-base64.js"
+                         "pub/js/metronome.js"
                          "pub/js/guitarpro-player.js")))
 
 (define* (page-footer G_)
@@ -527,12 +531,172 @@ the menu with @code{for}, so it reaches assistive technology as well."
                                                             md:px-3
                                                             cursor-pointer)))))))
 
+;;; A click track, for a reader practising from a song page.
+;;;
+;;; The words are the page's: both labels the control can show are written
+;;; here -- one for a metronome that is stopped and one for a metronome that is
+;;; running -- and the script un-hides one of them, so a translated page stays
+;;; translated.  The numbers are the reader's: the tempo, the meter, and the
+;;; lamps, one per beat the meter can hold, which the script hides and lights.
+;;;
+;;; The whole control is hidden until the script finds it, so a browser with no
+;;; JavaScript is offered no control that would do nothing.  `data-metronome'
+;;; is the only thing the script looks for; everything else it reaches is named
+;;; after the control's own identifier, which is why a page may hold more than
+;;; one of these without any of them being ambiguous.
+(define* (metronome-widget G_
+                           #:key id (tempo 120) (beats 4))
+  "Return a metronome a reader can practise to, named ID.
+
+@table @var
+@item id
+The identifier the control and every part of it are named after.  It is what
+makes a page holding two metronomes unambiguous, and it is the only contract
+between this markup and `pub/js/metronome.js'.
+@item tempo
+The tempo the control opens with, in beats per minute: the tempo of a stored
+tabulation when the page knows one, and 120 otherwise.
+@item beats
+The beats in a bar the control opens with; the menu offers two, three, four
+and six.
+@end table"
+  (let* ((tempo-id (format #f "~a-tempo" id))
+         (beats-id (format #f "~a-beats" id))
+         (label-class (mk-class '(dark:text-stone-300
+                                  text-stone-500
+                                  font-bold
+                                  text-sm)))
+         (field-class (mk-class '(bg-stone-100/75
+                                  dark:bg-onyx-500
+                                  dark:text-stone-300
+                                  text-onyx-900
+                                  border
+                                  border-stone-300
+                                  rounded-lg
+                                  px-2
+                                  py-1
+                                  text-sm
+                                  w-20)))
+         (option (lambda (meter)
+                   `(option (@ (value ,(number->string meter))
+                               ,@(if (= meter beats)
+                                     '((selected ""))
+                                     '()))
+                            ,(number->string meter)))))
+    `(div (@ (id ,id)
+             (data-metronome "")
+             (hidden "")
+             (class ,(mk-class '(flex flex-col gap-2 py-2))))
+          (div (@ (class ,(mk-class '(flex flex-row
+                                              flex-wrap
+                                              gap-3
+                                              items-center))))
+               (label (@ (for ,tempo-id) (class ,label-class))
+                      ,(G_ "tempo"))
+               (input (@ (type number)
+                         (id ,tempo-id)
+                         (name ,tempo-id)
+                         (min "20")
+                         (max "300")
+                         (step "1")
+                         (inputmode numeric)
+                         (value ,(number->string tempo))
+                         (class ,field-class)))
+               (label (@ (for ,beats-id) (class ,label-class))
+                      ,(G_ "beats in a bar"))
+               (select (@ (id ,beats-id)
+                          (name ,beats-id)
+                          (onchange ,(format #f
+                                             "wikimusicMetronomeMeterChanged('~a')"
+                                             id))
+                          (class ,field-class))
+                       ,(option 2)
+                       ,(option 3)
+                       ,(option 4)
+                       ,(option 6))
+               ,(icon-button #:icon 'timer
+                             #:id (format #f "~a-toggle" id)
+                             #:on-click (format #f
+                                                "wikimusicMetronomeToggle('~a')"
+                                                id)
+                             #:content `((span (@ (id ,(format #f "~a-start" id)))
+                                              ,(G_ "start"))
+                                         (span (@ (id ,(format #f "~a-stop" id))
+                                                  (hidden ""))
+                                               ,(G_ "stop")))))
+          ;; One lamp for each beat a meter can hold, all of them dim; the
+          ;; script hides the ones this meter does not use and brightens the
+          ;; one that is sounding.  They are decoration and are named as such,
+          ;; so a screen reader is not read a flickering row it cannot use.
+          (div (@ (id ,(format #f "~a-lamps" id))
+                  (aria-hidden "true")
+                  (class ,(mk-class '(flex flex-row gap-2 items-center))))
+               ,@(map (lambda (beat)
+                        `(span (@ (id ,(format #f "~a-beat-~a" id beat))
+                                  (class ,(mk-class '(w-2
+                                                      h-2
+                                                      rounded-full
+                                                      bg-persia-pink-900
+                                                      opacity-40))))
+                               ""))
+                      '(1 2 3 4 5 6))))))
+
+;;; The picture a page's link preview is shown with, when the page has one.
+;;;
+;;; An artwork's address is whatever its contributor typed, stored
+;;; percent-encoded: it may be a picture on somebody else's server or a path
+;;; into this instance's own upload directory.  A preview picture has to be an
+;;; address a crawler can fetch from outside, so only an absolute one is used
+;;; and a page whose artworks are all relative keeps the site's default.  The
+;;; first artwork wins because the artworks are ordered by their own
+;;; `order value', which is what puts the picture a contributor chose first.
+(define* (artwork-social-image artworks #:key fallback)
+  "Return the address of ARTWORKS' first absolute picture, or FALLBACK."
+  (let ((addresses (filter (lambda (address)
+                             (and (string? address)
+                                  (or (string-prefix? "http://" address)
+                                      (string-prefix? "https://" address))))
+                           (map (lambda (artwork)
+                                  (catch #t
+                                         (lambda ()
+                                           (uri-decode (assq-ref artwork
+                                                                 'content-url)))
+                                         (lambda (key . args)
+                                           (assq-ref artwork 'content-url))))
+                                artworks))))
+    (if (pair? addresses) (car addresses) fallback)))
+
+;;; The document every page is rendered into.  Its body is what a reader sees;
+;;; the keywords after it are what a crawler and a link preview are told about
+;;; the page instead, and are collected in `seo-head' (wikimusic seo).
+;;;
+;;; A page states its own title and description and every caller does: the
+;;; title is the `<title>', the tab's label and the headline of a pasted link
+;;; all at once, so it is the one place the words a reader would search for are
+;;; written down.  The remaining keywords are optional and a page that does not
+;;; pass one is described by the site's own defaults.
 (define* (html-template G_
                         #:key (title "WikiMusic") body
+                        (description #f)
+                        (path #f) (url #f)
+                        (image #f) (image-alt #f)
+                        (og-type "website") (locale "en_US")
+                        robots (json-ld '())
                         (is-logged-in #f) (reading? #f))
   
-  `(,doctype-html (html (head (title ,title)
+  `(,doctype-html (html (@ (lang ,(language-of locale)))
+                        (head (title ,title)
                               ,(hygguile-recommended-meta)
+                              ,(seo-head #:title title
+                                         #:description description
+                                         #:path path
+                                         #:url url
+                                         #:image image
+                                         #:image-alt image-alt
+                                         #:og-type og-type
+                                         #:locale locale
+                                         #:robots robots
+                                         #:json-ld json-ld)
                               ,(hygguile-recommended-resources #:fonts (custom-fonts))
 
                               (link (@ (rel "shortcut icon")
@@ -571,6 +735,9 @@ the menu with @code{for}, so it reaches assistive technology as well."
 
                               (script ,(assoc-ref asset-library
                                                   "pub/js/file-base64.js"))
+
+                              (script ,(assoc-ref asset-library
+                                                  "pub/js/metronome.js"))
 
                               (script ,(assoc-ref asset-library
                                                   "pub/js/guitarpro-player.js")))

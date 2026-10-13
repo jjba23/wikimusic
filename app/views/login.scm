@@ -75,6 +75,11 @@
                                                 #:content (G_ "reset")))))))
     (html-template G_
                    #:is-logged-in is-logged-in
+                   ;; A sign-in form is nobody's search result and nothing to
+                   ;; preview: it is kept out of the index and out of the
+                   ;; crawl, while the pages it links to stay crawlable.
+                   #:title "Sign in · WikiMusic"
+                   #:robots "noindex, nofollow"
                    #:body `((div (@ (class ,(mk-class '(px-4 md:px-8 py-2))))
                                  (div (@ (class ,(mk-class '(w-full flex
                                                                     flex-row

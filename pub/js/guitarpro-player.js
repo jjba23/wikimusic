@@ -141,6 +141,8 @@ const wikimusicGuitarPro = (() => {
         if (controls) {
           controls.hidden = false;
         }
+        boundPassageFields(id, api);
+        setLoopLabel(id, false);
       });
       api.playerReady.on(() => setStatus(id, "ready"));
       api.error.on(() => {
@@ -172,7 +174,118 @@ const wikimusicGuitarPro = (() => {
     }
   };
 
-  return { show, playPause, stop };
+  /// How fast the tab is played back, as a fraction of the tempo it is written
+  /// in.  A passage a reader cannot play at speed is practised slowly and
+  /// speeded up afterwards, so this is the control that makes a stored tab a
+  /// thing to learn from rather than a thing to listen to.
+  const speed = (id, value) => {
+    const api = players.get(id);
+    const multiplier = Number.parseFloat(value);
+    if (api && Number.isFinite(multiplier) && multiplier > 0) {
+      api.playbackSpeed = multiplier;
+    }
+  };
+
+  // The number a reader typed into one of the passage fields, or a fallback.
+  const barNumber = (id, suffix, fallback) => {
+    const field = part(id, suffix);
+    const number = field ? Number.parseInt(field.value, 10) : Number.NaN;
+    return Number.isFinite(number) ? number : fallback;
+  };
+
+  // The ticks a passage of bars covers.  A master bar carries the tick it
+  // starts at and can say how long it is, so the passage is measured out of
+  // the score itself rather than guessed at from its tempo: a bar of five-four
+  // and a bar of four-four are not the same number of ticks, and an anacrusis
+  // and a repeat are not either.
+  const passageTicks = (api, first, last) => {
+    const bars = (api.score && api.score.masterBars) || [];
+    if (bars.length === 0) {
+      return null;
+    }
+    const from = Math.min(Math.max(first, 1), bars.length);
+    const to = Math.min(Math.max(last, from), bars.length);
+    const firstBar = bars[from - 1];
+    const lastBar = bars[to - 1];
+    const endTick = lastBar.start + lastBar.calculateDuration();
+    if (!Number.isFinite(firstBar.start) || !Number.isFinite(endTick)) {
+      return null;
+    }
+    return { startTick: firstBar.start, endTick: endTick };
+  };
+
+  // Whether a passage is armed, and which of the button's two labels says so.
+  // Both labels are the page's own words, written into the markup; this only
+  // decides which of them is shown, so a translated page stays translated.
+  const setLoopLabel = (id, armed) => {
+    const on = part(id, "-loop-idle");
+    const off = part(id, "-loop-armed");
+    const button = part(id, "-loop");
+    if (on) {
+      on.hidden = armed;
+    }
+    if (off) {
+      off.hidden = !armed;
+    }
+    if (button) {
+      button.setAttribute("aria-pressed", armed ? "true" : "false");
+    }
+  };
+
+  /// Arm the passage between the two bar fields, or disarm it when one is
+  /// already armed.  A reader drills a few bars by playing them over and over,
+  /// which is what the loop does; a bar of count-in is played first while a
+  /// passage is armed, so the reader hears where the passage begins instead of
+  /// having to guess from a click that stops at the end.
+  const toggleLoop = (id) => {
+    const api = players.get(id);
+    if (!api) {
+      return;
+    }
+    if (api.playbackRange) {
+      api.isLooping = false;
+      api.playbackRange = null;
+      api.countInVolume = 0;
+      setLoopLabel(id, false);
+      return;
+    }
+    const ticks = passageTicks(api,
+                               barNumber(id, "-loop-from", 1),
+                               barNumber(id, "-loop-to", 1));
+    if (!ticks) {
+      return;
+    }
+    api.countInVolume = 0.9;
+    api.playbackRange = ticks;
+    api.isLooping = true;
+    api.tickPosition = ticks.startTick;
+    setLoopLabel(id, true);
+  };
+
+  // A passage cannot name a bar the tablature does not have, so once the score
+  // is drawn the fields are given the length of the score as their ceiling and
+  // a value that is inside it.
+  const boundPassageFields = (id, api) => {
+    const bars = (api.score && api.score.masterBars) || [];
+    if (bars.length === 0) {
+      return;
+    }
+    ["-loop-from", "-loop-to"].forEach((suffix) => {
+      const field = part(id, suffix);
+      if (!field) {
+        return;
+      }
+      field.max = String(bars.length);
+      const value = Number.parseInt(field.value, 10);
+      if (!Number.isFinite(value) || value < 1) {
+        field.value = "1";
+      } else if (value > bars.length) {
+        field.value = String(bars.length);
+      }
+    });
+  };
+
+  return { show, playPause, stop, speed, toggleLoop };
 })();
 
 // The markup reaches these by name, the way the rest of the site's controls
@@ -187,4 +300,12 @@ function wikimusicGuitarProPlayPause(id) {
 
 function wikimusicGuitarProStop(id) {
   wikimusicGuitarPro.stop(id);
+}
+
+function wikimusicGuitarProSpeed(id, value) {
+  wikimusicGuitarPro.speed(id, value);
+}
+
+function wikimusicGuitarProToggleLoop(id) {
+  wikimusicGuitarPro.toggleLoop(id);
 }

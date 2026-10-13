@@ -17,6 +17,7 @@
 
 (define-module (app views index)
   #:use-module (wikimusic html)
+  #:use-module (wikimusic seo)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -27,10 +28,31 @@
   #:use-module (ice-9 string-fun)
   #:export (welcome-page))
 
+;;; The words the front page is found by: what wikimusic is, and the things a
+;;; reader looks for in it -- the chords, the tabs and the lyrics of the songs
+;;; it holds, for the instruments it holds them for.  The same sentence is the
+;;; meta description, the Open Graph description and the description of the
+;;; `WebSite' node below, so the front page says the same thing wherever it is
+;;; read from.
+(define front-page-description
+  "WikiMusic is a free, community-written encyclopaedia of music: songs, artists and genres, with guitar and bass tabs, chords, lyrics, keys, tunings and sheet music, written by musicians for anyone learning to play.")
+
 (define* (welcome-page G_
                        #:key is-logged-in selected-locale)
   (html-template G_
                  #:is-logged-in is-logged-in
+                 #:title "WikiMusic: guitar tabs, chords and lyrics for every song"
+                 #:description front-page-description
+                 #:path "/"
+                 #:json-ld (list (append (list (schema-name "WebSite")
+                                               (cons "name" "WikiMusic")
+                                               (cons "alternateName"
+                                                     "the free music knowledge encyclopaedia")
+                                               (cons "description"
+                                                     front-page-description))
+                                         (if (absolute-url "/")
+                                             (list (cons "url" (absolute-url "/")))
+                                             '())))
                  #:body `(div (div (@ (class ,(mk-class '(p-2))))
                                    (div (@ (class ,(mk-class '(flex flex-row
                                                                flex-wrap

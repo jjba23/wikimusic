@@ -253,7 +253,25 @@ more than one tab has no ambiguity about which it is addressing."
         (let* ((metadata (gp5-bytes-metadata tab-bytes))
                (id (format #f "guitarpro-~a" (assq-ref version 'identifier)))
                (filename (guitarpro-filename song version))
-               (named (lambda (part) (string-append id part))))
+               (named (lambda (part) (string-append id part)))
+               ;; One small vocabulary for the two controls that are fields
+               ;; rather than buttons, so they read as the same kind of thing
+               ;; the rest of the site's forms are made of.
+               (label-class (mk-class '(dark:text-stone-300
+                                        text-stone-500
+                                        font-bold
+                                        text-sm)))
+               (field-class (mk-class '(bg-stone-100/75
+                                        dark:bg-onyx-500
+                                        dark:text-stone-300
+                                        text-onyx-900
+                                        border
+                                        border-stone-300
+                                        rounded-lg
+                                        px-2
+                                        py-1
+                                        text-sm
+                                        w-20))))
           (list
            `(details (@ (open true) (class ,(mk-class '(my-6))))
                      (summary (@ (class ,(mk-class '(text-xl
@@ -316,7 +334,7 @@ more than one tab has no ambiguity about which it is addressing."
                                        (hidden "")
                                        (class ,(mk-class '(flex flex-row
                                                                  flex-wrap
-                                                                 gap-2
+                                                                 gap-3
                                                                  items-center))))
                                     ,(icon-button #:icon 'play
                                                   #:content (G_ "play")
@@ -327,7 +345,65 @@ more than one tab has no ambiguity about which it is addressing."
                                                   #:content (G_ "stop")
                                                   #:on-click (format #f
                                                               "wikimusicGuitarProStop('~a')"
-                                                              id)))
+                                                              id))
+                                    ;; How fast the tab is played back.  The
+                                    ;; first choice is the tempo the tab is
+                                    ;; written in, which is the number
+                                    ;; already listed above it.
+                                    (label (@ (for ,(named "-speed"))
+                                              (class ,label-class))
+                                           ,(G_ "tempo"))
+                                    (select (@ (id ,(named "-speed"))
+                                               (name ,(named "-speed"))
+                                               (onchange ,(format #f
+                                                                  "wikimusicGuitarProSpeed('~a', this.value)"
+                                                                  id))
+                                               (class ,field-class))
+                                            (option (@ (value "1"))
+                                                    ,(format #f "100% — ~a"
+                                                             (G_ "the tab's own tempo")))
+                                            (option (@ (value "0.75")) "75%")
+                                            (option (@ (value "0.5")) "50%")
+                                            (option (@ (value "0.35")) "35%")
+                                            (option (@ (value "0.25")) "25%"))
+                                    ;; A passage to drill: the bars it runs from
+                                    ;; and to, and the control that arms it.
+                                    (label (@ (for ,(named "-loop-from"))
+                                              (class ,label-class))
+                                           ,(G_ "loop bars"))
+                                    (input (@ (type number)
+                                              (id ,(named "-loop-from"))
+                                              (name ,(named "-loop-from"))
+                                              (min "1")
+                                              (value "1")
+                                              (inputmode numeric)
+                                              (class ,field-class)))
+                                    (span ,(G_ "to"))
+                                    (input (@ (type number)
+                                              (id ,(named "-loop-to"))
+                                              (name ,(named "-loop-to"))
+                                              (min "1")
+                                              (value "4")
+                                              (inputmode numeric)
+                                              (class ,field-class)))
+                                    ,(icon-button #:icon 'repeat
+                                                  #:id (named "-loop")
+                                                  #:on-click (format #f
+                                                              "wikimusicGuitarProToggleLoop('~a')"
+                                                              id)
+                                                  #:content `((span (@ (id ,(named "-loop-idle")))
+                                                                    ,(G_ "loop these bars"))
+                                                               (span (@ (id ,(named "-loop-armed"))
+                                                                        (hidden ""))
+                                                                     ,(G_ "stop looping")))))
+                               ;; What the two bar fields are for, in the
+                               ;; page's own words: a reader who has never met
+                               ;; a practice loop should not have to find out
+                               ;; by arming one.
+                               (p (@ (class ,(mk-class '(text-sm
+                                                        text-onyx-300
+                                                        dark:text-stone-300))))
+                                  ,(G_ "a passage plays over and over between the two bars, after a bar of count-in"))
                                (div (@ (id ,(named "-score"))
                                        (class ,(mk-class '(overflow-x-auto))))
                                     "")
