@@ -109,6 +109,24 @@ holds `hover:' between its dot and the rest."
                                          (error-detail 500)))
                             #:name "nor do their explanations"))
 
+         (test "a page is drawn in the tone its class of refusal is read in"
+               ;; The glyph and the tone come from the same row, so a status
+               ;; the table does not spell out is still drawn as the kind of
+               ;; refusal it is -- a 502 as a server failure, a 418 as a
+               ;; request the server would not take -- rather than as a page
+               ;; with no mark on it at all.
+               (for-each (lambda (pair)
+                           (let ((status (car pair))
+                                 (expected (cdr pair)))
+                             (assert-equal #:name (format #f
+                                                          "a ~a is read as a ~a"
+                                                          status expected)
+                                           #:expect (car (error-note expected))
+                                           #:got (car (error-note status)))))
+                         '((502 . 500) (503 . 500) (418 . 400) (451 . 400)))
+               (assert-true (and (member 408 error-statuses) #t)
+                            #:name "a request that timed out has a page"))
+
          (test "a status with no wording of its own still describes itself"
                (assert-true (and (string-contains (error-headline 418) "418")
                                  #t)
@@ -165,8 +183,18 @@ holds `hover:' between its dot and the rest."
                                                #t)
                                           #:name (format #f
                                                          "a ~a page leads with its own wording"
-                                                         status))))
-                         '(400 401 403 404 500)))
+                                                         status))
+                             (assert-true
+                              (and (string-contains html
+                                                    (format #f
+                                                            "ph-~a"
+                                                            (car (error-note
+                                                                  status))))
+                                   #t)
+                              #:name (format #f
+                                             "a ~a page is drawn with a glyph"
+                                             status))))
+                         error-statuses))
 
          (test "the reader is offered a way out"
                (let ((html (rendered 404)))

@@ -23,7 +23,8 @@
   #:use-module ((artanis artanis) #:select (http-status))
   #:use-module ((artanis utils) #:select (sxml->xml-string))
   #:export (error-page error-page-html install-error-pages!
-                       error-headline error-detail))
+                       error-headline error-detail error-note
+                       error-statuses))
 
 ;;; What a reader is told when a page cannot be served.
 ;;;
@@ -39,6 +40,74 @@
 ;;; The wording of a page is decided by its status alone, so that decision
 ;;; is a function of the status and nothing else: it can be read, and
 ;;; tested, without a server in front of it.
+;;;
+;;; Each refusal is written down here the way it is met: a glyph to catch
+;;; the eye, the tone it is drawn in, a headline that says what happened in
+;;; the reader's own terms, and the sentence or two that says what to do
+;;; about it.  A status is a code a client understands and a reader is not a
+;;; client, so the code on its own is not enough to serve anyone.
+;;;
+;;; The tones are the accents the rest of the site is already built from,
+;;; used for what they mean there: plain ink for a wrong turn, the pink of
+;;; the site's own voice for a door that is shut, and the red the framework
+;;; already marks an error with for a failure on the server's side.
+(define error-notes
+  '((400
+     plugs
+     (text-onyx-300 dark:text-stone-300)
+     "that request did not make sense"
+     "the request arrived in a shape the server does not understand.  going
+back and submitting the form again is the way to retry.")
+    (401
+     lock-key
+     (text-persia-pink-500/90 dark:text-persia-pink-300)
+     "you need to sign in first"
+     "signing in gives you access to this page.")
+    (403
+     shield-slash
+     (text-persia-pink-500/90 dark:text-persia-pink-300)
+     "you are not allowed to see that"
+     "this entry exists, but it is not public and your account may not read
+it.")
+    (404
+     magnifying-glass
+     (text-onyx-300 dark:text-stone-300)
+     "we could not find that page"
+     "the address may have been mistyped, or the entry may have been moved
+or renamed since it was linked.  the pages below are a good place to pick
+the thread back up.")
+    ;; A request kept so long that the server gave up on it is a refusal
+    ;; artanis raises itself, and the page it answers with is empty: a
+    ;; reader who waited gets nothing at all unless there is a page here.
+    (408
+     arrow-clockwise
+     (text-onyx-300 dark:text-stone-300)
+     "that request took too long to arrive"
+     "the request was still on its way when the server stopped waiting for
+it, so it was left unread and nothing was changed.  sending it again
+usually settles it.")
+    (500
+     warning
+     (text-redwood-700 dark:text-redwood-300)
+     "something went wrong on our side"
+     "the server failed while building this page.  nothing was written, and
+nothing you did caused it.  trying again in a moment usually works; if it
+keeps failing, the source code is linked below and a report is welcome.")))
+
+(define (error-note status)
+  "Return the @code{(glyph tone headline detail)} STATUS is read with.
+
+The table is not a list of the statuses artanis can answer with -- it is the
+list of refusals that mean something particular to a reader.  A status
+without a line of its own is still rendered as a page rather than as a blank
+one: it is described by its class when it has one, and as a server failure
+when it has not, because that is what a page rendered for it would mean."
+  (let ((row (assv status error-notes)))
+    (cond
+     (row (cdr row))
+     ((and (>= status 400) (< status 500))
+      (cdr (assv 400 error-notes)))
+     (else (cdr (assv 500 error-notes))))))
 
 (define (error-headline status)
   "Return the one-line headline the page for STATUS leads with, in English.
@@ -46,45 +115,30 @@
 @var{status} is an HTTP status code as a number.  A status with no
 wording of its own is described by its class -- the page still says what
 happened, even when nothing named that code."
-  (cond
-   ((= status 404)
-    "we could not find that page")
-   ((= status 500)
-    "something went wrong on our side")
-   ((= status 403)
-    "you are not allowed to see that")
-   ((= status 401)
-    "you need to sign in first")
-   ((= status 400)
-    "that request did not make sense")
-   (else
-    (format #f "the server answered ~a" status))))
+  (let ((row (assv status error-notes)))
+    (if row (caddr (cdr row))
+        (format #f "the server answered ~a" status))))
 
 (define (error-detail status)
   "Return the paragraph the page for STATUS explains itself with.
 
 The detail says what the reader can do next rather than what the server
 did wrong: a reader cannot act on the second and can act on the first."
-  (cond
-   ((= status 404)
-    "the address may have been mistyped, or the entry may have been moved
-or renamed since it was linked.  the pages below are a good place to pick
-the thread back up.")
-   ((= status 500)
-    "the server failed while building this page.  nothing was written, and
-nothing you did caused it.  trying again in a moment usually works; if it
-keeps failing, the source code is linked below and a report is welcome.")
-   ((= status 403)
-    "this entry exists, but it is not public and your account may not read
-it.")
-   ((= status 401)
-    "signing in gives you access to this page.")
-   ((= status 400)
-    "the request arrived in a shape the server does not understand.  going
-back and submitting the form again is the way to retry.")
-   (else
-    "the server could not serve this request.  the pages below are still
+  (let ((row (assv status error-notes)))
+    (if row (cadddr (cdr row))
+        "the server could not serve this request.  the pages below are still
 there.")))
+
+;; The statuses the deployment answers with a page of its own.  The five are
+;; the ones a reader arrives at through no fault of the site's own views: a
+;; `400' is a request artanis could not read, a `401' a rule asking for a
+;; credential the request did not carry, a `403' an entry the reader's account
+;; may not read, a `404' a path no route answers, a `408' a request that
+;; arrived too slowly, and a `500' a handler that threw.  A refusal written by
+;; a proxy in front of the site -- a 502 while the service restarts, say --
+;; never reaches this process, so its page is the proxy's to write.
+(define error-statuses
+  '(400 401 403 404 408 500))
 
 (define (error-links G_)
   "Return the row of links a reader can leave an error page by."
@@ -112,48 +166,75 @@ or a test that has none -- can pass its own.
 @var{is-logged-in} only decides whether the navigation offers to sign in
 or to leave; a reader who is signed in and lands here should not be
 invited to sign in again."
-  (html-template G_
-                 #:title (format #f "~a · WikiMusic" status)
-                 #:is-logged-in is-logged-in
-                 #:body `((div (@ (class ,(mk-class
-                                           '(w-full flex flex-col
-                                                   items-center
-                                                   justify-center
-                                                   gap-6 py-8
-                                                   px-2 sm:px-4))))
-                               (div (@ (class ,(mk-class
-                                                '(hg-frost
-                                                  bg-stone-100/75
-                                                  dark:bg-onyx-900/75
-                                                  rounded-2xl
-                                                  sm:rounded-3xl
-                                                  shadow-xl
-                                                  border-3
-                                                  border-persia-pink-500/25
-                                                  dark:border-persia-pink-900/10
-                                                  max-w-196
-                                                  w-full
-                                                  flex flex-col
-                                                  items-center
-                                                  text-center
-                                                  gap-4
-                                                  p-6 sm:p-8 md:p-12))))
-                                    (span (@ (class ,(mk-class
-                                                      '(text-4xl
-                                                        sm:text-5xl
-                                                        font-bold
-                                                        text-persia-pink-500/90
-                                                        dark:text-persia-pink-300))))
-                                          ,(format #f "~a" status))
-                                    ,(sub-h3 (G_ (error-headline status))
-                                             #:family '(font-sans))
-                                    (p (@ (class ,(mk-class
-                                                   '(text-onyx-300
-                                                     dark:text-stone-300
-                                                     leading-6
-                                                     max-w-96))))
-                                       ,(G_ (error-detail status)))
-                                    ,(error-links G_))))))
+  (let* ((note (error-note status))
+         (glyph (car note))
+         (tone (cadr note))
+         ;; A status the table does not spell out is described by its class,
+         ;; and there is no glyph drawn for the status itself -- the glyph of
+         ;; the class it reads as is what the page shows, over the code it
+         ;; actually answered with.
+         (drawing (car (error-note (if (assv status error-notes) status
+                                       (if (< status 500) 400 500))))))
+    (html-template G_
+                   #:title (format #f "~a · WikiMusic" status)
+                   #:is-logged-in is-logged-in
+                   #:body `((div (@ (class ,(mk-class
+                                             '(w-full flex flex-col
+                                                     items-center
+                                                     justify-center
+                                                     gap-6 py-8
+                                                     px-2 sm:px-4))))
+                                 (div (@ (class ,(mk-class
+                                                  '(hg-frost
+                                                    bg-stone-100/75
+                                                    dark:bg-onyx-900/75
+                                                    rounded-2xl
+                                                    sm:rounded-3xl
+                                                    shadow-xl
+                                                    border-3
+                                                    border-persia-pink-500/25
+                                                    dark:border-persia-pink-900/10
+                                                    max-w-196
+                                                    w-full
+                                                    flex flex-col
+                                                    items-center
+                                                    text-center
+                                                    gap-4
+                                                    p-6 sm:p-8 md:p-12))))
+                                      ;; The code is shown beside a glyph of the
+                                      ;; same tone, so which kind of refusal a
+                                      ;; reader is reading is legible before a
+                                      ;; word of it is read.  The two are one
+                                      ;; line that wraps rather than two
+                                      ;; columns, which is what the pane can
+                                      ;; still hold on a phone.
+                                      (div (@ (class ,(mk-class '(flex
+                                                                  flex-row
+                                                                  flex-wrap
+                                                                  items-center
+                                                                  justify-center
+                                                                  gap-3))))
+                                           ,(icon #:type drawing
+                                                  #:weight 'bold
+                                                  #:icon-css (append tone
+                                                                     '(text-4xl
+                                                                       sm:text-5xl)))
+                                           (span (@ (class ,(mk-class
+                                                             (append
+                                                              '(font-bold
+                                                                text-4xl
+                                                                sm:text-5xl)
+                                                              tone))))
+                                                 ,(format #f "~a" status)))
+                                      ,(sub-h3 (G_ (error-headline status))
+                                               #:family '(font-sans))
+                                      (p (@ (class ,(mk-class
+                                                     '(text-onyx-300
+                                                       dark:text-stone-300
+                                                       leading-6
+                                                       max-w-96))))
+                                         ,(G_ (error-detail status)))
+                                      ,(error-links G_)))))))
 
 (define (error-page-html status)
   "Return the page for @var{status} as the string artanis renders it with.
@@ -166,9 +247,6 @@ served through, so an error page is serialized exactly like a page that
 worked."
   (sxml->xml-string (error-page status)))
 
-(define *error-statuses*
-  '(400 401 403 404 500))
-
 (define (install-error-pages!)
   "Register the pretty error page for every status wikimusic can answer with.
 
@@ -178,4 +256,4 @@ call belongs in ENTRY, in the section artanis reserves for work that has to
 happen before the server serves a request."
   (for-each (lambda (status)
               (http-status status (lambda () (error-page-html status))))
-            *error-statuses*))
+            error-statuses))

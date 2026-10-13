@@ -18,6 +18,8 @@
 (define-module (app views song-content-view)
   #:use-module (wikimusic html)
   #:use-module (wikimusic domain)
+  #:use-module (wikimusic guitarpro)
+  #:use-module (srfi srfi-1)
   #:use-module (wikimusic domain guitar-chord-guide)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
@@ -165,6 +167,105 @@
                                                    overflow-x-scroll)))))
                     ,ascii-contents)))))
 
+;; The Guitar Pro 5 tab of a version: the file itself, which a browser cannot
+;; open, offered back for download beside what its own header says about the
+;; score.  The facts come from the file and not from the row, so a reader can
+;; see what the download holds -- which song, whose tab, how long, how fast --
+;; before spending a download on it, and a file whose header cannot be read is
+;; offered all the same, because it is still its author's file.
+
+(define (guitarpro-facts G_ metadata)
+  "Return the (label . value) pairs a Guitar Pro 5 tab is described by.
+
+A text field the tab's author left empty is left out, so a page never lists a
+line that says nothing; the numbers a readable header always carries are always
+listed, since they are what a reader is deciding about."
+  (let ((text (lambda (key)
+                (let ((value (assq-ref metadata key)))
+                  (and (string? value)
+                       (not (string-null? value))
+                       value))))
+        (number (lambda (key)
+                  (let ((value (assq-ref metadata key)))
+                    (and (number? value) (number->string value))))))
+    (filter (lambda (fact) (cdr fact))
+            (list (cons (G_ "title") (text 'title))
+                  (cons (G_ "artist") (text 'artist))
+                  (cons (G_ "album") (text 'album))
+                  (cons (G_ "tabbed by") (text 'tabber))
+                  (cons (G_ "tempo")
+                        (let ((tempo (assq-ref metadata 'tempo)))
+                          (and (number? tempo) (format #f "~a bpm" tempo))))
+                  (cons (G_ "music key") (text 'key-name))
+                  (cons (G_ "measures") (number 'measures))
+                  (cons (G_ "tracks") (number 'tracks))))))
+
+(define (filename-safe text)
+  "Return TEXT with the characters a file name cannot hold replaced by dashes."
+  (string-map (lambda (character)
+                (if (memv character
+                          '(#\/ #\\ #\: #\* #\? #\" #\< #\> #\|))
+                    #\-
+                    character))
+              text))
+
+(define (guitarpro-filename song version)
+  "Return the name a version's Guitar Pro tab is saved under.
+
+The name is what a reader meets in their downloads folder, so it says which
+song and which version the file is: a tab saved as `tab.gp5' among many is a
+file its reader has to open to identify."
+  (let* ((parts (filter (lambda (part)
+                          (and (string? part) (not (string-null? part))))
+                        (list (assq-ref song 'display-name)
+                              (assq-ref version 'version-name))))
+         (base (if (null? parts)
+                   "wikimusic-tab"
+                   (string-join parts " - "))))
+    (string-append (filename-safe base) ".gp5")))
+
+(define* (render-guitarpro-section G_ song version)
+  "Return the section a version's Guitar Pro 5 tab is shown in, or '() when
+the version carries none."
+  (let* ((data-url (assq-ref version 'guitarpro-contents))
+         (metadata (gp5-metadata-of-data-url data-url)))
+    (if (data-url? data-url)
+        (list `(details (@ (open true) (class ,(mk-class '(my-6))))
+                        (summary (@ (class ,(mk-class '(text-xl
+                                                        font-bold
+                                                        text-onyx-300
+                                                        dark:text-stone-300
+                                                        cursor-pointer))))
+                                 ,(G_ "Guitar Pro 5 tab"))
+                        (div (@ (class ,(mk-class '(flex flex-col gap-4
+                                                           py-4))))
+                             ,(if metadata
+                                  `(div (@ (class ,(mk-class '(flex flex-col
+                                                                      gap-2))))
+                                        ,@(map (lambda (fact)
+                                                 `(div (@ (class ,(mk-class
+                                                                   '(flex flex-row
+                                                                         flex-wrap
+                                                                         gap-2))))
+                                                       (span (@ (class ,(mk-class
+                                                                         '(font-bold
+                                                                           text-onyx-300
+                                                                           dark:text-stone-300))))
+                                                             ,(car fact))
+                                                       (span (@ (class ,(mk-class
+                                                                         '(text-onyx-300
+                                                                           dark:text-stone-300))))
+                                                             ,(cdr fact))))
+                                               (guitarpro-facts G_ metadata)))
+                                  `(p (@ (class ,(mk-class '(text-onyx-300
+                                                             dark:text-stone-300))))
+                                      ,(G_ "the header of this tab could not be read, but the file itself can be downloaded")))
+                             (a (@ (href ,data-url)
+                                   (download ,(guitarpro-filename song version)))
+                                ,(icon-button #:icon 'download
+                                              #:content (G_ "download the tab"))))))
+        '())))
+
 (define* (render-version G_ song version ascii-size)
   (let* ((v-name (render-if-nempty (lambda (version-name)
                                      (format #f "~a ~a" version-name
@@ -261,7 +362,8 @@
                                                      (class ,(mk-class '(min-h-screen))))
                                                   "")))))
          (pdf-content-section (render-if-nestring render-pdf-content
-                                                  cleaned-pdf-data)))
+                                                  cleaned-pdf-data))
+         (guitarpro-section (render-guitarpro-section G_ song version)))
     `(,(hr) (details (@ (open true))
                      (summary (@ (class ,(mk-class '(text-xl font-bold
                                                      text-onyx-300
@@ -278,4 +380,5 @@
                                         ,version-management-section))
                           ,ascii-legend-section
                           ,ascii-content-section
-                          ,pdf-content-section)))))
+                          ,pdf-content-section
+                          ,guitarpro-section)))))

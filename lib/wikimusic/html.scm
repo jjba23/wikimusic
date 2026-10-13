@@ -574,8 +574,17 @@ the menu with @code{for}, so it reaches assistive technology as well."
                               ,notification-tray
 
                               ;; The page's colour, behind everything the frost
-                              ;; has to frost (see `ambient-washes').
-                              ,(ambient-washes)
+                              ;; has to frost (see `ambient-washes').  A wash is
+                              ;; wider than any screen and is anchored inside the
+                              ;; first screenful, so the three of them lay down
+                              ;; in a layer of their own that clips them: a
+                              ;; decorative disc must not be what makes a phone
+                              ;; scroll sideways to find the edge of the page.
+                              (div (@ (class ,(mk-class '(absolute
+                                                          inset-0
+                                                          overflow-hidden
+                                                          pointer-events-none))))
+                                   ,@(ambient-washes))
 
                               ,(with-footer #:main `((main (@ (class ,(mk-class '
                                                                        (flex
@@ -1205,42 +1214,78 @@ the menu with @code{for}, so it reaches assistive technology as well."
                          ))))))
 
 (define* (grid-size-select G_
-                           #:key entity size)
+                           #:key entity size (search-query #f))
   "Render the tile-size chooser.
 
-The chooser is a plain form control like `sort-select': choosing a size
-navigates to the same list page carrying `grid-size', and the route stores it
-in the `wikimusic-grid-size' cookie and reads it back on the next page.
+The chooser is three links and not a `select': each one is a size, and
+following it takes the reader to the same list carrying `grid-size' in the
+query string, which the route stores in the `wikimusic-grid-size' cookie and
+reads back on the next page.  A link is what lets the control be three icons
+with no script behind them, and it is also what makes a size an address a
+reader can open, bookmark or share.
+
+What the control shows is the icon alone -- no page needs the words `small',
+`medium' and `large' taking up room beside a list -- so the wording is what
+names each link to a reader who cannot see it, through the link's title and its
+accessible name, and the control itself is named to a screen reader.
+
 ENTITY is the list's own name -- `song', `artist', `genre' -- so each page
-chooses its own size against its own address."
-  `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-min))))
-         (select (@ (onchange "window.location.href=this.value;")
-                    (name "grid-size-select")
-                    (id "grid-size-select")
-                    (class ,(mk-class '(px-3 py-2
-                                             border-2
-                                             border-persia-pink-300/25
-                                             dark:border-persia-pink-300/25
-                                             font-sans
-                                             hg-frost bg-stone-100/75
-                                             dark:bg-onyx-900/75
-                                             text-onyx-300
-                                             dark:text-stone-300
+chooses its own size against its own address, and SEARCH-QUERY is carried along
+when the reader is looking at search results, so that choosing a size does not
+throw the results away."
+  (let ((tail (if (and search-query
+                       (not (equal? search-query "")))
+                  (format #f "&search=~a" search-query)
+                  "")))
+    `((div (@ (role "group")
+              (aria-label ,(G_ "tile size"))
+              (class ,(mk-class '(inline-flex flex-row items-center
+                                             gap-1
+                                             p-1
                                              rounded-xl
-                                             shadow-md))))
-                 (option (@ (disabled "true"))
-                         ,(G_ "tile size"))
-                 ,@(map (lambda (s)
-                          `((option (@ (value ,(format #f
-                                                      "/~as?grid-size=~a"
-                                                      entity (car s)))
-                                       ,(if (equal? size (car s))
-                                            '(selected "")
-                                            '(not-selected "")))
-                                    ,(cdr s))))
-                        `(("small" . ,(G_ "Small tiles"))
-                          ("medium" . ,(G_ "Medium tiles"))
-                          ("large" . ,(G_ "Large tiles"))))))))
+                                             border
+                                             border-persia-pink-100/25
+                                             dark:border-persia-pink-900/10
+                                             bg-stone-100/50
+                                             dark:bg-onyx-900/50))))
+           ,@(map (lambda (choice)
+                    (let ((name (car choice))
+                          (glyph (cadr choice))
+                          (wording (caddr choice)))
+                      (let ((current? (equal? size name)))
+                        `(a (@ (href ,(format #f "/~as?grid-size=~a~a"
+                                              entity name tail))
+                               (title ,wording)
+                               (aria-label ,wording)
+                               ,@(if current?
+                                     '((aria-current "true"))
+                                     '())
+                               (class ,(mk-class
+                                        (append
+                                         '(inline-flex items-center
+                                                       justify-center
+                                                       p-1
+                                                       rounded-lg
+                                                       no-underline
+                                                       cursor-pointer
+                                                       transition-colors
+                                                       duration-150)
+                                         (if current?
+                                             '(bg-persia-pink-500/15
+                                               text-persia-pink-700
+                                               dark:text-persia-pink-300)
+                                             '(text-onyx-300/50
+                                               dark:text-stone-300/50
+                                               hover:bg-stone-300/40
+                                               dark:hover:bg-onyx-500/40
+                                               hover:text-persia-pink-500
+                                               dark:hover:text-persia-pink-300))))))
+                            ,(icon #:type glyph
+                                   #:weight (if current? 'bold 'regular)
+                                   #:icon-css '(text-base))))))
+                  (list (list "small" 'dots-nine (G_ "Small tiles"))
+                        (list "medium" 'squares-four (G_ "Medium tiles"))
+                        (list "large" 'square (G_ "Large tiles"))))))))
 
 (define* (ascii-size-select G_
                             #:key route)

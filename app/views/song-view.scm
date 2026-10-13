@@ -176,7 +176,9 @@
                                                                      G_
                                                                      #:entity 'song
                                                                      #:size
-                                                                     grid-size))
+                                                                     grid-size
+                                                                     #:search-query
+                                                                     search-query))
                                                               (div (@ (class ,
                                                                              (mk-class '
                                                                               (flex

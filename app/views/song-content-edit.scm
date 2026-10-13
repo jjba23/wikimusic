@@ -163,10 +163,32 @@
                                                font-mono
                                                min-w-prose))
 
+               ;; A Guitar Pro tab is uploaded the way the PDF is: the browser
+               ;; turns the file into a data URL and the form carries that, so
+               ;; the field the form posts is a hidden one and what a reader
+               ;; picks is the file input above it.  The input used to be
+               ;; hidden itself and named `guitarpro-contents', which left a
+               ;; reader nothing to click and the route a filename where a
+               ;; file should have been.
+               (label (@ (class ,(mk-class '(dark:text-stone-300
+                                             text-stone-500 font-bold text-sm
+                                             mt-3))))
+                      ,(G_ "Guitar Pro 5 tab (.gp5)"))
                (input (@ (type file)
-                         (hidden true)
+                         (id guitarpro-upload)
+                         (accept ".gp5,.gp4,.gp3,.gpx")
+                         (onchange "translateFileToBase64AddToInput(document.getElementById('guitarpro-upload'), document.getElementById('guitarpro-contents'))")
+                         (class ,(mk-class '(bg-stone-300 dark:bg-stone-900
+                                             my-2
+                                             px-3
+                                             py-2
+                                             text-onyx-300
+                                             dark:text-stone-300
+                                             rounded-xl)))
+                         (value "")) "")
+               (input (@ (id guitarpro-contents)
                          (name guitarpro-contents)
-                         (value "")) ""))
+                         (hidden "")) ""))
           (div ,(submit-button (if song-content-identifier
                                    (G_ "edit")
                                    (G_ "create")))))))

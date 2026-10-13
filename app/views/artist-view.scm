@@ -96,7 +96,9 @@
                                                               G_
                                                               #:entity 'artist
                                                               #:size
-                                                              grid-size))
+                                                              grid-size
+                                                              #:search-query
+                                                              search-query))
                                                        (div (@ (class ,(mk-class '
                                                                         (flex
                                                                          flex-wrap
