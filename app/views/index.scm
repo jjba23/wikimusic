@@ -64,12 +64,6 @@
                                                             flex
                                                             flex-col
                                                             gap-6))))
-                              ;; What the instance holds, before anything said
-                              ;; about it.  The grid is the list page's own, so
-                              ;; a tile here is a tile there, down to the cover,
-                              ;; the artists, the comment and version counts, and
-                              ;; the song it leads to.
-                              ,song-fragment
 
                               ;; The two lines that remain: what the place is
                               ;; called, and what it is for.  Both are already
@@ -106,7 +100,13 @@
                                                         selected-locale)
                                    ,(wikimusic-support G_))
 
-                              ,(wikimusic-img))))
+                              ,(wikimusic-img)
+                              ;; What the instance holds, before anything said
+                              ;; about it.  The grid is the list page's own, so
+                              ;; a tile here is a tile there, down to the cover,
+                              ;; the artists, the comment and version counts, and
+                              ;; the song it leads to.
+                              ,song-fragment)))
 
 ;; The picture of the project, kept below the music and the lines that name
 ;; it: a picture of the place is not what a visitor came for.
