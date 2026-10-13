@@ -19,6 +19,7 @@
   #:use-module (wikimusic html)
   #:use-module (wikimusic domain)
   #:use-module (wikimusic guitarpro)
+  #:use-module (rnrs bytevectors)
   #:use-module (srfi srfi-1)
   #:use-module (wikimusic domain guitar-chord-guide)
   #:use-module (artanis artanis)
@@ -226,10 +227,17 @@ file its reader has to open to identify."
 
 (define* (render-guitarpro-section G_ song version)
   "Return the section a version's Guitar Pro 5 tab is shown in, or '() when
-the version carries none."
+the version carries none.
+
+A version that carries no tab holds either nothing at all or the empty data
+URL a file input leaves behind (`data:application/octet-stream;base64,'), and
+neither is a file: the section is shown only when the data URL actually carries
+bytes, so an untouched field does not offer a reader an empty download."
   (let* ((data-url (assq-ref version 'guitarpro-contents))
-         (metadata (gp5-metadata-of-data-url data-url)))
-    (if (data-url? data-url)
+         (tab-bytes (data-url-payload data-url))
+         (metadata (and tab-bytes (> (bytevector-length tab-bytes) 0)
+                        (gp5-bytes-metadata tab-bytes))))
+    (if (and tab-bytes (not (zero? (bytevector-length tab-bytes))))
         (list `(details (@ (open true) (class ,(mk-class '(my-6))))
                         (summary (@ (class ,(mk-class '(text-xl
                                                         font-bold

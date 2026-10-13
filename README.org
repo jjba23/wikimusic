@@ -31,6 +31,52 @@ Join us in building an ever-growing library of musical knowledge — where every
 
 [[https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic-small.jpg]]
 
+-------
+
+* What Wikimusic offers
+
+- *A gallery and a CMS in one*, built on Guile Scheme, GNU Artanis and SQLite,
+  and written to be hacked: every piece of the interface is Scheme.
+- *Songs, artists and genres*, each with a description written in Org mode,
+  artworks, external sources, cross-references to the other entities, opinions
+  and comments.
+- *Song versions* that can carry an ASCII tab, a PDF, and a *Guitar Pro 5 tab*
+  whose own header the page reads, so a reader sees what the download holds
+  before spending it.
+- *A responsive interface* -- the same shell on a phone and on a desktop -- with
+  sorting, search and a subtle, icon-first tile-size control on every list.
+- *Pretty error pages* for the refusals a reader actually meets (404, 403, 500
+  and the rest), rendered by the application itself in the site's own shell.
+- *Accounts and permissions*: sign-in, per-row ownership, and a super grant that
+  overrides ownership for an instance's maintainers.
+- *Everything out and back in*: a JSON dump of every content table and a
+  rendered HTML archive of the whole instance, with an import route to load a
+  dump into another instance.
+- *Translated* into English, Dutch, Spanish and Japanese.
+
+The [[file:docs/manual/en.org][manual]] covers each of these in detail.
+
+-------
+
+* Development quick start
+
+#+begin_src sh
+# enter the project's environment (all dependencies, pinned)
+guix shell -m manifest.scm
+
+# create the database and add your first users (see the manual)
+maak init-db
+
+# run the site with hot reloading on http://localhost:50050
+maak dev
+
+# run the test suite
+maak test
+#+end_src
+
+The [[file:docs/manual/en.org][manual]] explains the environment file a deployment
+needs, the migration that adds users, and how to run Wikimusic as a daemon.
+
 --------
 
 * Licensing

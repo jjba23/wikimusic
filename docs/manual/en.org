@@ -151,16 +151,16 @@ Then, you will need a database to be present in the root folder of the project (
 
 Wikimusic uses SQLite by default but is also compatible with PostgreSQL and MySQL.
 
-You can automate the creation of the database and the enabling of WAL mode for concurrent writes with ~make init-db~.
+You can automate the creation of the database and the enabling of WAL mode for concurrent writes with ~maak init-db~.
 
 You should then look at ~db/migration~ folder and edit the migration for the ~user~ table to your liking.
 
 Then do a ~guix shell -m manifest.scm -- art migrate up user~ to add your users.
 
-If you are hacking away at the project, I would suggest using ~make dev~ since this will effectively run the project with hot-reloading capabilities and it will use the default ~artanis.conf~ where we configure hostname, db path, etc.
+If you are hacking away at the project, I would suggest using ~maak dev~ since this will effectively run the project with hot-reloading capabilities and it will use the default ~artanis.conf~ where we configure hostname, db path, etc.  Running the test suite is ~maak test~, and rendering this manual is ~maak build-manual~.
 
 If you are hosting this for production, I would suggest running Wikimusic as a Shepherd service/daemon.
-You can alternatively just feel free to do this any other way, I recommend using the ~manifest.scm~ . Check the ~Makefile~ for more.
+You can alternatively just feel free to do this any other way, I recommend using the ~manifest.scm~ . Check ~maak.scm~ for every task the project defines.
 
 Here follows an example of a Guix (Shepherd service):
 
@@ -397,3 +397,113 @@ The routes live in =app/controllers/interchange.scm=.
 For a whole-instance backup the SQLite file may simply be copied -- see
 "Running Wikimusic" -- but the two export routes and the import are the
 supported, format-stable way to move content between instances.
+
+------
+
+* Browsing the lists: sorting, tile size and search
+
+Every list page -- =/songs=, =/artists=, =/genres= -- is the same grid of tiles
+with the same three controls above it, and each control is an ordinary address
+rather than a script.
+
+- *Sort order* is a =select=.  Choosing one takes the reader to the same list
+  with =?sort= in the query string, and the route remembers the choice in the
+  =wikimusic-sort= cookie, so the next list opens the same way.
+- *Tile size* is three icons -- small, medium and large -- in one small group.
+  No page needs the words taking up room beside a list, so a size is shown as
+  its icon alone: the words =Small tiles=, =Medium tiles= and =Large tiles=
+  name each link to a reader who cannot see it, through the link's title and
+  its accessible name, and the group itself is named to a screen reader.
+  Following one takes the reader to the same list with =?grid-size=, which the
+  route stores in the =wikimusic-grid-size= cookie.  Small is a dense wall of
+  covers, large is a handful of wide tiles, and medium is the default; each
+  size is a real address, so one can be bookmarked or shared.
+- *Search* keeps its words with the other two: choosing a size or a sort while
+  looking at results carries the search along instead of throwing the results
+  away.
+
+Every page is built from the same responsive shell, so these controls reflow
+onto their own lines as the screen narrows, and no page -- list, detail or form
+-- makes a phone scroll sideways to find the edge of the page.  The decorative
+colour washes behind the page are anchored to the first screenful and clipped
+to a layer of their own for the same reason: a decorative disc must never be
+what a reader scrolls to.
+
+------
+
+* Guitar Pro 5 tablature
+
+A song version may carry a *Guitar Pro 5* tab: the =.gp5= file the editors of
+that generation write, and the tablature a reader can practise from in the
+program that reads it.  A browser cannot open the file, so wikimusic holds it,
+hands it back for download, and reads the file's own *header* to describe it on
+the page.
+
+** Uploading a tab
+
+The =.gp5= is picked on the version form exactly as a PDF is: the browser turns
+the chosen file into a data URL and posts that, and the row keeps it.  The file
+field accepts =.gp5= files.
+
+** What the page shows
+
+When a version carries a tab, its section lists what the tab's own header
+declares -- the title, artist and album its author typed, who tabbed it, its
+tempo, its key, and how many measures and tracks the score holds -- and offers
+the file for download under a name that says which song and which version it
+is.  The facts come from the file and not from the row, so a reader can see what
+the download holds before spending it.  A field the author left blank is left
+out, and the numbers a readable header always carries are always listed.
+
+** How much of the file is read
+
+The reader stops at the counts of measures and tracks.  Everything a player
+would play -- measure headers, tracks, beats, notes -- lies behind them and is
+left where it is; those parts are long, version-dependent and structured, and
+nothing the page shows needs them.  The reader is strict about its place in the
+file: every string's declared length must match the bytes it occupies, and the
+file must still hold as many bytes as the next field needs, so a file that does
+not add up answers "the header of this tab could not be read" rather than a
+guess.
+
+A file the site cannot parse is still its author's file and is still offered
+for download -- it simply carries no facts on the page.  A file of another
+Guitar Pro generation is refused by the same header check, since its fields are
+laid out differently.  The reader is written against the Guitar Pro 5 format,
+and its module -- =(wikimusic guitarpro)= -- is the one place that knows the
+file's byte layout.
+
+------
+
+* When a page cannot be served
+
+A reader who mistypes an address, follows a stale link, or meets a failure on
+the server's side is shown a page of the site's own rather than the framework's
+plain one.
+
+The pages are built from the same document template, the same colour washes and
+the same frosted pane as every other page, and they are rendered by the
+application itself: a request that matches no route never reaches a controller,
+and a handler that throws is already unwinding, so nothing in these pages may
+depend on a route context.  The wording of a page is decided by its status
+alone, which is why it can be read, and tested, without a server in front of it.
+
+Each refusal is drawn in a tone that says what kind it is, leads with a
+headline that says what happened in the reader's own terms, and follows it with
+the sentence or two that says what to do about it:
+
+- =400= -- the request arrived in a shape the server does not understand;
+- =401= -- the page needs a signed-in reader;
+- =403= -- the entry exists, but the reader's account may not read it;
+- =404= -- no page answers that address, with links back to what is still
+  there;
+- =408= -- the request was still on its way when the server stopped waiting
+  for it;
+- =500= -- the server failed while building the page, and the source is linked
+  with a report invited.
+
+A status the table does not name is still rendered as a page rather than a
+blank one: it is described by its class -- a wrong turn for another =4xx=, a
+server failure for anything else -- over the code it actually answered with.
+The registration happens once, in =ENTRY=, before the server takes its first
+request, and the pages live in =app/views/error.scm=.

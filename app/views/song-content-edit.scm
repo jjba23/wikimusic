@@ -176,7 +176,7 @@
                       ,(G_ "Guitar Pro 5 tab (.gp5)"))
                (input (@ (type file)
                          (id guitarpro-upload)
-                         (accept ".gp5,.gp4,.gp3,.gpx")
+                         (accept ".gp5,application/x-guitar-pro")
                          (onchange "translateFileToBase64AddToInput(document.getElementById('guitarpro-upload'), document.getElementById('guitarpro-contents'))")
                          (class ,(mk-class '(bg-stone-300 dark:bg-stone-900
                                              my-2

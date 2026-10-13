@@ -95,24 +95,38 @@ This ensures the .po file stays up-to-date with the latest changes in the templa
            (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain)
            (~ "~a/~a.pot" i18n-dir i18n-textdomain))))
 
+(define (i18n-source-globs)
+  "Return the source file patterns xgettext should read, existing ones only.
+
+A glob that matches nothing is handed to xgettext as itself, and xgettext
+refuses the whole invocation over the missing file -- writing no template at
+all rather than the strings it did find.  The directories are therefore asked
+for only when they are there, so adding or removing a source directory is all a
+translation refresh ever needs."
+  (append (if (file-exists? "lib/wikimusic/job")
+              '("lib/wikimusic/job/*.scm")
+              '())
+          '("lib/wikimusic/*.scm"
+            "app/controllers/*.scm"
+            "app/views/*.scm")
+          (if (file-exists? "app/api")
+              '("app/api/*.scm")
+              '())
+          '("ENTRY")))
+
 (define* (i18n-extract* #:key (update? #t))
   "Extract translatable strings from Scheme source files using xgettext.
 Args: update? represents whether we should update a template or create a new one."
-  ($ (list (~ "xgettext --default-domain=~a" i18n-textdomain)
-           (~ "--output=~a/~a.pot" i18n-dir i18n-textdomain)
-           "--language=Scheme --keyword=G_"
-           "--sort-by-file"
-           (if update? "--join-existing" "")
-           (~ "--copyright-holder=\"~a\""
-              (string-join copyright-holders ","))
-           (~ "--package-name=~a" i18n-textdomain)
-           "lib/wikimusic/job/*.scm"
-           "lib/wikimusic/*.scm"
-           "app/controllers/*.scm"
-           "app/views/*.scm"
-           "app/api/*.scm"
-           "ENTRY"
-           "--from-code UTF-8")
+  ($ (append (list (~ "xgettext --default-domain=~a" i18n-textdomain)
+                   (~ "--output=~a/~a.pot" i18n-dir i18n-textdomain)
+                   "--language=Scheme --keyword=G_"
+                   "--sort-by-file")
+             (if update? (list "--join-existing") '())
+             (list (~ "--copyright-holder=\"~a\""
+                      (string-join copyright-holders ","))
+                   (~ "--package-name=~a" i18n-textdomain))
+             (i18n-source-globs)
+             (list "--from-code UTF-8"))
      #:verbose? #t))
 
 ;; ====== Maak tasks ======
