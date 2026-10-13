@@ -54,11 +54,20 @@
                (u ($users 'get
                           #:ret 'top
                           #:condition (where #:email email))))
+          ;; A refused sign-in says so on the page the reader lands back on.
+          ;; The two ways to be refused -- no such address, wrong password --
+          ;; are answered with the same sentence, so the form cannot be used
+          ;; to ask which addresses have accounts here.
           (if (nil? u)
               (redirect-to rc
-                           (string->uri (format #f
-                                         "~a/login?login_failed=true"
-                                         (current-myhost)))
+                           (string->uri
+                            (format #f "~a/login?login_failed=true~a"
+                                    (current-myhost)
+                                    (notice-query
+                                     #:title (G_ "could not sign you in")
+                                     #:body
+                                     (G_ "that email and password do not match an account")
+                                     #:duration-millis 8000)))
                            #:status 302)
               (let* ((user (car u))
                      (stored-hash (assoc-ref user "password"))
@@ -68,9 +77,14 @@
                                                     #:salt stored-salt)))
                 (if (not password-ok?)
                     (redirect-to rc
-                                 (string->uri (format #f
-                                               "~a/login?login_failed=true"
-                                               (current-myhost)))
+                                 (string->uri
+                                  (format #f "~a/login?login_failed=true~a"
+                                          (current-myhost)
+                                          (notice-query
+                                           #:title (G_ "could not sign you in")
+                                           #:body
+                                           (G_ "that email and password do not match an account")
+                                           #:duration-millis 8000)))
                                  #:status 302)
                     (let* ((user-identifier (assoc-ref user "identifier"))
                            ;; The permissions column decides what this session
@@ -119,9 +133,13 @@
                                          #:secure #t
                                          #:http-only #t)
                       (redirect-to rc
-                                   (string->uri (format #f
-                                                 "~a/songs?login_succeeded=true"
-                                                 (current-myhost)))
+                                   (string->uri
+                                    (format #f "~a/songs?login_succeeded=true~a"
+                                            (current-myhost)
+                                            (notice-query
+                                             #:title (G_ "signed in")
+                                             #:body
+                                             (G_ "welcome back; you may now add and edit songs"))))
                                    #:status 302))))))))
 
 (get "/logout"

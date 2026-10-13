@@ -279,44 +279,44 @@ the menu with @code{for}, so it reaches assistive technology as well."
                          "pub/js/song-chord-highlighter.js"
                          "pub/js/file-base64.js"
                          "pub/js/metronome.js"
+                         "pub/js/password-strength.js"
                          "pub/js/guitarpro-player.js")))
 
+;; The two lines every page ends with: where the rest of the project is, and
+;; what this running copy is.
+;;
+;; It used to carry four: a tagline, a row that announced its own links, a
+;; sentence of licence and a copyright.  All of that is either said elsewhere
+;; -- the tagline is the page's own description -- or said shorter: an SPDX
+;; identifier names the licence exactly where a sentence about it only
+;; described it, and the reader who wants the whole text is one click from it.
 (define* (page-footer G_)
   `(,(footer
-      `(;; What the site is, in one line.
-        ,(em (G_ "the free music knowledge encyclopaedia")
-             #:size '(text-md))
-
-        ;; Where to read about it and where to get the code, on one row
-        ;; rather than the two each repeating "find here the:".
+      `(;; Where the rest of it is.  The archive is the one link that leaves the
+        ;; server behind, so it is offered here rather than only to a reader
+        ;; who knows the address: a copy of everything, to save or read
+        ;; offline.
         (div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                            gap-2 sm:gap-4
                                            justify-start
                                            items-center))))
-             ,(em (G_ "find here the:"))
              ,(a (G_ "source code")
                  #:href "https://codeberg.org/jjba23/wikimusic"
                  #:size '(text-md))
+             ;; The manual is the README -- one document to keep true rather
+             ;; than two that drift -- so the link leads to that document.
              ,(a (G_ "manual")
-                 #:href "https://jointhefreeworld.org/manuals/wikimusic/"
+                 #:href "https://codeberg.org/jjba23/wikimusic/src/branch/trunk/README.org"
                  #:size '(text-md))
-             ;; The archive is the one page that leaves the server behind, so
-             ;; it is offered here rather than only to a reader who knows the
-             ;; address: a copy of everything, to save or to read offline.
              ,(a (G_ "export")
                  #:href "/export/html"
                  #:size '(text-md)))
 
-        ;; The licence and the version: the two facts about this running
-        ;; instance, and the licence now links to the licence itself.
+        ;; What this copy is, who made it, and the way back up.
         (div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                            gap-2 sm:gap-4
                                            justify-start
                                            items-center))))
-             ,(a (G_
-                  "wikimusic is free software, available under the GNU AGPL v3 or newer")
-                 #:href "https://www.gnu.org/licenses/agpl-3.0.html"
-                 #:size '(text-sm))
              (div (@ (class ,(mk-class '(flex flex-row
                                                 flex-wrap
                                                 gap-1
@@ -326,17 +326,11 @@ the menu with @code{for}, so it reaches assistive technology as well."
                   ,(mono (format #f "~a"
                                  (get-short-commit-sha))
                          #:size '(text-sm)
-                         #:weight '(font-light))))
-
-        ;; The copyright line, and the way back to the top at the far end
-        ;; of the same row.
-        (div (@ (class ,(mk-class '(flex flex-row flex-wrap
-                                           justify-between
-                                           gap-2 sm:gap-4
-                                           w-full
-                                           items-center))))
-             ,(em (G_
-                   "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;")
+                         #:weight '(font-light)))
+             ,(a (G_ "AGPL-3.0-or-later")
+                 #:href "https://www.gnu.org/licenses/agpl-3.0.html"
+                 #:size '(text-sm))
+             ,(em "© Josep Bigorra"
                   #:size '(text-sm))
              (a (@ (href "javascript:void(0)")
                    (class ,(mk-class '(no-underline
@@ -348,13 +342,13 @@ the menu with @code{for}, so it reaches assistive technology as well."
                     "window.scrollTo({ top: 0, behavior: 'smooth' })"))
                 ,(G_ "back to the top"))))
       #:footer-classes '(flex flex-col
-                                gap-3
+                                gap-2
                                 items-start
                                 px-6
                                 sm:px-8
                                 md:px-12
                                 justify-start
-                                py-8))))
+                                py-6))))
 
 (define* (nav G_
               #:key is-logged-in (reading? #f))
@@ -740,6 +734,9 @@ and six.
                                                   "pub/js/metronome.js"))
 
                               (script ,(assoc-ref asset-library
+                                                  "pub/js/password-strength.js"))
+
+                              (script ,(assoc-ref asset-library
                                                   "pub/js/guitarpro-player.js")))
 
                         (body (@ (class ,(mk-class '(bg-stone-100
@@ -1029,10 +1026,20 @@ and six.
                          opinions
                          comments
                          user-alist)
-  (let* ((rendered-artworks (map (lambda (art)
+  (let* (         ;; One photograph is a photograph and is shown as one.  Two or more
+         ;; are a carousel: the framework's track pans with a swipe and its
+         ;; arrows page one picture at a time, and both of those are better
+         ;; than a stack that pushes the rest of the page -- the opinions, the
+         ;; description, every fact a reader came for -- below the fold.  The
+         ;; arrows carry the framework's own `.js-only' class, so a browser
+         ;; with no scripting is told to scroll the track instead of being
+         ;; offered controls that do nothing.
+         (artwork-count (length (if (list? artworks) artworks '())))
+         (rendered-artworks (map (lambda (art)
                                    `(figure (@ (class ,(mk-class '(py-3
 
                                                                         ))))
+
                                             (img (@ (loading lazy)
                                                     (class ,(mk-class '(rounded-xl
                                                                         shadow-md
@@ -1174,7 +1181,29 @@ and six.
                                   p-4
                                   sm:p-6
                                   flex flex-row flex-wrap gap-6))))
-           (div ,rendered-artworks)
+           ,@(if (> artwork-count 1)
+                 (carousel #:id (format #f "artworks-~a-~a" entity
+                                        (assq-ref x 'identifier))
+                           #:fragments rendered-artworks
+                           ;; The frame is a fraction of the panel's own: a
+                           ;; detail card is already a frosted panel with a
+                           ;; border, and a second heavy surround inside it
+                           ;; would read as a box in a box.
+                           #:carousel-list-css '(flex
+                                                 gap-4
+                                                 sm:gap-6
+                                                 list-none
+                                                 overflow-x-scroll
+                                                 scroll-smooth
+                                                 snap-x
+                                                 rounded-xl
+                                                 my-2)
+                           #:item-width '(w-72 sm:w-96 lg:w-128)
+                           #:item-height '(h-auto)
+                           #:carousel-item-content-css '(flex items-center
+                                                              justify-center)
+                           #:no-js-hint (G_ "several pictures — scroll sideways to see them"))
+                 (list `(div ,rendered-artworks)))
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
                      ,opinion-buttons
                      (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity

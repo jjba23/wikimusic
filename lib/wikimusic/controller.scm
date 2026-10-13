@@ -49,7 +49,8 @@
   #:use-module (bewaking bewaking)
   #:use-module (app views error)
   #:use-module (kracht prelude)
-  #:export (body-alist delete-artwork entity-or-404
+  #:export (body-alist notice-query
+            delete-artwork entity-or-404
             session-payload may-mutate? forbidden guard-owner
             require-row-owner
             comment-new comment-edit comment-delete))
@@ -67,6 +68,35 @@ empty list, on which `assoc-ref' answers #f for every name."
     (if (nil? body)
         '()
         (alist-from-url-encoded-body body))))
+
+;; A controller that has just done something the reader cannot see -- sent a
+;; mail, refused a sign-in, changed a password -- has to say so on the page it
+;; sends them to next, because there is nowhere else to say it: the work is
+;; finished and the reader is no longer looking at the form that started it.
+;;
+;; The site's notifications are the framework's own, and they are read out of
+;; the address (`show-notifications-from-url-js' looks for these three query
+;; parameters), so a redirect carries the words and the page it lands on shows
+;; them without knowing which flow produced them.  That keeps one mechanism for
+;; every such message instead of one banner per form, and it is why this
+;; returns a fragment rather than writing any markup.
+(define* (notice-query #:key title body (duration-millis #f))
+  "Return the query-string fragment that asks a page to show a notification.
+
+TITLE and BODY are the notification's two lines, already translated; either
+may be left out.  The answer always begins with @code{&}, so it is appended to
+the flag the redirect already carries -- the flag @code{?created=true} becomes
+@code{?created=true&notify-title=...}.  When neither line is given the empty
+string comes back, so a caller may append the answer unconditionally."
+  (if (and (or (not (string? title)) (equal? "" title))
+           (or (not (string? body)) (equal? "" body)))
+      ""
+      (string-append "&notify-title=" (uri-encode (if (string? title) title ""))
+                     "&notify-body=" (uri-encode (if (string? body) body ""))
+                     (if duration-millis
+                         (format #f "&notify-duration-millis=~a"
+                                 duration-millis)
+                         ""))))
 
 (define* (entity-or-404 entity entity-name identifier)
   "Return ENTITY, or answer the request with a 404 page when there is none.

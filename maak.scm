@@ -51,8 +51,13 @@
   '(scm css js))
 
 ;; The Emacs Lisp script to run for publishing the manual.
+;;
+;; The manual is the README: one document, read on the forge and published as
+;; HTML, rather than two that say the same thing and drift apart.  The export
+;; lands beside it, as `README.html', and the deploy task below is what moves it
+;; in front of the instance that serves it.
 (define emacs-lisp-manual-publish-cmd
-  '(progn (find-file "./docs/manual/en.org")
+  '(progn (find-file "./README.org")
           (org-html-export-to-html)
           (message "finished publishing Wikimusic manual")))
 
@@ -151,17 +156,20 @@ Args: update? represents whether we should update a template or create a new one
      "-c '(load \"env.scm\") ((@ (veritas runner) run-tests))'")))
 
 (define (build-manual)
-  "Render the project's manual."
+  "Render the project's manual, which is the README."
   (time-machine-manifest-shell (list (~ "emacs -Q --batch --eval '~s'"
                                         emacs-lisp-manual-publish-cmd))
                                #:verbose? #t))
 
 (define (deploy)
-  "Deploy the project's documentation."
+  "Deploy the project's documentation.
+
+The manual is rendered from the README and served under `manuals/wikimusic',
+which is where a reader of the site is sent."
   (build-manual)
   (mkdir-p (~ "~a/manuals/wikimusic" deploy-dir))
   (delete-file-recursively (~ "~a/manuals/wikimusic/index.html" deploy-dir))
-  (mv "docs/manual/en.html"
+  (mv "README.html"
       (~ "~a/manuals/wikimusic/index.html" deploy-dir)))
 
 (define (fmt)

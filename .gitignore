@@ -4,3 +4,5 @@
 *.log
 env.scm
 .nrepl-port
+# the manual rendered from the README by `maak build-manual'
+README.html

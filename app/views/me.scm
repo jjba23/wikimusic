@@ -330,43 +330,118 @@
                                                             wikimusic:modify-permissions)))
                                                (div ,(submit-button (G_ "edit"))))))))))
 
+;; The page a reset link leads to, and the one a rejected password comes back
+;; to.  REJECTED is the reason the last submission did not take -- `weak' or
+;; `mismatch' -- and is #f on a first visit, which is what makes saying so
+;; possible at all: a reader sent back to the same form with no explanation
+;; types the same password again.
+;;
+;; The rule is stated rather than described.  The server takes a password that
+;; `strong-password?' calls strong, which is an estimate of sixty bits or more,
+;; and no sentence about that is exact -- so the page says what sort of
+;; password passes and lets the meter beside the field show where one is.
 (define* (reset-password-page G_
-                              #:key token email)
-  (html-template G_
-                 #:title "Choose a new password · WikiMusic"
-                 #:robots "noindex, nofollow"
-                 #:is-logged-in #f
-                 #:body `((div (@ (class ,(mk-class '(py-6 px-4))))
-                               ,(h2 (G_ "Reset your password"))
-                               ,(sub-h3 (format #f "~a: ~a"
-                                                (G_
-                                                 "perform a password reset for")
-                                                email))
-                               (form (@ (method POST)
-                                        (action "/password/do-reset"))
-                                     (div (@ (class ,(mk-class '(rounded-xl
-                                                                 my-6
-                                                                 py-6
-                                                                 px-4
-                                                                 shadow-md
-                                                                 max-w-prose
-                                                                 bg-stone-300
-                                                                 dark:bg-stone-900))))
-                                          (input (@ (hidden true)
-                                                    (name email)
-                                                    (value ,email)) "")
-                                          (input (@ (hidden true)
-                                                    (name reset-token)
-                                                    (value ,token)) "")
-                                          ,(input #:label (G_ "new password")
-                                                  #:name "new-password"
-                                                  #:value ""
-                                                  #:type 'password
-                                                  #:required #t)
-                                          ,(input #:label (G_
-                                                           "confirm password")
-                                                  #:name "confirm-password"
-                                                  #:value ""
-                                                  #:type 'password
-                                                  #:required #t)
-                                          (div ,(submit-button (G_ "reset")))))))))
+                              #:key token email rejected)
+  (let ((rejection (cond
+                     ((equal? rejected "mismatch")
+                      (G_ "the two passwords you typed are not the same"))
+                     ((equal? rejected "weak")
+                      (G_ "that password is too easy to guess, so it was not accepted; the rule below is what it has to pass"))
+                     (else #f))))
+    (html-template G_
+                   #:title "Choose a new password · WikiMusic"
+                   #:robots "noindex, nofollow"
+                   #:is-logged-in #f
+                   #:body `((div (@ (class ,(mk-class '(py-6 px-4))))
+                                 ,(h2 (G_ "Reset your password"))
+                                 ,(sub-h3 (format #f "~a: ~a"
+                                                  (G_
+                                                   "perform a password reset for")
+                                                  email))
+                                 (form (@ (method POST)
+                                          (action "/password/do-reset"))
+                                       (div (@ (class ,(mk-class '(rounded-xl
+                                                                   my-6
+                                                                   py-6
+                                                                   px-4
+                                                                   shadow-md
+                                                                   max-w-prose
+                                                                   bg-stone-300
+                                                                   dark:bg-stone-900))))
+                                            (input (@ (hidden true)
+                                                      (name email)
+                                                      (value ,email)) "")
+                                            (input (@ (hidden true)
+                                                      (name reset-token)
+                                                      (value ,token)) "")
+                                            ;; A submission that came back is
+                                            ;; announced, not silently
+                                            ;; repeated: the reader is owed
+                                            ;; the reason while they retype.
+                                            ,(when rejection
+                                               `(p (@ (role alert)
+                                                      (class
+                                                       ,(mk-class
+                                                         '(text-persia-pink-900
+                                                           dark:text-persia-pink-300
+                                                           font-bold
+                                                           py-2))))
+                                                   ,rejection))
+                                            ;; The meter is decoration on top
+                                            ;; of a form that already works:
+                                            ;; the fields are ordinary
+                                            ;; password fields, the rule is
+                                            ;; written out beside them, and
+                                            ;; the server is what decides.
+                                            ;; All this does is say, while a
+                                            ;; reader is typing, where the
+                                            ;; password stands.
+                                            (div (@ (data-password-strength "")
+                                                    (data-label-very-weak
+                                                     ,(G_ "very weak"))
+                                                    (data-label-weak ,(G_ "weak"))
+                                                    (data-label-fair ,(G_ "fair"))
+                                                    (data-label-strong
+                                                     ,(G_ "strong"))
+                                                    (data-label-very-strong
+                                                     ,(G_ "very strong"))
+                                                    (data-mismatch
+                                                     ,(G_ "the two passwords you typed are not the same"))
+                                                    (class
+                                                     ,(mk-class
+                                                       '(flex flex-col gap-2))))
+                                                 (p (@ (class
+                                                        ,(mk-class
+                                                          '(text-sm
+                                                            font-light
+                                                            text-onyx-300
+                                                            dark:text-stone-300))))
+                                                    ,(G_ "a password of at least a dozen characters, mixing upper and lower case with digits or symbols; a dozen plain lower-case letters is not enough on its own, and a common password is refused however long it is"))
+                                                 ,(input #:label (G_ "new password")
+                                                         #:name "new-password"
+                                                         #:value ""
+                                                         #:type 'password
+                                                         #:required #t
+                                                         #:autocomplete "new-password")
+                                                 (progress (@ (max "4")
+                                                              (value "0")
+                                                              (class
+                                                               ,(mk-class
+                                                                 '(hg-progress)))))
+                                                 (p (@ (data-password-strength-saying "")
+                                                       (aria-live polite)
+                                                       (class
+                                                        ,(mk-class
+                                                          '(text-sm
+                                                            font-bold
+                                                            text-onyx-500
+                                                            dark:text-stone-300))))
+                                                    "")
+                                                 ,(input #:label (G_
+                                                                  "confirm password")
+                                                         #:name "confirm-password"
+                                                         #:value ""
+                                                         #:type 'password
+                                                         #:required #t
+                                                         #:autocomplete "new-password"))
+                                            (div ,(submit-button (G_ "reset"))))))))))

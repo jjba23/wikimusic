@@ -196,42 +196,55 @@
                  (assert-true (and (member "sticky" browsing) #t)
                               #:name "and every other page keeps it")))))
 
+;; The footer is read through a procedure, and every assertion asks for it
+;; itself.  That is not tidiness: a suite takes its children as arguments and a
+;; test takes its cases as arguments, so a body wrapped in a `let' hands on the
+;; value of that `let' alone.  This suite used to render once and wrap its four
+;; tests in that `let', which passed the last test to the suite and dropped the
+;; three above it, none of which had ever run; and an assertion is a thunk, so
+;; two of three inside a `let' are built and never invoked.  A `let' holding a
+;; single assertion is fine, which is why only the last one below sits in one.
+(define (footer-html)
+  "Return the footer as HTML, which is what every test below reads."
+  (render (page-footer G_)))
+
 (define footer-suite
   (suite "The footer"
-         (let ((html (render (page-footer G_))))
-           (test "it points at the code, the manual and the licence"
-                 (assert-true (and (string-contains
-                                    html "codeberg.org/jjba23/wikimusic")
-                                   #t)
-                              #:name "where the source is")
-                 (assert-true (and (string-contains html "manuals/wikimusic")
-                                   #t)
-                              #:name "where the manual is")
-                 (assert-true (and (string-contains
-                                    html "gnu.org/licenses/agpl-3.0")
-                                   #t)
-                              #:name "and where the licence is written out"))
+         (test "it points at the code, the manual and the licence"
+               (assert-true (and (string-contains
+                                  (footer-html) "codeberg.org/jjba23/wikimusic")
+                                 #t)
+                            #:name "where the source is")
+               (assert-true (and (string-contains
+                                  (footer-html)
+                                  "codeberg.org/jjba23/wikimusic/src/branch/trunk/README.org")
+                                 #t)
+                            #:name "where the manual is")
+               (assert-true (and (string-contains
+                                  (footer-html) "gnu.org/licenses/agpl-3.0")
+                                 #t)
+                            #:name "and where the licence is written out"))
 
-           (test "it states the version this instance runs"
-                 (assert-true (and (string-contains html "version:") #t)
-                              #:name "the version is named"))
+         (test "it states the version this instance runs"
+               (assert-true (and (string-contains (footer-html) "version:") #t)
+                            #:name "the version is named"))
 
-           (test "it offers the way back to the top"
-                 (assert-true (and (string-contains html "back to the top") #t)
-                              #:name "the control says what it does")
-                 (assert-true (and (string-contains html "window.scrollTo")
-                                   #t)
-                              #:name "and it is the one that scrolls"))
+         (test "it offers the way back to the top"
+               (assert-true (and (string-contains (footer-html) "back to the top")
+                                 #t)
+                            #:name "the control says what it does")
+               (assert-true (and (string-contains (footer-html)
+                                                  "window.scrollTo")
+                                 #t)
+                            #:name "and it is the one that scrolls"))
 
-           (test "no class is asked for twice"
-                 (for-each (lambda (attribute)
-                             (assert-false (first-repeated-token attribute)
-                                           #:name (if (first-repeated-token
-                                                       attribute)
-                                                      (first-repeated-token
-                                                       attribute)
-                                                      "a clean class attribute")))
-                           (class-attributes html))))))
+         (test "no class is asked for twice"
+               (let ((offending (find first-repeated-token
+                                      (class-attributes (footer-html)))))
+                 (assert-false offending
+                               #:name (if offending
+                                          offending
+                                          "a clean class attribute"))))))
 
 (define shell-suite
   (suite "A page a browser can read"
