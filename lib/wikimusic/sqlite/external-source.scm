@@ -17,6 +17,7 @@
 
 (define-module (wikimusic sqlite external-source)
   #:declarative? #t
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
@@ -26,8 +27,14 @@
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-external-source-repository rc)
+  (define (table entity)
+    (format #f "~a_external_sources" entity))
+
+  (define (entity-column entity)
+    (string->symbol (format #f "~a-identifier" entity)))
+
   (define (columns entity)
-    (append (list (string->symbol (format #f "~a-identifier" entity)))
+    (append (list (entity-column entity))
             '(identifier created-by
                          spotify-url
                          youtube-url
@@ -35,10 +42,6 @@
                          wikipedia-url
                          created-at
                          last-edited-at)))
-
-  (define (insert-columns entity)
-    (delq 'last-edited-at
-          (columns entity)))
 
   (define conn
     (DB-open rc))
@@ -49,40 +52,33 @@
   (define execute-read
     (db-read conn))
 
-  (define (get-external-sources-by-entity-ids entity ids)
-    (let* ((query (format #f
-                   "SELECT ~a FROM ~a_external_sources WHERE ~a_identifier IN(~a) ORDER BY created_at DESC"
-                   (symbols->sql-columns-list (columns entity))
-                   entity
-                   entity
-                   (string-join (map value->sql-literal ids) ", "))))
-      (execute-read "get-external-sources-by-entity-ids" query)))
+  (define* (get-external-sources-by-entity-ids entity ids
+                                               #:key (order-by
+                                                      '((created-at
+                                                         desc))))
+    (execute-read "get-external-sources-by-entity-ids"
+                  (sql-select (table entity)
+                              #:columns (columns entity)
+                              #:where (list (list (entity-column entity)
+                                                  'in
+                                                  ids))
+                              #:order-by order-by)))
 
   (define (update-external-source-by-id entity id attrs)
-    (let* ((query (format #f
-                   "UPDATE ~a_external_sources SET ~a WHERE identifier = ~a"
-                   entity
-                   (string-join (map pair->sql-assignment attrs) ", ")
-                   (value->sql-literal id))))
-      (execute-write "update-external-source-by-id" query)))
+    (execute-write "update-external-source-by-id"
+                   (sql-update (table entity)
+                               (attrs->row attrs (columns entity))
+                               #:where (list (cons 'identifier id)))))
 
   (define (delete-external-source-by-id entity id)
-    (let* ((query (format #f
-                   "DELETE FROM ~a_external_sources WHERE identifier = ~a"
-                   entity
-                   (value->sql-literal id))))
-      (execute-write "delete-external-source-by-id" query)))
+    (execute-write "delete-external-source-by-id"
+                   (sql-delete (table entity)
+                               #:where (list (cons 'identifier id)))))
 
   (define (insert-external-source entity attrs)
-    (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x)))
-                      (insert-columns entity)))
-           (query (format #f
-                          "INSERT INTO ~a_external_sources (~a) VALUES (~a)"
-                          entity
-                          (symbols->sql-columns-list (insert-columns entity))
-                          (string-join vals ", "))))
-      (execute-write "insert-external-source" query)))
+    (execute-write "insert-external-source"
+                   (sql-insert (table entity)
+                               (attrs->row attrs (columns entity)))))
 
   (mk-external-source-repository #:get-external-sources-by-entity-ids-proc
                                  get-external-sources-by-entity-ids

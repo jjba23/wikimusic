@@ -17,6 +17,7 @@
 
 (define-module (wikimusic sqlite genre)
   #:declarative? #t
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
@@ -36,15 +37,6 @@
                  views
                  description))
 
-  (define cols-sql
-    (symbols->sql-columns-list columns))
-
-  (define insert-columns
-    (delq 'last-edited-at columns))
-
-  (define insert-cols-sql
-    (symbols->sql-columns-list insert-columns))
-
   (define conn
     (DB-open rc))
 
@@ -55,71 +47,86 @@
     (db-read conn))
 
   (define (get-genre-by-id id)
-    (let* ((query (format #f
-                   "SELECT ~a FROM genres WHERE identifier = ~a LIMIT 1"
-                   cols-sql
-                   (value->sql-literal id)))
-           (rows (execute-read "get-genre-by-id" query)))
+    (let ((rows (execute-read "get-genre-by-id"
+                              (sql-select 'genres
+                                          #:columns columns
+                                          #:where (list (cons 'identifier id))
+                                          #:limit 1))))
       (if (nil? rows) #f
           (car rows))))
 
   (define (get-genres-by-ids ids)
-    (let* ((query (format #f "SELECT ~a FROM genres WHERE identifier IN(~a)"
-                          cols-sql
-                          (string-join (map value->sql-literal ids) ", "))))
-      (execute-read "get-genres-by-ids" query)))
+    (execute-read "get-genres-by-ids"
+                  (sql-select 'genres
+                              #:columns columns
+                              #:where (list (list 'identifier 'in ids)))))
 
-  (define* (get-genres #:key (order-by "created_at DESC")
+  (define* (get-genres #:key (order-by '((created-at desc)))
                        (limit 100)
                        (offset 0))
-    (let* ((query (format #f
-                          "SELECT ~a FROM genres
-                   ORDER BY ~a LIMIT ~a OFFSET ~a"
-                          cols-sql
-                          order-by
-                          limit
-                          offset)))
-      (execute-read "get-genres" query)))
+    (execute-read "get-genres"
+                  (sql-select 'genres
+                              #:columns columns
+                              #:order-by order-by
+                              #:limit limit
+                              #:offset offset)))
 
+  ;; The one statement kracht's builders cannot write: a search matches the
+  ;; term against either of two columns, and kracht joins its conditions with
+  ;; `AND' only.  It is still kracht that owns it -- `sql-parameterize' is
+  ;; kracht's own escape hatch -- and the columns and the sort come from
+  ;; kracht's helpers, so only the `OR' itself is spelled here.
   (define* (search-genres s
-                          #:key (order-by "created_at DESC")
+                          #:key (order-by '((created-at desc)))
                           (limit 100)
                           (offset 0))
-    (let* ((search (value->sql-literal (format #f "%~a%" s)))
-           (query (format #f
-                   "SELECT ~a FROM genres
-                   WHERE (display_name LIKE ~a OR description LIKE ~a)
-                   ORDER BY ~a LIMIT ~a OFFSET ~a"
-                   cols-sql
-                   search
-                   search
-                   order-by
-                   limit
-                   offset)))
-      (execute-read "search-genres" query)))
+    (let ((search (format #f "%~a%" s)))
+      (execute-read "search-genres"
+                    (sql-parameterize
+                     (format #f
+                             "SELECT ~a FROM genres WHERE (display_name LIKE ? OR description LIKE ?) ORDER BY ~a LIMIT ? OFFSET ?"
+                             (symbols->sql-columns-list columns)
+                             (sql-order-by-sql order-by))
+                     (list search search limit offset)))))
+
+  ;; A count is a statement kracht's `sql-select' cannot express -- it takes
+  ;; column names, and `COUNT(*)' is not a column -- so `sql-parameterize',
+  ;; kracht's own escape hatch, carries it.  The `WHERE' is the same one
+  ;; `search-genres' uses, so a page count and a page of hits always agree.
+  (define* (count-genres #:key search)
+    (let* ((term (and search (format #f "%~a%" search)))
+           (rows (if term
+                     (execute-read "count-genres"
+                                   (sql-parameterize
+                                    "SELECT COUNT(*) AS count FROM genres WHERE (display_name LIKE ? OR description LIKE ?)"
+                                    (list term term)))
+                     (execute-read "count-genres"
+                                   (sql-parameterize
+                                    "SELECT COUNT(*) AS count FROM genres"
+                                    '())))))
+      (if (nil? rows) 0
+          (or (assq-ref (car rows) 'count) 0))))
 
   (define (update-genre-by-id id attrs)
-    (let* ((query (format #f "UPDATE genres SET ~a WHERE identifier = ~a"
-                          (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id))))
-      (execute-write "update-genre-by-id" query)))
+    (execute-write "update-genre-by-id"
+                   (sql-update 'genres
+                               (attrs->row attrs columns)
+                               #:where (list (cons 'identifier id)))))
 
   (define (delete-genre-by-id id)
-    (let* ((query (format #f "DELETE FROM genres WHERE identifier = ~a"
-                          (value->sql-literal id))))
-      (execute-write "delete-genre-by-id" query)))
+    (execute-write "delete-genre-by-id"
+                   (sql-delete 'genres
+                               #:where (list (cons 'identifier id)))))
 
   (define (insert-genre attrs)
-    (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x))) insert-cols))
-           (query (format #f "INSERT INTO genres (~a) VALUES (~a)"
-                          insert-cols-sql
-                          (string-join vals ", "))))
-      (execute-write "insert-genre" query)))
+    (execute-write "insert-genre"
+                   (sql-insert 'genres
+                               (attrs->row attrs columns))))
 
   (mk-genre-repository #:get-genre-by-id-proc get-genre-by-id
                        #:get-genres-by-ids-proc get-genres-by-ids
                        #:get-genres-proc get-genres
+                       #:count-genres-proc count-genres
                        #:search-genres-proc search-genres
                        #:insert-genre-proc insert-genre
                        #:delete-genre-by-id-proc delete-genre-by-id

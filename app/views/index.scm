@@ -28,7 +28,7 @@
   #:export (welcome-page))
 
 (define* (welcome-page G_
-                       #:key is-logged-in)
+                       #:key is-logged-in selected-locale)
   (html-template G_
                  #:is-logged-in is-logged-in
                  #:body `(div (div (@ (class ,(mk-class '(p-2))))
@@ -36,14 +36,17 @@
                                                                flex-wrap
                                                                gap-5
                                                                px-3
-                                                               align-center
+                                                               items-center
                                                                items-center
                                                                justify-center
                                                                py-6))))
+                                        ,(locale-choose-form G_
+                                                             #:selected-locale
+                                                             selected-locale)
                                         ,(wikimusic-explain G_))))))
 
 (define* (wikimusic-img)
-  `((div (div (@ (class ,(mk-class '(bg-stone-300/50 dark:bg-onyx-700
+  `((div (div (@ (class ,(mk-class '(hg-frost bg-stone-100/75 dark:bg-onyx-900/75
                                      p-4
                                      rounded-xl
                                      shadow-xl
@@ -52,7 +55,7 @@
                                      xl:px-12
                                      px-6
                                      md:px-12
-                                     xl:px-18
+                                     xl:px-20
                                      border-persia-pink-500/25
                                      border-3))))
               (figure (img (@ (class ,(mk-class '(rounded-2xl h-auto max-w-64
@@ -67,11 +70,11 @@
                                           xl:px-12
                                           px-6
                                           md:px-12
-                                          xl:px-18
+                                          xl:px-20
                                           font-sans
                                           text-justify
-                                          bg-stone-300/50
-                                          dark:bg-onyx-700
+                                          hg-frost bg-stone-100/75
+                                          dark:bg-onyx-900/75
                                           text-onyx-300
                                           dark:text-stone-300
                                           border-persia-pink-500/25
@@ -93,7 +96,7 @@
               (a (@ (class ,(mk-class '(font-bold text-china-violet-100
                                         hover:text-persia-pink-900
                                         dark:text-persia-pink-300
-                                        hover:dark:text-persia-pink-700
+                                        dark:hover:text-persia-pink-700
 
                                         flex
                                         flex-row
@@ -116,8 +119,8 @@
     
     ,(wikimusic-img)
 
-    (div (@ (class ,(mk-class '(max-w-196 bg-stone-300/50
-                                          dark:bg-onyx-700
+    (div (@ (class ,(mk-class '(max-w-196 hg-frost bg-stone-100/75
+                                          dark:bg-onyx-900/75
                                           text-onyx-300
                                           dark:text-stone-300
                                           rounded-2xl
@@ -135,7 +138,7 @@
                                           xl:px-12
                                           px-6
                                           md:px-12
-                                          xl:px-18))))
+                                          xl:px-20))))
 
          (p ,(G_
               "Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:"))

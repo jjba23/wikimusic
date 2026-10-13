@@ -11,6 +11,14 @@
 
  (init-server #:statics '(png gif jpg jpeg ico html js json csv xml css woff woff2 ttf))
  (add-to-load-path (string-append (current-toplevel) "/lib"))
+ (add-to-load-path (string-append (current-toplevel) "/"))
+
+ ;; Pretty pages for the requests that never reach a route (a 404) and for
+ ;; the handlers that throw on the way (a 500).  Artanis renders both itself,
+ ;; from outside any controller, and this is the point at which it is told
+ ;; what to render instead -- before the server takes its first request.
+ (use-modules ((app views error) #:prefix error-pages:))
+ (error-pages:install-error-pages!)
  ;; Put whatever you want to be called before server running here
 
 

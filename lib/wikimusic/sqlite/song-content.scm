@@ -17,6 +17,7 @@
 
 (define-module (wikimusic sqlite song-content)
   #:declarative? #t
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
@@ -40,15 +41,6 @@
                  created-at
                  last-edited-at))
 
-  (define cols-sql
-    (symbols->sql-columns-list columns))
-
-  (define insert-columns
-    (delq 'last-edited-at columns))
-
-  (define insert-cols-sql
-    (symbols->sql-columns-list insert-columns))
-
   (define conn
     (DB-open rc))
 
@@ -58,49 +50,44 @@
   (define execute-read
     (db-read conn))
 
-  (define (get-song-contents-by-ids ids)
-    (let* ((query (format #f
-                   "SELECT ~a FROM song_contents WHERE identifier IN(~a)
-                            ORDER BY version_name DESC"
-                   cols-sql
-                   (string-join (map value->sql-literal ids) ", "))))
-      (execute-read "get-song-contents-by-ids" query)))
+  (define* (get-song-contents-by-ids ids
+                                     #:key (order-by '((version-name desc))))
+    (execute-read "get-song-contents-by-ids"
+                  (sql-select 'song_contents
+                              #:columns columns
+                              #:where (list (list 'identifier 'in ids))
+                              #:order-by order-by)))
 
-  (define (get-song-contents-by-song-ids ids)
-    (let* ((query (format #f
-                   "SELECT ~a FROM song_contents WHERE song_identifier IN(~a)
-                            ORDER BY version_name DESC"
-                   cols-sql
-                   (string-join (map value->sql-literal ids) ", "))))
-      (execute-read "get-song-contents-by-song-ids" query)))
+  (define* (get-song-contents-by-song-ids ids
+                                          #:key (order-by '((version-name
+                                                             desc))))
+    (execute-read "get-song-contents-by-song-ids"
+                  (sql-select 'song_contents
+                              #:columns columns
+                              #:where (list (list 'song-identifier 'in ids))
+                              #:order-by order-by)))
 
   (define (get-song-content-ids-by-song-ids ids)
-    (let* ((query (format #f
-                   "SELECT identifier, song_identifier FROM song_contents WHERE song_identifier IN(~a)"
-                   cols-sql
-                   (string-join (map value->sql-literal ids) ", "))))
-      (execute-read "get-song-content-ids-by-song-ids" query)))
+    (execute-read "get-song-content-ids-by-song-ids"
+                  (sql-select 'song_contents
+                              #:columns '(identifier song-identifier)
+                              #:where (list (list 'song-identifier 'in ids)))))
 
   (define (update-song-content-by-id id attrs)
-    (let* ((query (format #f
-                          "UPDATE song_contents SET ~a WHERE identifier = ~a"
-                          (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id))))
-      (execute-write "update-song-content-by-id" query)))
+    (execute-write "update-song-content-by-id"
+                   (sql-update 'song_contents
+                               (attrs->row attrs columns)
+                               #:where (list (cons 'identifier id)))))
 
   (define (delete-song-content-by-id id)
-    (let* ((query (format #f "DELETE FROM song_contents WHERE identifier = ~a"
-                          (value->sql-literal id))))
-      (execute-write "delete-song-content-by-id" query)))
+    (execute-write "delete-song-content-by-id"
+                   (sql-delete 'song_contents
+                               #:where (list (cons 'identifier id)))))
 
   (define (insert-song-content attrs)
-    (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
-           (query (format #f "INSERT INTO song_contents (~a) VALUES (~a)"
-                          insert-cols-sql
-                          (string-join vals ", "))))
-      (execute-write "insert-song-content" query)))
+    (execute-write "insert-song-content"
+                   (sql-insert 'song_contents
+                               (attrs->row attrs columns))))
 
   (mk-song-content-repository #:get-song-contents-by-song-ids-proc
                               get-song-contents-by-song-ids

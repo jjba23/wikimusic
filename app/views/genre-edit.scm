@@ -36,7 +36,7 @@
                           external-sources
                           is-logged-in)
   (let* ((arts (map (lambda (a)
-                      `(div (figure (@ (class ,(mk-class '(py-3 sm:w-36))))
+                      `(div (figure (@ (class ,(mk-class '(py-3 sm:w-32))))
                                     (img (@ (loading lazy)
                                             (class ,(mk-class '(rounded-xl)))
                                             (src ,(uri-decode (assq-ref a
@@ -158,6 +158,11 @@
                        #:required #t)
                ,(textarea #:label (G_ "description")
                           #:name "description"
+                          ;; The column is rendered as Org by `org2html' when
+                          ;; the page is read, so the one who writes it is told
+                          ;; so here rather than left to find out.
+                          #:help-text (G_
+                                       "descriptions are written in Org mode syntax")
                           #:value (html-unescape description)))
           (div ,(submit-button (if identifier
                                    (G_ "edit")

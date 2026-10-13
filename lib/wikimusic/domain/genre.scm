@@ -21,6 +21,7 @@
   #:use-module (wikimusic domain repo)
   #:export (get-genre-by-id get-genres-by-ids
                             get-genres
+                            count-genres
                             search-genres
                             insert-genre
                             delete-genre-by-id
@@ -34,6 +35,7 @@
                        (get-genre-by-id-proc repo-get-genre-by-id)
                        (get-genres-by-ids-proc repo-get-genres-by-ids)
                        (get-genres-proc repo-get-genres)
+                       (count-genres-proc repo-count-genres)
                        (search-genres-proc repo-search-genres)
                        (insert-genre-proc repo-insert-genre)
                        (delete-genre-by-id-proc repo-delete-genre-by-id)
@@ -49,6 +51,9 @@
 
 (define-repo-method get-genres repo-get-genres
  "Retrieves a list of all active genres from the given REPO.")
+
+(define-repo-method count-genres repo-count-genres
+ "Counts the genres in the given REPO, optionally those a SEARCH matches.")
 
 (define-repo-method search-genres repo-search-genres
  "Retrieves a search list of all active genres from the given REPO.")

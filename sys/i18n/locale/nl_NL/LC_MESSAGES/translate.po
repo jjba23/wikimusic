@@ -1,0 +1,660 @@
+# Nederlands translations for wikimusic package.
+# Copyright (C) 2026 Josep Bigorra <jjbigorra@gmail.com>
+# This file is distributed under the same license as the wikimusic package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: wikimusic\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-10-13 12:00+0100\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: app/controllers/artist-form.scm:84 app/controllers/artist-form.scm:124
+#: app/controllers/artist-form.scm:374
+msgid "Edited artist succesfully!"
+msgstr "Artiest succesvol bewerkt!"
+
+#: app/controllers/artist-form.scm:275
+msgid "Liked artist!"
+msgstr "Artiest geliket!"
+
+#: app/controllers/artist-form.scm:276
+msgid "Disliked artist!"
+msgstr "Artiest gedisliket!"
+
+#: app/controllers/genre-form.scm:84 app/controllers/genre-form.scm:325
+#: app/controllers/genre-form.scm:370
+msgid "Edited genre succesfully!"
+msgstr "Genre succesvol bewerkt!"
+
+#: app/controllers/genre-form.scm:233
+msgid "Liked genre!"
+msgstr "Genre geliket!"
+
+#: app/controllers/genre-form.scm:234
+msgid "Disliked genre!"
+msgstr "Genre gedisliket!"
+
+#: app/controllers/song-form.scm:103 app/controllers/song-form.scm:585
+#: app/controllers/song-form.scm:630
+msgid "Edited song succesfully!"
+msgstr "Lied succesvol bewerkt!"
+
+#: app/controllers/song-form.scm:422
+msgid "Liked song!"
+msgstr "Lied geliket!"
+
+#: app/controllers/song-form.scm:423
+msgid "Disliked song!"
+msgstr "Lied gedisliket!"
+
+#: app/views/artist-edit.scm:68 app/views/artist-edit.scm:98
+msgid "editing artist"
+msgstr "artiest bewerken"
+
+#: app/views/artist-edit.scm:71 app/views/artist-view.scm:117
+msgid "new artist"
+msgstr "nieuwe artiest"
+
+#: app/views/artist-edit.scm:77 app/views/genre-edit.scm:73
+#: app/views/song-edit.scm:58
+msgid "edit artworks"
+msgstr "kunstwerken bewerken"
+
+#: app/views/artist-edit.scm:85 app/views/genre-edit.scm:81
+#: app/views/song-edit.scm:94
+msgid "new artwork"
+msgstr "nieuw kunstwerk"
+
+#: app/views/artist-edit.scm:113 app/views/genre-edit.scm:109
+#: app/views/song-edit.scm:137
+msgid "editing external sources"
+msgstr "externe bronnen bewerken"
+
+#: app/views/artist-edit.scm:159 app/views/genre-edit.scm:155
+#: app/views/song-edit.scm:294
+msgid "display name"
+msgstr "weergavenaam"
+
+#: app/views/artist-edit.scm:163 app/views/genre-edit.scm:159
+#: app/views/song-edit.scm:314 lib/wikimusic/html.scm:812
+msgid "description"
+msgstr "beschrijving"
+
+#: app/views/artist-edit.scm:167 app/views/genre-edit.scm:163
+#: app/views/me.scm:159 app/views/me.scm:327
+#: app/views/song-content-edit.scm:171 app/views/song-edit.scm:318
+#: lib/wikimusic/html.scm:858 lib/wikimusic/html.scm:940
+msgid "edit"
+msgstr "bewerken"
+
+#: app/views/artist-edit.scm:168 app/views/genre-edit.scm:164
+#: app/views/me.scm:231 app/views/song-content-edit.scm:172
+#: app/views/song-edit.scm:319 lib/wikimusic/html.scm:941
+msgid "create"
+msgstr "aanmaken"
+
+#: app/views/artist-view.scm:49 app/views/genre-view.scm:49
+#: app/views/song-view.scm:123
+msgid "previous"
+msgstr "vorige"
+
+#: app/views/artist-view.scm:56 app/views/genre-view.scm:56
+#: app/views/song-view.scm:131
+msgid "next"
+msgstr "volgende"
+
+#: app/views/artist-view.scm:74
+msgid "viewing artists:"
+msgstr "artiesten bekijken:"
+
+#: app/views/error.scm:94
+msgid "the front page"
+msgstr "de voorpagina"
+
+#: app/views/error.scm:97
+msgid "songs"
+msgstr "liedjes"
+
+#: app/views/error.scm:98
+msgid "artists"
+msgstr "artiesten"
+
+#: app/views/error.scm:99
+msgid "genres"
+msgstr "genres"
+
+#: app/views/genre-edit.scm:64 app/views/genre-edit.scm:94
+msgid "editing genre"
+msgstr "genre bewerken"
+
+#: app/views/genre-edit.scm:67 app/views/genre-view.scm:117
+msgid "new genre"
+msgstr "nieuw genre"
+
+#: app/views/genre-view.scm:74
+msgid "viewing genres:"
+msgstr "genres bekijken:"
+
+#: app/views/index.scm:89 lib/wikimusic/html.scm:250
+msgid "the free music knowledge encyclopaedia"
+msgstr "de vrije muziekkennis-encyclopedie"
+
+#: app/views/index.scm:93
+msgid "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."
+msgstr "Het WikiMusic-project is een non-profitgemeenschap met als doel kennisdeling en muziekeducatie, en biedt een open platform om muziek in al haar vormen te verkennen, te delen en te leren."
+
+#: app/views/index.scm:108
+msgid "donate what you can, by clicking here"
+msgstr "doneer wat je kunt, door hier te klikken"
+
+#: app/views/index.scm:111
+msgid "This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong."
+msgstr "Dit helpt ons de onderliggende cloudinfrastructuur en de werkuren van bijdragers draaiende te houden."
+
+#: app/views/index.scm:114
+msgid "WikiMusic leverages a database-backed architecture to ensure all content is easily searchable, linkable, and reusable. "
+msgstr "WikiMusic gebruikt een databankgestuurde architectuur zodat alle inhoud gemakkelijk doorzoekbaar, linkbaar en herbruikbaar is. "
+
+#: app/views/index.scm:116
+msgid "The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively."
+msgstr "De gebruikersinterface biedt een naadloze ervaring en nodigt zowel beginners als experts uit om samen met de wereld van muziek bezig te zijn."
+
+#: app/views/index.scm:118
+msgid "Join us in building an ever-growing library of musical knowledge — where every note tells a story."
+msgstr "Doe met ons mee aan een steeds groter wordende bibliotheek van muziekkennis — waar elke noot een verhaal vertelt."
+
+#: app/views/index.scm:144
+msgid "Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:"
+msgstr "Of je nu muzikant, docent, onderzoeker of gewoon een muziekliefhebber bent, WikiMusic stelt je in staat om:"
+
+#: app/views/index.scm:146
+msgid "Discover music from diverse genres and traditions."
+msgstr "Muziek uit uiteenlopende genres en tradities te ontdekken."
+
+#: app/views/index.scm:148
+msgid "Organize information with structured metadata and multimedia content."
+msgstr "Informatie te ordenen met gestructureerde metadata en multimediainhoud."
+
+#: app/views/index.scm:150
+msgid "Contribute by adding new compositions, analyses, or educational materials."
+msgstr "Bij te dragen door nieuwe composities, analyses of lesmateriaal toe te voegen."
+
+#: app/views/index.scm:152
+msgid "Learn through curated resources that connect music theory, history, and practice."
+msgstr "Te leren via samengestelde bronnen die muziektheorie, geschiedenis en praktijk verbinden."
+
+#: app/views/index.scm:154
+msgid "At its core, WikiMusic leverages the expressive power of Lisp to build a dynamic interactive Music Gallery and Content Management System (CMS)."
+msgstr "In de kern gebruikt WikiMusic de expressieve kracht van Lisp om een dynamische interactieve muziekgalerij en contentmanagementsysteem (CMS) te bouwen."
+
+#: app/views/login.scm:45 app/views/me.scm:127 app/views/me.scm:209
+#: app/views/me.scm:291
+msgid "email"
+msgstr "e-mail"
+
+#: app/views/login.scm:50
+msgid "password"
+msgstr "wachtwoord"
+
+#: app/views/login.scm:55 app/views/me.scm:112 lib/wikimusic/html.scm:419
+msgid "login"
+msgstr "inloggen"
+
+#: app/views/login.scm:68
+msgid "account to reset (email)"
+msgstr "account om te resetten (e-mail)"
+
+#: app/views/login.scm:75 app/views/me.scm:366
+msgid "reset"
+msgstr "resetten"
+
+#: app/views/login.scm:86
+msgid "login to wikimusic"
+msgstr "inloggen bij wikimusic"
+
+#: app/views/login.scm:93 app/views/me.scm:108
+msgid "reset password"
+msgstr "wachtwoord resetten"
+
+#: app/views/me.scm:44
+msgid "my unique id:"
+msgstr "mijn unieke id:"
+
+#: app/views/me.scm:53
+msgid "my permissions (in database):"
+msgstr "mijn rechten (in de databank):"
+
+#: app/views/me.scm:63
+msgid "current session permissions (in token):"
+msgstr "huidige sessierechten (in token):"
+
+#: app/views/me.scm:70
+msgid "tip: if your session permissions don't match the DB consider logging out and logging in again"
+msgstr "tip: als je sessierechten niet overeenkomen met de DB, log dan uit en opnieuw in"
+
+#: app/views/me.scm:76
+msgid "logged in until"
+msgstr "ingelogd tot"
+
+#: app/views/me.scm:97
+msgid "go to user management"
+msgstr "ga naar gebruikersbeheer"
+
+#: app/views/me.scm:101
+msgid "logout"
+msgstr "uitloggen"
+
+#: app/views/me.scm:122 app/views/me.scm:206 app/views/me.scm:286
+msgid "username"
+msgstr "gebruikersnaam"
+
+#: app/views/me.scm:131
+msgid "id"
+msgstr "id"
+
+#: app/views/me.scm:136
+msgid "permissions"
+msgstr "rechten"
+
+#: app/views/me.scm:146 lib/wikimusic/html.scm:950
+msgid "delete"
+msgstr "verwijderen"
+
+#: app/views/me.scm:151
+msgid "are you sure you want to delete this user?"
+msgstr "weet je zeker dat je deze gebruiker wilt verwijderen?"
+
+#: app/views/me.scm:168
+msgid "User management"
+msgstr "Gebruikersbeheer"
+
+#: app/views/me.scm:172
+msgid "new user"
+msgstr "nieuwe gebruiker"
+
+#: app/views/me.scm:195
+msgid "New User"
+msgstr "Nieuwe gebruiker"
+
+#: app/views/me.scm:214 app/views/me.scm:298
+msgid "user permissions"
+msgstr "gebruikersrechten"
+
+#: app/views/me.scm:269
+msgid "Edit User"
+msgstr "Gebruiker bewerken"
+
+#: app/views/me.scm:334
+msgid "Reset your password"
+msgstr "Reset je wachtwoord"
+
+#: app/views/me.scm:337
+msgid "perform a password reset for"
+msgstr "voer een wachtwoordreset uit voor"
+
+#: app/views/me.scm:355
+msgid "new password"
+msgstr "nieuw wachtwoord"
+
+#: app/views/me.scm:361
+msgid "confirm password"
+msgstr "wachtwoord bevestigen"
+
+#: app/views/song-content-edit.scm:94
+msgid "editing version"
+msgstr "versie bewerken"
+
+#: app/views/song-content-edit.scm:95 app/views/song-content-view.scm:78
+msgid "new version"
+msgstr "nieuwe versie"
+
+#: app/views/song-content-edit.scm:103
+msgid "instrument type"
+msgstr "instrumenttype"
+
+#: app/views/song-content-edit.scm:107
+msgid "version name"
+msgstr "versienaam"
+
+#: app/views/song-content-edit.scm:114 app/views/song-content-view.scm:258
+msgid "PDF contents"
+msgstr "PDF-inhoud"
+
+#: app/views/song-content-edit.scm:133 app/views/song-content-view.scm:216
+msgid "ascii legend"
+msgstr "ascii-legenda"
+
+#: app/views/song-content-edit.scm:149 app/views/song-content-view.scm:148
+msgid "ascii contents"
+msgstr "ascii-inhoud"
+
+#: app/views/song-content-view.scm:84
+msgid "1 line"
+msgstr "1 regel"
+
+#: app/views/song-content-view.scm:86
+msgid "2 line"
+msgstr "2 regels"
+
+#: app/views/song-content-view.scm:88
+msgid "4 line"
+msgstr "4 regels"
+
+#: app/views/song-content-view.scm:91
+msgid "8 line"
+msgstr "8 regels"
+
+#: app/views/song-content-view.scm:93
+msgid "16 line"
+msgstr "16 regels"
+
+#: app/views/song-content-view.scm:95
+msgid "32 line"
+msgstr "32 regels"
+
+#: app/views/song-content-view.scm:100
+msgid "1 second"
+msgstr "1 seconde"
+
+#: app/views/song-content-view.scm:102
+msgid "2 second"
+msgstr "2 seconden"
+
+#: app/views/song-content-view.scm:104
+msgid "4 second"
+msgstr "4 seconden"
+
+#: app/views/song-content-view.scm:106
+msgid "8 second"
+msgstr "8 seconden"
+
+#: app/views/song-content-view.scm:108
+msgid "16 second"
+msgstr "16 seconden"
+
+#: app/views/song-content-view.scm:110
+msgid "32 second"
+msgstr "32 seconden"
+
+#: app/views/song-content-view.scm:115
+msgid "auto-scrolling:"
+msgstr "automatisch scrollen:"
+
+#: app/views/song-content-view.scm:118
+msgid "scroll"
+msgstr "scrollen"
+
+#: app/views/song-content-view.scm:123
+msgid "highlight chords"
+msgstr "akkoorden markeren"
+
+#: app/views/song-content-view.scm:187
+msgid "edit version"
+msgstr "versie bewerken"
+
+#: app/views/song-content-view.scm:206
+msgid "delete version"
+msgstr "versie verwijderen"
+
+#: app/views/song-content-view.scm:277
+msgid "manage version"
+msgstr "versie beheren"
+
+#: app/views/song-edit.scm:49 app/views/song-edit.scm:107
+msgid "editing song"
+msgstr "lied bewerken"
+
+#: app/views/song-edit.scm:52 app/views/song-view.scm:205
+msgid "new song"
+msgstr "nieuw lied"
+
+#: app/views/song-edit.scm:169
+msgid "song's artists"
+msgstr "artiesten van het lied"
+
+#: app/views/song-edit.scm:171
+msgid "add artist relation"
+msgstr "artiestrelatie toevoegen"
+
+#: app/views/song-edit.scm:183 app/views/song-edit.scm:236
+msgid "submit"
+msgstr "verzenden"
+
+#: app/views/song-edit.scm:222
+msgid "song's genres"
+msgstr "genres van het lied"
+
+#: app/views/song-edit.scm:224
+msgid "add genre relation"
+msgstr "genrerelatie toevoegen"
+
+#: app/views/song-edit.scm:299 app/views/song-view.scm:267
+msgid "music key"
+msgstr "muzieksleutel"
+
+#: app/views/song-edit.scm:302
+msgid "music tuning"
+msgstr "muziekstemming"
+
+#: app/views/song-edit.scm:305 app/views/song-view.scm:273
+msgid "music creation date"
+msgstr "aanmaakdatum muziek"
+
+#: app/views/song-edit.scm:308 app/views/song-view.scm:280
+msgid "album name"
+msgstr "albumnaam"
+
+#: app/views/song-edit.scm:311
+msgid "album info url"
+msgstr "album-info-url"
+
+#: app/views/song-view.scm:52
+msgid "versions"
+msgstr "versies"
+
+#: app/views/song-view.scm:150
+msgid "viewing songs:"
+msgstr "liedjes bekijken:"
+
+#: app/views/song-view.scm:261
+msgid "tuning"
+msgstr "stemming"
+
+#: app/views/song-view.scm:287
+msgid "album info link"
+msgstr "album-infolink"
+
+#: app/views/song-view.scm:346
+msgid "musical content pref:"
+msgstr "muzikale inhoud pref:"
+
+#: lib/wikimusic/html.scm:201
+msgid "language"
+msgstr "taal"
+
+#: lib/wikimusic/html.scm:259
+msgid "find here the:"
+msgstr "vind hier de:"
+
+#: lib/wikimusic/html.scm:260
+msgid "source code"
+msgstr "broncode"
+
+#: lib/wikimusic/html.scm:263
+msgid "manual"
+msgstr "handleiding"
+
+#: lib/wikimusic/html.scm:274
+msgid "wikimusic is free software, available under the GNU AGPL v3 or newer"
+msgstr "wikimusic is vrije software, beschikbaar onder de GNU AGPL v3 of nieuwer"
+
+#: lib/wikimusic/html.scm:281
+msgid "version:"
+msgstr "versie:"
+
+#: lib/wikimusic/html.scm:296
+msgid "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"
+msgstr "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"
+
+#: lib/wikimusic/html.scm:306
+msgid "back to the top"
+msgstr "terug naar boven"
+
+#: lib/wikimusic/html.scm:387
+msgid "WikiMusic"
+msgstr "WikiMusic"
+
+#: lib/wikimusic/html.scm:438
+msgid "me"
+msgstr "ik"
+
+#: lib/wikimusic/html.scm:646 lib/wikimusic/html.scm:860
+msgid "views"
+msgstr "weergaven"
+
+#: lib/wikimusic/html.scm:657 lib/wikimusic/html.scm:909
+msgid "comments"
+msgstr "opmerkingen"
+
+#: lib/wikimusic/html.scm:666
+msgid "published"
+msgstr "gepubliceerd"
+
+#: lib/wikimusic/html.scm:667
+msgid "unkown status"
+msgstr "onbekende status"
+
+#: lib/wikimusic/html.scm:776
+msgid "like"
+msgstr "leuk"
+
+#: lib/wikimusic/html.scm:800
+msgid "dislike"
+msgstr "niet leuk"
+
+#: lib/wikimusic/html.scm:821
+msgid "last edited"
+msgstr "laatst bewerkt"
+
+#: lib/wikimusic/html.scm:832
+msgid "approved by"
+msgstr "goedgekeurd door"
+
+#: lib/wikimusic/html.scm:865
+msgid "created"
+msgstr "aangemaakt"
+
+#: lib/wikimusic/html.scm:871
+msgid "contributor"
+msgstr "bijdrager"
+
+#: lib/wikimusic/html.scm:882
+msgid "visibility"
+msgstr "zichtbaarheid"
+
+#: lib/wikimusic/html.scm:888
+msgid "uuid"
+msgstr "uuid"
+
+#: lib/wikimusic/html.scm:928
+msgid "content url"
+msgstr "inhoud-url"
+
+#: lib/wikimusic/html.scm:932
+msgid "content caption"
+msgstr "inhoud-bijschrift"
+
+#: lib/wikimusic/html.scm:935
+msgid "order value"
+msgstr "ordewaarde"
+
+#: lib/wikimusic/html.scm:971
+msgid "wikipedia url"
+msgstr "wikipedia-url"
+
+#: lib/wikimusic/html.scm:975
+msgid "youtube url"
+msgstr "youtube-url"
+
+#: lib/wikimusic/html.scm:979
+msgid "spotify url"
+msgstr "spotify-url"
+
+#: lib/wikimusic/html.scm:983
+msgid "soundcloud url"
+msgstr "soundcloud-url"
+
+#: lib/wikimusic/html.scm:988 lib/wikimusic/html.scm:989
+msgid "save"
+msgstr "opslaan"
+
+#: lib/wikimusic/html.scm:1009
+msgid "sort order"
+msgstr "sorteerorde"
+
+#: lib/wikimusic/html.scm:1021
+msgid "Name - Ascending"
+msgstr "Naam - Oplopend"
+
+#: lib/wikimusic/html.scm:1023
+msgid "Name - Descending"
+msgstr "Naam - Aflopend"
+
+#: lib/wikimusic/html.scm:1026
+msgid "Created - Ascending"
+msgstr "Aangemaakt - Oplopend"
+
+#: lib/wikimusic/html.scm:1028
+msgid "Created - Descending"
+msgstr "Aangemaakt - Aflopend"
+
+#: lib/wikimusic/html.scm:1031
+msgid "Last edited - Ascending"
+msgstr "Laatst bewerkt - Oplopend"
+
+#: lib/wikimusic/html.scm:1033
+msgid "Last edited - Descending"
+msgstr "Laatst bewerkt - Aflopend"
+
+#: lib/wikimusic/html.scm:1036
+msgid "Views - Ascending"
+msgstr "Weergaven - Oplopend"
+
+#: lib/wikimusic/html.scm:1038
+msgid "Views - Descending"
+msgstr "Weergaven - Aflopend"
+
+#: lib/wikimusic/html.scm:1059
+msgid "ascii size"
+msgstr "ascii-grootte"
+
+#: lib/wikimusic/html.scm:1122
+msgid "Search..."
+msgstr "Zoeken..."
+
+#: lib/wikimusic/html.scm:1135
+msgid "search"
+msgstr "zoeken"
+
+#: lib/wikimusic/html.scm:1178
+msgid "Wikipedia"
+msgstr "Wikipedia"
+
+#: lib/wikimusic/html.scm:1182
+msgid "Spotify"
+msgstr "Spotify"
+
+#: lib/wikimusic/html.scm:1186
+msgid "Youtube"
+msgstr "Youtube"
+
+#: lib/wikimusic/html.scm:1190
+msgid "Soundcloud"
+msgstr "Soundcloud"
+

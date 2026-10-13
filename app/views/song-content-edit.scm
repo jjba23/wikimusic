@@ -109,7 +109,7 @@
                        #:value (html-unescape version-name)
                        #:required #t)
                (label (@ (class ,(mk-class '(dark:text-stone-300
-                                             text-stone-600 font-bold text-sm
+                                             text-stone-500 font-bold text-sm
                                              mt-3))))
                       ,(G_ "PDF contents"))
                (input (@ (type file)
@@ -119,7 +119,7 @@
                                                                       document.getElementById('pdf-upload'),
                                                                       document.getElementById('pdf-contents')
                                                            )")
-                         (class ,(mk-class '(bg-stone-200 dark:bg-stone-900
+                         (class ,(mk-class '(bg-stone-300 dark:bg-stone-900
                                                           my-2
                                                           px-3
                                                           py-2
@@ -138,8 +138,8 @@
                                                border-stone-300
                                                dark:border-stone-700
                                                dark:text-stone-300
-                                               bg-stone-300
-                                               dark:bg-onyx-700/75
+                                               hg-frost bg-stone-100/75
+                                               dark:bg-onyx-900/75
                                                border-2
                                                min-h-72
                                                shadow-md
@@ -154,8 +154,8 @@
                                                border-stone-300
                                                dark:border-stone-700
                                                dark:text-stone-300
-                                               bg-stone-300
-                                               dark:bg-onyx-700/75
+                                               hg-frost bg-stone-100/75
+                                               dark:bg-onyx-900/75
                                                border-2
                                                min-h-256
                                                text-sm

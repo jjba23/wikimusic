@@ -224,6 +224,9 @@ concurrently by default.")
                           guile-kracht
                           guile-orgwebalchemy
                           guile-bewaking
+                          ;; The test suite under test/veritas/unit is written
+                          ;; for veritas; maak's `test' target runs it.
+                          guile-veritas
                           guile-curl
                           sqlite
                           guile-gcrypt

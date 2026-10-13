@@ -23,6 +23,8 @@
         (app models users)
         (wikimusic env)
         (wikimusic auth)
+        (wikimusic controller)
+        (wikimusic sqlite util)
         (kracht prelude)
         (app views me)
         (curl)
@@ -30,8 +32,8 @@
         (rnrs bytevectors)
         (json)
         (artanis security nss)
-        (app models password_reset)
-        (bewaking bewaking))
+        (bewaking bewaking)
+        (bewaking password))
 
 (get "/me"
      #:mime 'xml
@@ -154,7 +156,7 @@
                                                     encryption-key
                                                     #:signing-key signing-key)
                                      #f))
-                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (body (body-alist rc))
                  (username (html-escape (assoc-ref body "username")))
                  (email (html-escape (assoc-ref body "email")))
                  (permissions (filter (lambda (p)
@@ -197,7 +199,7 @@
       (lambda (rc)
         (define (do-delete-user)
           (let* ((G_ (:i18n rc))
-                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (body (body-alist rc))
                  (identifier (assoc-ref body "identifier"))
                  (_ ($users 'mod
                             'row-delete
@@ -219,7 +221,7 @@
       (lambda (rc)
         (define (do-edit-user)
           (let* ((G_ (:i18n rc))
-                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (body (body-alist rc))
                  (username (html-escape (assoc-ref body "username")))
                  (email (html-escape (assoc-ref body "email")))
                  (permissions (filter (lambda (p)
@@ -235,15 +237,17 @@
                                              wikimusic:user-create
                                              wikimusic:user-delete
                                              wikimusic:modify-permissions))))
-                 (_ (DB-query (DB-open rc)
-                              (->sql update
-                                     'users set
-                                     `((username ,username)
-                                       (email ,email)
-                                       (permissions ,(format #f "`~s"
-                                                             permissions)))
-                                     (where #:identifier (params rc
-                                                                 "identifier"))))))
+                 (_ (sql-execute! rc
+                                  (sql-update 'users
+                                              `((username . ,username)
+                                                (email . ,email)
+                                                (permissions
+                                                 . ,(format #f "~s"
+                                                            permissions)))
+                                              #:where `((identifier
+                                                         . ,(params rc
+                                                                   "identifier"))))
+                                  #:name "edit-user")))
             (redirect-to rc
                          (string->uri (format #f
                                               "~a/users/manage/?edited=true"
@@ -255,31 +259,38 @@
                            #:happy-flow do-edit-user
                            #:unhappy-flow back-to-login)))
 
+;; A reset link is worth a page only while its envelope still opens *and* the
+;; account it names is still there.  Everything else -- a truncated or edited
+;; link, one whose hour is up, one for a user since deleted -- is answered by
+;; sending the visitor to the sign-in page instead of the error page: a link
+;; that can no longer be honoured is not a server fault, and the person who
+;; clicked it a day late needs somewhere to go.
 (get "/password/reset/token/:token"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((tt (car ($password_reset 'get
-                                        #:ret 'top
-                                        #:condition (where #:reset_token (params
-                                                                          rc
-                                                                          "token")))))
-              (now (current-time))
-              (allowance (* 24 7 3600)) ;reset token is valid for a week
-              (_ (when (> now
-                          (+ allowance
-                             (assoc-ref tt "created_at")))
-                   (error "reset token is found but not valid anymore")))
-              (user-id (assoc-ref tt "user_id"))
-              (email (assoc-ref (car ($users 'get
-                                             #:ret 'top
-                                             #:condition (where #:identifier
-                                                                user-id)))
-                                "email")))
-         (response-emit (:mime rc
-                               (reset-password-page (:i18n rc)
-                                                    #:token (params rc "token")
-                                                    #:email email))))))
+       (let* ((sealed-payload (decrypt-object #:object (params rc "token")
+                                              #:encryption-key encryption-key
+                                              #:signing-key signing-key))
+              (user-id (and (not (nil? sealed-payload))
+                            (equal? 'reset-password
+                                    (assoc-ref sealed-payload 'action))
+                            (assoc-ref sealed-payload 'user)))
+              (user (and user-id ($users 'get
+                                         #:ret 'top
+                                         #:condition (where #:identifier
+                                                            user-id))))
+              (email (and (not (nil? user)) (assoc-ref (car user) "email"))))
+         (if (not email)
+             (redirect-to rc
+                          (string->uri (format #f
+                                        "~a/login?reset-link-expired=true"
+                                        (current-myhost)))
+                          #:status 302)
+             (response-emit (:mime rc
+                                   (reset-password-page (:i18n rc)
+                                                        #:token (params rc "token")
+                                                        #:email email)))))))
 
 (define* (send-to-pingwing #:key body)
   (write body)
@@ -310,17 +321,19 @@
     (display rr)))
 
 (define (request-password-reset u)
-  (let* ((_ ($password_reset 'mod
-                             'row-delete
-                             (where #:user_id (assoc-ref (car u) "identifier"))))
-         (reset-token (base16-encode (format #f "~a-~a-~a"
-                                             (generate-string-uuid)
-                                             (generate-string-uuid)
-                                             (generate-string-uuid))))
-         (pr ($password_reset 'set
-                              #:user_id (assoc-ref (car u) "identifier")
-                              #:reset_token reset-token
-                              #:created_at (current-time)))
+  (let* ((user-identifier (assoc-ref (car u) "identifier"))
+         ;; The reset link is a sealed object rather than a row: bewaking
+         ;; encrypts and authenticates the little payload below, records when it
+         ;; was sealed and when it expires in the envelope's own header, and
+         ;; refuses to open it once that hour is up.  Nothing has to be stored,
+         ;; expired links leave nothing behind, and the link cannot be edited
+         ;; into somebody else's.
+         (reset-token (encrypt-object #:payload `((user . ,user-identifier)
+                                                  (action
+                                                   . reset-password))
+                                      #:encryption-key encryption-key
+                                      #:signing-key signing-key
+                                      #:ttl-seconds password-reset-validity-seconds))
          (mail-payload `((task-type . send-email) (template . password-reset)
                          (template-vars (system-name . Wikimusic)
                                         (user unquote
@@ -348,10 +361,8 @@
                                                   encryption-key
                                                   #:signing-key signing-key)
                                    #f))
-               (body (if (not (rc-body rc)) #f
-                         (alist-from-url-encoded-body (rc-body rc))))
-               (email (if (not body) #f
-                          (assoc-ref body "email")))
+               (body (body-alist rc))
+               (email (assoc-ref body "email"))
                (u (if (not email)
                       ($users 'get
                               #:ret 'top
@@ -361,8 +372,13 @@
                       ($users 'get
                               #:ret 'top
                               #:condition (where #:email email)))))
-          
-          (request-password-reset u)
+          ;; An address that is not on file is answered exactly like one that
+          ;; is: the same redirect, and no mail.  Asking for a reset used to
+          ;; raise here -- `car' of an empty result -- which turned a typo in
+          ;; the email box into an internal error, and it also said out loud
+          ;; whether an address is registered.
+          (when (not (nil? u))
+            (request-password-reset u))
           (redirect-to rc
                        (string->uri (format #f "~a/?sent-password-reset=true"
                                             (current-myhost)))
@@ -373,48 +389,62 @@
       #:i18n '(cookie "lang")
       (lambda (rc)
         (let* ((G_ (:i18n rc))
-               (body (alist-from-url-encoded-body (rc-body rc)))
+               (body (body-alist rc))
                (email (assoc-ref body "email"))
                (reset-token (assoc-ref body "reset-token"))
                (new-password (assoc-ref body "new-password"))
                (confirm-password (assoc-ref body "confirm-password"))
-               (tt (car ($password_reset 'get
-                                         #:ret 'top
-                                         #:condition (where #:reset_token
-                                                            reset-token))))
-               (now (current-time))
-               (allowance (* 24 7 3600)) ;reset token is valid for a week
-               (_ (when (> now
-                           (+ allowance
-                              (assoc-ref tt "created_at")))
-                    (error "reset token is found but not valid anymore!")))
-               (_ (when (not (equal? new-password confirm-password))
-                    (error "password confirmation did not match!")))
-               (user-id (assoc-ref tt "user_id"))
-               (u ($users 'get
-                          #:ret 'top
-                          #:condition (where #:identifier user-id)))
-               (new-salt (generate-string-uuid))
-               (h (string->sha-256 (string-append new-password new-salt)))
-               (_ (DB-query (DB-open rc)
-                            (format #f
-                             "UPDATE users SET salt = '~a', password = '~a' WHERE identifier = '~a'"
-                             new-salt h
-                             (assoc-ref (car u) "identifier"))))
-               (_ ($password_reset 'mod
-                                   'row-delete
-                                   (where #:user_id (assoc-ref (car u)
-                                                               "identifier")))))
-          (:cookies-set! rc
-                         'x-bewaking-wikimusic "x-bewaking-wikimusic" "")
-          (:cookies-setattr! rc
-                             'x-bewaking-wikimusic
-                             #:expires 1
-                             #:path "/"
-                             #:secure #t
-                             #:http-only #t)
-          (redirect-to rc
-                       (string->uri (format #f
-                                     "~a/login?has-reset-password=true"
-                                     (current-myhost)))
-                       #:status 302))))
+               ;; #f once the hour recorded in the envelope is over, or when the
+               ;; link was edited on its way through the mail client: the tag
+               ;; covers the whole payload, so there is no half-valid case.
+               (sealed-payload (decrypt-object #:object reset-token
+                                               #:encryption-key encryption-key
+                                               #:signing-key signing-key))
+               ;; A submission the server cannot accept is answered with a
+               ;; redirect, never with a raised error: a mistyped confirmation
+               ;; or a link that has aged out is not a server fault, and the
+               ;; error page would leave the person who made the typo with
+               ;; nothing to try again with.  The envelope is read first, so
+               ;; a link that no longer opens never reaches the KDF.
+               (link-works? (and (not (nil? sealed-payload))
+                                 (equal? 'reset-password
+                                         (assoc-ref sealed-payload 'action)))))
+          (cond
+           ((not link-works?)
+            (redirect-to rc
+                         (string->uri (format #f
+                                       "~a/login?reset-link-expired=true"
+                                       (current-myhost)))
+                         #:status 302))
+           ((not (and (string? new-password)
+                      (equal? new-password confirm-password)
+                      (strong-password? #:password new-password)))
+            (redirect-to rc
+                         (string->uri (format #f
+                                       "~a/password/reset/token/~a?password-rejected=true"
+                                       (current-myhost)
+                                       (uri-encode reset-token)))
+                         #:status 302))
+           (else
+            (sql-execute! rc
+                          (sql-update 'users
+                                      `((password
+                                         . ,(hash-password new-password))
+                                        (salt . ""))
+                                      #:where `((identifier
+                                                 . ,(assoc-ref sealed-payload
+                                                               'user))))
+                          #:name "reset-user-password")
+            (:cookies-set! rc
+                           'x-bewaking-wikimusic "x-bewaking-wikimusic" "")
+            (:cookies-setattr! rc
+                               'x-bewaking-wikimusic
+                               #:expires 1
+                               #:path "/"
+                               #:secure #t
+                               #:http-only #t)
+            (redirect-to rc
+                         (string->uri (format #f
+                                       "~a/login?has-reset-password=true"
+                                       (current-myhost)))
+                         #:status 302))))))

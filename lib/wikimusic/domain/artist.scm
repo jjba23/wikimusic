@@ -20,6 +20,7 @@
   #:use-module (srfi srfi-9)
   #:use-module (wikimusic domain repo)
   #:export (get-artist-by-id get-artists
+                             count-artists
                              search-artists
                              insert-artist
                              delete-artist-by-id
@@ -35,6 +36,7 @@
                        (get-artists-by-ids-proc repo-get-artists-by-ids)
                        (search-artists-proc repo-search-artists)
                        (get-artists-proc repo-get-artists)
+                       (count-artists-proc repo-count-artists)
                        (insert-artist-proc repo-insert-artist)
                        (delete-artist-by-id-proc repo-delete-artist-by-id)
                        (update-artist-by-id-proc repo-update-artist-by-id))
@@ -49,6 +51,9 @@
 
 (define-repo-method get-artists repo-get-artists
  "Retrieves a list of all active artists from the given REPO.")
+
+(define-repo-method count-artists repo-count-artists
+ "Counts the artists in the given REPO, optionally those a SEARCH matches.")
 
 (define-repo-method search-artists repo-search-artists
  "Retrieves a search list of all active artists from the given REPO.")

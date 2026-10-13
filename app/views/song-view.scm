@@ -45,7 +45,7 @@
                                                                            flex-row
                                                                            gap-2
                                                                            justify-center
-                                                                           align-center))))
+                                                                           items-center))))
                                                     ,(em (format #f "~a ~a"
                                                                  (car vc)
                                                                  (G_
@@ -75,7 +75,7 @@
 
          (extra-top-info `((div (@ (class ,(mk-class '(py-2 text-center flex
                                                             flex-col gap-2
-                                                            align-center))))
+                                                            items-center))))
                                 ,(map (lambda (ar)
                                         (a (assq-ref ar
                                                      'display-name)
@@ -88,7 +88,7 @@
                                            #:color '(text-onyx-300
                                                      dark:text-stone-100)
                                            #:hover '(hover:text-persia-pink-900
-                                                     hover:dark:text-persia-pink-300)))
+                                                     dark:hover:text-persia-pink-300)))
                                       art))))
 
          )
@@ -112,24 +112,26 @@
                          offset
                          search-query
                          user-sort
+                         grid-size
+                         pages
                          is-logged-in)
-  (let* ((page-buttons `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
-                                                          gap-3 my-4))))
-                              ,(if (> offset 0)
-                                   `((a (@ (href ,(format #f
-                                                   "/songs?offset=~a&limit=~a"
-                                                   (- offset limit) limit)))
-                                        ,(icon-button #:icon 'arrow-left
-                                                      #:content (G_ "previous"))))
-                                   '())
-                              ,(if (and (> limit 0)
-                                        (= (length songs) limit))
-                                   `((a (@ (href ,(format #f
-                                                   "/songs?offset=~a&limit=~a"
-                                                   (+ offset limit) limit)))
-                                        ,(icon-button #:icon 'arrow-right
-                                                      #:content (G_ "next"))))
-                                   '()))))
+  (let* ((page (if (and limit (> limit 0)) (+ 1 (quotient offset limit)) 1))
+         (page-buttons (if (and pages (> pages 1))
+                           (pagination #:current page
+                                       #:total pages
+                                       #:base-url (format #f
+                                                          "/songs?limit=~a&sort=~a~a&page="
+                                                          limit (or user-sort "")
+                                                          (if (and search-query
+                                                                   (not (equal? search-query
+                                                                                "")))
+                                                              (format #f
+                                                                      "&search=~a"
+                                                                      search-query)
+                                                              ""))
+                                       #:prev-label (G_ "previous")
+                                       #:next-label (G_ "next"))
+                           '()))
          (body `(div (@ (class ,(mk-class '(px-4 md:px-8
                                                  py-2
                                                  flex
@@ -139,13 +141,13 @@
                                                  gap-3
                                                  md:gap-5
                                                  items-center
-                                                 align-center
+                                                 items-center
                                                  justify-center
                                                  md:justify-between))))
                      (,(unless only-tiles
                          (h4 `(div (@ (class ,(mk-class '(flex flex-row
                                                                items-center
-                                                               align-center
+                                                               items-center
                                                                gap-1))))
                                    ,(G_ "viewing songs:"))
                              #:weight '(font-light)
@@ -169,21 +171,27 @@
                                                                      G_
                                                                      #:entity 'song
                                                                      #:user-sort
-                                                                     user-sort))
+                                                                     user-sort)
+                                                                   ,(grid-size-select
+                                                                     G_
+                                                                     #:entity 'song
+                                                                     #:size
+                                                                     grid-size))
                                                               (div (@ (class ,
                                                                              (mk-class '
                                                                               (flex
                                                                                flex-wrap
                                                                                flex-row
                                                                                gap-3
-                                                                               justify-right
+                                                                               justify-end
                                                                                items-center))))
 
                                                                    ,(search-box
                                                                      G_
                                                                      #:search-query
                                                                      search-query))))
-                      (div (div (@ (class ,item-tile-grid-face))
+                      (div (div (@ (class ,(item-tile-grid-face
+                                            #:size grid-size)))
                                 ,(map (lambda (x)
                                         (render-song-tile G_
                                          #:artworks artworks
@@ -231,7 +239,7 @@
                                                #:color '(text-onyx-300
                                                          dark:text-stone-100)
                                                #:hover '(hover:text-persia-pink-500
-                                                         hover:dark:text-persia-pink-300
+                                                         dark:hover:text-persia-pink-300
                                                          hover:underline)
                                                #:href (format #f
                                                        "/artists/uuid/~a"
@@ -247,7 +255,7 @@
                                               #:color '(text-onyx-300
                                                         dark:text-stone-100)
                                               #:hover '(hover:text-persia-pink-500
-                                                        hover:dark:text-persia-pink-300
+                                                        dark:hover:text-persia-pink-300
                                                         hover:underline)
                                               #:href (format #f
                                                       "/genres/uuid/~a"
@@ -255,8 +263,7 @@
                                                       (assq-ref ar
                                                                 'identifier))))))
                                  genres))
-         (song-attributes `((div (@ (class ,(mk-class '(px-4 py-6 container
-                                                             mx-auto))))
+         (song-attributes `((div (@ (class ,(mk-class '(px-4 py-6 mx-auto))))
                                  (dl ,(render-if-nestring (lambda (tuning)
                                                             (list (dt (G_
                                                                        "tuning"))
@@ -292,6 +299,12 @@
                                                            "album_info_link")))))))
     (html-template G_
                    #:is-logged-in is-logged-in
+                   ;; A song page is where a reader reads: its ascii contents,
+                   ;; its ascii legend and any embedded PDF.  Nothing about
+                   ;; reading wants a bar pinned over the top of it, so the
+                   ;; navigation is left to scroll away here and gives the
+                   ;; viewport back to the music.
+                   #:reading? #t
                    #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
                                                              md:py-4))))
                                  ((div (@ (class ,(mk-class '(flex flex-col
@@ -309,7 +322,7 @@
                                                                         flex-wrap
                                                                         gap-4
                                                                         items-center
-                                                                        align-center
+                                                                        items-center
                                                                         justify-start))))
                                                  ,(em "by:")
                                                  ,artist-name-titles)))
@@ -319,7 +332,7 @@
                                                                         flex-wrap
                                                                         gap-4
                                                                         items-center
-                                                                        align-center
+                                                                        items-center
                                                                         justify-start))))
                                                  ,(em "genres:")
                                                  ,genre-name-titles))))

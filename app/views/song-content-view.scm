@@ -42,7 +42,7 @@
                                              border
                                              border-stone-300
                                              dark:border-onyx-500
-                                             bg-stone-300
+                                             hg-frost bg-stone-100/75
                                              dark:bg-onyx-500
                                              shadow-md
                                              transition-all))))
@@ -63,7 +63,7 @@
   "Helper to render the flex row container for all chord pills"
   (if (null? chord-pairs) ""
       `(div (@ (class ,(mk-class '(flex flex-wrap gap-3 py-6 items-center
-                                        align-center))))
+                                        items-center))))
             ,@(map render-chord-pill chord-pairs))))
 
 (define* (render-song-content G_ song song-contents ascii-size)
@@ -153,15 +153,15 @@
                                                  '(p-4 md:p-6
                                                    shadow-md
                                                    font-mono
-                                                   bg-stone-300/75
-                                                   dark:bg-onyx-700
+                                                   hg-frost bg-stone-100/75
+                                                   dark:bg-onyx-900/75
                                                    text-black
                                                    dark:text-white
                                                    rounded-xl
                                                    border-2
                                                    border-persia-pink-100/25
                                                    dark:border-persia-pink-900/10
-                                                   white-space-pre
+                                                   whitespace-pre
                                                    overflow-x-scroll)))))
                     ,ascii-contents)))))
 
@@ -222,15 +222,15 @@
                                                                               font-mono
                                                                               md:p-6
                                                                               shadow-md
-                                                                              bg-stone-300/50
-                                                                              dark:bg-onyx-700
+                                                                              hg-frost bg-stone-100/75
+                                                                              dark:bg-onyx-900/75
                                                                               text-black
                                                                               dark:text-white
                                                                               rounded-xl
                                                                               border-2
                                                                               border-persia-pink-100/25
                                                                               dark:border-persia-pink-900/10
-                                                                              white-space-pre
+                                                                              whitespace-pre
                                                                               overflow-x-auto)))))
                                                ,ascii-legend))))
          (ascii-legend-section (render-if-nestring render-ascii-legend

@@ -23,12 +23,12 @@
 
 ;; The TCP port on which the web server will listen.
 (define http-port
-  50025)
+  50050)
 
 (define deploy-dir
   "/srv/http/jointhefreeworld.org")
 
-;; The file where the Wikimusic DB is located.  
+;; The file where the Wikimusic DB is located.
 (define wikimusic-db
   "wikimusic.db")
 
@@ -45,12 +45,12 @@
   "translate")
 
 (define i18n-locales
-  '(en_US nl_NL es_ES))
+  '(en_US nl_NL es_ES ja_JP))
 
 (define hot-reload-file-types
   '(scm css js))
 
-;; The Emacs Lisp script to run for publishing the manual. 
+;; The Emacs Lisp script to run for publishing the manual.
 (define emacs-lisp-manual-publish-cmd
   '(progn (find-file "./docs/manual/en.org")
           (org-html-export-to-html)
@@ -125,6 +125,16 @@ Args: update? represents whether we should update a template or create a new one
 (define (default)
   "Default task to be run, list available tasks."
   ($ '("maak --list")))
+
+;; The key file has to be loaded before the runner forks a worker for each
+;; spec: the modules under test import (wikimusic env), and a worker inherits
+;; what the parent had loaded.  The server does the same thing from ENTRY, so
+;; this is the test run reading the project's keys the way the server does.
+(define (test)
+  "Run the project's test suite, one spec at a time, from test/veritas."
+  (time-machine-manifest-shell
+   '("guile -L ./lib -L ./test -L ."
+     "-c '(load \"env.scm\") ((@ (veritas runner) run-tests))'")))
 
 (define (build-manual)
   "Render the project's manual."
@@ -206,6 +216,10 @@ for higher concurrent writes to SQLite 3."
 (define (i18n-init-es)
   "Initialize a new translation file for es_ES."
   (i18n-init* 'es_ES))
+
+(define (i18n-init-ja)
+  "Initialize a new translation file for ja_JP."
+  (i18n-init* 'ja_JP))
 
 (define (i18n-merge)
   "Merge translation updates for all locales."

@@ -237,3 +237,163 @@ History
     29 December 2021 - GNU Artanis donates to HardenedLinux community to connect with product environment more tightly.
 
 -----
+
+------
+
+* Writing descriptions in Org mode
+
+Every description field -- a song's, an artist's, a genre's -- is stored as
+plain text and rendered as Org markup when the page is read.  The rendering is
+done by [[https://codeberg.org/jjba23/orgwebalchemy][orgwebalchemy]], through the one function wikimusic exposes for it:
+
+#+begin_src scheme
+(org2html org-string)   ; (wikimusic html), line ~1130
+#+end_src
+
+`org2html' turns an Org fragment into the SXML the rest of the page is built
+from, so a description is styled by the same components as everything around it
+and carries no raw HTML of its own.  It is called in exactly one place --
+`entity-details', the shared detail block -- which means every entity that has
+a description renders it the same way.
+
+The syntax that reads well in a description:
+
+- *#bold* and _/italic/_ words;
+- =-verbatim= codes and ~monospace~ paths;
+- nested bullet lists, with - or + or *;
+- ordered lists, written 1. or 1);
+- block quotes, wrapped in =#+begin_quote= ... =#+end_quote=;
+- example and source blocks, =#+begin_example= / =#+begin_src=;
+- and links, written =[[https://example.org][the words shown]]=.
+
+A description is stored unescaped and rendered by orgwebalchemy, which escapes
+what it emits; the field is therefore for prose, not for hand-written HTML.
+The edit forms say so under the field itself, so a contributor need not read
+this page to find out.
+
+------
+
+* Who may edit what: permissions and ownership
+
+A session is a sealed token that names the signed-in user and the permissions
+they hold.  A route states the permission it needs, and a request that lacks it
+is refused -- that is the *permission* half of the rule.  Wikimusic also has an
+*ownership* half: a contributor may change what they created.
+
+The rule, in one sentence: a request may change a row when the session either
+holds the permission the route asks for *and* is the row's creator, or holds
+=wikimusic:modify-permissions=, the grant that overrides ownership for every
+row.  It is enforced on every mutation -- an entity's own edit route, and the
+rows that hang off it: an artwork, an external source, a song version, a link
+between two entities, and a comment's author.  There is no route that rewrites
+or deletes a row without asking who made it.
+
+- =wikimusic:modify-permissions= is the *super* grant.  Its holder edits and
+  deletes anything, on any entity, regardless of who created it.  This is the
+  permission to hand to the instance's maintainers.
+- For everyone else, a mutation is allowed only when the row's =created_by=
+  column names the session's user id.  A song's edit route, for instance, looks
+  the song up and refuses when =created_by= is someone else.
+- The check has two shapes for the two ways a route meets a row.  Where the
+  page's own entity is at hand, =guard-owner= in =(wikimusic controller)= takes
+  the row's =created_by= and answers #t when the change may go ahead.  Where the
+  row has to be read first -- an artwork addressed by its own identifier, a
+  relation addressed by the pair it joins -- =require-row-owner= reads that
+  row's =created_by= and defers to =guard-owner= with it.
+- A refusal *raises*, it does not emit: the handler's return value is what
+  Artanis renders, so a route that emitted a 403 and then carried on would have
+  it thrown away and answer 500 instead.  Both helpers raise the 403 that
+  unwinds the route (=require-row-owner= a 404 first, when no such row exists).
+  A route therefore only has to wrap its mutation in
+  =(when (guard-owner ...) ...)= and cannot forget to refuse.
+- Under both, =may-mutate?= in =(wikimusic auth)= answers #t for the super
+  grant, and otherwise compares =created_by= with the session's =owner-id=.  A
+  refusal is a 403, rendered by the same error pages as every other status.
+
+Reading is not restricted: anyone may read any public row.  Only *writing* to a
+row you did not create needs the super grant.
+
+------
+
+* Export, archival, and exchanging between instancesWikimusic can hand out *everything* it knows so that the whole corpus can be
+archived, read offline, or loaded into another instance.  The unit of exchange
+is the instance, not one entity: a share is how one wikimusic talks to another,
+and a single file per side is what makes it a copy rather than a crawl.  Two
+views of the same rows are offered, and one door back in.
+
+The routes live in =app/controllers/interchange.scm=.
+
+** The machine's view: a JSON dump
+
+  GET /export/json
+  #+begin_src sh
+  curl -O https://wikimusic.example/export/json
+  #+end_src
+
+  The answer is =application/json= holding every content table row by row in a
+  shape this same instance can read back:
+
+  #+begin_src json
+  {
+    "format": "wikimusic-export",
+    "version": 1,
+    "exported-at": 1791907095,
+    "tables": [
+      { "table": "artists", "rows": [ { "identifier": "...", ... } ] },
+      { "table": "songs",   "rows": [ ... ] }
+    ]
+  }
+  #+end_src
+
+  =tables= is a list in an order that respects the foreign keys among the
+  tables, so an entity is always written before anything that points at it.
+  Each row is the raw column values -- the dump is *not* rendered -- and the
+  values are what a script or another instance reads back.
+
+  The tables carried are the content itself: =artists=, =genres=, =songs=,
+  their artworks, external sources and relations, a song's contents, and every
+  entity's opinions and comments.  =users= and =password_reset= are
+  deliberately absent: a share is a link to somebody's account, not a copy of
+  it, and each row's =created_by= is resolved by the receiving instance on its
+  own.
+
+** The reader's view: a rendered HTML archive
+
+  GET /export/html
+  #+begin_src sh
+  curl -O https://wikimusic.example/export/html
+  #+end_src
+
+  The same rows, as one long self-contained page: every artist, genre and song
+  with its name linked to its page and its description already rendered from
+  Org.  It is what an archivist wants -- a copy that reads in a browser with no
+  server behind it -- and it links to the JSON dump above for the machine's
+  copy.
+
+** Loading a dump into another instance
+
+  POST /import/json
+  #+begin_src sh
+  curl -X POST -H 'Content-Type: application/json' \
+       --data @wikimusic-export.json https://other.example/import/json
+  #+end_src
+
+  The body is the JSON the export above produced.  Import is the one *write*
+  here and the change is to the whole database, so it is gated: the session
+  must hold =wikimusic:modify-permissions=, the super grant, and the route is
+  never reachable anonymously.  Rows are inserted one at a time, and a row that
+  fails -- a foreign key pointing at a user this instance does not have, or an
+  identifier already taken -- is counted and skipped rather than aborting the
+  share, so a partial import is still a partial success.  The answer says what
+  happened:
+
+  #+begin_src json
+  { "format": "wikimusic-import", "inserted": 812, "skipped": 47 }
+  #+end_src
+
+  A table is only ever written if it is in the controller's fixed list of
+  content tables, so a crafted body cannot reach a table of its own choosing.
+
+For a whole-instance backup the SQLite file may simply be copied -- see
+"Running Wikimusic" -- but the two export routes and the import are the
+supported, format-stable way to move content between instances.

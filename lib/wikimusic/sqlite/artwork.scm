@@ -17,6 +17,7 @@
 
 (define-module (wikimusic sqlite artwork)
   #:declarative? #t
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
@@ -26,6 +27,13 @@
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-artwork-repository rc)
+  ;; Every entity keeps its artworks in a table of its own, so a repository is
+  ;; asked about one entity and the table name follows from it.  It is always
+  ;; one of wikimusic's own names -- never a request value -- and kracht quotes
+  ;; it as an identifier either way.
+  (define (table entity)
+    (format #f "~a_artworks" entity))
+
   (define (columns entity)
     (append (list (string->symbol (format #f "~a-identifier" entity)))
             '(identifier created-by
@@ -37,10 +45,6 @@
                          created-at
                          last-edited-at)))
 
-  (define (insert-columns entity)
-    (delq 'last-edited-at
-          (columns entity)))
-
   (define conn
     (DB-open rc))
 
@@ -50,37 +54,34 @@
   (define execute-read
     (db-read conn))
 
-  (define (get-artworks-by-entity-ids entity ids)
-    (let* ((query (format #f
-                   "SELECT ~a FROM ~a_artworks WHERE ~a_identifier IN(~a)
-                   ORDER BY order_value ASC"
-                   (symbols->sql-columns-list (columns entity))
-                   entity
-                   entity
-                   (string-join (map value->sql-literal ids) ", "))))
-      (execute-read "get-artworks-by-entity-ids" query)))
+  (define* (get-artworks-by-entity-ids entity ids
+                                       #:key (order-by
+                                              '((order-value asc))))
+    (execute-read "get-artworks-by-entity-ids"
+                  (sql-select (table entity)
+                              #:columns (columns entity)
+                              #:where (list (list (string->symbol
+                                                   (format #f "~a-identifier"
+                                                           entity))
+                                                  'in
+                                                  ids))
+                              #:order-by order-by)))
 
   (define (update-artwork-by-id entity id attrs)
-    (let* ((query (format #f "UPDATE ~a_artworks SET ~a WHERE identifier = ~a"
-                          entity
-                          (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id))))
-      (execute-write "update-artwork-by-id" query)))
+    (execute-write "update-artwork-by-id"
+                   (sql-update (table entity)
+                               (attrs->row attrs (columns entity))
+                               #:where (list (cons 'identifier id)))))
 
   (define (delete-artwork-by-id entity id)
-    (let* ((query (format #f "DELETE FROM ~a_artworks WHERE identifier = ~a"
-                          entity
-                          (value->sql-literal id))))
-      (execute-write "delete-artwork-by-id" query)))
+    (execute-write "delete-artwork-by-id"
+                   (sql-delete (table entity)
+                               #:where (list (cons 'identifier id)))))
 
   (define (insert-artwork entity attrs)
-    (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x)))
-                      (insert-columns entity)))
-           (query (format #f "INSERT INTO ~a_artworks (~a) VALUES (~a)" entity
-                          (symbols->sql-columns-list (insert-columns entity))
-                          (string-join vals ", "))))
-      (execute-write "insert-artwork" query)))
+    (execute-write "insert-artwork"
+                   (sql-insert (table entity)
+                               (attrs->row attrs (columns entity)))))
 
   (mk-artwork-repository #:get-artworks-by-entity-ids-proc
                          get-artworks-by-entity-ids

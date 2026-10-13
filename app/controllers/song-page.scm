@@ -53,7 +53,9 @@
 (get "/songs"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-song-sort x-bewaking-wikimusic)
+     #:cookies '(names wikimusic-song-sort
+                       wikimusic-grid-size
+                       x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (song-repo (make-sqlite-song-repository rc))
@@ -86,30 +88,57 @@
                                           "wikimusic-song-sort")))
                             (:cookies-value rc "wikimusic-song-sort"))
                            (else "display-name-asc")))
+              ;; The tile-size preference travels the same way the sort does:
+              ;; a `grid-size' in the query string is stored in a cookie and
+              ;; every later visit reads it back, so the choice outlives the
+              ;; page it was made on.
+              (grid-size (cond
+                           ((not (equal? #f
+                                         (get-from-qstr rc "grid-size")))
+                            (:cookies-set! rc
+                                           'wikimusic-grid-size
+                                           "wikimusic-grid-size"
+                                           (get-from-qstr rc "grid-size"))
+                            (:cookies-setattr! rc
+                                               'wikimusic-grid-size
+                                               #:expires 12000000
+                                               #:path "/"
+                                               #:secure #t
+                                               #:http-only #t)
+                            (get-from-qstr rc "grid-size"))
+                           ((not (equal? #f
+                                         (:cookies-value rc
+                                          "wikimusic-grid-size")))
+                            (:cookies-value rc "wikimusic-grid-size"))
+                           (else "medium")))
               (query-sort (entity-sort-from-query user-sort))
-              (query-offset (cond
-                              ((not (nil? (get-from-qstr rc "offset")))
-                               (string->number (get-from-qstr rc "offset")))
-                              (else 0)))
-              (query-limit (cond
-                             ((not (nil? (get-from-qstr rc "limit")))
-                              (string->number (get-from-qstr rc "limit")))
-                             (else 100)))
+              ;; The list is read a page at a time.  Forty rows fill a
+              ;; screenful of tiles without making the reader scroll far, and
+              ;; the page number in the query string is what the nav links
+              ;; carry, so a page is a plain `offset = (page - 1) * 40'.
+              (query-page (let ((p (get-from-qstr rc "page")))
+                            (if (nil? p) 1
+                                (max 1 (or (string->number p) 1)))))
+              (query-limit 40)
+              (query-offset (* (- query-page 1) query-limit))
               (songs (cond
                        ((equal? #f user-search)
                         (get-songs song-repo
-                                   #:order-by (format #f "~a ~a"
-                                                      (car query-sort)
-                                                      (cadr query-sort))
+                                   #:order-by query-sort
                                    #:limit query-limit
                                    #:offset query-offset))
                        (else (search-songs song-repo
                                            (html-escape user-search)
-                                           #:order-by (format #f "~a ~a"
-                                                              (car query-sort)
-                                                              (cadr query-sort))
+                                           #:order-by query-sort
                                            #:limit query-limit
                                            #:offset query-offset))))
+              (song-total (count-songs song-repo
+                                       #:search (and user-search
+                                                     (html-escape
+                                                      user-search))))
+              (song-pages (max 1
+                               (ceiling (/ song-total
+                                           query-limit))))
               (song-ids (map (lambda (s)
                                (assq-ref s
                                          'identifier)) songs))
@@ -166,8 +195,10 @@
                                                #:comments comments
                                                #:limit query-limit
                                                #:offset query-offset
+                                               #:pages song-pages
                                                #:search-query user-search
                                                #:user-sort user-sort
+                                               #:grid-size grid-size
                                                #:is-logged-in (:cookies-value
                                                                rc
                                                                "x-bewaking-wikimusic")))))))
@@ -211,7 +242,8 @@
               (user-repo (make-sqlite-user-repository rc))
               (song-content-repo (make-sqlite-song-content-repository rc))
               (song-id (params rc "uuid"))
-              (song (get-song-by-id song-repo song-id))
+              (song (entity-or-404 (get-song-by-id song-repo song-id)
+                                    "song" song-id))
               (ascii-size (cond
                             ((not (equal? #f
                                           (get-from-qstr rc "ascii-size")))
@@ -312,7 +344,8 @@
               (genre-repo (make-sqlite-genre-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (song-content-repo (make-sqlite-song-content-repository rc))
-              (song (get-song-by-id song-repo song-id))
+              (song (entity-or-404 (get-song-by-id song-repo song-id)
+                                    "song" song-id))
               (artworks (get-artworks-by-entity-ids artwork-repo
                                                     'song
                                                     (list song-id)))
@@ -364,8 +397,9 @@
        (let* ((G_ (:i18n rc))
               (song-repo (make-sqlite-song-repository rc))
               (song-content-repo (make-sqlite-song-content-repository rc))
-              (song (get-song-by-id song-repo
-                                    (params rc "uuid")))
+              (song (entity-or-404 (get-song-by-id song-repo
+                                                        (params rc "uuid"))
+                                          "song" (params rc "uuid")))
               (song-contents (car (get-song-contents-by-ids song-content-repo
                                                             (list (params rc
                                                                    "version-uuid"))))))

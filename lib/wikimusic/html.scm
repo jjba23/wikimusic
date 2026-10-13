@@ -34,6 +34,7 @@
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (hygguile hygguile)
+  #:use-module (hygguile abstraction)
   #:use-module (srfi srfi-19)
   #:use-module (orgwebalchemy html)
   #:use-module (kracht prelude)
@@ -41,6 +42,8 @@
   #:use-module (artanis route)
   #:export (asset-library page-footer
                           nav
+                          wikimusic-locales
+                          locale-choose-form
                           html-template
                           item-tile
                           render-visibility-status
@@ -51,19 +54,218 @@
                           org2html
                           external-sources-form
                           sort-select
+                          grid-size-select
                           ascii-size-select
                           search-box
                           render-external-sources
                           item-tile-grid-face))
 
-(define item-tile-grid-face
-  (mk-class '(grid grid-cols-2
-                   gap-2
-                   sm:gap-3
-                   sm:grid-cols-3
-                   md:grid-cols-4
-                   lg:grid-cols-5
-                   xl:grid-cols-6)))
+;; The tile grid's shape, chosen by the reader and remembered in a cookie.  A
+;; reader who wants a dense wall of covers asks for `small' and gets more,
+;; narrower columns at every breakpoint; a reader who wants a handful of large
+;; tiles asks for `large' and gets fewer, wider ones.  `medium' is the default
+;; and is what the grid has always been.
+(define* (item-tile-grid-face #:key (size "medium"))
+  "Return the tile grid's class string, sized to SIZE.
+
+SIZE is one of the strings `small', `medium' or `large'; anything else is
+read as `medium'."
+  (mk-class (cond
+              ((equal? size "small")
+               '(grid grid-cols-3
+                      gap-1
+                      sm:gap-2
+                      sm:grid-cols-4
+                      md:grid-cols-6
+                      lg:grid-cols-8
+                      xl:grid-cols-10))
+              ((equal? size "large")
+               '(grid grid-cols-1
+                      gap-3
+                      sm:gap-4
+                      sm:grid-cols-2
+                      md:grid-cols-2
+                      lg:grid-cols-3
+                      xl:grid-cols-3))
+              (else
+               '(grid grid-cols-2
+                      gap-2
+                      sm:gap-3
+                      sm:grid-cols-3
+                      md:grid-cols-4
+                      lg:grid-cols-5
+                      xl:grid-cols-6)))))
+
+;; The page's own colour, laid down once for the whole document: three
+;; oversized, heavily blurred discs drifting very slowly behind everything.
+;; They are what the frosted panes have to frost -- a backdrop filter over a
+;; flat page hands back a flat pane -- and they are the framework's own wash
+;; mechanics (`hg-blob' for the drift, Olive's blur ladder for the rest),
+;; which a `glass-panel' would otherwise build for one pane at a time.
+(define* (ambient-wash classes #:key delay pace)
+  "Render one decorative colour wash for the page's background.
+
+@var{classes} give the disc its size, its place and its colour; the
+positioning, the blur and the fact that it never takes a pointer event are
+named here, the same way `glass-panel' names them for a pane.
+
+@table @var
+@item delay
+A number of seconds, or any CSS time as a string. A negative delay starts
+the disc part way through its cycle, which is how the page's three washes
+are kept out of step with one another.
+@item pace
+How long one drift takes, as a number of seconds or any CSS time.
+@end table"
+  (let ((style (append (if delay
+                           (list (cons 'animation-delay
+                                       (if (symbol? delay)
+                                           (symbol->string delay)
+                                           (format #f "~as" delay))))
+                           '())
+                       (if pace
+                           (list (cons '--hg-blob-duration
+                                       (if (symbol? pace)
+                                           (symbol->string pace)
+                                           (format #f "~as" pace))))
+                           '()))))
+    `((div (@ (aria-hidden "true")
+              (class ,(mk-class classes))
+              ,@(if (null? style)
+                    '()
+                    (list (list 'style (mk-style style)))))
+           ;; The empty string is load-bearing, as it is for the notification
+           ;; tray.  A childless element is serialized as `<div ... />', and
+           ;; HTML has no self-closing tag for a div: the parser reads it as an
+           ;; opening tag and nests everything that follows inside the disc.
+           ;; A wash is `pointer-events-none', `select-none', `aria-hidden' and
+           ;; blurred by 128px, so the whole page would end up unclickable,
+           ;; unselectable, invisible to a screen reader and painted as haze.
+           ""))))
+
+(define ambient-wash-classes
+  '(absolute pointer-events-none select-none rounded-512 blur-3xl opacity-75
+             hg-blob))
+
+;; Olive's offsets are the positive ones (`top-196', `bottom-1/4'): it
+;; generates no negative inset utility at all, so a wash cannot be pushed
+;; off an edge by naming a negative offset.  It does not have to be.  The
+;; whitespace around the panes is where the colour reads, so the discs sit
+;; inside the page instead -- anchored from whichever edge keeps them off
+;; the centre -- and the blur decides how much of the page each one tints.
+(define* (ambient-washes)
+  "Return the page's background washes, out of phase with one another."
+  (list (ambient-wash `(,@ambient-wash-classes
+                        w-196 h-196 bottom-1/4 right-1/4
+                        bg-persia-pink-500/25 dark:bg-persia-pink-900/25)
+                      #:delay -6 #:pace 48)
+        (ambient-wash `(,@ambient-wash-classes
+                        w-128 h-128 bottom-0 right-1/2
+                        bg-china-violet-500/25 dark:bg-china-violet-900/25)
+                      #:delay -22 #:pace 62)
+        (ambient-wash `(,@ambient-wash-classes
+                        w-196 h-196 bottom-0 left-1/4
+                        bg-jeans-blue-500/25 dark:bg-jeans-blue-900/25)
+                      #:delay -38 #:pace 74)));;; ===== The language a reader reads the interface in =====
+
+;; The languages this instance answers in: the name of the catalog under
+;; `sys/i18n/locale', and the language as it is written in that language.
+;; The list is the page's -- it is what a reader is offered -- so a catalog
+;; added under that directory is offered here, and one removed stops being
+;; offered.  See `sys/i18n/locale' and `maak i18n-compile'.
+(define-public wikimusic-locales
+  '(("en_US" . "English (US)")
+    ("nl_NL" . "Nederlands")
+    ("es_ES" . "Español")
+    ("ja_JP" . "日本語")))
+
+(define* (locale-choose-form G_
+                             #:key selected-locale return-to)
+  "The control a reader changes the interface's language with.
+
+The choice is posted to @code{/preferences/locale}, which writes it to the
+@code{lang} cookie -- the cookie every route builds its translator from --
+and sends the reader back to the page they were reading.  The language a
+page is *being* read in is the server's to state, since it is the language
+that page was rendered in, so the row the menu shows is the one the caller
+passes rather than one this control guesses.
+
+The control names itself: a translate glyph and the word @code{language}
+stand beside the menu rather than hiding behind it, because a reader who
+cannot read the page around them cannot be asked to recognise a control that
+shows nothing but the language it is already set to.  The name is bound to
+the menu with @code{for}, so it reaches assistive technology as well."
+  `((form (@ (action "/preferences/locale")
+             (method "POST")
+             (enctype "application/x-www-form-urlencoded")
+             (class ,(mk-class '(flex flex-row flex-wrap
+                                        items-center
+                                        gap-1
+                                        px-2 py-1
+                                        w-fit
+                                        rounded-xl
+                                        hg-frost bg-stone-100/75
+                                        dark:bg-onyx-900/75
+                                        border-2
+                                        border-china-violet-500/25
+                                        dark:border-china-violet-300/25
+                                        shadow-md))))
+          ,@(if return-to
+                `((input (@ (type "hidden")
+                            (name "return-to")
+                            (value ,return-to)))
+                         "")
+                '())
+          ,(icon #:type 'translate
+                 #:icon-css '(text-lg text-china-violet-700
+                                     dark:text-china-violet-300))
+          (label (@ (class ,(mk-class '(text-md
+                                        font-medium
+                                        font-sans
+                                        px-1
+                                        text-onyx-700
+                                        dark:text-stone-300)))
+                    (for user-lang))
+                 ,(G_ "language"))
+          ,(select #:name 'user-lang
+                   ;; No `lowercase' here: a language writes its own name,
+                   ;; and `Nederlands' or `Español' is how it is spelled.
+                   #:select-classes '(text-md
+                                      font-medium
+                                      font-sans
+                                      text-onyx-900
+                                      dark:text-stone-100
+                                      bg-transparent
+                                      rounded-lg
+                                      border-0
+                                      px-2
+                                      py-1
+                                      outline-none
+                                      cursor-pointer
+                                      hover:bg-stone-300/75
+                                      dark:hover:bg-onyx-700/75
+                                      focus:ring-2)
+                   #:select-flex-css '(flex flex-row
+                                             items-center
+                                             my-0
+                                             w-fit)
+                   #:options (map (lambda (locale)
+                                    (option #:value (car locale)
+                                            #:content (cdr locale)
+                                            #:selected-value selected-locale))
+                                  wikimusic-locales))
+          ,(icon-button #:icon 'check
+                        #:content ""
+                        #:type 'submit
+                        #:extra-classes '(py-1
+                                          px-2
+                                          max-w-prose
+                                          cursor-pointer
+                                          text-onyx-700
+                                          dark:text-stone-300)
+                        #:icon-css '(text-lg
+                                     text-onyx-700
+                                     dark:text-stone-300)))))
 
 (define* asset-library
   (build-asset-library '("pub/js/song-auto-scroll.js" "pub/js/symbanta.js"
@@ -71,52 +273,82 @@
                          "pub/js/file-base64.js")))
 
 (define* (page-footer G_)
-  `(,(footer `(,(em (G_ "the free music knowledge encyclopaedia")) ,(em (G_
-                                                                         "wikimusic is free software, available under the GNU AGPL v3 or newer")
-                                                                        #:size '
-                                                                        (text-sm))
-               (div (@ (class ,(mk-class '(flex flex-row
-                                                flex-wrap
-                                                gap-2
-                                                justify-start
-                                                break-words
-                                                items-center))))
-                    ,(em (G_ "find here the:"))
-                    ,(a "source code"
-                        #:href "https://codeberg.org/jjba23/wikimusic"
-                        #:size '(text-md)))
-               (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                align-center items-center))))
-                    ,(em (G_ "find here the:"))
-                    ,(a "manual"
-                        #:href
-                        "https://jointhefreeworld.org/manuals/wikimusic/"
-                        #:size '(text-md)))
-               ,(em (G_
-                     "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;")
-                    #:size '(text-sm))
+  `(,(footer
+      `(;; What the site is, in one line.
+        ,(em (G_ "the free music knowledge encyclopaedia")
+             #:size '(text-md))
 
-               (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
-                                                align-center items-center))))
-                    (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                     align-center items-center))))
-                         (a (@ (href "javascript:void(0)")
-                               (class ,(mk-class '(no-underline text-onyx-500
-                                                   dark:text-stone-300
-                                                   cursor-pointer font-light)))
-                               (onclick
-                                "window.scrollTo({ top: 0, behavior: 'smooth' })"))
-                            "⬆️ back to the top"))
-                    (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                     align-center items-center))))
-                         ,(em "version:")
-                         ,(mono (format #f "~a"
-                                        (get-short-commit-sha))
-                                #:size '(text-md)
-                                #:weight '(font-light))))))))
+        ;; Where to read about it and where to get the code, on one row
+        ;; rather than the two each repeating "find here the:".
+        (div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                           gap-2 sm:gap-4
+                                           justify-start
+                                           items-center))))
+             ,(em (G_ "find here the:"))
+             ,(a (G_ "source code")
+                 #:href "https://codeberg.org/jjba23/wikimusic"
+                 #:size '(text-md))
+             ,(a (G_ "manual")
+                 #:href "https://jointhefreeworld.org/manuals/wikimusic/"
+                 #:size '(text-md))
+             ;; The archive is the one page that leaves the server behind, so
+             ;; it is offered here rather than only to a reader who knows the
+             ;; address: a copy of everything, to save or to read offline.
+             ,(a (G_ "export")
+                 #:href "/export/html"
+                 #:size '(text-md)))
+
+        ;; The licence and the version: the two facts about this running
+        ;; instance, and the licence now links to the licence itself.
+        (div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                           gap-2 sm:gap-4
+                                           justify-start
+                                           items-center))))
+             ,(a (G_
+                  "wikimusic is free software, available under the GNU AGPL v3 or newer")
+                 #:href "https://www.gnu.org/licenses/agpl-3.0.html"
+                 #:size '(text-sm))
+             (div (@ (class ,(mk-class '(flex flex-row
+                                                flex-wrap
+                                                gap-1
+                                                items-center))))
+                  ,(em (G_ "version:")
+                       #:size '(text-sm))
+                  ,(mono (format #f "~a"
+                                 (get-short-commit-sha))
+                         #:size '(text-sm)
+                         #:weight '(font-light))))
+
+        ;; The copyright line, and the way back to the top at the far end
+        ;; of the same row.
+        (div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                           justify-between
+                                           gap-2 sm:gap-4
+                                           w-full
+                                           items-center))))
+             ,(em (G_
+                   "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;")
+                  #:size '(text-sm))
+             (a (@ (href "javascript:void(0)")
+                   (class ,(mk-class '(no-underline
+                                       text-onyx-500
+                                       dark:text-stone-300
+                                       cursor-pointer
+                                       font-light)))
+                   (onclick
+                    "window.scrollTo({ top: 0, behavior: 'smooth' })"))
+                ,(G_ "back to the top"))))
+      #:footer-classes '(flex flex-col
+                                gap-3
+                                items-start
+                                px-6
+                                sm:px-8
+                                md:px-12
+                                justify-start
+                                py-8))))
 
 (define* (nav G_
-              #:key is-logged-in)
+              #:key is-logged-in (reading? #f))
   (let ((nav-link (lambda (href icon content)
                     `(a (@ (href ,href)
                            (class ,(mk-class '(shrink-0 no-underline))))
@@ -137,19 +369,38 @@
                                                         md:px-3
                                                         cursor-pointer
                                                         whitespace-nowrap))))))
-    `((div (@ (class ,(mk-class '(flex flex-col
-                                       lg:flex-row
-                                       lg:items-center
-                                       lg:justify-between
-                                       gap-2
-                                       sm:gap-3
-                                       w-full
-                                       p-2
-                                       sm:p-3
-                                       bg-stone-300/50
-                                       dark:bg-onyx-700
-                                       shadow-md
-                                       hover:text-china-violet-700))))
+    `((div (@ (class ,(mk-class (append
+                                 ;; The bar is a strip, not a panel: a reader
+                                 ;; looks past it on every page, so it keeps
+                                 ;; just enough height for its controls and
+                                 ;; no more, and grows no taller than the
+                                 ;; row it holds.
+                                 '(flex flex-col
+                                        lg:flex-row
+                                        lg:items-center
+                                        lg:justify-between
+                                        gap-1
+                                        sm:gap-2
+                                        w-full
+                                        px-2
+                                        py-1
+                                        sm:px-3
+                                        sm:py-2
+                                        hg-frost bg-stone-100/75
+                                        dark:bg-onyx-900/75
+                                        rounded-2xl
+                                        border
+                                        border-stone-500/25
+                                        dark:border-onyx-100/10
+                                        shadow-md)
+                                 ;; While a reader is reading -- a song's ascii
+                                 ;; contents, or a PDF beside them -- the bar is
+                                 ;; not pinned: it scrolls away with the page and
+                                 ;; gives the whole viewport back to the content.
+                                 (if reading?
+                                     '()
+                                     '(sticky top-2 z-32))
+                                 '(hover:text-china-violet-700)))))
 
            ;; Logo
            (div (@ (class ,(mk-class '(flex items-center
@@ -173,12 +424,12 @@
                                                  text-onyx-300
                                                  dark:text-stone-300
                                                  hover:text-persia-pink-900
-                                                 hover:dark:text-persia-pink-300))
+                                                 dark:hover:text-persia-pink-300))
                               (G_ "WikiMusic"))
                         #:weight '(font-medium italic)
                         #:color '(text-onyx-300 dark:text-stone-300
                                   hover:text-persia-pink-900
-                                  hover:dark:text-persia-pink-300)
+                                  dark:hover:text-persia-pink-300)
                         #:family '(font-sans)
                         #:size '(text-lg sm:text-xl md:text-2xl))))
 
@@ -273,7 +524,7 @@
 
 (define* (html-template G_
                         #:key (title "WikiMusic") body
-                        (is-logged-in #f))
+                        (is-logged-in #f) (reading? #f))
   
   `(,doctype-html (html (head (title ,title)
                               ,(hygguile-recommended-meta)
@@ -322,6 +573,10 @@
 
                               ,notification-tray
 
+                              ;; The page's colour, behind everything the frost
+                              ;; has to frost (see `ambient-washes').
+                              ,(ambient-washes)
+
                               ,(with-footer #:main `((main (@ (class ,(mk-class '
                                                                        (flex
                                                                         flex-col
@@ -332,7 +587,9 @@
 
                                                            ,(nav G_
                                                                  #:is-logged-in
-                                                                 is-logged-in)
+                                                                 is-logged-in
+                                                                 #:reading?
+                                                                 reading?)
 
                                                            ;; Content gets its own responsive container.
                                                            (div (@ (class ,(mk-class '
@@ -360,7 +617,7 @@
   (let ((item-link (format #f "/~as/uuid/~a" entity
                            (assq-ref x
                                      'identifier))))
-    `((div (@ (class ,(mk-class '(bg-stone-300 dark:bg-onyx-700
+    `((div (@ (class ,(mk-class '(hg-frost bg-stone-100/75 dark:bg-onyx-900/75
                                                rounded-xl
                                                sm:rounded-2xl
                                                shadow-md
@@ -397,7 +654,7 @@
 
            ;; Content
            (div (@ (class ,(mk-class '(flex flex-col
-                                            flex-grow
+                                            grow
                                             min-w-0
                                             p-2
                                             sm:p-3
@@ -413,7 +670,7 @@
                          #:href item-link
                          #:color '(text-onyx-300 dark:text-stone-100)
                          #:hover '(hover:text-persia-pink-500
-                                   hover:dark:text-persia-pink-300)))
+                                   dark:hover:text-persia-pink-300)))
 
                 ;; Extra information
                 ,(render-if-nempty (lambda (info)
@@ -450,10 +707,93 @@
      (G_ "published"))
     (else (G_ "unkown status"))))
 
-(define* (render-comment G_ user-alist comment)
-  `(div (@ (class "py-3"))
+;; A comment's toolbar.  Reply, edit and delete all need the entity the thread
+;; hangs off and the comment's own identifier, so both are handed down from the
+;; page rather than guessed.  Every control is rendered for every reader -- the
+;; way the entity's own edit link is -- and the route it posts to is what
+;; refuses a session that may not use it (see `guard-owner').
+(define* (comment-actions G_ #:key entity entity-identifier comment)
+  (let* ((comment-identifier (assq-ref comment 'identifier))
+         (base (format #f "/~as/uuid/~a/comments/~a" entity entity-identifier
+                       comment-identifier)))
+    `(div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-3
+                                          items-center my-2))))
+          (details
+           (summary (@ (class ,(mk-class '(cursor-pointer
+                                           text-sm
+                                           text-persia-pink-500
+                                           dark:text-persia-pink-300))))
+                    ,(G_ "reply"))
+           (form (@ (method POST)
+                    (action ,(format #f "/~as/uuid/~a/comments/new" entity
+                                     entity-identifier)))
+                 (input (@ (type hidden)
+                           (name parent-identifier)
+                           (value ,comment-identifier)))
+                 ,(textarea #:label (G_ "your reply")
+                            #:name "contents"
+                            #:rows 3
+                            #:maxlength 4096
+                            #:textarea-css '(p-3
+                                             rounded-xl
+                                             border-2
+                                             border-stone-700
+                                             dark:border-onyx-100
+                                             dark:text-stone-300
+                                             dark:bg-onyx-700/75
+                                             bg-stone-300/75
+                                             min-h-16
+                                             w-full
+                                             max-w-prose
+                                             resize-y
+                                             shadow-md))
+                 ,(button (G_ "post reply") #:type 'submit)))
+          (details
+           (summary (@ (class ,(mk-class '(cursor-pointer
+                                           text-sm
+                                           text-persia-pink-500
+                                           dark:text-persia-pink-300))))
+                    ,(G_ "edit"))
+           (form (@ (method POST)
+                    (action ,(format #f "~a/edit" base)))
+                 ,(textarea #:label (G_ "your comment")
+                            #:name "contents"
+                            #:value (or (assq-ref comment 'contents) "")
+                            #:rows 3
+                            #:maxlength 4096
+                            #:textarea-css '(p-3
+                                             rounded-xl
+                                             border-2
+                                             border-stone-700
+                                             dark:border-onyx-100
+                                             dark:text-stone-300
+                                             dark:bg-onyx-700/75
+                                             bg-stone-300/75
+                                             min-h-16
+                                             w-full
+                                             max-w-prose
+                                             resize-y
+                                             shadow-md))
+                 ,(button (G_ "save") #:type 'submit)))
+          (form (@ (method POST)
+                   (action ,(format #f "~a/delete" base)))
+                ,(button (G_ "delete")
+                         #:type 'submit
+                         #:color '(text-stone-100)
+                         #:background '(bg-redwood-500)
+                         #:hover-background '(hover:bg-redwood-900))))))
+
+(define* (render-comment G_ user-alist comment
+                         #:key entity entity-identifier)
+  `(div (@ (class ,(mk-class '(py-3 max-w-prose
+                                      rounded-lg
+                                      border-2
+                                      border-stone-500/25
+                                      dark:border-onyx-100/25
+                                      px-3))))
         ,(render-if-nempty (lambda (u)
-                             `(p (@ (class ,(mk-class '(text-sm text-stone-600))))
+                             `(p (@ (class ,(mk-class '(text-sm
+                                                        text-stone-500))))
                                  ,(format #f "~a (~a) &lt;~a&gt;"
                                           (assoc-ref u "display_name")
                                           (assoc-ref u "username")
@@ -464,11 +804,22 @@
         (p (@ (class ,(mk-class '(text-md text-stone-900))))
            ,(assq-ref comment
                       'contents))
-        (p (@ (class ,(mk-class '(text-sm text-stone-400 dark:text-stone-300))))
+        (p (@ (class ,(mk-class '(text-sm text-stone-500 dark:text-stone-300))))
            ,(assq-ref comment
-                      'created-at))))
+                      'created-at))
+        ,(render-if-nempty (lambda (at)
+                             `(p (@ (class ,(mk-class '(text-sm
+                                                        italic
+                                                        text-stone-500
+                                                        dark:text-stone-300))))
+                                 ,(G_ "edited")))
+                           (assq-ref comment 'last-edited-at))
+        ,(comment-actions G_ #:entity entity
+                          #:entity-identifier entity-identifier
+                          #:comment comment)))
 
-(define* (render-comments G_ user-alist parent-identifier comments)
+(define* (render-comments G_ user-alist parent-identifier comments
+                          #:key entity entity-identifier)
   (let* ((top-nodes (filter (lambda (c)
                               (equal? parent-identifier
                                       (assoc-ref c
@@ -476,11 +827,15 @@
                             comments)))
     (map (lambda (comment)
            `((div (@ (class "max-w-prose"))
-                  ,(render-comment G_ user-alist comment))
+                  ,(render-comment G_ user-alist comment
+                                   #:entity entity
+                                   #:entity-identifier entity-identifier))
              (div (@ (class ,(mk-class '(max-w-prose pl-3))))
                   ,(render-comments G_ user-alist
                                     (assoc-ref comment
-                                               'identifier) comments))))
+                                               'identifier) comments
+                                    #:entity entity
+                                    #:entity-identifier entity-identifier))))
          top-nodes)))
 
 (define* (entity-details G_
@@ -516,7 +871,10 @@
                                                                (assq-ref art
                                                                          'content-caption))))
                                  artworks))
-         (rendered-comments (render-comments G_ user-alist #f comments))
+         (rendered-comments (render-comments G_ user-alist #f comments
+                                             #:entity entity
+                                             #:entity-identifier
+                                             (assq-ref x 'identifier)))
          (like-count (length (filter (lambda (o)
                                        (and (equal? (assq-ref x
                                                               'identifier)
@@ -621,7 +979,17 @@
                                               (assq-ref x
                                                         'approved-by))))
     
-    `((div (@ (class ,(mk-class '(py-4 flex flex-row flex-wrap gap-6))))
+    `((div (@ (class ,(mk-class '(hg-frost
+                                  bg-stone-100/75
+                                  dark:bg-onyx-900/75
+                                  rounded-3xl
+                                  border-2
+                                  border-stone-500/25
+                                  dark:border-onyx-100/25
+                                  shadow-lg
+                                  p-4
+                                  sm:p-6
+                                  flex flex-row flex-wrap gap-6))))
            (div ,rendered-artworks)
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
                      ,opinion-buttons
@@ -666,8 +1034,8 @@
                                 ,(mono (assq-ref x
                                                  'identifier)
                                        #:size '(text-sm)
-                                       #:color '(text-stone-600
-                                                 dark:text-stone-400))
+                                       #:color '(text-stone-500
+                                                 dark:text-stone-500))
                                 ,(icon-button #:icon 'copy
                                               #:content "copy"
 
@@ -681,6 +1049,29 @@
                         ,(em (format #f "~a ~a"
                                      (length comments)
                                      (G_ "comments"))))
+               ;; Anyone signed in may add a comment; nobody else is let in by
+               ;; the route this posts to.
+               (form (@ (method POST)
+                        (action ,(format #f "/~as/uuid/~a/comments/new" entity
+                                         (assq-ref x 'identifier))))
+                     ,(textarea #:label (G_ "new comment")
+                                #:name "contents"
+                                #:rows 4
+                                #:maxlength 4096
+                                #:textarea-css '(p-3
+                                                 rounded-xl
+                                                 border-2
+                                                 border-stone-700
+                                                 dark:border-onyx-100
+                                                 dark:text-stone-300
+                                                 dark:bg-onyx-700/75
+                                                 bg-stone-300/75
+                                                 min-h-16
+                                                 w-full
+                                                 max-w-prose
+                                                 resize-y
+                                                 shadow-md))
+                     ,(button (G_ "post comment") #:type 'submit))
                ,rendered-comments))))
 
 (define* (artwork-form G_
@@ -773,8 +1164,8 @@
                                              border-persia-pink-300/25
                                              dark:border-persia-pink-300/25
                                              font-sans
-                                             bg-stone-300
-                                             dark:bg-onyx-700
+                                             hg-frost bg-stone-100/75
+                                             dark:bg-onyx-900/75
                                              text-onyx-300
                                              dark:text-stone-300
                                              rounded-xl
@@ -813,6 +1204,44 @@
 
                          ))))))
 
+(define* (grid-size-select G_
+                           #:key entity size)
+  "Render the tile-size chooser.
+
+The chooser is a plain form control like `sort-select': choosing a size
+navigates to the same list page carrying `grid-size', and the route stores it
+in the `wikimusic-grid-size' cookie and reads it back on the next page.
+ENTITY is the list's own name -- `song', `artist', `genre' -- so each page
+chooses its own size against its own address."
+  `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-min))))
+         (select (@ (onchange "window.location.href=this.value;")
+                    (name "grid-size-select")
+                    (id "grid-size-select")
+                    (class ,(mk-class '(px-3 py-2
+                                             border-2
+                                             border-persia-pink-300/25
+                                             dark:border-persia-pink-300/25
+                                             font-sans
+                                             hg-frost bg-stone-100/75
+                                             dark:bg-onyx-900/75
+                                             text-onyx-300
+                                             dark:text-stone-300
+                                             rounded-xl
+                                             shadow-md))))
+                 (option (@ (disabled "true"))
+                         ,(G_ "tile size"))
+                 ,@(map (lambda (s)
+                          `((option (@ (value ,(format #f
+                                                      "/~as?grid-size=~a"
+                                                      entity (car s)))
+                                       ,(if (equal? size (car s))
+                                            '(selected "")
+                                            '(not-selected "")))
+                                    ,(cdr s))))
+                        `(("small" . ,(G_ "Small tiles"))
+                          ("medium" . ,(G_ "Medium tiles"))
+                          ("large" . ,(G_ "Large tiles"))))))))
+
 (define* (ascii-size-select G_
                             #:key route)
   `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-min))))
@@ -823,8 +1252,8 @@
                                              border-2
                                              border-persia-pink-300/25
                                              dark:border-persia-pink-300/25
-                                             bg-stone-300
-                                             dark:bg-onyx-700
+                                             hg-frost bg-stone-100/75
+                                             dark:bg-onyx-900/75
                                              text-onyx-300
                                              dark:text-stone-300
                                              rounded-xl
@@ -881,7 +1310,7 @@ function addSearchQueryParam(form) {
     (div (@ (class ,(mk-class '(my-3))))
          (form (@ (onsubmit "addSearchQueryParam(this)"))
                (div (@ (class ,(mk-class '(flex flex-row
-                                                align-center
+                                                items-center
                                                 flex-wrap
                                                 items-center
                                                 justify-center
@@ -900,8 +1329,8 @@ function addSearchQueryParam(form) {
                                                border-2
                                                border-persia-pink-300/25
                                                dark:border-persia-pink-300/25
-                                               bg-stone-300
-                                               dark:bg-onyx-700
+                                               hg-frost bg-stone-100/75
+                                               dark:bg-onyx-900/75
                                                dark:text-stone-300
                                                text-onyx-300
                                                shadow-md)
@@ -913,7 +1342,7 @@ function addSearchQueryParam(form) {
                         `((div (@ (class ,(mk-class '(flex flex-row gap-1
                                                            items-center
                                                            flex-wrap
-                                                           align-center))))
+                                                           items-center))))
                                ,(a `((div (@ (class ,(mk-class '(flex flex-row
                                                                  items-center
                                                                  gap-1))))
@@ -922,7 +1351,7 @@ function addSearchQueryParam(form) {
                                                  #:icon-css '(text-china-violet-700
                                                               dark:text-china-violet-300
                                                               hover:text-persia-pink-500
-                                                              hover:dark:text-persia-pink-300
+                                                              dark:hover:text-persia-pink-300
                                                               text-2xl))))
                                    #:href l
                                    #:size '(text-lg)
@@ -930,7 +1359,7 @@ function addSearchQueryParam(form) {
                                    #:color '(text-china-violet-700
                                              dark:text-china-violet-300)
                                    #:hover '(hover:text-persia-pink-500
-                                             hover:dark:text-persia-pink-300))
+                                             dark:hover:text-persia-pink-300))
 
                                ))) link))
 
@@ -945,7 +1374,7 @@ function addSearchQueryParam(form) {
                                      w-full
                                      justify-center
                                      items-start
-                                     align-end))))
+                                     items-end))))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
                                                     external-sources
                                                     'wikipedia-url))
@@ -965,7 +1394,7 @@ function addSearchQueryParam(form) {
 
 (define (org2html org)
   (parameterize ((link-classes '(dark:text-china-violet-300
-                                 hover:dark:text-persia-pink-300
+                                 dark:hover:text-persia-pink-300
                                  hover:text-persia-pink-500
                                  text-china-violet-700 hover:underline
                                  font-bold))
@@ -999,9 +1428,9 @@ function addSearchQueryParam(form) {
                                                 text-md
                                                 leading-7
                                                 max-w-196
-                                                break-words))
+                                                overflow-hidden))
                  (bold-classes '(font-bold text-onyx-500 dark:text-stone-500))
-                 (example-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
+                 (example-block-classes '(hg-frost bg-stone-100/75 dark:bg-onyx-900/75
                                                           text-onyx-700
                                                           dark:text-stone-300
                                                           rounded-lg
@@ -1011,7 +1440,7 @@ function addSearchQueryParam(form) {
                                                           whitespace-pre
                                                           font-mono
                                                           overflow-x-scroll))
-                 (quote-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
+                 (quote-block-classes '(hg-frost bg-stone-100/75 dark:bg-onyx-900/75
                                                         text-onyx-700
                                                         dark:text-stone-300
                                                         rounded-lg
@@ -1021,7 +1450,7 @@ function addSearchQueryParam(form) {
                                                         whitespace-pre
                                                         font-sans
                                                         overflow-x-scroll))
-                 (code-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
+                 (code-block-classes '(hg-frost bg-stone-100/75 dark:bg-onyx-900/75
                                                        text-onyx-700
                                                        dark:text-stone-300
                                                        rounded-lg
@@ -1031,8 +1460,8 @@ function addSearchQueryParam(form) {
                                                        whitespace-pre
                                                        font-mono
                                                        overflow-x-scroll))
-                 (code-classes '(rounded-lg bg-stone-300/75
-                                            dark:bg-onyx-700/75
+                 (code-classes '(rounded-lg hg-frost bg-stone-100/75
+                                            dark:bg-onyx-900/75
                                             text-onyx-700
                                             px-2
                                             py-1

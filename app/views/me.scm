@@ -150,9 +150,9 @@
                                               (G_
                                                "are you sure you want to delete this user?"))
                                   #:type 'submit
-                                  #:background '(bg-red-700)
-                                  #:color '(text-stone-200)
-                                  #:hover-background '(hover:bg-red-900)))
+                                  #:background '(bg-redwood-700)
+                                  #:color '(text-stone-100)
+                                  #:hover-background '(hover:bg-redwood-900)))
                    (a (@ (href ,(format #f "/users/edit/~a"
                                         (assoc-ref u "identifier"))))
                       ,(icon-button #:icon 'pencil
@@ -176,7 +176,7 @@
                                                            py-8
                                                            px-4
                                                            rounded-xl
-                                                           bg-stone-200
+                                                           bg-stone-300
                                                            dark:bg-stone-900))))
                                     ,(map (lambda (u)
                                             (render-user G_ u)) users))))))
@@ -199,7 +199,7 @@
                                                            py-8
                                                            px-4
                                                            rounded-xl
-                                                           bg-stone-200
+                                                           bg-stone-300
                                                            dark:bg-stone-900))))
                                     (form (@ (method POST)
                                              (action "/users/new"))
@@ -237,15 +237,15 @@
                                         (checked #f)
                                         (input-css '(p-3 max-w-prose
                                                      rounded-xl
-                                                     border-stone-200
+                                                     border-stone-100
                                                      dark:border-stone-700
                                                      dark:text-stone-300
-                                                     bg-stone-200/75
+                                                     bg-stone-300/75
                                                      dark:bg-stone-700/75
                                                      border-2
                                                      shadow-md))
                                         (label-css '(text-sm font-bold
-                                                     text-stone-600
+                                                     text-stone-500
                                                      dark:text-stone-300))
                                         (input-flex-css '(my-2 flex flex-row
                                                                gap-1)))
@@ -273,7 +273,7 @@
                                                            py-8
                                                            px-4
                                                            rounded-xl
-                                                           bg-stone-200
+                                                           bg-stone-300
                                                            dark:bg-stone-900))))
                                     (form (@ (method POST)
                                              (action ,(format #f
@@ -344,7 +344,7 @@
                                                                  px-4
                                                                  shadow-md
                                                                  max-w-prose
-                                                                 bg-stone-200
+                                                                 bg-stone-300
                                                                  dark:bg-stone-900))))
                                           (input (@ (hidden true)
                                                     (name email)

@@ -1,0 +1,660 @@
+# 日本語 translations for wikimusic package.
+# Copyright (C) 2026 Josep Bigorra <jjbigorra@gmail.com>
+# This file is distributed under the same license as the wikimusic package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: wikimusic\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-10-13 12:00+0100\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+#: app/controllers/artist-form.scm:84 app/controllers/artist-form.scm:124
+#: app/controllers/artist-form.scm:374
+msgid "Edited artist succesfully!"
+msgstr "アーティストを編集しました！"
+
+#: app/controllers/artist-form.scm:275
+msgid "Liked artist!"
+msgstr "アーティストに「いいね」しました！"
+
+#: app/controllers/artist-form.scm:276
+msgid "Disliked artist!"
+msgstr "アーティストに「よくないね」しました！"
+
+#: app/controllers/genre-form.scm:84 app/controllers/genre-form.scm:325
+#: app/controllers/genre-form.scm:370
+msgid "Edited genre succesfully!"
+msgstr "ジャンルを編集しました！"
+
+#: app/controllers/genre-form.scm:233
+msgid "Liked genre!"
+msgstr "ジャンルに「いいね」しました！"
+
+#: app/controllers/genre-form.scm:234
+msgid "Disliked genre!"
+msgstr "ジャンルに「よくないね」しました！"
+
+#: app/controllers/song-form.scm:103 app/controllers/song-form.scm:585
+#: app/controllers/song-form.scm:630
+msgid "Edited song succesfully!"
+msgstr "曲を編集しました！"
+
+#: app/controllers/song-form.scm:422
+msgid "Liked song!"
+msgstr "曲に「いいね」しました！"
+
+#: app/controllers/song-form.scm:423
+msgid "Disliked song!"
+msgstr "曲に「よくないね」しました！"
+
+#: app/views/artist-edit.scm:68 app/views/artist-edit.scm:98
+msgid "editing artist"
+msgstr "アーティストを編集"
+
+#: app/views/artist-edit.scm:71 app/views/artist-view.scm:117
+msgid "new artist"
+msgstr "新しいアーティスト"
+
+#: app/views/artist-edit.scm:77 app/views/genre-edit.scm:73
+#: app/views/song-edit.scm:58
+msgid "edit artworks"
+msgstr "アートワークを編集"
+
+#: app/views/artist-edit.scm:85 app/views/genre-edit.scm:81
+#: app/views/song-edit.scm:94
+msgid "new artwork"
+msgstr "新しいアートワーク"
+
+#: app/views/artist-edit.scm:113 app/views/genre-edit.scm:109
+#: app/views/song-edit.scm:137
+msgid "editing external sources"
+msgstr "外部ソースを編集"
+
+#: app/views/artist-edit.scm:159 app/views/genre-edit.scm:155
+#: app/views/song-edit.scm:294
+msgid "display name"
+msgstr "表示名"
+
+#: app/views/artist-edit.scm:163 app/views/genre-edit.scm:159
+#: app/views/song-edit.scm:314 lib/wikimusic/html.scm:812
+msgid "description"
+msgstr "説明"
+
+#: app/views/artist-edit.scm:167 app/views/genre-edit.scm:163
+#: app/views/me.scm:159 app/views/me.scm:327
+#: app/views/song-content-edit.scm:171 app/views/song-edit.scm:318
+#: lib/wikimusic/html.scm:858 lib/wikimusic/html.scm:940
+msgid "edit"
+msgstr "編集"
+
+#: app/views/artist-edit.scm:168 app/views/genre-edit.scm:164
+#: app/views/me.scm:231 app/views/song-content-edit.scm:172
+#: app/views/song-edit.scm:319 lib/wikimusic/html.scm:941
+msgid "create"
+msgstr "作成"
+
+#: app/views/artist-view.scm:49 app/views/genre-view.scm:49
+#: app/views/song-view.scm:123
+msgid "previous"
+msgstr "前へ"
+
+#: app/views/artist-view.scm:56 app/views/genre-view.scm:56
+#: app/views/song-view.scm:131
+msgid "next"
+msgstr "次へ"
+
+#: app/views/artist-view.scm:74
+msgid "viewing artists:"
+msgstr "アーティストを表示中:"
+
+#: app/views/error.scm:94
+msgid "the front page"
+msgstr "フロントページ"
+
+#: app/views/error.scm:97
+msgid "songs"
+msgstr "曲"
+
+#: app/views/error.scm:98
+msgid "artists"
+msgstr "アーティスト"
+
+#: app/views/error.scm:99
+msgid "genres"
+msgstr "ジャンル"
+
+#: app/views/genre-edit.scm:64 app/views/genre-edit.scm:94
+msgid "editing genre"
+msgstr "ジャンルを編集"
+
+#: app/views/genre-edit.scm:67 app/views/genre-view.scm:117
+msgid "new genre"
+msgstr "新しいジャンル"
+
+#: app/views/genre-view.scm:74
+msgid "viewing genres:"
+msgstr "ジャンルを表示中:"
+
+#: app/views/index.scm:89 lib/wikimusic/html.scm:250
+msgid "the free music knowledge encyclopaedia"
+msgstr "自由な音楽知識の百科事典"
+
+#: app/views/index.scm:93
+msgid "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."
+msgstr "WikiMusicプロジェクトは非営利のコミュニティであり、知識の共有と音楽教育を目的として、あらゆる形の音楽を探求し、共有し、学ぶためのオープンなプラットフォームを提供します。"
+
+#: app/views/index.scm:108
+msgid "donate what you can, by clicking here"
+msgstr "できる範囲で寄付するには、ここをクリック"
+
+#: app/views/index.scm:111
+msgid "This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong."
+msgstr "これは、基盤となるクラウドインフラと貢献者の作業時間を維持する助けになります。"
+
+#: app/views/index.scm:114
+msgid "WikiMusic leverages a database-backed architecture to ensure all content is easily searchable, linkable, and reusable. "
+msgstr "WikiMusicはデータベースに支えられたアーキテクチャにより、すべてのコンテンツを検索・リンク・再利用しやすくしています。 "
+
+#: app/views/index.scm:116
+msgid "The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively."
+msgstr "ユーザーインターフェースはシームレスな体験を提供し、初心者も専門家も協力して音楽の世界に触れられるようにします。"
+
+#: app/views/index.scm:118
+msgid "Join us in building an ever-growing library of musical knowledge — where every note tells a story."
+msgstr "成長し続ける音楽知識のライブラリづくりに参加してください — すべての音符が物語を語ります。"
+
+#: app/views/index.scm:144
+msgid "Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:"
+msgstr "音楽家、教育者、研究者、あるいはただの音楽好きであっても、WikiMusicは次のことを可能にします:"
+
+#: app/views/index.scm:146
+msgid "Discover music from diverse genres and traditions."
+msgstr "多様なジャンルや伝統の音楽を発見する。"
+
+#: app/views/index.scm:148
+msgid "Organize information with structured metadata and multimedia content."
+msgstr "構造化されたメタデータとマルチメディアコンテンツで情報を整理する。"
+
+#: app/views/index.scm:150
+msgid "Contribute by adding new compositions, analyses, or educational materials."
+msgstr "新しい楽曲、分析、教材を追加して貢献する。"
+
+#: app/views/index.scm:152
+msgid "Learn through curated resources that connect music theory, history, and practice."
+msgstr "音楽理論、歴史、実践をつなぐ厳選されたリソースで学ぶ。"
+
+#: app/views/index.scm:154
+msgid "At its core, WikiMusic leverages the expressive power of Lisp to build a dynamic interactive Music Gallery and Content Management System (CMS)."
+msgstr "中核として、WikiMusicはLispの表現力を活かし、動的でインタラクティブな音楽ギャラリー兼コンテンツ管理システム（CMS）を構築しています。"
+
+#: app/views/login.scm:45 app/views/me.scm:127 app/views/me.scm:209
+#: app/views/me.scm:291
+msgid "email"
+msgstr "メールアドレス"
+
+#: app/views/login.scm:50
+msgid "password"
+msgstr "パスワード"
+
+#: app/views/login.scm:55 app/views/me.scm:112 lib/wikimusic/html.scm:419
+msgid "login"
+msgstr "ログイン"
+
+#: app/views/login.scm:68
+msgid "account to reset (email)"
+msgstr "リセットするアカウント（メールアドレス）"
+
+#: app/views/login.scm:75 app/views/me.scm:366
+msgid "reset"
+msgstr "リセット"
+
+#: app/views/login.scm:86
+msgid "login to wikimusic"
+msgstr "wikimusicにログイン"
+
+#: app/views/login.scm:93 app/views/me.scm:108
+msgid "reset password"
+msgstr "パスワードをリセット"
+
+#: app/views/me.scm:44
+msgid "my unique id:"
+msgstr "私の一意のID:"
+
+#: app/views/me.scm:53
+msgid "my permissions (in database):"
+msgstr "私の権限（データベース内）:"
+
+#: app/views/me.scm:63
+msgid "current session permissions (in token):"
+msgstr "現在のセッション権限（トークン内）:"
+
+#: app/views/me.scm:70
+msgid "tip: if your session permissions don't match the DB consider logging out and logging in again"
+msgstr "ヒント: セッションの権限がデータベースと一致しない場合は、ログアウトして再度ログインしてください"
+
+#: app/views/me.scm:76
+msgid "logged in until"
+msgstr "ログイン有効期限"
+
+#: app/views/me.scm:97
+msgid "go to user management"
+msgstr "ユーザー管理へ移動"
+
+#: app/views/me.scm:101
+msgid "logout"
+msgstr "ログアウト"
+
+#: app/views/me.scm:122 app/views/me.scm:206 app/views/me.scm:286
+msgid "username"
+msgstr "ユーザー名"
+
+#: app/views/me.scm:131
+msgid "id"
+msgstr "ID"
+
+#: app/views/me.scm:136
+msgid "permissions"
+msgstr "権限"
+
+#: app/views/me.scm:146 lib/wikimusic/html.scm:950
+msgid "delete"
+msgstr "削除"
+
+#: app/views/me.scm:151
+msgid "are you sure you want to delete this user?"
+msgstr "このユーザーを削除してもよろしいですか？"
+
+#: app/views/me.scm:168
+msgid "User management"
+msgstr "ユーザー管理"
+
+#: app/views/me.scm:172
+msgid "new user"
+msgstr "新しいユーザー"
+
+#: app/views/me.scm:195
+msgid "New User"
+msgstr "新しいユーザー"
+
+#: app/views/me.scm:214 app/views/me.scm:298
+msgid "user permissions"
+msgstr "ユーザー権限"
+
+#: app/views/me.scm:269
+msgid "Edit User"
+msgstr "ユーザーを編集"
+
+#: app/views/me.scm:334
+msgid "Reset your password"
+msgstr "パスワードをリセット"
+
+#: app/views/me.scm:337
+msgid "perform a password reset for"
+msgstr "パスワードリセットを実行する対象"
+
+#: app/views/me.scm:355
+msgid "new password"
+msgstr "新しいパスワード"
+
+#: app/views/me.scm:361
+msgid "confirm password"
+msgstr "パスワードの確認"
+
+#: app/views/song-content-edit.scm:94
+msgid "editing version"
+msgstr "バージョンを編集"
+
+#: app/views/song-content-edit.scm:95 app/views/song-content-view.scm:78
+msgid "new version"
+msgstr "新しいバージョン"
+
+#: app/views/song-content-edit.scm:103
+msgid "instrument type"
+msgstr "楽器の種類"
+
+#: app/views/song-content-edit.scm:107
+msgid "version name"
+msgstr "バージョン名"
+
+#: app/views/song-content-edit.scm:114 app/views/song-content-view.scm:258
+msgid "PDF contents"
+msgstr "PDFの内容"
+
+#: app/views/song-content-edit.scm:133 app/views/song-content-view.scm:216
+msgid "ascii legend"
+msgstr "asciiの凡例"
+
+#: app/views/song-content-edit.scm:149 app/views/song-content-view.scm:148
+msgid "ascii contents"
+msgstr "asciiの内容"
+
+#: app/views/song-content-view.scm:84
+msgid "1 line"
+msgstr "1行"
+
+#: app/views/song-content-view.scm:86
+msgid "2 line"
+msgstr "2行"
+
+#: app/views/song-content-view.scm:88
+msgid "4 line"
+msgstr "4行"
+
+#: app/views/song-content-view.scm:91
+msgid "8 line"
+msgstr "8行"
+
+#: app/views/song-content-view.scm:93
+msgid "16 line"
+msgstr "16行"
+
+#: app/views/song-content-view.scm:95
+msgid "32 line"
+msgstr "32行"
+
+#: app/views/song-content-view.scm:100
+msgid "1 second"
+msgstr "1秒"
+
+#: app/views/song-content-view.scm:102
+msgid "2 second"
+msgstr "2秒"
+
+#: app/views/song-content-view.scm:104
+msgid "4 second"
+msgstr "4秒"
+
+#: app/views/song-content-view.scm:106
+msgid "8 second"
+msgstr "8秒"
+
+#: app/views/song-content-view.scm:108
+msgid "16 second"
+msgstr "16秒"
+
+#: app/views/song-content-view.scm:110
+msgid "32 second"
+msgstr "32秒"
+
+#: app/views/song-content-view.scm:115
+msgid "auto-scrolling:"
+msgstr "自動スクロール:"
+
+#: app/views/song-content-view.scm:118
+msgid "scroll"
+msgstr "スクロール"
+
+#: app/views/song-content-view.scm:123
+msgid "highlight chords"
+msgstr "コードを強調表示"
+
+#: app/views/song-content-view.scm:187
+msgid "edit version"
+msgstr "バージョンを編集"
+
+#: app/views/song-content-view.scm:206
+msgid "delete version"
+msgstr "バージョンを削除"
+
+#: app/views/song-content-view.scm:277
+msgid "manage version"
+msgstr "バージョンを管理"
+
+#: app/views/song-edit.scm:49 app/views/song-edit.scm:107
+msgid "editing song"
+msgstr "曲を編集"
+
+#: app/views/song-edit.scm:52 app/views/song-view.scm:205
+msgid "new song"
+msgstr "新しい曲"
+
+#: app/views/song-edit.scm:169
+msgid "song's artists"
+msgstr "この曲のアーティスト"
+
+#: app/views/song-edit.scm:171
+msgid "add artist relation"
+msgstr "アーティストの関連を追加"
+
+#: app/views/song-edit.scm:183 app/views/song-edit.scm:236
+msgid "submit"
+msgstr "送信"
+
+#: app/views/song-edit.scm:222
+msgid "song's genres"
+msgstr "この曲のジャンル"
+
+#: app/views/song-edit.scm:224
+msgid "add genre relation"
+msgstr "ジャンルの関連を追加"
+
+#: app/views/song-edit.scm:299 app/views/song-view.scm:267
+msgid "music key"
+msgstr "楽曲のキー"
+
+#: app/views/song-edit.scm:302
+msgid "music tuning"
+msgstr "楽曲のチューニング"
+
+#: app/views/song-edit.scm:305 app/views/song-view.scm:273
+msgid "music creation date"
+msgstr "楽曲の作成日"
+
+#: app/views/song-edit.scm:308 app/views/song-view.scm:280
+msgid "album name"
+msgstr "アルバム名"
+
+#: app/views/song-edit.scm:311
+msgid "album info url"
+msgstr "アルバム情報のURL"
+
+#: app/views/song-view.scm:52
+msgid "versions"
+msgstr "バージョン"
+
+#: app/views/song-view.scm:150
+msgid "viewing songs:"
+msgstr "曲を表示中:"
+
+#: app/views/song-view.scm:261
+msgid "tuning"
+msgstr "チューニング"
+
+#: app/views/song-view.scm:287
+msgid "album info link"
+msgstr "アルバム情報のリンク"
+
+#: app/views/song-view.scm:346
+msgid "musical content pref:"
+msgstr "音楽コンテンツの設定:"
+
+#: lib/wikimusic/html.scm:201
+msgid "language"
+msgstr "言語"
+
+#: lib/wikimusic/html.scm:259
+msgid "find here the:"
+msgstr "こちらをご覧ください:"
+
+#: lib/wikimusic/html.scm:260
+msgid "source code"
+msgstr "ソースコード"
+
+#: lib/wikimusic/html.scm:263
+msgid "manual"
+msgstr "マニュアル"
+
+#: lib/wikimusic/html.scm:274
+msgid "wikimusic is free software, available under the GNU AGPL v3 or newer"
+msgstr "wikimusicは自由ソフトウェアであり、GNU AGPL v3以降の下で利用できます"
+
+#: lib/wikimusic/html.scm:281
+msgid "version:"
+msgstr "バージョン:"
+
+#: lib/wikimusic/html.scm:296
+msgid "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"
+msgstr "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"
+
+#: lib/wikimusic/html.scm:306
+msgid "back to the top"
+msgstr "トップへ戻る"
+
+#: lib/wikimusic/html.scm:387
+msgid "WikiMusic"
+msgstr "WikiMusic"
+
+#: lib/wikimusic/html.scm:438
+msgid "me"
+msgstr "マイページ"
+
+#: lib/wikimusic/html.scm:646 lib/wikimusic/html.scm:860
+msgid "views"
+msgstr "閲覧数"
+
+#: lib/wikimusic/html.scm:657 lib/wikimusic/html.scm:909
+msgid "comments"
+msgstr "コメント"
+
+#: lib/wikimusic/html.scm:666
+msgid "published"
+msgstr "公開"
+
+#: lib/wikimusic/html.scm:667
+msgid "unkown status"
+msgstr "不明なステータス"
+
+#: lib/wikimusic/html.scm:776
+msgid "like"
+msgstr "いいね"
+
+#: lib/wikimusic/html.scm:800
+msgid "dislike"
+msgstr "よくないね"
+
+#: lib/wikimusic/html.scm:821
+msgid "last edited"
+msgstr "最終編集"
+
+#: lib/wikimusic/html.scm:832
+msgid "approved by"
+msgstr "承認者"
+
+#: lib/wikimusic/html.scm:865
+msgid "created"
+msgstr "作成日"
+
+#: lib/wikimusic/html.scm:871
+msgid "contributor"
+msgstr "貢献者"
+
+#: lib/wikimusic/html.scm:882
+msgid "visibility"
+msgstr "公開範囲"
+
+#: lib/wikimusic/html.scm:888
+msgid "uuid"
+msgstr "uuid"
+
+#: lib/wikimusic/html.scm:928
+msgid "content url"
+msgstr "コンテンツのURL"
+
+#: lib/wikimusic/html.scm:932
+msgid "content caption"
+msgstr "コンテンツのキャプション"
+
+#: lib/wikimusic/html.scm:935
+msgid "order value"
+msgstr "並び順の値"
+
+#: lib/wikimusic/html.scm:971
+msgid "wikipedia url"
+msgstr "wikipediaのURL"
+
+#: lib/wikimusic/html.scm:975
+msgid "youtube url"
+msgstr "youtubeのURL"
+
+#: lib/wikimusic/html.scm:979
+msgid "spotify url"
+msgstr "spotifyのURL"
+
+#: lib/wikimusic/html.scm:983
+msgid "soundcloud url"
+msgstr "soundcloudのURL"
+
+#: lib/wikimusic/html.scm:988 lib/wikimusic/html.scm:989
+msgid "save"
+msgstr "保存"
+
+#: lib/wikimusic/html.scm:1009
+msgid "sort order"
+msgstr "並び順"
+
+#: lib/wikimusic/html.scm:1021
+msgid "Name - Ascending"
+msgstr "名前 - 昇順"
+
+#: lib/wikimusic/html.scm:1023
+msgid "Name - Descending"
+msgstr "名前 - 降順"
+
+#: lib/wikimusic/html.scm:1026
+msgid "Created - Ascending"
+msgstr "作成日 - 昇順"
+
+#: lib/wikimusic/html.scm:1028
+msgid "Created - Descending"
+msgstr "作成日 - 降順"
+
+#: lib/wikimusic/html.scm:1031
+msgid "Last edited - Ascending"
+msgstr "最終編集 - 昇順"
+
+#: lib/wikimusic/html.scm:1033
+msgid "Last edited - Descending"
+msgstr "最終編集 - 降順"
+
+#: lib/wikimusic/html.scm:1036
+msgid "Views - Ascending"
+msgstr "閲覧数 - 昇順"
+
+#: lib/wikimusic/html.scm:1038
+msgid "Views - Descending"
+msgstr "閲覧数 - 降順"
+
+#: lib/wikimusic/html.scm:1059
+msgid "ascii size"
+msgstr "asciiのサイズ"
+
+#: lib/wikimusic/html.scm:1122
+msgid "Search..."
+msgstr "検索..."
+
+#: lib/wikimusic/html.scm:1135
+msgid "search"
+msgstr "検索"
+
+#: lib/wikimusic/html.scm:1178
+msgid "Wikipedia"
+msgstr "Wikipedia"
+
+#: lib/wikimusic/html.scm:1182
+msgid "Spotify"
+msgstr "Spotify"
+
+#: lib/wikimusic/html.scm:1186
+msgid "Youtube"
+msgstr "Youtube"
+
+#: lib/wikimusic/html.scm:1190
+msgid "Soundcloud"
+msgstr "Soundcloud"
+

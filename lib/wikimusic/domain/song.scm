@@ -21,6 +21,7 @@
   #:use-module (wikimusic domain repo)
   #:export (get-song-by-id search-songs
                            get-songs
+                           count-songs
                            insert-song
                            get-songs-by-artist-id
                            get-songs-by-genre-id
@@ -36,6 +37,7 @@
                        mk-song-repository
                        (get-song-by-id-proc repo-get-song-by-id)
                        (get-songs-proc repo-get-songs)
+                       (count-songs-proc repo-count-songs)
                        (get-songs-by-artist-id-proc
                         repo-get-songs-by-artist-id)
                        (get-songs-by-genre-id-proc repo-get-songs-by-genre-id)
@@ -55,6 +57,9 @@
 
 (define-repo-method get-songs repo-get-songs
  "Retrieves a list of all active songs from the given REPO.")
+
+(define-repo-method count-songs repo-count-songs
+ "Counts the songs in the given REPO, optionally those a SEARCH matches.")
 
 (define-repo-method get-songs-by-artist-id repo-get-songs-by-artist-id
  "Retrieves a list of all active songs by artist ID from the given REPO.")

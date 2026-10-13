@@ -17,6 +17,7 @@
 
 (define-module (wikimusic sqlite song)
   #:declarative? #t
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
@@ -41,15 +42,6 @@
                  views
                  description))
 
-  (define cols-sql
-    (symbols->sql-columns-list columns))
-
-  (define insert-columns
-    (delq 'last-edited-at columns))
-
-  (define insert-cols-sql
-    (symbols->sql-columns-list insert-columns))
-
   (define conn
     (DB-open rc))
 
@@ -60,103 +52,133 @@
     (db-read conn))
 
   (define (get-song-by-id id)
-    (let* ((query (format #f
-                   "SELECT ~a FROM songs WHERE identifier = ~a LIMIT 1"
-                   cols-sql
-                   (value->sql-literal id)))
-           (rows (execute-read "get-song-by-id" query)))
+    (let ((rows (execute-read "get-song-by-id"
+                              (sql-select 'songs
+                                          #:columns columns
+                                          #:where (list (cons 'identifier id))
+                                          #:limit 1))))
       (if (nil? rows) #f
           (car rows))))
 
-  (define* (get-songs #:key (order-by "created_at DESC")
+  (define* (get-songs #:key (order-by '((created-at desc)))
                       (limit 100)
                       (offset 0))
-    (let* ((query (format #f
-                          "SELECT ~a FROM songs
-                   ORDER BY ~a LIMIT ~a OFFSET ~a"
-                          cols-sql
-                          order-by
-                          limit
-                          offset)))
-      (execute-read "get-songs" query)))
+    (execute-read "get-songs"
+                  (sql-select 'songs
+                              #:columns columns
+                              #:order-by order-by
+                              #:limit limit
+                              #:offset offset)))
+
+  ;; A song's artists and genres are held in the join tables, so the songs of
+  ;; an artist are those whose identifiers the join table names.  Reading the
+  ;; identifiers first and then the songs keeps both statements inside
+  ;; kracht's builders -- an `IN (SELECT ...)' subquery would have to be
+  ;; written out by hand, and kracht would no longer own the statement.
+  (define (song-ids-in-relation name related-table related-column id)
+    (map (lambda (row) (assq-ref row 'song-identifier))
+         (execute-read name
+                       (sql-select related-table
+                                   #:columns '(song-identifier)
+                                   #:where (list (cons related-column id))))))
 
   (define* (get-songs-by-artist-id id
-                                   #:key (order-by "display_name DESC"))
-    (let* ((query (format #f
-                   "SELECT ~a FROM songs
-                   WHERE identifier IN (SELECT song_identifier FROM song_artists WHERE
-                    artist_identifier = ~a)
-                   ORDER BY ~a"
-                   cols-sql
-                   (value->sql-literal id) order-by)))
-      (execute-read "get-songs-by-artist-id" query)))
+                                   #:key (order-by '((display-name desc))))
+    (execute-read "get-songs-by-artist-id"
+                  (sql-select 'songs
+                              #:columns columns
+                              #:where (list (list 'identifier
+                                                  'in
+                                                  (song-ids-in-relation
+                                                   "song-ids-by-artist-id"
+                                                   'song_artists
+                                                   'artist-identifier
+                                                   id)))
+                              #:order-by order-by)))
 
   (define* (get-songs-by-genre-id id
-                                  #:key (order-by "display_name DESC"))
-    (let* ((query (format #f
-                   "SELECT ~a FROM songs
-                   WHERE identifier IN (SELECT song_identifier FROM song_genres WHERE
-                    genre_identifier = ~a)
-                   ORDER BY ~a"
-                   cols-sql
-                   (value->sql-literal id) order-by)))
-      (execute-read "get-songs-by-genre-id" query)))
+                                  #:key (order-by '((display-name desc))))
+    (execute-read "get-songs-by-genre-id"
+                  (sql-select 'songs
+                              #:columns columns
+                              #:where (list (list 'identifier
+                                                  'in
+                                                  (song-ids-in-relation
+                                                   "song-ids-by-genre-id"
+                                                   'song_genres
+                                                   'genre-identifier
+                                                   id)))
+                              #:order-by order-by)))
 
+  ;; The one statement kracht's builders cannot write: a search matches the
+  ;; term against either of two columns, and kracht joins its conditions with
+  ;; `AND' only.  It is still kracht that owns it -- `sql-parameterize' is
+  ;; kracht's own escape hatch -- and the columns and the sort come from
+  ;; kracht's helpers, so only the `OR' itself is spelled here.
   (define* (search-songs s
-                         #:key (order-by "created_at DESC")
+                         #:key (order-by '((created-at desc)))
                          (limit 100)
                          (offset 0))
-    (let* ((search (value->sql-literal (format #f "%~a%" s)))
-           (query (format #f
-                   "SELECT ~a FROM songs
-                   WHERE (display_name LIKE ~a OR description LIKE ~a)
-                   ORDER BY ~a LIMIT ~a OFFSET ~a"
-                   cols-sql
-                   search
-                   search
-                   order-by
-                   limit
-                   offset)))
-      (execute-read "search-songs" query)))
+    (let ((search (format #f "%~a%" s)))
+      (execute-read "search-songs"
+                    (sql-parameterize
+                     (format #f
+                             "SELECT ~a FROM songs WHERE (display_name LIKE ? OR description LIKE ?) ORDER BY ~a LIMIT ? OFFSET ?"
+                             (symbols->sql-columns-list columns)
+                             (sql-order-by-sql order-by))
+                     (list search search limit offset)))))
+
+  ;; A count is a statement kracht's `sql-select' cannot express -- it takes
+  ;; column names, and `COUNT(*)' is not a column -- so `sql-parameterize',
+  ;; kracht's own escape hatch, carries it.  The `WHERE' is the same one
+  ;; `search-songs' uses, so a page count and a page of hits always agree.
+  (define* (count-songs #:key search)
+    (let* ((term (and search (format #f "%~a%" search)))
+           (rows (if term
+                     (execute-read "count-songs"
+                                   (sql-parameterize
+                                    "SELECT COUNT(*) AS count FROM songs WHERE (display_name LIKE ? OR description LIKE ?)"
+                                    (list term term)))
+                     (execute-read "count-songs"
+                                   (sql-parameterize
+                                    "SELECT COUNT(*) AS count FROM songs"
+                                    '())))))
+      (if (nil? rows) 0
+          (or (assq-ref (car rows) 'count) 0))))
 
   (define* (get-song-artists-by-ids ids)
-    (let* ((query (format #f
-                   "SELECT song_identifier, artist_identifier FROM song_artists
-                   WHERE song_identifier IN(~a)
-                   ORDER BY created_at DESC"
-                   (string-join (map value->sql-literal ids) ", "))))
-      (execute-read "get-song-artists-by-ids" query)))
+    (execute-read "get-song-artists-by-ids"
+                  (sql-select 'song_artists
+                              #:columns '(song-identifier artist-identifier)
+                              #:where (list (list 'song-identifier 'in ids))
+                              #:order-by '((created-at desc)))))
 
   (define* (get-song-genres-by-ids ids)
-    (let* ((query (format #f
-                   "SELECT song_identifier, genre_identifier FROM song_genres
-                   WHERE song_identifier IN(~a)
-                   ORDER BY created_at DESC"
-                   (string-join (map value->sql-literal ids) ", "))))
-      (execute-read "get-song-genres-by-ids" query)))
+    (execute-read "get-song-genres-by-ids"
+                  (sql-select 'song_genres
+                              #:columns '(song-identifier genre-identifier)
+                              #:where (list (list 'song-identifier 'in ids))
+                              #:order-by '((created-at desc)))))
 
   (define (update-song-by-id id attrs)
-    (let* ((query (format #f "UPDATE songs SET ~a WHERE identifier = ~a"
-                          (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id))))
-      (execute-write "update-song-by-id" query)))
+    (execute-write "update-song-by-id"
+                   (sql-update 'songs
+                               (attrs->row attrs columns)
+                               #:where (list (cons 'identifier id)))))
 
   (define (delete-song-by-id id)
-    (let* ((query (format #f "DELETE FROM songs WHERE identifier = ~a"
-                          (value->sql-literal id))))
-      (execute-write "delete-song-by-id" query)))
+    (execute-write "delete-song-by-id"
+                   (sql-delete 'songs
+                               #:where (list (cons 'identifier id)))))
 
   (define (insert-song attrs)
-    (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
-           (query (format #f "INSERT INTO songs (~a) VALUES (~a)"
-                          insert-cols-sql
-                          (string-join vals ", "))))
-      (execute-write "insert-song" query)))
+    (execute-write "insert-song"
+                   (sql-insert 'songs
+                               (attrs->row attrs columns))))
 
   (mk-song-repository #:get-song-by-id-proc get-song-by-id
                       #:get-songs-proc get-songs
+                      #:count-songs-proc count-songs
                       #:get-songs-by-artist-id-proc get-songs-by-artist-id
                       #:get-songs-by-genre-id-proc get-songs-by-genre-id
                       #:get-song-genres-by-ids-proc get-song-genres-by-ids

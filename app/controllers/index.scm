@@ -25,10 +25,12 @@
 (get "/"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies '(names x-bewaking-wikimusic lang)
      (lambda (rc)
        (response-emit (:mime rc
                              (welcome-page (:i18n rc)
+                                           #:selected-locale (:cookies-value
+                                                              rc "lang")
                                            #:is-logged-in (:cookies-value rc
                                                            "x-bewaking-wikimusic"))))))
 

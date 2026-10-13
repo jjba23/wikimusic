@@ -31,8 +31,8 @@
                      #:key is-logged-in)
   (let* ((login-form `(div (form (@ (action "/login")
                                     (class ,(mk-class '(w-full rounded-xl
-                                                        bg-stone-300/50
-                                                        dark:bg-onyx-700
+                                                        hg-frost bg-stone-100/75
+                                                        dark:bg-onyx-900/75
                                                         p-4
                                                         flex
                                                         flex-row
@@ -40,7 +40,7 @@
                                                         items-center
                                                         gap-4
                                                         shadow-md
-                                                        align-center)))
+                                                        items-center)))
                                     (method POST))
                                  ,(input #:label (G_ "email")
                                          #:name "email"
@@ -55,8 +55,8 @@
                                  (div ,(submit-button (G_ "login"))))))
          (reset-form `((form (@ (action "/password/reset")
                                 (class ,(mk-class '(w-full rounded-xl
-                                                           bg-stone-300/50
-                                                           dark:bg-onyx-700
+                                                           hg-frost bg-stone-100/75
+                                                           dark:bg-onyx-900/75
                                                            p-4
                                                            flex
                                                            flex-row

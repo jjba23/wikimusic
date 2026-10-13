@@ -53,7 +53,9 @@
 (get "/genres"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-genre-sort x-bewaking-wikimusic)
+     #:cookies '(names wikimusic-genre-sort
+                       wikimusic-grid-size
+                       x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (genre-repo (make-sqlite-genre-repository rc))
@@ -84,32 +86,57 @@
                                           "wikimusic-genre-sort")))
                             (:cookies-value rc "wikimusic-genre-sort"))
                            (else "display-name-asc")))
+              ;; The tile-size preference travels the same way the sort does:
+              ;; a `grid-size' in the query string is stored in a cookie and
+              ;; every later visit reads it back, so the choice outlives the
+              ;; page it was made on.
+              (grid-size (cond
+                           ((not (equal? #f
+                                         (get-from-qstr rc "grid-size")))
+                            (:cookies-set! rc
+                                           'wikimusic-grid-size
+                                           "wikimusic-grid-size"
+                                           (get-from-qstr rc "grid-size"))
+                            (:cookies-setattr! rc
+                                               'wikimusic-grid-size
+                                               #:expires 12000000
+                                               #:path "/"
+                                               #:secure #t
+                                               #:http-only #t)
+                            (get-from-qstr rc "grid-size"))
+                           ((not (equal? #f
+                                         (:cookies-value rc
+                                          "wikimusic-grid-size")))
+                            (:cookies-value rc "wikimusic-grid-size"))
+                           (else "medium")))
               (query-sort (entity-sort-from-query user-sort))
-              (query-offset (cond
-                              ((not (nil? (get-from-qstr rc "offset")))
-                               (string->number (get-from-qstr rc "offset")))
-                              (else 0)))
-              (query-limit (cond
-                             ((not (nil? (get-from-qstr rc "limit")))
-                              (string->number (get-from-qstr rc "limit")))
-                             (else 100)))
+              ;; The list is read a page at a time.  Forty rows fill a
+              ;; screenful of tiles without making the reader scroll far, and
+              ;; the page number in the query string is what the nav links
+              ;; carry, so a page is a plain `offset = (page - 1) * 40'.
+              (query-page (let ((p (get-from-qstr rc "page")))
+                            (if (nil? p) 1
+                                (max 1 (or (string->number p) 1)))))
+              (query-limit 40)
+              (query-offset (* (- query-page 1) query-limit))
               (genres (cond
                         ((equal? #f user-search)
                          (get-genres genre-repo
-                                     #:order-by (format #f "~a ~a"
-                                                        (car query-sort)
-                                                        (cadr query-sort))
+                                     #:order-by query-sort
                                      #:limit query-limit
                                      #:offset query-offset))
                         (else (search-genres genre-repo
                                              (html-escape user-search)
-                                             #:order-by (format #f "~a ~a"
-                                                                (car
-                                                                 query-sort)
-                                                                (cadr
-                                                                 query-sort))
+                                             #:order-by query-sort
                                              #:limit query-limit
                                              #:offset query-offset))))
+              (genre-total (count-genres genre-repo
+                                         #:search (and user-search
+                                                       (html-escape
+                                                        user-search))))
+              (genre-pages (max 1
+                                (ceiling (/ genre-total
+                                            query-limit))))
               (genre-ids (map (lambda (s)
                                 (assq-ref s
                                           'identifier)) genres))
@@ -130,8 +157,10 @@
                                                 #:comments comments
                                                 #:limit query-limit
                                                 #:offset query-offset
+                                                #:pages genre-pages
                                                 #:search-query user-search
                                                 #:user-sort user-sort
+                                                #:grid-size grid-size
                                                 #:is-logged-in (:cookies-value
                                                                 rc
                                                                 "x-bewaking-wikimusic")))))))
@@ -155,7 +184,8 @@
               (genre-repo (make-sqlite-genre-repository rc))
               (opinion-repo (make-sqlite-opinion-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
-              (genre (get-genre-by-id genre-repo genre-id))
+              (genre (entity-or-404 (get-genre-by-id genre-repo genre-id)
+                                    "genre" genre-id))
               (artwork-repo (make-sqlite-artwork-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
               (comment-repo (make-sqlite-comment-repository rc))
@@ -209,11 +239,7 @@
               (song-query-sort (entity-sort-from-query song-user-sort))
 
               (songs (get-songs-by-genre-id song-repo genre-id
-                                            #:order-by (format #f "~a ~a"
-                                                               (car
-                                                                song-query-sort)
-                                                               (cadr
-                                                                song-query-sort))))
+                                            #:order-by song-query-sort))
               (song-ids (map (lambda (s)
                                (assq-ref s
                                          'identifier)) songs))
@@ -300,7 +326,8 @@
      (lambda (rc)
        (let* ((genre-id (params rc "uuid"))
               (genre-repo (make-sqlite-genre-repository rc))
-              (genre (get-genre-by-id genre-repo genre-id))
+              (genre (entity-or-404 (get-genre-by-id genre-repo genre-id)
+                                    "genre" genre-id))
               (artwork-repo (make-sqlite-artwork-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (e (get-external-sources-by-entity-ids external-source-repo

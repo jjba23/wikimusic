@@ -80,23 +80,26 @@
                - views-asc
              Any other string will default to sorting by 'last_edited_at' descending.
 
-  Returns a list containing two elements: the field to sort by (a symbol)
-  and the sort order (the symbol 'asc' for ascending or 'desc' for descending)."
+  Returns it as the clause list kracht's `sql-select' takes: a list holding one
+  `(column direction)' clause, where the column is a hyphenated Scheme symbol
+  (`display-name', which kracht spells display_name in SQL) and the direction is
+  `asc' or `desc'.  The repository hands the result straight to `sql-select',
+  so no query string is ever built out of it."
   (cond
     ((equal? "created-at-desc" user-sort)
-     '(created_at desc))
+     '((created-at desc)))
     ((equal? "created-at-asc" user-sort)
-     '(created_at asc))
+     '((created-at asc)))
     ((equal? "last-edited-at-desc" user-sort)
-     '(last_edited_at desc))
+     '((last-edited-at desc)))
     ((equal? "last-edited-at-asc" user-sort)
-     '(last_edited_at asc))
+     '((last-edited-at asc)))
     ((equal? "display-name-desc" user-sort)
-     '(display_name desc))
+     '((display-name desc)))
     ((equal? "display-name-asc" user-sort)
-     '(display_name asc))
+     '((display-name asc)))
     ((equal? "views-desc" user-sort)
-     '(views desc))
+     '((views desc)))
     ((equal? "views-asc" user-sort)
-     '(views asc))
-    (else '(last_edited_at desc))))
+     '((views asc)))
+    (else '((last-edited-at desc)))))
