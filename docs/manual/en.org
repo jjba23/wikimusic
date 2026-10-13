@@ -473,6 +473,37 @@ laid out differently.  The reader is written against the Guitar Pro 5 format,
 and its module -- =(wikimusic guitarpro)= -- is the one place that knows the
 file's byte layout.
 
+** Seeing and hearing the tab in the page
+
+The tab is not only offered for download.  Beside it is an offer to draw the
+tablature in the page itself, notation and tablature staff together, and to play
+it back: pressing the offer loads a *renderer* -- [[https://alphatab.net][alphaTab]] --
+and draws the score, and the play control that appears with it plays the tab
+through the browser's own audio.
+
+Neither the renderer nor the sound it plays with is fetched until a reader asks
+for a tab.  They are about two megabytes together, and a reader who came to read
+about a song should not pay for a tablature they never open; a page whose tabs
+are never opened costs a reader only the small script that offers them.  When a
+reader does ask, the words describing what is happening -- loading, drawn, or
+could not be drawn -- are the page's own: the view writes every sentence the
+player can show and the script only un-hides one of them, so a translated page
+stays translated while a tablature loads.
+
+What the renderer and the sound are, where they came from, and the licences they
+travel under are written down beside them in =pub/vendor/alphatab/README.md=.
+They are fetched by =maak alphatab= and committed, so an instance serves its own
+files and reaches no CDN at run time; raising the release in =maak.scm= and
+running that task again is how they are updated.
+
+A tab the site's own reader cannot follow is still offered to the renderer, and
+a tab the renderer cannot draw says so on the page while leaving the file
+downloadable: the two readers are independent, and a file that defeats one of
+them is not therefore a file the site will not hold.
+
+The list of file extensions artanis serves statically -- in =ENTRY= -- carries
+=sf2= for the SoundFont, so a deployment that narrows that list should keep it.
+
 ------
 
 * When a page cannot be served

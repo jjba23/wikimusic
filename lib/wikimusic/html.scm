@@ -267,10 +267,15 @@ the menu with @code{for}, so it reaches assistive technology as well."
                                      text-onyx-700
                                      dark:text-stone-300)))))
 
+;; Every page carries these, so they are the site's smallest scripts: what a
+;; page uses only sometimes -- the renderer a Guitar Pro tab is drawn with, and
+;; the SoundFont that makes it audible -- is fetched by the script below when a
+;; reader asks for a tab, and the renderer itself is never inlined.
 (define* asset-library
   (build-asset-library '("pub/js/song-auto-scroll.js" "pub/js/symbanta.js"
                          "pub/js/song-chord-highlighter.js"
-                         "pub/js/file-base64.js")))
+                         "pub/js/file-base64.js"
+                         "pub/js/guitarpro-player.js")))
 
 (define* (page-footer G_)
   `(,(footer
@@ -565,7 +570,10 @@ the menu with @code{for}, so it reaches assistive technology as well."
                                                   "pub/js/symbanta.js"))
 
                               (script ,(assoc-ref asset-library
-                                                  "pub/js/file-base64.js")))
+                                                  "pub/js/file-base64.js"))
+
+                              (script ,(assoc-ref asset-library
+                                                  "pub/js/guitarpro-player.js")))
 
                         (body (@ (class ,(mk-class '(bg-stone-100
                                                      dark:bg-onyx-900

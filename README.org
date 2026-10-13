@@ -41,8 +41,9 @@ Join us in building an ever-growing library of musical knowledge — where every
   artworks, external sources, cross-references to the other entities, opinions
   and comments.
 - *Song versions* that can carry an ASCII tab, a PDF, and a *Guitar Pro 5 tab*
-  whose own header the page reads, so a reader sees what the download holds
-  before spending it.
+  whose own header the page reads, which the page draws as notation and
+  tablature, and which it plays back -- so a reader can see, hear and download
+  the same file without leaving the page.
 - *A responsive interface* -- the same shell on a phone and on a desktop -- with
   sorting, search and a subtle, icon-first tile-size control on every list.
 - *Pretty error pages* for the refusals a reader actually meets (404, 403, 500
@@ -88,6 +89,24 @@ https://www.gnu.org/licenses/agpl-3.0.html
 The documentation and examples, including this document, which are provided with wikimusic, are all licensed under the GNU Free Documentation License v1.3 (or newer at your convenience).
 
 https://www.gnu.org/licenses/fdl-1.3.html
+
+-------
+
+* On bundled third-party assets
+
+wikimusic serves its own assets, and some of them are somebody else's work,
+vendored into the tree rather than linked to, so that an instance reaches no CDN
+at run time and works with no network of its own:
+
+- *alphaTab* (MPL-2.0) draws a stored Guitar Pro tab as notation and tablature
+  and plays it back;
+- the *SONiVOX SoundFont* (Apache-2.0, © Sonic Network Inc.) is what makes a
+  played-back tab audible, and fits beside it;
+- *Bravura* (SIL OFL 1.1) is the music font a tablature is drawn with.
+
+Their licences, their provenance and the task that fetches them are written
+down beside the files, in =pub/vendor/alphatab/README.md=.  They are unmodified,
+and their source stays where it came from.
 
 -------
 

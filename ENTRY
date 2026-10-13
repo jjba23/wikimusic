@@ -9,7 +9,10 @@
               (artanis utils))
  ;; Put whatever you want to be called before server initilization here
 
- (init-server #:statics '(png gif jpg jpeg ico html js json csv xml css woff woff2 ttf))
+ ;; `sf2' is here for the SoundFont a stored Guitar Pro tab is played back
+ ;; with: artanis serves a static file only when its extension is named in this
+ ;; list, and a SoundFont is served to the page the way a font or an image is.
+ (init-server #:statics '(png gif jpg jpeg ico html js json csv xml css woff woff2 ttf sf2))
  (add-to-load-path (string-append (current-toplevel) "/lib"))
  (add-to-load-path (string-append (current-toplevel) "/"))
 

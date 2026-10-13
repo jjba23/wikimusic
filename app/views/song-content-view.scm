@@ -31,7 +31,9 @@
   #:use-module (kracht prelude)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (render-song-content render-version))
+  #:export (render-song-content render-version
+                       render-guitarpro-section guitarpro-facts
+                       guitarpro-filename))
 
 (define (render-chord-pill pair)
   "Helper to render a single chord pill badge."
@@ -232,46 +234,121 @@ the version carries none.
 A version that carries no tab holds either nothing at all or the empty data
 URL a file input leaves behind (`data:application/octet-stream;base64,'), and
 neither is a file: the section is shown only when the data URL actually carries
-bytes, so an untouched field does not offer a reader an empty download."
+bytes, so an untouched field does not offer a reader an empty download.
+
+What the section holds is what a reader can do with the tab.  The file is
+still offered for download, because a tab is played in the program it was
+written in and the download is the page's whole answer for a reader who has
+one; beside it is the offer to draw the tablature in the page itself, which
+fetches the renderer only when it is taken.  The file is written into the page
+once -- in the download link's own `href' -- and the player reads it from
+there, so a song page with several tabs does not carry several copies of the
+largest thing each version holds.
+
+Every part the script reaches is named after the version, so a page holding
+more than one tab has no ambiguity about which it is addressing."
   (let* ((data-url (assq-ref version 'guitarpro-contents))
-         (tab-bytes (data-url-payload data-url))
-         (metadata (and tab-bytes (> (bytevector-length tab-bytes) 0)
-                        (gp5-bytes-metadata tab-bytes))))
+         (tab-bytes (data-url-payload data-url)))
     (if (and tab-bytes (not (zero? (bytevector-length tab-bytes))))
-        (list `(details (@ (open true) (class ,(mk-class '(my-6))))
-                        (summary (@ (class ,(mk-class '(text-xl
-                                                        font-bold
-                                                        text-onyx-300
-                                                        dark:text-stone-300
-                                                        cursor-pointer))))
-                                 ,(G_ "Guitar Pro 5 tab"))
-                        (div (@ (class ,(mk-class '(flex flex-col gap-4
+        (let* ((metadata (gp5-bytes-metadata tab-bytes))
+               (id (format #f "guitarpro-~a" (assq-ref version 'identifier)))
+               (filename (guitarpro-filename song version))
+               (named (lambda (part) (string-append id part))))
+          (list
+           `(details (@ (open true) (class ,(mk-class '(my-6))))
+                     (summary (@ (class ,(mk-class '(text-xl
+                                                     font-bold
+                                                     text-onyx-300
+                                                     dark:text-stone-300
+                                                     cursor-pointer))))
+                              ,(G_ "Guitar Pro 5 tab"))
+                     (div (@ (id ,id)
+                             (class ,(mk-class '(flex flex-col gap-4
                                                            py-4))))
-                             ,(if metadata
-                                  `(div (@ (class ,(mk-class '(flex flex-col
+                          ,(if metadata
+                               `(div (@ (class ,(mk-class '(flex flex-col
+                                                                   gap-2))))
+                                     ,@(map (lambda (fact)
+                                              `(div (@ (class ,(mk-class
+                                                                '(flex flex-row
+                                                                      flex-wrap
                                                                       gap-2))))
-                                        ,@(map (lambda (fact)
-                                                 `(div (@ (class ,(mk-class
-                                                                   '(flex flex-row
-                                                                         flex-wrap
-                                                                         gap-2))))
-                                                       (span (@ (class ,(mk-class
-                                                                         '(font-bold
-                                                                           text-onyx-300
-                                                                           dark:text-stone-300))))
-                                                             ,(car fact))
-                                                       (span (@ (class ,(mk-class
-                                                                         '(text-onyx-300
-                                                                           dark:text-stone-300))))
-                                                             ,(cdr fact))))
-                                               (guitarpro-facts G_ metadata)))
-                                  `(p (@ (class ,(mk-class '(text-onyx-300
-                                                             dark:text-stone-300))))
-                                      ,(G_ "the header of this tab could not be read, but the file itself can be downloaded")))
-                             (a (@ (href ,data-url)
-                                   (download ,(guitarpro-filename song version)))
-                                ,(icon-button #:icon 'download
-                                              #:content (G_ "download the tab"))))))
+                                                    (span (@ (class ,(mk-class
+                                                                      '(font-bold
+                                                                        text-onyx-300
+                                                                        dark:text-stone-300))))
+                                                          ,(car fact))
+                                                    (span (@ (class ,(mk-class
+                                                                      '(text-onyx-300
+                                                                        dark:text-stone-300))))
+                                                          ,(cdr fact))))
+                                            (guitarpro-facts G_ metadata)))
+                               `(p (@ (class ,(mk-class '(text-onyx-300
+                                                         dark:text-stone-300))))
+                                   ,(G_ "the header of this tab could not be read, but the file itself can be downloaded")))
+                          ;; The file, and the offer to draw it here.  The
+                          ;; renderer is not on the page until the offer is
+                          ;; taken, so a reader who came for the song pays
+                          ;; nothing for a tablature they never open.
+                          (div (@ (class ,(mk-class '(flex flex-row
+                                                             flex-wrap
+                                                             gap-3
+                                                             items-center))))
+                               (a (@ (id ,(named "-file"))
+                                     (href ,data-url)
+                                     (download ,filename))
+                                  ,(icon-button #:icon 'download
+                                                #:content (G_ "download the tab")))
+                               (span (@ (id ,(named "-ask")))
+                                     ,(icon-button #:icon 'music-notes-simple
+                                                   #:content (G_
+                                                              "show the tablature")
+                                                   #:on-click (format #f
+                                                              "wikimusicGuitarProShow('~a')"
+                                                              id))))
+                          ;; The tablature and the controls that come with it.
+                          ;; The controls are hidden until a score is drawn:
+                          ;; there is nothing to play before there is
+                          ;; something written down.
+                          (div (@ (class ,(mk-class '(flex flex-col
+                                                             gap-3))))
+                               (div (@ (id ,(named "-controls"))
+                                       (hidden "")
+                                       (class ,(mk-class '(flex flex-row
+                                                                 flex-wrap
+                                                                 gap-2
+                                                                 items-center))))
+                                    ,(icon-button #:icon 'play
+                                                  #:content (G_ "play")
+                                                  #:on-click (format #f
+                                                              "wikimusicGuitarProPlayPause('~a')"
+                                                              id))
+                                    ,(icon-button #:icon 'stop
+                                                  #:content (G_ "stop")
+                                                  #:on-click (format #f
+                                                              "wikimusicGuitarProStop('~a')"
+                                                              id)))
+                               (div (@ (id ,(named "-score"))
+                                       (class ,(mk-class '(overflow-x-auto))))
+                                    "")
+                               ;; What the player is doing, in the page's own
+                               ;; words: all three sentences are written here
+                               ;; and the script un-hides the one that is
+                               ;; true, so a translated page stays translated
+                               ;; when a tablature loads.
+                               (p (@ (class ,(mk-class '(text-sm
+                                                        text-onyx-300
+                                                        dark:text-stone-300)))
+                                     (aria-live "polite"))
+                                  (span (@ (id ,(named "-status-loading"))
+                                           (hidden ""))
+                                        ,(G_ "loading the tablature …"))
+                                  (span (@ (id ,(named "-status-ready"))
+                                           (hidden ""))
+                                        ,(G_ "the tablature is drawn below: press play to hear it"))
+                                  (span (@ (id ,(named "-status-failed"))
+                                           (hidden ""))
+                                        ,(G_ "this tablature could not be drawn here, but the file can still be downloaded"))))))))
         '())))
 
 (define* (render-version G_ song version ascii-size)

@@ -251,6 +251,55 @@ for higher concurrent writes to SQLite 3."
   ($ '("curl --output \"./pub/css/wikimusic.olive.min.css\""
        "\"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/wikimusic.olive.min.css\"")))
 
+;; ====== The vendored Guitar Pro renderer ======
+
+;; The release of alphaTab whose files are kept under `pub/vendor/alphatab'.
+;; The files are fetched rather than installed, the way the stylesheet above
+;; is, so that the site carries them itself and reaches no CDN at run time.
+;; Pinning the release is what keeps the vendored files and the code that
+;; drives them in step: alphaTab loads the worker it renders with and the
+;; music font it draws with from paths its own release decides.
+(define alphatab-version
+  "1.8.4")
+
+(define* (alphatab-fetch #:key url destination)
+  "Fetch URL into DESTINATION, creating the directory it belongs in first.
+
+The download fails loudly -- `--fail' turns an HTTP error into a non-zero
+status -- because a run that quietly left a page's asset missing would be found
+by a reader looking at a tab that will not render."
+  ($ (list "curl --fail --location --silent --show-error"
+           (~ "--output \"~a\"" destination)
+           (~ "\"~a\"" url))))
+
+(define (alphatab)
+  "Vendor alphaTab, the Guitar Pro renderer, into `pub/vendor/alphatab'.
+
+What is fetched is what the site serves: alphaTab's browser build, which also
+holds the worker it renders a score in; Bravura, the music font a tab is drawn
+with; and sonivox, the SoundFont a tab is played back with.  Their licences
+travel beside them, and the release they came from is written down in the
+directory's README, so what is vendored can be explained and re-fetched rather
+than being a blob of unknown age."
+  (let ((base (~ "https://cdn.jsdelivr.net/npm/@coderline/alphatab@~a/dist"
+                 alphatab-version))
+        (vendor "pub/vendor/alphatab"))
+    (mkdir-p (~ "~a/font" vendor))
+    (mkdir-p (~ "~a/soundfont" vendor))
+    (alphatab-fetch #:url (~ "~a/alphaTab.min.js" base)
+                    #:destination (~ "~a/alphaTab.min.js" vendor))
+    (alphatab-fetch #:url (~ "~a/font/Bravura.woff2" base)
+                    #:destination (~ "~a/font/Bravura.woff2" vendor))
+    (alphatab-fetch #:url (~ "~a/font/Bravura-OFL.txt" base)
+                    #:destination (~ "~a/font/Bravura-OFL.txt" vendor))
+    (alphatab-fetch #:url (~ "~a/soundfont/sonivox.sf2" base)
+                    #:destination (~ "~a/soundfont/sonivox.sf2" vendor))
+    (alphatab-fetch #:url (~ "~a/soundfont/LICENSE" base)
+                    #:destination (~ "~a/soundfont/LICENSE" vendor))
+    (alphatab-fetch #:url (~ "https://raw.githubusercontent.com/CoderLine/alphaTab/v~a/LICENSE"
+                             alphatab-version)
+                    #:destination (~ "~a/LICENSE" vendor))))
+
 (define (import-production-database)
   "Import production env's database to local workspace via SSH/SCP"
   ($ '("scp wolk-jjba:/etc/byggsteg/job-clone/wikimusic/trunk/wikimusic.db* .")))
