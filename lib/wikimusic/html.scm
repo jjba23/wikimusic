@@ -188,7 +188,7 @@ How long one drift takes, as a number of seconds or any CSS time.
                         dark:bg-jeans-blue-900/25)
                       #:delay -38
                       #:pace 74)))
- ;;; ===== The language a reader reads the interface in =====
+;;; ===== The language a reader reads the interface in =====
 
 ;; The languages this instance answers in: the name of the catalog under
 ;; `sys/i18n/locale', and the language as it is written in that language.
@@ -348,6 +348,7 @@ the same string however it is nested."
 (define* (page-footer G_)
   `(,(footer `( ;Where the rest of it is.  The archive is the one link that leaves the
                
+
                ;; server behind, so it is offered here rather than only to a reader
                ;; who knows the address: a copy of everything, to save or read
                ;; offline.
@@ -1120,6 +1121,7 @@ and six.
                          user-alist)
   (let* ( ;One photograph is a photograph and is shown as one.  Two or more
          
+
          ;; are a carousel: the framework's track pans with a swipe and its
          ;; arrows page one picture at a time, and both of those are better
          ;; than a stack that pushes the rest of the page -- the opinions, the

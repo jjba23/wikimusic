@@ -226,11 +226,10 @@ transaction.  That is what makes this safe to run at any time, and it is also
 the way to bring a database made by an earlier deployment up to what the source
 in front of it expects.  Mutastructura is the only thing that applies
 migrations; no task reads the SQL files and hands them to sqlite3 itself."
-  (time-machine-manifest-shell
-   (list (format #f
-                 "mutastructura --database sqlite3 --connection ~a --migrations ~a"
-                 wikimusic-db migrations-dir))
-   #:verbose? #t))
+  (time-machine-manifest-shell (list (format #f
+                                      "mutastructura --database sqlite3 --connection ~a --migrations ~a"
+                                      wikimusic-db migrations-dir))
+                               #:verbose? #t))
 
 (define (init-db)
   "Initialize a new database, enable WAL mode, and apply the schema.
@@ -246,8 +245,9 @@ why a deployment that has data runs `maak migrate' instead."
   ;; The command list, not the bare string: `time-machine-manifest-shell'
   ;; appends what it is given to the `guix time-machine ... shell' it builds,
   ;; so a string here would make the whole command an improper list.
-  (time-machine-manifest-shell
-   (list (~ "sqlite3 ~a 'PRAGMA journal_mode=WAL;'" wikimusic-db)))
+  (time-machine-manifest-shell (list (~
+                                      "sqlite3 ~a 'PRAGMA journal_mode=WAL;'"
+                                      wikimusic-db)))
   (migrate))
 
 ;; ====== Maak i18n tasks ======
