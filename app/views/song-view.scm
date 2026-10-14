@@ -113,12 +113,16 @@
 ;; carries no tab, or a file whose header cannot be read, is passed over.
 (define (first-tab-tempo versions)
   "Return the tempo the first readable tab among VERSIONS declares, or #f."
-  (let loop ((rest versions))
-    (if (null? rest)
-        #f
-        (let* ((url (assq-ref (car rest) 'guitarpro-contents))
-               (metadata (and (string? url) (gp5-metadata-of-data-url url))))
-          (or (and metadata (assq-ref metadata 'tempo))
+  (let loop
+    ((rest versions))
+    (if (null? rest) #f
+        (let* ((url (assq-ref (car rest)
+                              'guitarpro-contents))
+               (metadata (and (string? url)
+                              (gp5-metadata-of-data-url url))))
+          (or (and metadata
+                   (assq-ref metadata
+                             'tempo))
               (loop (cdr rest)))))))
 
 (define* (song-list-page G_
@@ -136,7 +140,10 @@
                          grid-size
                          pages
                          is-logged-in)
-  (let* ((page (if (and limit (> limit 0)) (+ 1 (quotient offset limit)) 1))
+  (let* ((page (if (and limit
+                        (> limit 0))
+                   (+ 1
+                      (quotient offset limit)) 1))
          ;; A list page is described by the list itself: what is on it, and --
          ;; when one was searched for -- the words that found it.  Everything
          ;; past the first page, and every page of results, is kept out of the
@@ -145,26 +152,30 @@
          (searching? (and (string? search-query)
                           (not (string-null? search-query))))
          (list-title (if searching?
-                         (format #f "Songs matching “~a” — guitar tabs & chords | WikiMusic"
-                                 search-query)
-                         "Songs: guitar tabs, bass tabs, chords and keys | WikiMusic"))
+                      (format #f
+                       "Songs matching “~a” — guitar tabs & chords | WikiMusic"
+                       search-query)
+                      "Songs: guitar tabs, bass tabs, chords and keys | WikiMusic"))
          (list-description (if searching?
-                               (format #f "Songs on WikiMusic matching “~a”, with their artists, keys, tunings and stored tabs."
-                                       search-query)
-                               "Every song on WikiMusic with its artists, key, tuning and stored guitar and bass tabs, chords and notation."))
-         (page-buttons (if (and pages (> pages 1))
+                            (format #f
+                             "Songs on WikiMusic matching “~a”, with their artists, keys, tunings and stored tabs."
+                             search-query)
+                            "Every song on WikiMusic with its artists, key, tuning and stored guitar and bass tabs, chords and notation."))
+         (page-buttons (if (and pages
+                                (> pages 1))
                            (pagination #:current page
                                        #:total pages
                                        #:base-url (format #f
-                                                          "/songs?limit=~a&sort=~a~a&page="
-                                                          limit (or user-sort "")
-                                                          (if (and search-query
-                                                                   (not (equal? search-query
-                                                                                "")))
-                                                              (format #f
-                                                                      "&search=~a"
-                                                                      search-query)
-                                                              ""))
+                                                   "/songs?limit=~a&sort=~a~a&page="
+                                                   limit
+                                                   (or user-sort "")
+                                                   (if (and search-query
+                                                            (not (equal?
+                                                                  search-query
+                                                                  "")))
+                                                       (format #f "&search=~a"
+                                                               search-query)
+                                                       ""))
                                        #:prev-label (G_ "previous")
                                        #:next-label (G_ "next"))
                            '()))
@@ -228,8 +239,8 @@
                                                                      G_
                                                                      #:search-query
                                                                      search-query))))
-                      (div (div (@ (class ,(item-tile-grid-face
-                                            #:size grid-size)))
+                      (div (div (@ (class ,(item-tile-grid-face #:size
+                                                                grid-size)))
                                 ,(map (lambda (x)
                                         (render-song-tile G_
                                          #:artworks artworks
@@ -254,18 +265,17 @@
                        #:is-logged-in is-logged-in
                        #:title list-title
                        #:description list-description
-                       #:path (if (and (= page 1) (not searching?))
-                                  "/songs"
-                                  #f)
-                       #:robots (if (or searching? (> page 1))
-                                    "noindex, follow"
-                                    #f)
+                       #:path (if (and (= page 1)
+                                       (not searching?)) "/songs" #f)
+                       #:robots (if (or searching?
+                                        (> page 1)) "noindex, follow" #f)
                        #:json-ld (list (page-json-ld #:type "CollectionPage"
-                                                     #:url (if searching?
-                                                              #f
-                                                              (absolute-url "/songs"))
+                                                     #:url (if searching? #f
+                                                               (absolute-url
+                                                                "/songs"))
                                                      #:name list-title
-                                                     #:description list-description))
+                                                     #:description
+                                                     list-description))
                        #:body body))))
 
 (define* (song-detail-page G_
@@ -324,92 +334,123 @@
          ;; then carries as much of the song's own description as a meta tag
          ;; holds, so a phrase a contributor wrote -- the lyrics they quoted,
          ;; the album they named -- is searchable too.
-         (song-path (format #f "/songs/uuid/~a" (assq-ref song 'identifier)))
-         (song-name (assq-ref song 'display-name))
-         (artist-names (map (lambda (ar) (assq-ref ar 'display-name)) artists))
+         (song-path (format #f "/songs/uuid/~a"
+                            (assq-ref song
+                                      'identifier)))
+         (song-name (assq-ref song
+                              'display-name))
+         (artist-names (map (lambda (ar)
+                              (assq-ref ar
+                                        'display-name)) artists))
          (artist-line (and (pair? artist-names)
                            (string-join artist-names " and ")))
-         (instruments (delete-duplicates
-                       (filter (lambda (word)
-                                 (and (string? word) (not (string-null? word))))
-                               (map (lambda (sc) (assq-ref sc 'instrument-type))
-                                    song-contents))))
-         (genre-names (map (lambda (g) (assq-ref g 'display-name)) genres))
-         (key (assq-ref song 'music-key))
-         (tuning (assq-ref song 'music-tuning))
-         (album (assq-ref song 'album-name))
+         (instruments (delete-duplicates (filter (lambda (word)
+                                                   (and (string? word)
+                                                        (not (string-null?
+                                                              word))))
+                                                 (map (lambda (sc)
+                                                        (assq-ref sc
+                                                                  'instrument-type))
+                                                      song-contents))))
+         (genre-names (map (lambda (g)
+                             (assq-ref g
+                                       'display-name)) genres))
+         (key (assq-ref song
+                        'music-key))
+         (tuning (assq-ref song
+                           'music-tuning))
+         (album (assq-ref song
+                          'album-name))
          (stored-words (cond
                          ((pair? instruments)
-                          (format #f "~a tabs, chords" (string-join instruments " & ")))
-                         ((pair? song-contents) "tabs, chords")
+                          (format #f "~a tabs, chords"
+                                  (string-join instruments " & ")))
+                         ((pair? song-contents)
+                          "tabs, chords")
                          (else "chords")))
-         (page-title (format #f "~a~a — ~a~a | WikiMusic"
+         (page-title (format #f
+                             "~a~a — ~a~a | WikiMusic"
                              song-name
-                             (if artist-line (format #f " – ~a" artist-line) "")
+                             (if artist-line
+                                 (format #f " – ~a" artist-line) "")
                              stored-words
                              (if (and (string? key)
                                       (not (string-null? key)))
-                                 (format #f " & the key of ~a" key)
-                                 "")))
-         (page-description (summarize
-                            (string-append
-                             song-name
-                             (if artist-line (format #f " by ~a" artist-line) "")
-                             (if (and (string? album)
-                                      (not (string-null? album)))
-                                 (format #f " from ~a" album)
-                                 "")
-                             " — "
-                             stored-words
-                             (if (and (string? tuning)
-                                      (not (string-null? tuning)))
-                                 (format #f " in ~a tuning" tuning)
-                                 "")
-                             ", stored on WikiMusic as "
-                             (if (pair? song-contents)
-                                 (format #f "~a~a"
-                                         (length song-contents)
-                                         (if (= 1 (length song-contents))
-                                             " version"
-                                             " versions"))
-                                 "a song page")
-                             ". "
-                             (let ((written (assq-ref song 'description)))
-                               (if (string? written) written "")))
-                            #:limit 300))
+                                 (format #f " & the key of ~a" key) "")))
+         (page-description (summarize (string-append song-name
+                                       (if artist-line
+                                           (format #f " by ~a" artist-line) "")
+                                       (if (and (string? album)
+                                                (not (string-null? album)))
+                                           (format #f " from ~a" album) "")
+                                       " — "
+                                       stored-words
+                                       (if (and (string? tuning)
+                                                (not (string-null? tuning)))
+                                           (format #f " in ~a tuning" tuning)
+                                           "")
+                                       ", stored on WikiMusic as "
+                                       (if (pair? song-contents)
+                                           (format #f "~a~a"
+                                                   (length song-contents)
+                                                   (if (= 1
+                                                          (length
+                                                           song-contents))
+                                                       " version" " versions"))
+                                           "a song page")
+                                       ". "
+                                       (let ((written (assq-ref song
+                                                                'description)))
+                                         (if (string? written) written "")))
+                                      #:limit 300))
          (page-image (artwork-social-image artworks
-                                           #:fallback
-                                           (announced-image)))
+                                           #:fallback (announced-image)))
          ;; A click track, at the tempo the first tab declares when one does:
          ;; a reader practising a passage wants it at the speed the tab is
          ;; written in, and the page already knows what that is.
          (tab-tempo (first-tab-tempo song-contents))
-         (page-json-ld-data (page-json-ld
-                             #:type "WebPage"
-                             #:url (absolute-url song-path)
-                             #:name page-title
-                             #:description page-description
-                             #:main-entity
-                             (append (list (schema-name "MusicComposition")
-                                           (cons "name" song-name))
-                                     (if (and (string? key)
-                                              (not (string-null? key)))
-                                         (list (cons "musicalKey" key))
-                                         '())
-                                     (let ((creators (named-nodes
-                                                      #:type "MusicGroup"
-                                                      #:names artist-names)))
-                                       (if creators
-                                           (list (cons "creator" creators))
-                                           '()))
-                                     (let ((genres-node (named-nodes
-                                                         #:type "DefinedTerm"
-                                                         #:names genre-names)))
-                                       (if genres-node
-                                           (list (cons "genre" genres-node))
-                                           '())))))
+         (page-json-ld-data (page-json-ld #:type "WebPage"
+                                          #:url (absolute-url song-path)
+                                          #:name page-title
+                                          #:description page-description
+                                          #:main-entity (append (list (schema-name
+                                                                       "MusicComposition")
+                                                                      (cons
+                                                                       "name"
+                                                                       song-name))
+                                                                (if (and (string?
+                                                                          key)
+                                                                         (not (string-null?
+                                                                               key)))
+                                                                    (list (cons
+                                                                           "musicalKey"
+                                                                           key))
+                                                                    '())
+                                                                (let ((creators
+                                                                       (named-nodes
+                                                                        #:type
+                                                                        "MusicGroup"
+                                                                        #:names
+                                                                        artist-names)))
+                                                                  (if creators
+                                                                   (list (cons
+                                                                          "creator"
+                                                                          creators))
+                                                                   '()))
+                                                                (let ((genres-node
+                                                                       (named-nodes
+                                                                        #:type
+                                                                        "DefinedTerm"
+                                                                        #:names
+                                                                        genre-names)))
+                                                                  (if
+                                                                   genres-node
+                                                                   (list (cons
+                                                                          "genre"
+                                                                          genres-node))
+                                                                   '())))))
          (song-attributes `((div (@ (class ,(mk-class '(px-4 py-6 mx-auto))))
-                                 (dl                                     ;; The row's own keys are the hyphenated
+                                 (dl ;The row's own keys are the hyphenated
                                      ;; ones the repository asked SQL for; a
                                      ;; column named with an underscore is
                                      ;; not there, so each of these is `#f'
@@ -511,10 +552,9 @@
                                  ,(sub-h4 (G_ "metronome"))
                                  ,(metronome-widget G_
                                                     #:id (format #f
-                                                                 "metronome-~a"
-                                                                 (assq-ref
-                                                                  song
-                                                                  'identifier))
+                                                          "metronome-~a"
+                                                          (assq-ref song
+                                                                    'identifier))
                                                     #:tempo (or tab-tempo 120)))
 
                             (div song-attributes

@@ -31,7 +31,8 @@
                      #:key is-logged-in)
   (let* ((login-form `(div (form (@ (action "/login")
                                     (class ,(mk-class '(w-full rounded-xl
-                                                        hg-frost bg-stone-100/75
+                                                        hg-frost
+                                                        bg-stone-100/75
                                                         dark:bg-onyx-900/75
                                                         p-4
                                                         flex
@@ -55,15 +56,16 @@
                                  (div ,(submit-button (G_ "login"))))))
          (reset-form `((form (@ (action "/password/reset")
                                 (class ,(mk-class '(w-full rounded-xl
-                                                           hg-frost bg-stone-100/75
-                                                           dark:bg-onyx-900/75
-                                                           p-4
-                                                           flex
-                                                           flex-row
-                                                           flex-wrap
-                                                           items-center
-                                                           gap-4
-                                                           shadow-md)))
+                                                    hg-frost
+                                                    bg-stone-100/75
+                                                    dark:bg-onyx-900/75
+                                                    p-4
+                                                    flex
+                                                    flex-row
+                                                    flex-wrap
+                                                    items-center
+                                                    gap-4
+                                                    shadow-md)))
                                 (method POST))
                              ,(input #:label (G_ "account to reset (email)")
                                      #:name "email"

@@ -20,7 +20,7 @@
   #:use-module (srfi srfi-9)
   #:use-module (wikimusic domain repo)
   #:export (insert-comment delete-comment-by-id update-comment-by-id
-            get-comment-by-id get-comments-by-entity-ids))
+                           get-comment-by-id get-comments-by-entity-ids))
 
 ;; -- Record definition ---
 

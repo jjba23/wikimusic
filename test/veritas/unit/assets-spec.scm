@@ -52,29 +52,30 @@
 
 (define (count-character character text)
   "Return how many times CHARACTER occurs in TEXT."
-  (let loop ((index 0) (count 0))
-    (if (>= index (string-length text))
-        count
+  (let loop
+    ((index 0)
+     (count 0))
+    (if (>= index
+            (string-length text)) count
         (loop (+ index 1)
-              (if (char=? (string-ref text index)
-                          character)
-                  (+ count 1)
-                  count)))))
+              (if (char=? (string-ref text index) character)
+                  (+ count 1) count)))))
 
 ;; What Google answers with for the two families the interface is set in.  The
 ;; shape is the one the service is known to use: every face is announced by the
 ;; subset it carries, states its own slope, and names the file it is read from
 ;; on the gstatic host -- which is exactly the address that must not survive.
 (define google-answer
-  (string-append
-   "/* symbols2 */\n"
+  (string-append "/* symbols2 */\n"
    "@font-face {\n"
    "  font-family: 'Intel One Mono';\n"
    "  font-style: italic;\n"
    "  font-weight: 300 700;\n"
    "  font-display: swap;\n"
-   "  src: url(https://fonts.gstatic.com/s/intelonemono/v25/aaa111.woff2) format('woff2');\n"
-   "  unicode-range: U+2000-2001, U+23B8-23BD;\n"
+   "  src: url(https://fonts.gstatic.com/s/intelonemono/v25/aaa111.woff2) format('woff2');
+"
+   "  unicode-range: U+2000-2001, U+23B8-23BD;
+"
    "}\n"
    "/* latin */\n"
    "@font-face {\n"
@@ -82,7 +83,8 @@
    "  font-style: normal;\n"
    "  font-weight: 300 700;\n"
    "  font-display: swap;\n"
-   "  src: url(https://fonts.gstatic.com/s/intelonemono/v25/bbb222.woff2) format('woff2');\n"
+   "  src: url(https://fonts.gstatic.com/s/intelonemono/v25/bbb222.woff2) format('woff2');
+"
    "  unicode-range: U+0000-00FF, U+0131;\n"
    "}\n"
    "/* latin */\n"
@@ -91,29 +93,33 @@
    "  font-style: italic;\n"
    "  font-weight: 200 800;\n"
    "  font-display: swap;\n"
-   "  src: url(https://fonts.gstatic.com/s/plusjakartasans/v9/ccc333.woff2) format('woff2');\n"
+   "  src: url(https://fonts.gstatic.com/s/plusjakartasans/v9/ccc333.woff2) format('woff2');
+"
    "  unicode-range: U+0000-00FF, U+0131;\n"
    "}\n"))
 
 ;; The same, as Phosphor publishes it: one face, four files, one to a line.
 (define phosphor-answer
-  (string-append
-   "@font-face {\n"
-   "  font-family: \"Phosphor\";\n"
-   "  src:\n"
-   "    url(\"./Phosphor.woff2\") format(\"woff2\"),\n"
-   "    url(\"./Phosphor.woff\") format(\"woff\"),\n"
-   "    url(\"./Phosphor.ttf\") format(\"truetype\"),\n"
-   "    url(\"./Phosphor.svg#Phosphor\") format(\"svg\");\n"
-   "  font-weight: normal;\n"
-   "  font-style: normal;\n"
-   "  font-display: block;\n"
-   "}\n"
-   "\n"
-   ".ph {\n"
-   "  font-family: \"Phosphor\" !important;\n"
-   "  line-height: 1;\n"
-   "}\n"))
+  (string-append "@font-face {\n"
+                 "  font-family: \"Phosphor\";\n"
+                 "  src:\n"
+                 "    url(\"./Phosphor.woff2\") format(\"woff2\"),
+"
+                 "    url(\"./Phosphor.woff\") format(\"woff\"),
+"
+                 "    url(\"./Phosphor.ttf\") format(\"truetype\"),
+"
+                 "    url(\"./Phosphor.svg#Phosphor\") format(\"svg\");
+"
+                 "  font-weight: normal;\n"
+                 "  font-style: normal;\n"
+                 "  font-display: block;\n"
+                 "}\n"
+                 "\n"
+                 ".ph {\n"
+                 "  font-family: \"Phosphor\" !important;\n"
+                 "  line-height: 1;\n"
+                 "}\n"))
 
 ;; The rewrite answers with two things -- the stylesheet with its addresses
 ;; made relative, and the faces it names as a list of addresses paired with the
@@ -138,20 +144,18 @@
                              #:expect "intelonemono-latin.woff2"
                              #:got (font-file-name
                                     "https://fonts.gstatic.com/s/intelonemono/v25/bbb222.woff2"
-                                    "latin"
-                                    #f))
+                                    "latin" #f))
                (assert-equal #:name "a sloped one says so"
                              #:expect "plusjakartasans-latin-italic.woff2"
                              #:got (font-file-name
                                     "https://fonts.gstatic.com/s/plusjakartasans/v9/ccc333.woff2"
-                                    "latin"
-                                    #t))
-               (assert-equal #:name "and a subset that is not latin is kept apart"
+                                    "latin" #t))
+               (assert-equal #:name
+                             "and a subset that is not latin is kept apart"
                              #:expect "intelonemono-symbols2-italic.woff2"
                              #:got (font-file-name
                                     "https://fonts.gstatic.com/s/intelonemono/v25/aaa111.woff2"
-                                    "symbols2"
-                                    #t)))))
+                                    "symbols2" #t)))))
 
 ;; The rewrite itself: nobody else's address survives it, and everything that is
 ;; not an address is left as the stylesheet wrote it.
@@ -159,32 +163,32 @@
   (suite "A fetched stylesheet names the files beside it"
          (test "the address of the host it came from is gone"
                (let ((css (rewritten-google-stylesheet)))
-                 (assert-true (not (string-contains css
-                                                    "fonts.gstatic.com"))
+                 (assert-true (not (string-contains css "fonts.gstatic.com"))
                               #:name "no gstatic face is asked for")
-                 (assert-true (not (string-contains css
-                                                    "https://"))
+                 (assert-true (not (string-contains css "https://"))
                               #:name "nor any other absolute address")
-                 (assert-true (and (string-contains
-                                    css "url(./intelonemono-latin.woff2)")
-                                   #t)
+                 (assert-true (and (string-contains css
+                                    "url(./intelonemono-latin.woff2)") #t)
                               #:name "the file beside it is named instead")))
 
          (test "what the face says about itself is kept"
                (let ((css (rewritten-google-stylesheet)))
                  (assert-true (and (string-contains css "format('woff2')") #t)
                               #:name "the format stays on the line")
-                 (assert-true (and (string-contains css "font-display: swap;") #t)
-                              #:name "so does what the face asks of the reader")
-                 (assert-true (and (string-contains
-                                    css "unicode-range: U+0000-00FF, U+0131;")
+                 (assert-true (and (string-contains css "font-display: swap;")
                                    #t)
+                              #:name
+                              "so does what the face asks of the reader")
+                 (assert-true (and (string-contains css
+                                    "unicode-range: U+0000-00FF, U+0131;") #t)
                               #:name "and the range it carries")
                  (assert-true (and (string-contains css "/* symbols2 */") #t)
                               #:name "the line saying which subset follows")
-                 (assert-equal #:name "and the stylesheet is as long as it was"
-                             #:expect (count-character #\newline google-answer)
-                             #:got (count-character #\newline css))))
+                 (assert-equal #:name
+                               "and the stylesheet is as long as it was"
+                               #:expect (count-character #\newline
+                                                         google-answer)
+                               #:got (count-character #\newline css))))
 
          (test "each face is named for the block it stands in"
                ;; The subsets and the slopes are read in the order the
@@ -193,13 +197,9 @@
                ;; in order, because the mistake this catches is exactly a name
                ;; taken from the block before or after.
                (assert-equal #:name "the addresses and the names line up"
-                             #:expect
-                             '(("https://fonts.gstatic.com/s/intelonemono/v25/aaa111.woff2"
-                                . "intelonemono-symbols2-italic.woff2")
-                               ("https://fonts.gstatic.com/s/intelonemono/v25/bbb222.woff2"
-                                . "intelonemono-latin.woff2")
-                               ("https://fonts.gstatic.com/s/plusjakartasans/v9/ccc333.woff2"
-                                . "plusjakartasans-latin-italic.woff2"))
+                             #:expect '(("https://fonts.gstatic.com/s/intelonemono/v25/aaa111.woff2" . "intelonemono-symbols2-italic.woff2")
+                                        ("https://fonts.gstatic.com/s/intelonemono/v25/bbb222.woff2" . "intelonemono-latin.woff2")
+                                        ("https://fonts.gstatic.com/s/plusjakartasans/v9/ccc333.woff2" . "plusjakartasans-latin-italic.woff2"))
                              #:got (rewritten-google-faces)))
 
          (test "every face the answer named is a face to fetch"
@@ -212,8 +212,7 @@
   (suite "An icon set is copied with what is served of it"
          (test "the face names the file that is beside it, and only it"
                (let ((css (prune-phosphor-stylesheet phosphor-answer)))
-                 (assert-true (and (string-contains
-                                    css
+                 (assert-true (and (string-contains css
                                     "url(\"./Phosphor.woff2\") format(\"woff2\");")
                                    #t)
                               #:name "the woff2 clause ends the list")
@@ -227,13 +226,13 @@
          (test "what is left is still a stylesheet"
                (let ((css (prune-phosphor-stylesheet phosphor-answer)))
                  (assert-equal #:name "the braces still balance"
-                             #:expect (count-character #\{ phosphor-answer)
-                             #:got (count-character #\{ css))
+                               #:expect (count-character #\{ phosphor-answer)
+                               #:got (count-character #\{ css))
                  (assert-equal #:name "and they close as often"
-                             #:expect (count-character #\} phosphor-answer)
-                             #:got (count-character #\} css))
-                 (assert-true (and (string-contains css "font-family: \"Phosphor\";")
-                                   #t)
+                               #:expect (count-character #\} phosphor-answer)
+                               #:got (count-character #\} css))
+                 (assert-true (and (string-contains css
+                                    "font-family: \"Phosphor\";") #t)
                               #:name "the face keeps its family")
                  (assert-true (and (string-contains css ".ph {") #t)
                               #:name "and the class the glyphs are worn with")
@@ -246,12 +245,9 @@
                ;; unchanged -- which is what a set that stops publishing them
                ;; would need, and what this must not mangle if it does.
                (assert-equal #:name "the text comes back as it went in"
-                             #:expect (prune-phosphor-stylesheet
-                                       (prune-phosphor-stylesheet
-                                        phosphor-answer))
+                             #:expect (prune-phosphor-stylesheet (prune-phosphor-stylesheet
+                                                                  phosphor-answer))
                              #:got (prune-phosphor-stylesheet phosphor-answer)))))
 
 (define (spec)
-  (veritas-run naming-suite
-               rewrite-suite
-               pruning-suite))
+  (veritas-run naming-suite rewrite-suite pruning-suite))

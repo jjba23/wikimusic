@@ -70,8 +70,7 @@
   "Return #t when VALUE is an absolute http or https address."
   (and (string? value)
        (or (string-prefix? "https://" value)
-           (string-prefix? "http://" value))
-       #t))
+           (string-prefix? "http://" value)) #t))
 
 (define reader-suite
   (suite "Where the instance reads what it says about itself"
@@ -79,7 +78,8 @@
                (assert-equal #:name "the project's own value is used"
                              #:expect "the project's own value"
                              #:got (config-value 'a-variable-no-deployment-sets
-                                                 #:default "the project's own value")))
+                                                 #:default
+                                                 "the project's own value")))
 
          (test "a variable the deployment set is the one read"
                ;; `pingwing-url' is required of every deployment -- it is where
@@ -90,7 +90,8 @@
                (assert-equal #:name "the deployment's own value wins"
                              #:expect pingwing-url
                              #:got (config-value 'pingwing-url
-                                                 #:default "the project's own value")))))
+                                                 #:default
+                                                 "the project's own value")))))
 
 (define address-suite
   (suite "The addresses the instance offers"
@@ -106,8 +107,7 @@
 
          (test "the copyright line names somebody"
                (assert-true (and (string? (copyright-holder))
-                                 (not (string-null? (copyright-holder)))
-                                 #t)
+                                 (not (string-null? (copyright-holder))) #t)
                             #:name "the holder is named"))
 
          (test "the mail an instance sends comes from an address"
@@ -116,12 +116,10 @@
                ;; with an `@' between them, and nothing blank anywhere.
                (assert-true (and (string? (mail-sender-address))
                                  (string-index (mail-sender-address) #\@)
-                                 (not (string-null? (mail-sender-address)))
-                                 #t)
+                                 (not (string-null? (mail-sender-address))) #t)
                             #:name "an address, not a blank")
                (assert-true (and (string? (mail-sender-name))
-                                 (not (string-null? (mail-sender-name)))
-                                 #t)
+                                 (not (string-null? (mail-sender-name))) #t)
                             #:name "and a name beside it"))))
 
 ;; The picture a page is announced with is the one thing an instance names that
@@ -137,21 +135,22 @@
          (test "a path is turned into an address of the instance serving it"
                (assert-equal #:name "the path is joined onto the origin"
                              #:expect "https://example.org/img/cover.jpg"
-                             #:got (with-deployment
-                                     'social-image-url "/img/cover.jpg"
-                                     (lambda ()
-                                       (absolute-url (social-image-url)
-                                                     #:origin "https://example.org")))))
+                             #:got (with-deployment 'social-image-url
+                                                    "/img/cover.jpg"
+                                                    (lambda ()
+                                                      (absolute-url (social-image-url)
+                                                       #:origin
+                                                       "https://example.org")))))
 
          (test "an address the deployment gave is left alone"
                (assert-equal #:name "an address is already one"
                              #:expect "https://pictures.example.org/cover.jpg"
-                             #:got (with-deployment
-                                     'social-image-url
-                                     "https://pictures.example.org/cover.jpg"
-                                     (lambda ()
-                                       (absolute-url (social-image-url)
-                                                     #:origin "https://example.org")))))
+                             #:got (with-deployment 'social-image-url
+                                    "https://pictures.example.org/cover.jpg"
+                                    (lambda ()
+                                      (absolute-url (social-image-url)
+                                                    #:origin
+                                                    "https://example.org")))))
 
          (test "and with no host to build one on, no address is invented"
                ;; An origin is what an address is built from, and there are
@@ -161,11 +160,11 @@
                ;; configuration may hold a path, so what it rests on is pinned:
                ;; no origin, no address, rather than an address guessed at from
                ;; whatever the machine happens to be called.
-               (assert-false (with-deployment
-                              'social-image-url "/img/cover.jpg"
-                              (lambda ()
-                                (absolute-url (social-image-url)
-                                              #:origin "")))
+               (assert-false (with-deployment 'social-image-url
+                                              "/img/cover.jpg"
+                                              (lambda ()
+                                                (absolute-url (social-image-url)
+                                                              #:origin "")))
                              #:name "no origin, no address"))))
 
 ;; The switch an instance that raises no money turns off.  It is not read as a
@@ -180,11 +179,13 @@
                ;; reading an operator who commented the line out gets, which is
                ;; this half of the rule however the deployment's file is
                ;; written today.
-               (assert-true (with-deployment 'show-donation? "" donation-shown?)
+               (assert-true (with-deployment 'show-donation? ""
+                                             donation-shown?)
                             #:name "the ask is shown unless it says otherwise"))
 
          (test "an instance that raises nothing says so with #f"
-               (assert-false (with-deployment 'show-donation? #f donation-shown?)
+               (assert-false (with-deployment 'show-donation? #f
+                                              donation-shown?)
                              #:name "the switch itself"))
 
          (test "and may say so in words"
@@ -208,7 +209,8 @@
                (assert-true (with-deployment 'show-donation? "yes"
                                              donation-shown?)
                             #:name "yes")
-               (assert-true (with-deployment 'show-donation? #t donation-shown?)
+               (assert-true (with-deployment 'show-donation? #t
+                                             donation-shown?)
                             #:name "or the switch itself"))))
 
 ;; Where the interface's own files are read from: the stylesheets a page is set
@@ -222,36 +224,34 @@
          (test "an instance serving its own reads them off itself"
                (assert-equal #:name "a path on this instance"
                              #:expect "/vendor/fonts/lucida.css"
-                             #:got (with-deployment
-                                     'assets-url ""
-                                     (lambda ()
-                                       (asset-address "vendor/fonts/lucida.css"))))
+                             #:got (with-deployment 'assets-url ""
+                                                    (lambda ()
+                                                      (asset-address
+                                                       "vendor/fonts/lucida.css"))))
                (assert-equal #:name "and the page's own stylesheet with it"
                              #:expect "/css/wikimusic.olive.min.css"
-                             #:got (with-deployment
-                                     'assets-url ""
-                                     (lambda ()
-                                       (asset-address
-                                        "css/wikimusic.olive.min.css")))))
+                             #:got (with-deployment 'assets-url ""
+                                                    (lambda ()
+                                                      (asset-address
+                                                       "css/wikimusic.olive.min.css")))))
 
          (test "a deployment that serves them elsewhere says where"
                (assert-equal #:name "every file hangs off the host it named"
-                             #:expect
-                             "https://assets.example.org/wikimusic/vendor/fonts/lucida.css"
-                             #:got (with-deployment
-                                     'assets-url
-                                     "https://assets.example.org/wikimusic"
-                                     (lambda ()
-                                       (asset-address "vendor/fonts/lucida.css")))))
+                #:expect
+                "https://assets.example.org/wikimusic/vendor/fonts/lucida.css"
+                #:got (with-deployment 'assets-url
+                                       "https://assets.example.org/wikimusic"
+                                       (lambda ()
+                                         (asset-address
+                                          "vendor/fonts/lucida.css")))))
 
          (test "a host written with a trailing slash does not double it"
                (assert-equal #:name "one slash between the two"
-                             #:expect "https://assets.example.org/wikimusic/favicon.ico"
-                             #:got (with-deployment
-                                     'assets-url
-                                     "https://assets.example.org/wikimusic/"
-                                     (lambda ()
-                                       (asset-address "favicon.ico")))))
+                #:expect "https://assets.example.org/wikimusic/favicon.ico"
+                #:got (with-deployment 'assets-url
+                       "https://assets.example.org/wikimusic/"
+                       (lambda ()
+                         (asset-address "favicon.ico")))))
 
          (test "a file named with a leading slash is one file"
                ;; A caller writes the path it has, and the two spellings of
@@ -272,12 +272,14 @@
          ;; manual itself has the last word, and the rule is stated out loud
          ;; here rather than sampled: what the manual's address is, is what the
          ;; deployment said, or the README beside the code.
-         (test "the manual's address is the deployment's, or the README beside its code"
-               (assert-equal #:name "the manual follows the code"
-                             #:expect (or (config-value 'manual-url)
-                                          (format #f "~a/src/branch/trunk/README.org"
-                                                  (source-repository-url)))
-                             #:got (manual-url)))))
+         (test
+          "the manual's address is the deployment's, or the README beside its code"
+          (assert-equal #:name "the manual follows the code"
+                        #:expect (or (config-value 'manual-url)
+                                     (format #f
+                                             "~a/src/branch/trunk/README.org"
+                                             (source-repository-url)))
+                        #:got (manual-url)))))
 
 (define (spec)
   (veritas-run reader-suite

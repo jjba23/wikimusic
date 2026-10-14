@@ -42,14 +42,16 @@
 ;; grid, one row on a phone, and it is a door into the collection rather than
 ;; a second way of listing it -- `/songs' is where a reader browses, sorts and
 ;; searches, and every tile here leads to the same song that page would.
-(define front-page-song-count 12)
+(define front-page-song-count
+  12)
 
 ;; How many genres the front page offers as ways in.  Twelve is the same
 ;; number the song wall shows and for the same reason: it fills a row or two,
 ;; and it is a first choice rather than the whole list -- `/genres' is where a
 ;; reader browses them, and a visitor who wants a genre that is not here is one
 ;; click from it.
-(define front-page-genre-count 12)
+(define front-page-genre-count
+  12)
 
 ;; What the front page says the instance holds.
 ;;
@@ -59,14 +61,18 @@
 ;; of a table is a question its own repository answers.
 (define (front-page-counts rc)
   "Return how many songs, artists and genres this instance holds."
-  `((songs . ,(count-songs (make-sqlite-song-repository rc)))
-    (artists . ,(count-artists (make-sqlite-artist-repository rc)))
-    (genres . ,(count-genres (make-sqlite-genre-repository rc)))))
+  `((songs unquote
+           (count-songs (make-sqlite-song-repository rc)))
+    (artists unquote
+             (count-artists (make-sqlite-artist-repository rc)))
+    (genres unquote
+            (count-genres (make-sqlite-genre-repository rc)))))
 
 ;; How many artists the front page offers, the same number the song wall shows
 ;; and for the same reason: it fills a row or two, and a visitor who wants a
 ;; name that is not here is one click from `/artists'.
-(define front-page-artist-count 12)
+(define front-page-artist-count
+  12)
 
 ;; The genres a visitor can start from, newest first: the strip is a way into
 ;; the collection rather than a catalogue of it, so it moves as the place grows
@@ -122,16 +128,16 @@
                                                            'artist-identifier))
                                                song-artists))))
          (song-version-count-alist (map (lambda (song)
-                                          (list (assq-ref song 'identifier)
-                                                (length
-                                                 (filter (lambda (sc)
-                                                           (equal? (assq-ref
-                                                                    sc
-                                                                    'song-identifier)
-                                                                   (assq-ref
-                                                                    song
-                                                                    'identifier)))
-                                                         song-contents))))
+                                          (list (assq-ref song
+                                                          'identifier)
+                                                (length (filter (lambda (sc)
+                                                                  (equal? (assq-ref
+                                                                           sc
+                                                                           'song-identifier)
+                                                                          (assq-ref
+                                                                           song
+                                                                           'identifier)))
+                                                                song-contents))))
                                         songs)))
     (song-list-page (:i18n rc)
                     #:only-tiles #t
@@ -165,7 +171,8 @@
                                            "created-at-desc")
                                #:limit front-page-artist-count))
          (artist-ids (map (lambda (a)
-                            (assq-ref a 'identifier)) artists))
+                            (assq-ref a
+                                      'identifier)) artists))
          (artworks (if (nil? artist-ids)
                        '()
                        (get-artworks-by-entity-ids artwork-repo
@@ -176,7 +183,8 @@
                                                    'artist artist-ids))))
     `(div (@ (class ,(item-tile-grid-face #:size "medium")))
           ,@(map (lambda (x)
-                   `(div ,(item-tile (:i18n rc) 'artist x
+                   `(div ,(item-tile (:i18n rc)
+                                     'artist x
                                      (relevant-entities 'artist artworks x)
                                      (relevant-entities 'artist comments x))))
                  artists))))
@@ -192,13 +200,12 @@
                                                               rc "lang")
                                            #:is-logged-in (:cookies-value rc
                                                            "x-bewaking-wikimusic")
-                                           #:song-fragment
-                                           (front-page-song-fragment rc)
-                                           #:artist-fragment
-                                           (front-page-artist-fragment rc)
+                                           #:song-fragment (front-page-song-fragment
+                                                            rc)
+                                           #:artist-fragment (front-page-artist-fragment
+                                                              rc)
                                            #:genres (front-page-genres rc)
-                                           #:counts (front-page-counts
-                                                     rc))))))
+                                           #:counts (front-page-counts rc))))))
 
 ;; `/robots.txt' and `/sitemap.xml' are served by the controller in
 ;; `app/controllers/seo.scm': both state this instance's own address, which is

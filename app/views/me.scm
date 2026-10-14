@@ -346,7 +346,8 @@
                      ((equal? rejected "mismatch")
                       (G_ "the two passwords you typed are not the same"))
                      ((equal? rejected "weak")
-                      (G_ "that password is too easy to guess, so it was not accepted; the rule below is what it has to pass"))
+                      (G_
+                       "that password is too easy to guess, so it was not accepted; the rule below is what it has to pass"))
                      (else #f))))
     (html-template G_
                    #:title "Choose a new password · WikiMusic"
@@ -380,12 +381,10 @@
                                             ;; the reason while they retype.
                                             ,(when rejection
                                                `(p (@ (role alert)
-                                                      (class
-                                                       ,(mk-class
-                                                         '(text-persia-pink-900
-                                                           dark:text-persia-pink-300
-                                                           font-bold
-                                                           py-2))))
+                                                      (class ,(mk-class '(text-persia-pink-900
+                                                                          dark:text-persia-pink-300
+                                                                          font-bold
+                                                                          py-2))))
                                                    ,rejection))
                                             ;; The meter is decoration on top
                                             ;; of a form that already works:
@@ -397,51 +396,54 @@
                                             ;; reader is typing, where the
                                             ;; password stands.
                                             (div (@ (data-password-strength "")
-                                                    (data-label-very-weak
-                                                     ,(G_ "very weak"))
-                                                    (data-label-weak ,(G_ "weak"))
-                                                    (data-label-fair ,(G_ "fair"))
-                                                    (data-label-strong
-                                                     ,(G_ "strong"))
-                                                    (data-label-very-strong
-                                                     ,(G_ "very strong"))
-                                                    (data-mismatch
-                                                     ,(G_ "the two passwords you typed are not the same"))
-                                                    (class
-                                                     ,(mk-class
-                                                       '(flex flex-col gap-2))))
-                                                 (p (@ (class
-                                                        ,(mk-class
-                                                          '(text-sm
-                                                            font-light
-                                                            text-onyx-300
-                                                            dark:text-stone-300))))
-                                                    ,(G_ "a password of at least a dozen characters, mixing upper and lower case with digits or symbols; a dozen plain lower-case letters is not enough on its own, and a common password is refused however long it is"))
-                                                 ,(input #:label (G_ "new password")
+                                                    (data-label-very-weak ,(G_
+                                                                            "very weak"))
+                                                    (data-label-weak ,(G_
+                                                                       "weak"))
+                                                    (data-label-fair ,(G_
+                                                                       "fair"))
+                                                    (data-label-strong ,(G_
+                                                                         "strong"))
+                                                    (data-label-very-strong ,(G_
+                                                                              "very strong"))
+                                                    (data-mismatch ,(G_
+                                                                     "the two passwords you typed are not the same"))
+                                                    (class ,(mk-class '(flex
+                                                                        flex-col
+                                                                        gap-2))))
+                                                 (p (@ (class ,(mk-class '(text-sm
+                                                                           font-light
+                                                                           text-onyx-300
+                                                                           dark:text-stone-300))))
+                                                    ,(G_
+                                                      "a password of at least a dozen characters, mixing upper and lower case with digits or symbols; a dozen plain lower-case letters is not enough on its own, and a common password is refused however long it is"))
+                                                 ,(input #:label (G_
+                                                                  "new password")
                                                          #:name "new-password"
                                                          #:value ""
                                                          #:type 'password
                                                          #:required #t
-                                                         #:autocomplete "new-password")
+                                                         #:autocomplete
+                                                         "new-password")
                                                  (progress (@ (max "4")
                                                               (value "0")
-                                                              (class
-                                                               ,(mk-class
-                                                                 '(hg-progress)))))
-                                                 (p (@ (data-password-strength-saying "")
+                                                              (class ,(mk-class '
+                                                                       (hg-progress)))))
+                                                 (p (@ (data-password-strength-saying
+                                                        "")
                                                        (aria-live polite)
-                                                       (class
-                                                        ,(mk-class
-                                                          '(text-sm
-                                                            font-bold
-                                                            text-onyx-500
-                                                            dark:text-stone-300))))
+                                                       (class ,(mk-class '(text-sm
+                                                                           font-bold
+                                                                           text-onyx-500
+                                                                           dark:text-stone-300))))
                                                     "")
                                                  ,(input #:label (G_
                                                                   "confirm password")
-                                                         #:name "confirm-password"
+                                                         #:name
+                                                         "confirm-password"
                                                          #:value ""
                                                          #:type 'password
                                                          #:required #t
-                                                         #:autocomplete "new-password"))
+                                                         #:autocomplete
+                                                         "new-password"))
                                             (div ,(submit-button (G_ "reset"))))))))))

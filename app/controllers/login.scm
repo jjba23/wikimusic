@@ -60,14 +60,14 @@
           ;; to ask which addresses have accounts here.
           (if (nil? u)
               (redirect-to rc
-                           (string->uri
-                            (format #f "~a/login?login_failed=true~a"
-                                    (current-myhost)
-                                    (notice-query
-                                     #:title (G_ "could not sign you in")
-                                     #:body
-                                     (G_ "that email and password do not match an account")
-                                     #:duration-millis 8000)))
+                           (string->uri (format #f
+                                         "~a/login?login_failed=true~a"
+                                         (current-myhost)
+                                         (notice-query #:title (G_
+                                                                "could not sign you in")
+                                                       #:body (G_
+                                                               "that email and password do not match an account")
+                                                       #:duration-millis 8000)))
                            #:status 302)
               (let* ((user (car u))
                      (stored-hash (assoc-ref user "password"))
@@ -77,20 +77,22 @@
                                                     #:salt stored-salt)))
                 (if (not password-ok?)
                     (redirect-to rc
-                                 (string->uri
-                                  (format #f "~a/login?login_failed=true~a"
-                                          (current-myhost)
-                                          (notice-query
-                                           #:title (G_ "could not sign you in")
-                                           #:body
-                                           (G_ "that email and password do not match an account")
-                                           #:duration-millis 8000)))
+                                 (string->uri (format #f
+                                               "~a/login?login_failed=true~a"
+                                               (current-myhost)
+                                               (notice-query #:title (G_
+                                                                      "could not sign you in")
+                                                             #:body (G_
+                                                                     "that email and password do not match an account")
+                                                             #:duration-millis
+                                                             8000)))
                                  #:status 302)
                     (let* ((user-identifier (assoc-ref user "identifier"))
                            ;; The permissions column decides what this session
                            ;; may do, so it is read as data -- never evaluated.
-                           (permissions (permissions-from-column
-                                         (assoc-ref user "permissions")))
+                           (permissions (permissions-from-column (assoc-ref
+                                                                  user
+                                                                  "permissions")))
                            ;; A password still stored the old way proves the
                            ;; user knows it, which is the moment to replace it
                            ;; with one derived by a KDF.  Nobody is asked to
@@ -98,16 +100,16 @@
                            (_ (when (password-hash-legacy? stored-hash)
                                 (sql-execute! rc
                                               (sql-update 'users
-                                                          `((password
-                                                             . ,(hash-password
-                                                                 password))
+                                                          `((password unquote
+                                                                      (hash-password
+                                                                       password))
                                                             (salt . ""))
                                                           #:where `((identifier
-                                                                     . ,user-identifier)))
+                                                                     unquote
+                                                                     user-identifier)))
                                               #:name "upgrade-password-hash")))
                            (get-owner-details (lambda ()
-                                                `((id unquote
-                                                      user-identifier)
+                                                `((id unquote user-identifier)
                                                   (email unquote
                                                          (assoc-ref user
                                                                     "email"))
@@ -133,13 +135,13 @@
                                          #:secure #t
                                          #:http-only #t)
                       (redirect-to rc
-                                   (string->uri
-                                    (format #f "~a/songs?login_succeeded=true~a"
-                                            (current-myhost)
-                                            (notice-query
-                                             #:title (G_ "signed in")
-                                             #:body
-                                             (G_ "welcome back; you may now add and edit songs"))))
+                                   (string->uri (format #f
+                                                 "~a/songs?login_succeeded=true~a"
+                                                 (current-myhost)
+                                                 (notice-query #:title (G_
+                                                                        "signed in")
+                                                               #:body (G_
+                                                                       "welcome back; you may now add and edit songs"))))
                                    #:status 302))))))))
 
 (get "/logout"

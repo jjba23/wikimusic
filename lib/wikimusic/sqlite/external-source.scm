@@ -53,21 +53,20 @@
     (db-read conn))
 
   (define* (get-external-sources-by-entity-ids entity ids
-                                               #:key (order-by
-                                                      '((created-at
-                                                         desc))))
+                                               #:key (order-by '((created-at
+                                                                  desc))))
     (execute-read "get-external-sources-by-entity-ids"
                   (sql-select (table entity)
                               #:columns (columns entity)
                               #:where (list (list (entity-column entity)
-                                                  'in
-                                                  ids))
+                                                  'in ids))
                               #:order-by order-by)))
 
   (define (update-external-source-by-id entity id attrs)
     (execute-write "update-external-source-by-id"
                    (sql-update (table entity)
-                               (attrs->row attrs (columns entity))
+                               (attrs->row attrs
+                                           (columns entity))
                                #:where (list (cons 'identifier id)))))
 
   (define (delete-external-source-by-id entity id)
@@ -78,7 +77,8 @@
   (define (insert-external-source entity attrs)
     (execute-write "insert-external-source"
                    (sql-insert (table entity)
-                               (attrs->row attrs (columns entity)))))
+                               (attrs->row attrs
+                                           (columns entity)))))
 
   (mk-external-source-repository #:get-external-sources-by-entity-ids-proc
                                  get-external-sources-by-entity-ids

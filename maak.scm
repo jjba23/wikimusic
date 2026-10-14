@@ -111,9 +111,7 @@ translation refresh ever needs."
   (append (if (file-exists? "lib/wikimusic/job")
               '("lib/wikimusic/job/*.scm")
               '())
-          '("lib/wikimusic/*.scm"
-            "app/controllers/*.scm"
-            "app/views/*.scm")
+          '("lib/wikimusic/*.scm" "app/controllers/*.scm" "app/views/*.scm")
           (if (file-exists? "app/api")
               '("app/api/*.scm")
               '())
@@ -124,9 +122,10 @@ translation refresh ever needs."
 Args: update? represents whether we should update a template or create a new one."
   ($ (append (list (~ "xgettext --default-domain=~a" i18n-textdomain)
                    (~ "--output=~a/~a.pot" i18n-dir i18n-textdomain)
-                   "--language=Scheme --keyword=G_"
-                   "--sort-by-file")
-             (if update? (list "--join-existing") '())
+                   "--language=Scheme --keyword=G_" "--sort-by-file")
+             (if update?
+                 (list "--join-existing")
+                 '())
              (list (~ "--copyright-holder=\"~a\""
                       (string-join copyright-holders ","))
                    (~ "--package-name=~a" i18n-textdomain))
@@ -151,9 +150,8 @@ Args: update? represents whether we should update a template or create a new one
 ;; this is the test run reading the project's keys the way the server does.
 (define (test)
   "Run the project's test suite, one spec at a time, from test/veritas."
-  (time-machine-manifest-shell
-   '("guile -L ./lib -L ./test -L ."
-     "-c '(load \"env.scm\") ((@ (veritas runner) run-tests))'")))
+  (time-machine-manifest-shell '("guile -L ./lib -L ./test -L ."
+                                 "-c '(load \"env.scm\") ((@ (veritas runner) run-tests))'")))
 
 (define (build-manual)
   "Render the project's manual, which is the README."
@@ -268,8 +266,7 @@ for higher concurrent writes to SQLite 3."
 ;; the stylesheets themselves name.
 (define (vendor-assets)
   "Fetch the assets the interface is painted with into `pub/'."
-  (time-machine-manifest-shell
-   '("guile -L ./lib -L . resources/assets/fetch.scm")))
+  (time-machine-manifest-shell '("guile -L ./lib -L . resources/assets/fetch.scm")))
 
 ;; ====== The vendored Guitar Pro renderer ======
 
@@ -316,8 +313,9 @@ than being a blob of unknown age."
                     #:destination (~ "~a/soundfont/sonivox.sf2" vendor))
     (alphatab-fetch #:url (~ "~a/soundfont/LICENSE" base)
                     #:destination (~ "~a/soundfont/LICENSE" vendor))
-    (alphatab-fetch #:url (~ "https://raw.githubusercontent.com/CoderLine/alphaTab/v~a/LICENSE"
-                             alphatab-version)
+    (alphatab-fetch #:url (~
+                           "https://raw.githubusercontent.com/CoderLine/alphaTab/v~a/LICENSE"
+                           alphatab-version)
                     #:destination (~ "~a/LICENSE" vendor))))
 
 (define (import-production-database)

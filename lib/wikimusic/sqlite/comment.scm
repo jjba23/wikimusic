@@ -52,14 +52,12 @@
     (db-read conn))
 
   (define* (get-comments-by-entity-ids entity ids
-                                       #:key (order-by
-                                              '((created-at desc))))
+                                       #:key (order-by '((created-at desc))))
     (execute-read "get-comments-by-entity-ids"
                   (sql-select (table entity)
                               #:columns (columns entity)
                               #:where (list (list (entity-column entity)
-                                                  'in
-                                                  ids))
+                                                  'in ids))
                               #:order-by order-by)))
 
   (define* (get-comment-by-id entity id)
@@ -74,7 +72,8 @@
   (define (update-comment-by-id entity id attrs)
     (execute-write "update-comment-by-id"
                    (sql-update (table entity)
-                               (attrs->row attrs (columns entity))
+                               (attrs->row attrs
+                                           (columns entity))
                                #:where (list (cons 'identifier id)))))
 
   (define (delete-comment-by-id entity id)
@@ -85,7 +84,8 @@
   (define (insert-comment entity attrs)
     (execute-write "insert-comment"
                    (sql-insert (table entity)
-                               (attrs->row attrs (columns entity)))))
+                               (attrs->row attrs
+                                           (columns entity)))))
 
   (mk-comment-repository #:get-comments-by-entity-ids-proc
                          get-comments-by-entity-ids

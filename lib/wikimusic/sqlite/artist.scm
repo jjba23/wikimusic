@@ -76,25 +76,26 @@
                            (offset 0))
     (let ((search (format #f "%~a%" s)))
       (execute-read "search-artists"
-                    (sql-parameterize
-                     (format #f
-                             "SELECT ~a FROM artists WHERE (display_name LIKE ? OR description LIKE ?) ORDER BY ~a LIMIT ? OFFSET ?"
-                             (symbols->sql-columns-list columns)
-                             (sql-order-by-sql order-by))
-                     (list search search limit offset)))))
+                    (sql-parameterize (format #f
+                                       "SELECT ~a FROM artists WHERE (display_name LIKE ? OR description LIKE ?) ORDER BY ~a LIMIT ? OFFSET ?"
+                                       (symbols->sql-columns-list columns)
+                                       (sql-order-by-sql order-by))
+                                      (list search search limit offset)))))
 
   (define (get-artists-by-ids ids)
     (execute-read "get-artists-by-ids"
                   (sql-select 'artists
                               #:columns columns
-                              #:where (list (list 'identifier 'in ids)))))
+                              #:where (list (list 'identifier
+                                                  'in ids)))))
 
   ;; A count is a statement kracht's `sql-select' cannot express -- it takes
   ;; column names, and `COUNT(*)' is not a column -- so `sql-parameterize',
   ;; kracht's own escape hatch, carries it.  The `WHERE' is the same one
   ;; `search-artists' uses, so a page count and a page of hits always agree.
   (define* (count-artists #:key search)
-    (let* ((term (and search (format #f "%~a%" search)))
+    (let* ((term (and search
+                      (format #f "%~a%" search)))
            (rows (if term
                      (execute-read "count-artists"
                                    (sql-parameterize
@@ -105,7 +106,8 @@
                                     "SELECT COUNT(*) AS count FROM artists"
                                     '())))))
       (if (nil? rows) 0
-          (or (assq-ref (car rows) 'count) 0))))
+          (or (assq-ref (car rows)
+                        'count) 0))))
 
   (define (update-artist-by-id id attrs)
     (execute-write "update-artist-by-id"

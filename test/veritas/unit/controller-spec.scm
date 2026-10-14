@@ -57,22 +57,27 @@ Artanis reads such an exception as a code, the name of what raised it, and a
 format string with its arguments, which is the shape built here."
   (catch 'artanis-err
          (lambda ()
-           (thunk)
-           #f)
-         (lambda (key . args) args)))
+           (thunk) #f)
+         (lambda (key . args)
+           args)))
 
 (define (status-of answer)
   "Return the HTTP status ANSWER carries, or #f when there is no answer."
-  (and answer (car answer)))
+  (and answer
+       (car answer)))
 
 (define (message-of answer)
   "Return the format string ANSWER carries, or #f when there is no answer."
-  (and answer (>= (length answer) 3) (caddr answer)))
+  (and answer
+       (>= (length answer) 3)
+       (caddr answer)))
 
 (define (message-args-of answer)
   "Return the arguments ANSWER's format string is filled in with, or #f when
 there is no answer."
-  (and answer (>= (length answer) 3) (cdddr answer)))
+  (and answer
+       (>= (length answer) 3)
+       (cdddr answer)))
 
 (define guard-suite
   (suite "The guard a mistyped address reaches"
@@ -84,21 +89,22 @@ there is no answer."
                              #:expect found-row
                              #:got (entity-or-404 found-row "song" "1c9a"))
                (assert-true (eq? found-row
-                                 (entity-or-404 found-row
-                                                "artist"
+                                 (entity-or-404 found-row "artist"
                                                 "a-mistyped-identifier"))
-                            #:name "what it is called does not decide what it returns"))
+                #:name "what it is called does not decide what it returns"))
 
          (test "a lookup that found nothing is answered with a 404"
                (let ((answer (answer-for (lambda ()
                                            (entity-or-404 #f "song" "nope")))))
                  (assert-true (and answer #t)
                               #:name "it raises rather than returning nothing")
-                 (assert-equal #:name "with the code artanis renders a page for"
+                 (assert-equal #:name
+                               "with the code artanis renders a page for"
                                #:expect 404
                                #:got (status-of answer))
                  (assert-true (and (>= (length answer) 4) #t)
-                              #:name "in the shape artanis reads: code, name, message, arguments")
+                  #:name
+                  "in the shape artanis reads: code, name, message, arguments")
                  (assert-true (and (string? (message-of answer)) #t)
                               #:name "the message is a format string")
                  (assert-true (and (list? (message-args-of answer)) #t)
@@ -106,25 +112,26 @@ there is no answer."
 
          (test "the answer says what was looked for, and where"
                (let ((answer (answer-for (lambda ()
-                                           (entity-or-404 #f
-                                                          "genre"
-                                                          "a-genre-that-is-not-there")))))
-                 (assert-equal #:name "the message names the kind of thing and the identifier"
-                               #:expect "no genre with the identifier a-genre-that-is-not-there"
-                               #:got (apply format #f
-                                            (message-of answer)
-                                            (message-args-of answer)))))
+                                           (entity-or-404 #f "genre"
+                                            "a-genre-that-is-not-there")))))
+                 (assert-equal #:name
+                  "the message names the kind of thing and the identifier"
+                  #:expect
+                  "no genre with the identifier a-genre-that-is-not-there"
+                  #:got (apply format #f
+                               (message-of answer)
+                               (message-args-of answer)))))
 
-         (test "a lookup that found an empty list is a lookup that found nothing"
-               ;; #f is what the repositories answer with, and the guard has to
-               ;; agree with them about what "there is no such thing" is.
-               (assert-equal #:name "an empty list is answered like #f"
-                             #:expect 404
-                             #:got (status-of
-                                    (answer-for (lambda ()
-                                                  (entity-or-404 '()
-                                                                 "song"
-                                                                 "nope"))))))))
+         (test
+          "a lookup that found an empty list is a lookup that found nothing"
+          ;; #f is what the repositories answer with, and the guard has to
+          ;; agree with them about what "there is no such thing" is.
+          (assert-equal #:name "an empty list is answered like #f"
+                        #:expect 404
+                        #:got (status-of (answer-for (lambda ()
+                                                       (entity-or-404 '()
+                                                                      "song"
+                                                                      "nope"))))))))
 
 ;;; ====== Who may change a row ======
 ;;;
@@ -137,13 +144,12 @@ there is no answer."
 ;;; that names no creator at all.
 
 (define super-session
-  '((owner-id . "the-maintainer")
-    (owner-permissions . (wikimusic:modify-permissions))))
+  '((owner-id . "the-maintainer") (owner-permissions
+                                   wikimusic:modify-permissions)))
 
 (define contributor-session
-  '((owner-id . "a-contributor")
-    (owner-permissions . (wikimusic:song-create
-                          wikimusic:artist-create))))
+  '((owner-id . "a-contributor") (owner-permissions wikimusic:song-create
+                                                    wikimusic:artist-create)))
 
 (define ownership-suite
   (suite "The ownership half of who may change a row"
@@ -165,13 +171,14 @@ there is no answer."
                                           #:created-by "another-contributor")
                              #:name "someone else's row is refused"))
 
-         (test "a row that names no creator is only the super grant's to change"
-               (assert-false (may-mutate? #:session contributor-session
-                                          #:created-by #f)
-                             #:name "a row with no creator is refused")
-               (assert-true (may-mutate? #:session super-session
-                                         #:created-by #f)
-                            #:name "while the super grant may still change it"))))
+         (test
+          "a row that names no creator is only the super grant's to change"
+          (assert-false (may-mutate? #:session contributor-session
+                                     #:created-by #f)
+                        #:name "a row with no creator is refused")
+          (assert-true (may-mutate? #:session super-session
+                                    #:created-by #f)
+                       #:name "while the super grant may still change it"))))
 
 (define (spec)
   (veritas-run guard-suite ownership-suite))

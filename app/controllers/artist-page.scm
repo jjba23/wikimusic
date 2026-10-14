@@ -53,8 +53,7 @@
 (get "/artists"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-artist-sort
-                       wikimusic-grid-size
+     #:cookies '(names wikimusic-artist-sort wikimusic-grid-size
                        x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
@@ -116,7 +115,8 @@
               ;; carry, so a page is a plain `offset = (page - 1) * 40'.
               (query-page (let ((p (get-from-qstr rc "page")))
                             (if (nil? p) 1
-                                (max 1 (or (string->number p) 1)))))
+                                (max 1
+                                     (or (string->number p) 1)))))
               (query-limit 40)
               (query-offset (* (- query-page 1) query-limit))
               (artists (cond
@@ -135,8 +135,7 @@
                                                          (html-escape
                                                           user-search))))
               (artist-pages (max 1
-                                 (ceiling (/ artist-total
-                                             query-limit))))
+                                 (ceiling (/ artist-total query-limit))))
               (artist-ids (map (lambda (s)
                                  (assq-ref s
                                            'identifier)) artists))
@@ -173,7 +172,7 @@
        (let* ((artist-id (params rc "uuid"))
               (artist-repo (make-sqlite-artist-repository rc))
               (artist (entity-or-404 (get-artist-by-id artist-repo artist-id)
-                                      "artist" artist-id))
+                                     "artist" artist-id))
               (artwork-repo (make-sqlite-artwork-repository rc))
               (opinion-repo (make-sqlite-opinion-repository rc))
               (comment-repo (make-sqlite-comment-repository rc))
@@ -255,10 +254,12 @@
                                                                            (filter (lambda 
                                                                                            (sc)
                                                                                      
+                                                                                     
                                                                                      (equal?
                                                                                       (assq-ref
                                                                                        sc
                                                                                        'song-identifier)
+
                                                                                       
                                                                                       (assq-ref
                                                                                        song
@@ -317,7 +318,7 @@
               (artwork-repo (make-sqlite-artwork-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
               (artist (entity-or-404 (get-artist-by-id artist-repo artist-id)
-                                      "artist" artist-id))
+                                     "artist" artist-id))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (artworks (get-artworks-by-entity-ids artwork-repo
                                                     'artist

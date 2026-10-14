@@ -48,7 +48,8 @@
 ;; community wiki fits inside this many several times over; an instance that
 ;; grows past it serves a sitemap index instead, which is a change to this
 ;; controller and not to anything that reads it.
-(define sitemap-row-limit 20000)
+(define sitemap-row-limit
+  20000)
 
 ;;; ====== Reading a row's own time ======
 ;;;
@@ -62,13 +63,15 @@
   "Return VALUE -- seconds since the epoch, as a number or as its digits -- as
 the `YYYY-MM-DD' a sitemap states, or #f when it is not a time at all."
   (let ((seconds (cond
-                   ((integer? value) value)
-                   ((string? value) (string->number value))
+                   ((integer? value)
+                    value)
+                   ((string? value)
+                    (string->number value))
                    (else #f))))
-    (if (and seconds (> seconds 0))
+    (if (and seconds
+             (> seconds 0))
         (date->string (time-utc->date (make-time time-utc 0 seconds))
-                      "~Y-~m-~d")
-        #f)))
+                      "~Y-~m-~d") #f)))
 
 ;;; ====== Building the sitemap ======
 
@@ -79,11 +82,18 @@ LOC is the only part a sitemap requires; each of the rest is stated by a
 keyword and left out of the element when it is #f, so a caller states only what
 it actually knows."
   `(url (loc ,loc)
-        ,@(if lastmod `((lastmod ,lastmod)) '())
-        ,@(if changefreq `((changefreq ,changefreq)) '())
-        ,@(if priority `((priority ,priority)) '())))
+        ,@(if lastmod
+              `((lastmod ,lastmod))
+              '())
+        ,@(if changefreq
+              `((changefreq ,changefreq))
+              '())
+        ,@(if priority
+              `((priority ,priority))
+              '())))
 
-(define* (entity-sitemap-entries rows #:key entity)
+(define* (entity-sitemap-entries rows
+                                 #:key entity)
   "Return ROWS as the sitemap entries of the ENTITY kind of page.
 
 ENTITY is wikimusic's own name for the kind -- `song', `artist', `genre',
@@ -92,10 +102,11 @@ address is spelled with.  A row whose own time is unreadable is still listed:
 being in the sitemap at all is worth more to a reader than the date it changed,
 and the address is what a crawler acts on."
   (map (lambda (row)
-         (sitemap-entry
-          #:loc (absolute-url (format #f "/~as/uuid/~a" entity
-                                      (assq-ref row 'identifier)))
-          #:lastmod (epoch->lastmod (assq-ref row 'last-edited-at))))
+         (sitemap-entry #:loc (absolute-url (format #f "/~as/uuid/~a" entity
+                                                    (assq-ref row
+                                                              'identifier)))
+                        #:lastmod (epoch->lastmod (assq-ref row
+                                                            'last-edited-at))))
        rows))
 
 (define (sitemap-entries rc)
@@ -106,35 +117,37 @@ actually change at; then every song, artist and genre, each with the date it was
 last written to.  Nothing that a reader cannot reach without signing in is
 listed, and no address is listed twice: each kind of page has one address per
 row, and a row has one identifier."
-  (append
-   (list (sitemap-entry #:loc (absolute-url "/")
-                        #:changefreq "daily" #:priority "1.0")
-         (sitemap-entry #:loc (absolute-url "/songs")
-                        #:changefreq "daily" #:priority "0.9")
-         (sitemap-entry #:loc (absolute-url "/artists")
-                        #:changefreq "weekly" #:priority "0.8")
-         (sitemap-entry #:loc (absolute-url "/genres")
-                        #:changefreq "weekly" #:priority "0.8")
-         ;; What the project is changes when the project does, which is
-         ;; seldomer than the corpus -- a monthly-revisit hint, and a
-         ;; standing page ranked below the three doors into the collection.
-         (sitemap-entry #:loc (absolute-url "/about")
-                        #:changefreq "monthly" #:priority "0.5"))
-   (entity-sitemap-entries
-    (get-songs (make-sqlite-song-repository rc)
-               #:order-by '((display-name asc))
-               #:limit sitemap-row-limit)
-    #:entity 'song)
-   (entity-sitemap-entries
-    (get-artists (make-sqlite-artist-repository rc)
-                 #:order-by '((display-name asc))
-                 #:limit sitemap-row-limit)
-    #:entity 'artist)
-   (entity-sitemap-entries
-    (get-genres (make-sqlite-genre-repository rc)
-                #:order-by '((display-name asc))
-                #:limit sitemap-row-limit)
-    #:entity 'genre)))
+  (append (list (sitemap-entry #:loc (absolute-url "/")
+                               #:changefreq "daily"
+                               #:priority "1.0")
+                (sitemap-entry #:loc (absolute-url "/songs")
+                               #:changefreq "daily"
+                               #:priority "0.9")
+                (sitemap-entry #:loc (absolute-url "/artists")
+                               #:changefreq "weekly"
+                               #:priority "0.8")
+                (sitemap-entry #:loc (absolute-url "/genres")
+                               #:changefreq "weekly"
+                               #:priority "0.8")
+                ;; What the project is changes when the project does, which is
+                ;; seldomer than the corpus -- a monthly-revisit hint, and a
+                ;; standing page ranked below the three doors into the collection.
+                (sitemap-entry #:loc (absolute-url "/about")
+                               #:changefreq "monthly"
+                               #:priority "0.5"))
+          (entity-sitemap-entries (get-songs (make-sqlite-song-repository rc)
+                                             #:order-by '((display-name asc))
+                                             #:limit sitemap-row-limit)
+                                  #:entity 'song)
+          (entity-sitemap-entries (get-artists (make-sqlite-artist-repository
+                                                rc)
+                                               #:order-by '((display-name asc))
+                                               #:limit sitemap-row-limit)
+                                  #:entity 'artist)
+          (entity-sitemap-entries (get-genres (make-sqlite-genre-repository rc)
+                                              #:order-by '((display-name asc))
+                                              #:limit sitemap-row-limit)
+                                  #:entity 'genre)))
 
 (define (sitemap rc)
   "Return the sitemap of this instance.
@@ -145,14 +158,15 @@ namespace has it in scope throughout, and a sitemap a crawler has to resolve a
 prefix in is one more thing that can be got wrong."
   (when (string-null? (site-origin))
     (throw 'artanis-err 500 sitemap
-           "no host name is configured, so this instance has no addresses to publish"))
+     "no host name is configured, so this instance has no addresses to publish"))
   `(urlset (@ (xmlns "http://www.sitemaps.org/schemas/sitemap/0.9"))
            ,@(sitemap-entries rc)))
 
 (get "/sitemap.xml"
      #:mime 'xml
      (lambda (rc)
-       (:mime rc (sitemap rc))))
+       (:mime rc
+              (sitemap rc))))
 
 ;;; ====== robots.txt ======
 ;;;
@@ -169,8 +183,7 @@ prefix in is one more thing that can be got wrong."
 ;;; of page adds is covered the moment it exists.
 
 (define robots-lines
-  '("User-agent: *"
-    "Allow: /"
+  '("User-agent: *" "Allow: /"
     ""
     "Disallow: /login"
     "Disallow: /logout"
@@ -187,10 +200,10 @@ prefix in is one more thing that can be got wrong."
   (string-join (append robots-lines
                        (list ""
                              (format #f "Sitemap: ~a/sitemap.xml"
-                                     (site-origin))))
-               "\n"))
+                                     (site-origin)))) "\n"))
 
 (get "/robots.txt"
      (lambda (rc)
        (response-emit (string-append (robots-txt) "\n")
-                      #:headers `((content-type . (text/plain (charset . "UTF-8")))))))
+                      #:headers `((content-type text/plain
+                                                (charset . "UTF-8"))))))

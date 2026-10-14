@@ -67,7 +67,8 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-13)
   #:use-module (support deployment)
-  #:use-module ((artanis utils) #:select (sxml->xml-string))
+  #:use-module ((artanis utils)
+                #:select (sxml->xml-string))
   #:use-module (app views about)
   #:use-module (app views index)
   #:use-module (wikimusic config)
@@ -78,7 +79,8 @@
 ;; A page is read through a translator that does not translate: what a test
 ;; reads is then the msgid the catalog is asked for, which is the only part of
 ;; a translated page that is the same in all four locales.
-(define (G_ key) key)
+(define (G_ key)
+  key)
 
 (define (about-html)
   "Return the about page as HTML, which every test below reads."
@@ -117,15 +119,19 @@ and `string-contains' answers #f for something that is not there at all; a
 missing needle is turned into a failure here rather than into a comparison
 error."
   (let ((at (string-contains html needle)))
-    (if (and at (number? at)) at #f)))
+    (if (and at
+             (number? at)) at #f)))
 
 (define (occurrences html needle)
   "Return how many times NEEDLE occurs in HTML."
-  (let loop ((start 0) (found 0))
+  (let loop
+    ((start 0)
+     (found 0))
     (let ((next (string-contains html needle start)))
       (if next
-          (loop (+ next (string-length needle)) (+ found 1))
-          found))))
+          (loop (+ next
+                   (string-length needle))
+                (+ found 1)) found))))
 
 (define (catalog-translates? path msgid)
   "Return #t when the catalog at PATH carries a translation for MSGID.
@@ -136,16 +142,21 @@ missing translation is a missing entry here and nothing else."
   (and (file-exists? path)
        (let ((lines (call-with-input-file path
                       (lambda (port)
-                        (let loop ((lines '()))
+                        (let loop
+                          ((lines '()))
                           (let ((line (read-line port)))
                             (if (eof-object? line)
                                 (reverse lines)
                                 (loop (cons line lines)))))))))
-         (let loop ((lines lines))
+         (let loop
+           ((lines lines))
            (cond
-             ((null? lines) #f)
-             ((string=? (car lines) (format #f "msgid \"~a\"" msgid))
-              (let ((msgstr (if (null? (cdr lines)) "" (cadr lines))))
+             ((null? lines)
+              #f)
+             ((string=? (car lines)
+                        (format #f "msgid \"~a\"" msgid))
+              (let ((msgstr (if (null? (cdr lines)) ""
+                                (cadr lines))))
                 (and (string-prefix? "msgstr \"" msgstr)
                      (not (string=? msgstr "msgstr \"\"")))))
              (else (loop (cdr lines))))))))
@@ -154,8 +165,7 @@ missing translation is a missing entry here and nothing else."
   (suite "What the page says the project is"
          (test "it names what the project is"
                (assert-true (and (position-of (about-html)
-                                              "non-profit community")
-                                 #t)
+                                              "non-profit community") #t)
                             #:name "the community is named")
                (assert-true (and (position-of (about-html) "musical education")
                                  #t)
@@ -170,15 +180,13 @@ missing translation is a missing entry here and nothing else."
                             #:name "and so is the architecture"))
 
          (test "it introduces the list of what a reader can do"
-               (assert-true (and (position-of
-                                  (about-html)
+               (assert-true (and (position-of (about-html)
                                   "Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:")
                                  #t)
                             #:name "the list is introduced"))
 
          (test "it ends on an invitation"
-               (assert-true (and (position-of
-                                  (about-html)
+               (assert-true (and (position-of (about-html)
                                   "Join us in building an ever-growing library of musical knowledge — where every note tells a story.")
                                  #t)
                             #:name "the last line is the invitation"))))
@@ -189,10 +197,9 @@ missing translation is a missing entry here and nothing else."
              (lambda (doing)
                (let ((label (string-take doing 40)))
                  (test (format #f "“~a…” is promised" label)
-                       (assert-true (and (position-of
-                                          (about-html)
-                                          (format #f "<li>~a</li>" doing))
-                                         #t)
+                       (assert-true (and (position-of (about-html)
+                                                      (format #f "<li>~a</li>"
+                                                              doing)) #t)
                                     #:name "it is an item of the list")
                        (assert-equal #:name "and it is said once"
                                      #:expect 1
@@ -201,20 +208,25 @@ missing translation is a missing entry here and nothing else."
 (define order-suite
   (suite "The order the page says things in"
          (test "the promises keep the order they were written in"
-               (assert-true (apply < (map (lambda (doing)
-                                            (at (about-html) doing))
-                                          (doings)))
+               (assert-true (apply <
+                                   (map (lambda (doing)
+                                          (at (about-html) doing))
+                                        (doings)))
                             #:name "each one follows the one before it"))
 
          (test "the list stands under the sentence that introduces it"
                (assert-true (< (at (about-html) "WikiMusic empowers you to:")
-                               (at (about-html) (car (doings))))
+                               (at (about-html)
+                                   (car (doings))))
                             #:name "the introduction comes first"))
 
          (test "the account of the place comes before the ask"
-               (assert-true (< (at (about-html) (last (doings)))
-                               (at (about-html) (donate-url)))
-                            #:name "nothing is asked for before anything is said"))))
+               (assert-true (< (at (about-html)
+                                   (last (doings)))
+                               (at (about-html)
+                                   (donate-url)))
+                            #:name
+                            "nothing is asked for before anything is said"))))
 
 ;; The two pages read the same project: the front page says what the place is
 ;; called and what it is for, and the about page says all of it.  The sentences
@@ -224,7 +236,8 @@ missing translation is a missing entry here and nothing else."
 ;; disagreed.
 (define (front-html)
   "Return the front page as HTML, with a stand-in for the songs it lists."
-  (sxml->xml-string (welcome-page G_ #:song-fragment '((p "songs")))))
+  (sxml->xml-string (welcome-page G_
+                                  #:song-fragment '((p "songs")))))
 
 (define (front-html-with-shelves)
   "Return the front page as HTML, with a stand-in for each shelf it lists.
@@ -240,45 +253,39 @@ reader meets them, songs before artists."
   (suite "The words the two pages share"
          (test "both pages name the place the same way"
                (assert-true (and (position-of (about-html)
-                                              (project-tagline G_))
-                                 #t)
+                                              (project-tagline G_)) #t)
                             #:name "the about page says it")
                (assert-true (and (position-of (front-html)
-                                              (project-tagline G_))
-                                 #t)
+                                              (project-tagline G_)) #t)
                             #:name "and so does the front page"))
 
          (test "both pages close on the same invitation"
                (assert-true (and (position-of (about-html)
-                                              (project-invitation G_))
-                                 #t)
+                                              (project-invitation G_)) #t)
                             #:name "the about page invites")
                (assert-true (and (position-of (front-html)
-                                              (project-invitation G_))
-                                 #t)
+                                              (project-invitation G_)) #t)
                             #:name "and so does the front page"))
 
          (test "the account of the project belongs to the about page"
                ;; The front page opens on the collection, which is the whole
                ;; reason the about page exists; a paragraph of introduction
                ;; creeping back above the tiles is the thing to catch.
-               (assert-false (position-of (front-html) (project-account G_))
+               (assert-false (position-of (front-html)
+                                          (project-account G_))
                              #:name "the front page is still the collection"))
 
          (test "the one ask is the same control on both pages"
-               (assert-true (and (position-of
-                                  (about-html)
-                                  (format #f "href=\"~a\"" (donate-url)))
-                                 #t)
+               (assert-true (and (position-of (about-html)
+                                              (format #f "href=\"~a\""
+                                                      (donate-url))) #t)
                             #:name "the about page asks")
-               (assert-true (and (position-of
-                                  (front-html)
-                                  (format #f "href=\"~a\"" (donate-url)))
-                                 #t)
+               (assert-true (and (position-of (front-html)
+                                              (format #f "href=\"~a\""
+                                                      (donate-url))) #t)
                             #:name "and so does the front page")
                (assert-true (and (position-of (front-html)
-                                              (project-support-ask G_))
-                                 #t)
+                                              (project-support-ask G_)) #t)
                             #:name "offered in the project's own words"))))
 
 ;;; ====== The front page as a way in ======
@@ -292,11 +299,12 @@ reader meets them, songs before artists."
   (suite "The front page as a way in"
          (test "the first screen says what is in the place"
                (assert-true (and (position-of (front-html)
-                                              (project-summary G_))
-                                 #t)
+                                              (project-summary G_)) #t)
                             #:name "the summary is read under the tagline")
-               (assert-true (< (at (front-html) (project-tagline G_))
-                               (at (front-html) (project-summary G_)))
+               (assert-true (< (at (front-html)
+                                   (project-tagline G_))
+                               (at (front-html)
+                                   (project-summary G_)))
                             #:name "and it is read after it"))
 
          (test "the search control carries the words to the collection"
@@ -312,12 +320,10 @@ reader meets them, songs before artists."
 
          (test "both shelves of the collection are shown, songs first"
                (assert-true (and (position-of (front-html-with-shelves)
-                                              "SONG-SHELF-MARKER")
-                                 #t)
+                                              "SONG-SHELF-MARKER") #t)
                             #:name "the songs are there")
                (assert-true (and (position-of (front-html-with-shelves)
-                                              "ARTIST-SHELF-MARKER")
-                                 #t)
+                                              "ARTIST-SHELF-MARKER") #t)
                             #:name "and so are the artists")
                (assert-true (< (at (front-html-with-shelves)
                                    "SONG-SHELF-MARKER")
@@ -325,15 +331,15 @@ reader meets them, songs before artists."
                                    "ARTIST-SHELF-MARKER"))
                             #:name "in the order they are read")
                (assert-true (and (position-of (front-html-with-shelves)
-                                              "href=\"/artists\"")
-                                 #t)
+                                              "href=\"/artists\"") #t)
                             #:name "with a way to the rest of them"))
 
          (test "a page with no artists to show is still the whole page"
                ;; The controller always asks; a caller that has no rows -- a
                ;; test, a page rendered before a database is there -- gets no
                ;; empty shelf with a heading over it.
-               (assert-false (position-of (front-html) (G_ "newest artists"))
+               (assert-false (position-of (front-html)
+                                          (G_ "newest artists"))
                              #:name "no heading over nothing"))))
 
 ;; The other half of the ask: an instance that raises nothing.  The control, the
@@ -346,60 +352,56 @@ reader meets them, songs before artists."
 (define quiet-suite
   (suite "The pages of an instance that asks for nothing"
          (test "the about page asks for nothing"
-               (assert-false (position-of
-                              (with-deployment 'show-donation? #f about-html)
-                              (donate-url))
+               (assert-false (position-of (with-deployment 'show-donation? #f
+                                                           about-html)
+                                          (donate-url))
                              #:name "there is no control")
-               (assert-false (position-of
-                              (with-deployment 'show-donation? #f about-html)
-                              (project-support-ask G_))
+               (assert-false (position-of (with-deployment 'show-donation? #f
+                                                           about-html)
+                                          (project-support-ask G_))
                              #:name "and none of the words that are on one")
-               (assert-false (position-of
-                              (with-deployment 'show-donation? #f about-html)
-                              (project-support-note G_))
-                             #:name "and nothing about what the money pays for"))
+               (assert-false (position-of (with-deployment 'show-donation? #f
+                                                           about-html)
+                                          (project-support-note G_))
+                             #:name
+                             "and nothing about what the money pays for"))
 
          (test "and the front page asks for nothing either"
-               (assert-false (position-of
-                              (with-deployment 'show-donation? #f front-html)
-                              (donate-url))
+               (assert-false (position-of (with-deployment 'show-donation? #f
+                                                           front-html)
+                                          (donate-url))
                              #:name "there is no control")
-               (assert-false (position-of
-                              (with-deployment 'show-donation? #f front-html)
-                              (project-support-ask G_))
+               (assert-false (position-of (with-deployment 'show-donation? #f
+                                                           front-html)
+                                          (project-support-ask G_))
                              #:name "and none of the words that are on one"))
 
          (test "what the pages are for is still said"
-               (assert-true (and (position-of
-                                  (with-deployment 'show-donation? #f about-html)
-                                  (car (doings)))
-                                 #t)
+               (assert-true (and (position-of (with-deployment 'show-donation?
+                                                               #f about-html)
+                                              (car (doings))) #t)
                             #:name "the promises are still made")
-               (assert-true (and (position-of
-                                  (with-deployment 'show-donation? #f front-html)
-                                  (project-invitation G_))
-                                 #t)
+               (assert-true (and (position-of (with-deployment 'show-donation?
+                                                               #f front-html)
+                                              (project-invitation G_)) #t)
                             #:name "and the front page still invites"))))
 
 (define seo-suite
   (suite "What the page tells a crawler"
          (test "the title names the community"
                (assert-true (and (position-of (about-html)
-                                              "<title>About WikiMusic")
-                                 #t)
+                                              "<title>About WikiMusic") #t)
                             #:name "the page is titled"))
 
          (test "the description is the page's own one"
-               (assert-true (and (position-of
-                                  (about-html)
+               (assert-true (and (position-of (about-html)
                                   "name=\"description\" content=\"WikiMusic is a non-profit community")
                                  #t)
                             #:name "a search result shows the community"))
 
          (test "the page says what kind of page it is"
                (assert-true (and (position-of (about-html)
-                                              "\"@type\":\"AboutPage\"")
-                                 #t)
+                                              "\"@type\":\"AboutPage\"") #t)
                             #:name "the page states its own type")
                (assert-true (and (position-of (about-html) "\"@type\":\"NGO\"")
                                  #t)
@@ -415,15 +417,12 @@ reader meets them, songs before artists."
                             #:name "and says where it leads"))))
 
 (define label-suite
-  (test-each "The word the link is offered in"
-             locales
+  (test-each "The word the link is offered in" locales
              (lambda (locale)
                (test (format #f "~a has a word for it" locale)
-                     (assert-true (catalog-translates?
-                                   (format #f
-                                           "sys/i18n/locale/~a/LC_MESSAGES/translate.po"
-                                           locale)
-                                   "about")
+                     (assert-true (catalog-translates? (format #f
+                                                        "sys/i18n/locale/~a/LC_MESSAGES/translate.po"
+                                                        locale) "about")
                                   #:name "the label is translated")))))
 
 (define (spec)

@@ -42,12 +42,14 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-13)
   #:use-module (support deployment)
-  #:use-module ((artanis utils) #:select (sxml->xml-string))
+  #:use-module ((artanis utils)
+                #:select (sxml->xml-string))
   #:use-module (wikimusic config)
   #:use-module (wikimusic html)
   #:export (spec))
 
-(define (G_ key) key)
+(define (G_ key)
+  key)
 
 (define (render sxml)
   "Return the HTML SXML serializes to."
@@ -55,8 +57,10 @@
 
 (define (all-matches pattern string)
   "Return every first group of PATTERN's matches in STRING."
-  (fold-matches (make-regexp pattern) string '()
-                (lambda (match tail)
+  (fold-matches (make-regexp pattern) string
+                '()
+                (lambda (match tail
+                          )
                   (cons (match:substring match 1) tail))))
 
 (define (class-attributes html)
@@ -66,20 +70,29 @@
 (define (class-with html token)
   "Return the class attribute of HTML that names TOKEN, or #f."
   (find (lambda (attribute)
-          (and (member token (string-tokenize attribute)) #t))
+          (and (member token
+                       (string-tokenize attribute)) #t))
         (class-attributes html)))
 
 (define (class-tokens html token)
   "Return the class tokens of the attribute naming TOKEN, or '()."
   (let ((attribute (class-with html token)))
-    (if attribute (string-tokenize attribute) '())))
+    (if attribute
+        (string-tokenize attribute)
+        '())))
 
 (define (first-repeated-token attribute)
   "Return the first token ATTRIBUTE names twice, or #f when it names none twice."
-  (let loop ((tokens (string-tokenize attribute)) (seen '()))
-    (cond ((null? tokens) #f)
-          ((member (car tokens) seen) (car tokens))
-          (else (loop (cdr tokens) (cons (car tokens) seen))))))
+  (let loop
+    ((tokens (string-tokenize attribute))
+     (seen '()))
+    (cond
+      ((null? tokens)
+       #f)
+      ((member (car tokens) seen)
+       (car tokens))
+      (else (loop (cdr tokens)
+                  (cons (car tokens) seen))))))
 
 (define locale-suite
   (suite "The languages a page offers"
@@ -99,8 +112,8 @@
          (test "a compiled catalog stands behind each offered language"
                (for-each (lambda (entry)
                            (let ((mo (format #f
-                                             "sys/i18n/locale/~a/LC_MESSAGES/translate.mo"
-                                             (car entry))))
+                                      "sys/i18n/locale/~a/LC_MESSAGES/translate.mo"
+                                      (car entry))))
                              (assert-true (file-exists? mo)
                                           #:name (format #f "~a has a catalog"
                                                          (car entry)))))
@@ -112,9 +125,8 @@
                (let ((html (render (locale-choose-form G_
                                                        #:selected-locale
                                                        "nl_NL"))))
-                 (assert-true (and (string-contains
-                                    html "action=\"/preferences/locale\"")
-                                   #t)
+                 (assert-true (and (string-contains html
+                                    "action=\"/preferences/locale\"") #t)
                               #:name "the form names the route")
                  (assert-true (and (string-contains html "name=\"user-lang\"")
                                    #t)
@@ -125,10 +137,10 @@
                                                        #:selected-locale
                                                        "en_US"))))
                  (for-each (lambda (entry)
-                             (assert-true (and (string-contains
-                                                html
-                                                (format #f "value=\"~a\""
-                                                        (car entry)))
+                             (assert-true (and (string-contains html
+                                                                (format #f
+                                                                 "value=\"~a\""
+                                                                 (car entry)))
                                                #t)
                                           #:name (format #f "~a is offered"
                                                          (car entry))))
@@ -138,16 +150,14 @@
                (let ((html (render (locale-choose-form G_
                                                        #:selected-locale
                                                        "ja_JP"))))
-                 (assert-true (and (regexp-exec
-                                    (make-regexp
-                                     "value=\"ja_JP\"[^>]*selected")
-                                    html)
-                                   #t)
-                              #:name "the language being read is the row shown")
-                 (assert-false (regexp-exec
-                                (make-regexp
-                                 "value=\"nl_NL\"[^>]*selected")
-                                html)
+                 (assert-true (and (regexp-exec (make-regexp
+                                                 "value=\"ja_JP\"[^>]*selected")
+                                                html) #t)
+                              #:name
+                              "the language being read is the row shown")
+                 (assert-false (regexp-exec (make-regexp
+                                             "value=\"nl_NL\"[^>]*selected")
+                                            html)
                                #:name "and a language not being read is not")))
 
          (test "the control names itself for a reader and for assistive tech"
@@ -170,7 +180,8 @@
                               #:name "just below the top edge")))
 
          (test "the navigation is left to scroll away while reading"
-               (let ((tokens (class-tokens (render (nav G_ #:reading? #t))
+               (let ((tokens (class-tokens (render (nav G_
+                                                        #:reading? #t))
                                            "lg:flex-row")))
                  (assert-true (and (pair? tokens) #t)
                               #:name "the bar is still rendered")
@@ -182,15 +193,16 @@
                                #:name "and it does not float above the text")))
 
          (test "the whole template carries the reading mode down to the bar"
-               (let ((reading (class-tokens
-                               (render (html-template G_
-                                                      #:reading? #t
-                                                      #:body '((p "reading"))))
-                               "lg:flex-row"))
-                     (browsing (class-tokens
-                                (render (html-template G_
-                                                       #:body '((p "browsing"))))
-                                "lg:flex-row")))
+               (let ((reading (class-tokens (render (html-template G_
+                                                                   #:reading?
+                                                                   #t
+                                                                   #:body '((p
+                                                                             "reading"))))
+                                            "lg:flex-row"))
+                     (browsing (class-tokens (render (html-template G_
+                                                                    #:body '((p
+                                                                              "browsing"))))
+                                             "lg:flex-row")))
                  (assert-true (and (pair? reading) #t)
                               #:name "a reading page still has a bar")
                  (assert-false (member "sticky" reading)
@@ -217,17 +229,14 @@
          ;; where *this* deployment says the code, the manual and the licence
          ;; are, and an instance that names its own is not a failure.
          (test "it points at the code, the manual and the licence"
-               (assert-true (and (string-contains
-                                  (footer-html) (source-repository-url))
-                                 #t)
+               (assert-true (and (string-contains (footer-html)
+                                                  (source-repository-url)) #t)
                             #:name "where the source is")
-               (assert-true (and (string-contains
-                                  (footer-html) (manual-url))
-                                 #t)
+               (assert-true (and (string-contains (footer-html)
+                                                  (manual-url)) #t)
                             #:name "where the manual is")
-               (assert-true (and (string-contains
-                                  (footer-html) (licence-url))
-                                 #t)
+               (assert-true (and (string-contains (footer-html)
+                                                  (licence-url)) #t)
                             #:name "and where the licence is written out"))
 
          (test "it states the version this instance runs"
@@ -235,29 +244,26 @@
                             #:name "the version is named"))
 
          (test "it offers the way back to the top"
-               (assert-true (and (string-contains (footer-html) "back to the top")
-                                 #t)
+               (assert-true (and (string-contains (footer-html)
+                                                  "back to the top") #t)
                             #:name "the control says what it does")
                (assert-true (and (string-contains (footer-html)
-                                                  "window.scrollTo")
-                                 #t)
+                                                  "window.scrollTo") #t)
                             #:name "and it is the one that scrolls"))
 
          (test "no class is asked for twice"
                (let ((offending (find first-repeated-token
                                       (class-attributes (footer-html)))))
                  (assert-false offending
-                               #:name (if offending
-                                          offending
+                               #:name (if offending offending
                                           "a clean class attribute"))))))
 
 (define shell-suite
   (suite "A page a browser can read"
          (test "the body the caller passed is the body that is served"
-               (let ((html (render
-                            (html-template G_
-                                           #:body '((p (@ (id "marker"))
-                                                        "HELLO-BODY-MARKER"))))))
+               (let ((html (render (html-template G_
+                                                  #:body '((p (@ (id "marker"))
+                                                            "HELLO-BODY-MARKER"))))))
                  (assert-true (and (string-contains html "HELLO-BODY-MARKER")
                                    #t)
                               #:name "the content survives")
@@ -265,14 +271,16 @@
                               #:name "and it stands inside the document")))
 
          (test "no non-void element is closed as a self-closed tag"
-               (let ((html (render (html-template G_ #:body '((p "x")))))
-                     (pattern (make-regexp
-                               (string-append
-                                "<(div|span|main|p|section|article|nav|"
-                                "button|details|summary|ul|ol|li|h[1-6]|"
-                                "form|label)([ >])[^>]*/>"))))
+               (let ((html (render (html-template G_
+                                                  #:body '((p "x")))))
+                     (pattern (make-regexp (string-append
+                                            "<(div|span|main|p|section|article|nav|"
+                                            "button|details|summary|ul|ol|li|h[1-6]|"
+                                            "form|label)([ >])[^>]*/>"))))
                  (assert-false (fold-matches pattern html #f
-                                             (lambda (match tail) #t))
+                                             (lambda (match tail
+                                                       )
+                                               #t))
                                #:name "each one is closed, not reopened")))))
 
 ;; Where the shell reads the files it is made of.  The type a page is set in,
@@ -285,57 +293,55 @@
 ;; a host (see `(support deployment)').
 (define (shell-html)
   "Return the shell as HTML, which the asset tests below read."
-  (render (html-template G_ #:body '((p "a page")))))
+  (render (html-template G_
+                         #:body '((p "a page")))))
 
 (define assets-suite
   (suite "Where the shell reads its own files"
          (test "an instance that serves its own reads them off itself"
-               (assert-true (and (string-contains
-                                  (with-deployment 'assets-url "" shell-html)
-                                  "href=\"/css/wikimusic.olive.min.css\"")
-                                 #t)
+               (assert-true (and (string-contains (with-deployment 'assets-url
+                                                                   ""
+                                                                   shell-html)
+                                  "href=\"/css/wikimusic.olive.min.css\"") #t)
                             #:name "the stylesheet the page is laid out with")
-               (assert-true (and (string-contains
-                                  (with-deployment 'assets-url "" shell-html)
-                                  "href=\"/favicon.ico\"")
-                                 #t)
+               (assert-true (and (string-contains (with-deployment 'assets-url
+                                                                   ""
+                                                                   shell-html)
+                                                  "href=\"/favicon.ico\"") #t)
                             #:name "and the icon the tab is marked with"))
 
-         (test "a deployment that serves them elsewhere moves every one of them"
-               (assert-true (and (string-contains
-                                  (with-deployment
-                                   'assets-url "https://assets.example.org/theme"
-                                   shell-html)
-                                  (string-append
-                                   "href=\"https://assets.example.org/theme"
-                                   "/css/wikimusic.olive.min.css\""))
-                                 #t)
-                            #:name "the stylesheet")
-               (assert-true (and (string-contains
-                                  (with-deployment
-                                   'assets-url "https://assets.example.org/theme"
-                                   shell-html)
-                                  (string-append
-                                   "href=\"https://assets.example.org/theme"
-                                   "/vendor/fonts/lucida.css\""))
-                                 #t)
-                            #:name "the type the page is set in")
-               (assert-true (and (string-contains
-                                  (with-deployment
-                                   'assets-url "https://assets.example.org/theme"
-                                   shell-html)
-                                  (string-append
-                                   "href=\"https://assets.example.org/theme"
-                                   "/vendor/phosphor/phosphor.css\""))
-                                 #t)
-                            #:name "the glyphs its controls wear")
-               (assert-true (and (string-contains
-                                  (with-deployment 'assets-url
-                                                   "https://assets.example.org/theme"
-                                                   shell-html)
-                                  "href=\"https://assets.example.org/theme/favicon.ico\"")
-                                 #t)
-                            #:name "and the icon, with no address left behind"))
+         (test
+          "a deployment that serves them elsewhere moves every one of them"
+          (assert-true (and (string-contains (with-deployment 'assets-url
+                                              "https://assets.example.org/theme"
+                                              shell-html)
+                                             (string-append
+                                              "href=\"https://assets.example.org/theme"
+                                              "/css/wikimusic.olive.min.css\""))
+                            #t)
+                       #:name "the stylesheet")
+          (assert-true (and (string-contains (with-deployment 'assets-url
+                                              "https://assets.example.org/theme"
+                                              shell-html)
+                                             (string-append
+                                              "href=\"https://assets.example.org/theme"
+                                              "/vendor/fonts/lucida.css\""))
+                            #t)
+                       #:name "the type the page is set in")
+          (assert-true (and (string-contains (with-deployment 'assets-url
+                                              "https://assets.example.org/theme"
+                                              shell-html)
+                                             (string-append
+                                              "href=\"https://assets.example.org/theme"
+                                              "/vendor/phosphor/phosphor.css\""))
+                            #t)
+                       #:name "the glyphs its controls wear")
+          (assert-true (and (string-contains (with-deployment 'assets-url
+                                              "https://assets.example.org/theme"
+                                              shell-html)
+                             "href=\"https://assets.example.org/theme/favicon.ico\"")
+                            #t)
+                       #:name "and the icon, with no address left behind"))
 
          (test "no file of the interface is somebody else's to serve"
                ;; Every one of these was a request a reader's browser made to
@@ -347,9 +353,9 @@
                (assert-false (string-contains (shell-html)
                                               "fonts.googleapis.com")
                              #:name "no font host")
-               (assert-false (string-contains (shell-html)
-                                              "fonts.gstatic.com")
-                             #:name "and none of the hosts a face was fetched from")
+               (assert-false (string-contains (shell-html) "fonts.gstatic.com")
+                             #:name
+                             "and none of the hosts a face was fetched from")
                (assert-false (string-contains (shell-html) "cdn.jsdelivr.net")
                              #:name "no icon CDN")
                ;; The Lucida families used to be read from the author's own
@@ -360,7 +366,7 @@
                ;; interface waiting on somebody else's machine to be up.
                (assert-false (string-contains (shell-html)
                                               "static-assets/fonts")
-                             #:name "and no typeface read from somebody's static assets"))))
+                #:name "and no typeface read from somebody's static assets"))))
 
 (define (spec)
   (veritas-run locale-suite

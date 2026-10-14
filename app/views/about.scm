@@ -54,7 +54,8 @@
 ;; search result, and in the JSON-LD below.  It says who the community is as
 ;; well as what the page is, because the address `/about' is not something a
 ;; reader sees in a link they were sent.
-(define about-title "About WikiMusic: the non-profit music community")
+(define about-title
+  "About WikiMusic: the non-profit music community")
 
 ;; The one sentence a search result shows.  It names the community, what it
 ;; offers and who writes it, so a reader who has never heard of the project
@@ -68,13 +69,20 @@
 ;; is drawn inside, so a reader arriving here from the collection is still on
 ;; the same site.
 (define about-page-classes
-  '(w-full flex flex-col items-center gap-6 py-8 px-2 sm:px-4))
+  '(w-full flex
+           flex-col
+           items-center
+           gap-6
+           py-8
+           px-2
+           sm:px-4))
 
 ;; The frosted panel the content is read on, and the list and the rule inside
 ;; it.  They are named here rather than written into the markup so that the
 ;; page reads as an outline of itself.
 (define about-panel-classes
-  '(hg-frost bg-stone-100/75 dark:bg-onyx-900/75
+  '(hg-frost bg-stone-100/75
+             dark:bg-onyx-900/75
              rounded-2xl
              sm:rounded-3xl
              shadow-xl
@@ -83,19 +91,32 @@
              dark:border-persia-pink-900/10
              max-w-196
              w-full
-             flex flex-col
+             flex
+             flex-col
              gap-4
-             p-6 sm:p-8 md:p-12))
+             p-6
+             sm:p-8
+             md:p-12))
 
 (define about-doings-classes
-  '(pl-8 list-disc flex flex-col gap-1
-         font-sans text-lg leading-6
-         text-onyx-500 dark:text-stone-300))
+  '(pl-8 list-disc
+         flex
+         flex-col
+         gap-1
+         font-sans
+         text-lg
+         leading-6
+         text-onyx-500
+         dark:text-stone-300))
 
 ;; The rule that separates the account of the place from the ask.
 (define about-ask-classes
-  '(flex flex-col items-center gap-3 pt-4
-         border-t-2 border-persia-pink-500/25))
+  '(flex flex-col
+         items-center
+         gap-3
+         pt-4
+         border-t-2
+         border-persia-pink-500/25))
 
 (define (about-panel G_)
   "Return the panel the page is read on, as SXML.
@@ -119,12 +140,14 @@ and the foundation last."
         (p ,(project-lead-in G_))
 
         (ul (@ (class ,(mk-class about-doings-classes)))
-            ,@(map (lambda (promise) `(li ,promise))
+            ,@(map (lambda (promise)
+                     `(li ,promise))
                    (project-promises G_)))
 
         ;; What the project is built on, one paragraph per sentence, in the
         ;; order the sentences are written in.
-        ,@(map (lambda (sentence) `(p ,sentence))
+        ,@(map (lambda (sentence)
+                 `(p ,sentence))
                (project-foundation G_))
 
         ;; What a reader can do about it, under the rule that separates the
@@ -159,24 +182,30 @@ index and no reason to hide it."
                  #:title about-title
                  #:description about-description
                  #:path "/about"
-                 #:json-ld (list (page-json-ld
-                                  #:type "AboutPage"
-                                  #:url (absolute-url "/about")
-                                  #:name about-title
-                                  #:description about-description
-                                  ;; What the page is about: the community, and
-                                  ;; not the page.  A wiki that works towards
-                                  ;; knowledge sharing for musical education is
-                                  ;; an NGO, which is the closest type
-                                  ;; schema.org has for it.
-                                  #:main-entity
-                                  (append (list (schema-name "NGO")
-                                                (cons "name" "WikiMusic")
-                                                (cons "alternateName"
-                                                      "the free music knowledge encyclopaedia"))
-                                          (if (absolute-url "/")
-                                              (list (cons "url"
-                                                          (absolute-url "/")))
-                                              '()))))
+                 #:json-ld (list (page-json-ld #:type "AboutPage"
+                                               #:url (absolute-url "/about")
+                                               #:name about-title
+                                               #:description about-description
+                                               ;; What the page is about: the community, and
+                                               ;; not the page.  A wiki that works towards
+                                               ;; knowledge sharing for musical education is
+                                               ;; an NGO, which is the closest type
+                                               ;; schema.org has for it.
+                                               #:main-entity (append (list (schema-name
+                                                                            "NGO")
+                                                                           (cons
+                                                                            "name"
+                                                                            "WikiMusic")
+                                                                           (cons
+                                                                            "alternateName"
+                                                                            "the free music knowledge encyclopaedia"))
+                                                                     (if (absolute-url
+                                                                          "/")
+                                                                         (list
+                                                                          (cons
+                                                                           "url"
+                                                                           (absolute-url
+                                                                            "/")))
+                                                                         '()))))
                  #:body `((div (@ (class ,(mk-class about-page-classes)))
                                ,(about-panel G_)))))

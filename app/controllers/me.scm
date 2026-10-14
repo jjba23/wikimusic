@@ -191,20 +191,20 @@
             ;; for a mail that is never coming.
             (let ((queued? (request-password-reset u)))
               (redirect-to rc
-                           (string->uri
-                            (format #f
-                                    "~a/users/manage/?created=true~a"
-                                    (current-myhost)
-                                    (if queued?
-                                        (notice-query
-                                         #:title (G_ "account created")
-                                         #:body
-                                         (G_ "an invitation to choose a password has been emailed to them"))
-                                        (notice-query
-                                         #:title (G_ "account created, but the invitation was not sent")
-                                         #:body
-                                         (G_ "the mail service did not accept it; ask for a password reset for this account to try again")
-                                         #:duration-millis 10000))))
+                           (string->uri (format #f
+                                         "~a/users/manage/?created=true~a"
+                                         (current-myhost)
+                                         (if queued?
+                                             (notice-query #:title (G_
+                                                                    "account created")
+                                                           #:body (G_
+                                                                   "an invitation to choose a password has been emailed to them"))
+                                             (notice-query #:title (G_
+                                                                    "account created, but the invitation was not sent")
+                                                           #:body (G_
+                                                                   "the mail service did not accept it; ask for a password reset for this account to try again")
+                                                           #:duration-millis
+                                                           10000))))
                            #:status 302))))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:user-create)
@@ -258,14 +258,14 @@
                                              wikimusic:modify-permissions))))
                  (_ (sql-execute! rc
                                   (sql-update 'users
-                                              `((username . ,username)
-                                                (email . ,email)
-                                                (permissions
-                                                 . ,(format #f "~s"
-                                                            permissions)))
-                                              #:where `((identifier
-                                                         . ,(params rc
-                                                                   "identifier"))))
+                                              `((username unquote username)
+                                                (email unquote email)
+                                                (permissions unquote
+                                                             (format #f "~s"
+                                                              permissions)))
+                                              #:where `((identifier unquote
+                                                                    (params rc
+                                                                     "identifier"))))
                                   #:name "edit-user")))
             (redirect-to rc
                          (string->uri (format #f
@@ -294,27 +294,31 @@
                                               #:signing-key signing-key))
               (user-id (and (not (nil? sealed-payload))
                             (equal? 'reset-password
-                                    (assoc-ref sealed-payload 'action))
-                            (assoc-ref sealed-payload 'user)))
-              (user (and user-id ($users 'get
-                                         #:ret 'top
-                                         #:condition (where #:identifier
-                                                            user-id))))
-              (email (and (not (nil? user)) (assoc-ref (car user) "email"))))
+                                    (assoc-ref sealed-payload
+                                               'action))
+                            (assoc-ref sealed-payload
+                                       'user)))
+              (user (and user-id
+                         ($users 'get
+                                 #:ret 'top
+                                 #:condition (where #:identifier user-id))))
+              (email (and (not (nil? user))
+                          (assoc-ref (car user) "email"))))
          (if (not email)
              (redirect-to rc
-                          (string->uri
-                           (format #f "~a/login?reset-link-expired=true~a"
-                                   (current-myhost)
-                                   (notice-query
-                                    #:title (G_ "this reset link has expired")
-                                    #:body
-                                    (G_ "ask for a new one and a fresh link will be emailed to you")
-                                    #:duration-millis 8000)))
+                          (string->uri (format #f
+                                        "~a/login?reset-link-expired=true~a"
+                                        (current-myhost)
+                                        (notice-query #:title (G_
+                                                               "this reset link has expired")
+                                                      #:body (G_
+                                                              "ask for a new one and a fresh link will be emailed to you")
+                                                      #:duration-millis 8000)))
                           #:status 302)
              (response-emit (:mime rc
                                    (reset-password-page (:i18n rc)
-                                                        #:token (params rc "token")
+                                                        #:token (params rc
+                                                                 "token")
                                                         ;; The reason the last submission came
                                                         ;; back, when it did: `weak' or
                                                         ;; `mismatch', and #f on a first visit.
@@ -346,23 +350,28 @@
 ;; nobody knows whether it was.  The timeout and the pauses are short enough
 ;; that a healthy service delays nobody, and a dead one costs a few seconds
 ;; rather than the message.
-(define mail-attempts 3)
+(define mail-attempts
+  3)
 
 ;; How long the first pause between attempts is; each later pause is twice the
 ;; one before it, so a service that is restarting gets room to come back.  It
 ;; is written in milliseconds because that is what `usleep' takes -- a sleep
 ;; of half a second is not an integer number of seconds.
-(define mail-attempt-pause-milliseconds 500)
+(define mail-attempt-pause-milliseconds
+  500)
 
 ;; A request that never finishes is exactly the failure a retry is for, so
 ;; both the connection and the whole transfer are bounded.
-(define mail-timeout-seconds 6)
-(define mail-connect-timeout-seconds 3)
+(define mail-timeout-seconds
+  6)
+(define mail-connect-timeout-seconds
+  3)
 
 ;; The sentence pingwing answers an accepted task with.  It is quoted here
 ;; rather than paraphrased: it is the service's own wording, and a rewording
 ;; there would make every mail look unsent and be sent over and over.
-(define mail-accepted-sentence "successfully saved task")
+(define mail-accepted-sentence
+  "successfully saved task")
 
 ;; Where this machine's trust anchors are.
 ;;
@@ -378,22 +387,23 @@
 ;; for the way the rest of the machine's tools find them: from the environment
 ;; when it names them, and otherwise where a unix puts them.
 (define trust-anchor-bundle-paths
-  '("/etc/ssl/certs/ca-certificates.crt"
-    "/etc/ssl/certs/ca-bundle.crt"
-    "/etc/pki/tls/certs/ca-bundle.crt"
-    "/etc/ssl/cert.pem"))
+  '("/etc/ssl/certs/ca-certificates.crt" "/etc/ssl/certs/ca-bundle.crt"
+    "/etc/pki/tls/certs/ca-bundle.crt" "/etc/ssl/cert.pem"))
 
 (define trust-anchor-directories
-  '("/etc/ssl/certs"
-    "/etc/pki/tls/certs"))
+  '("/etc/ssl/certs" "/etc/pki/tls/certs"))
 
 (define (first-existing paths)
   "Return the first of PATHS that is on disk, or #f when none of them is."
-  (let loop ((rest paths))
+  (let loop
+    ((rest paths))
     (cond
-     ((null? rest) #f)
-     ((and (string? (car rest)) (file-exists? (car rest))) (car rest))
-     (else (loop (cdr rest))))))
+      ((null? rest)
+       #f)
+      ((and (string? (car rest))
+            (file-exists? (car rest)))
+       (car rest))
+      (else (loop (cdr rest))))))
 
 (define (trust-anchor-bundle)
   "Return the path of a file of certificate authorities, or #f."
@@ -413,20 +423,22 @@ shape the option below takes."
 succeeds takes a fraction of a second -- so the seconds alone would report
 every healthy attempt as having taken no time at all."
   (let ((now (gettimeofday)))
-    (+ (* (car now) 1000000) (cdr now))))
+    (+ (* (car now) 1000000)
+       (cdr now))))
 
 (define (mail-recipient-addresses mail-payload)
   "Return the addresses a mail is addressed to, as one comma-separated line.
 
 Only the addresses are read out of the payload: what the mail carries is a
 reset link or an invitation, and neither belongs in a log."
-  (let ((recipients (assoc-ref mail-payload 'recipients)))
+  (let ((recipients (assoc-ref mail-payload
+                               'recipients)))
     (if (vector? recipients)
         (format #f "~{~a~^, ~}"
                 (map (lambda (one)
-                       (or (assoc-ref one 'address) "?"))
-                     (vector->list recipients)))
-        "?")))
+                       (or (assoc-ref one
+                                      'address) "?"))
+                     (vector->list recipients))) "?")))
 
 (define (post-mail-once mail-payload)
   "Hand MAIL-PAYLOAD to pingwing once, and answer whether it was accepted.
@@ -439,62 +451,79 @@ for it."
   (catch #t
          (lambda ()
            (let ((handle (curl-easy-init)))
-             (dynamic-wind
-              (lambda () #t)
-              (lambda ()
-                (curl-easy-setopt handle 'post #t)
-                (curl-easy-setopt handle 'url
-                                  (format #f "~a/api/v1/tasks" pingwing-url))
-                (curl-easy-setopt handle 'postfields
-                                  (string->utf8 (scm->json-string mail-payload)))
-                ;; The payload is JSON, and saying so is what lets the service
-                ;; read it as one rather than as a form.
-                (curl-easy-setopt handle 'httpheader
-                                  (list "Content-Type: application/json"))
-                (curl-easy-setopt handle 'connecttimeout
-                                  mail-connect-timeout-seconds)
-                (curl-easy-setopt handle 'timeout mail-timeout-seconds)
-                (curl-easy-setopt handle 'use-ssl 1)
-                ;; Verification is on -- it is the point of TLS -- but curl has
-                ;; to be told where to verify against, which is the one thing
-                ;; this binding does not do for itself.
-                (let ((bundle (trust-anchor-bundle)))
-                  (if bundle
-                      (curl-easy-setopt handle 'cainfo bundle)))
-                (let ((anchors (trust-anchor-directory)))
-                  (if anchors
-                      (curl-easy-setopt handle 'capath anchors)))
-                (curl-easy-setopt handle 'username pingwing-basic-auth-user)
-                (curl-easy-setopt handle 'password pingwing-basic-auth-password)
-                ;; `verbose' is left alone on purpose: it prints the request's
-                ;; own headers, and one of them is the service's password.
-                (let* ((answer (curl-easy-perform handle #t))
-                       ;; A refusal arrives two ways: as a raised error, and as
-                       ;; no answer at all, since this binding hands back a
-                       ;; body or #f -- it exposes no status code.  Both are
-                       ;; answered with #f, and what curl itself has to say
-                       ;; about it is written where an operator can read it.
-                       (body (and (bytevector? answer)
-                                  (catch #t
-                                         (lambda () (utf8->string answer))
-                                         (lambda (key . args) "")))))
-                  (if (and body
-                           (string-contains body mail-accepted-sentence))
-                      #t
-                      (begin
-                        (format (current-error-port)
-                                "wikimusic mail: the service did not accept the task (curl: ~a)~%"
-                                (curl-error-string))
-                        #f))))
-              (lambda () (curl-easy-cleanup handle)))))
+             (dynamic-wind (lambda ()
+                             #t)
+                           (lambda ()
+                             (curl-easy-setopt handle
+                                               'post #t)
+                             (curl-easy-setopt handle
+                                               'url
+                                               (format #f "~a/api/v1/tasks"
+                                                       pingwing-url))
+                             (curl-easy-setopt handle
+                                               'postfields
+                                               (string->utf8 (scm->json-string
+                                                              mail-payload)))
+                             ;; The payload is JSON, and saying so is what lets the service
+                             ;; read it as one rather than as a form.
+                             (curl-easy-setopt handle
+                                               'httpheader
+                                               (list
+                                                "Content-Type: application/json"))
+                             (curl-easy-setopt handle
+                                               'connecttimeout
+                                               mail-connect-timeout-seconds)
+                             (curl-easy-setopt handle
+                                               'timeout mail-timeout-seconds)
+                             (curl-easy-setopt handle
+                                               'use-ssl 1)
+                             ;; Verification is on -- it is the point of TLS -- but curl has
+                             ;; to be told where to verify against, which is the one thing
+                             ;; this binding does not do for itself.
+                             (let ((bundle (trust-anchor-bundle)))
+                               (if bundle
+                                   (curl-easy-setopt handle
+                                                     'cainfo bundle)))
+                             (let ((anchors (trust-anchor-directory)))
+                               (if anchors
+                                   (curl-easy-setopt handle
+                                                     'capath anchors)))
+                             (curl-easy-setopt handle
+                                               'username
+                                               pingwing-basic-auth-user)
+                             (curl-easy-setopt handle
+                                               'password
+                                               pingwing-basic-auth-password)
+                             ;; `verbose' is left alone on purpose: it prints the request's
+                             ;; own headers, and one of them is the service's password.
+                             (let* ((answer (curl-easy-perform handle #t))
+                                    ;; A refusal arrives two ways: as a raised error, and as
+                                    ;; no answer at all, since this binding hands back a
+                                    ;; body or #f -- it exposes no status code.  Both are
+                                    ;; answered with #f, and what curl itself has to say
+                                    ;; about it is written where an operator can read it.
+                                    (body (and (bytevector? answer)
+                                               (catch #t
+                                                      (lambda ()
+                                                        (utf8->string answer))
+                                                      (lambda (key . args)
+                                                        "")))))
+                               (if (and body
+                                        (string-contains body
+                                         mail-accepted-sentence)) #t
+                                   (begin
+                                     (format (current-error-port)
+                                      "wikimusic mail: the service did not accept the task (curl: ~a)~%"
+                                      (curl-error-string)) #f))))
+                           (lambda ()
+                             (curl-easy-cleanup handle)))))
          (lambda (key . args)
            ;; Why an attempt failed is worth a line of its own: a request the
            ;; service refused and a request this side could not even build
            ;; look the same from the outside, and only one of them is the
            ;; service's fault.
            (format (current-error-port)
-                   "wikimusic mail: the attempt itself failed: ~a ~a~%"
-                   key
+                   "wikimusic mail: the attempt itself failed: ~a ~a~%" key
                    args)
            #f)))
 
@@ -505,8 +534,10 @@ answer whether it was queued.
 A failure is logged -- naming who the mail was for and which template it was,
 and never what it carried -- because a mail that was not sent is something an
 operator has to be able to find out, and nothing else can tell them."
-  (let loop ((attempt 1) (pause mail-attempt-pause-milliseconds)
-             (started (mail-clock)))
+  (let loop
+    ((attempt 1)
+     (pause mail-attempt-pause-milliseconds)
+     (started (mail-clock)))
     (let ((landed? (post-mail-once body))
           (elapsed (/ (- (mail-clock) started) 1000000.0)))
       ;; A log line is worth nothing while it sits in a buffer: an operator
@@ -516,30 +547,31 @@ operator has to be able to find out, and nothing else can tell them."
           (begin
             (format (current-error-port)
                     "wikimusic mail: queued ~a for ~a (attempt ~a, ~,1fs)~%"
-                    (assoc-ref body 'template)
+                    (assoc-ref body
+                               'template)
                     (mail-recipient-addresses body)
                     attempt
-                    elapsed)
-            #t)
+                    elapsed) #t)
           (if (>= attempt mail-attempts)
               (begin
                 (format (current-error-port)
-                        "wikimusic mail: could not queue ~a for ~a after ~a attempt(s) in ~,1fs~%"
-                        (assoc-ref body 'template)
-                        (mail-recipient-addresses body)
-                        attempt
-                        elapsed)
-                #f)
+                 "wikimusic mail: could not queue ~a for ~a after ~a attempt(s) in ~,1fs~%"
+                 (assoc-ref body
+                            'template)
+                 (mail-recipient-addresses body)
+                 attempt
+                 elapsed) #f)
               (begin
                 ;; How long each attempt took is worth saying: it is the
                 ;; difference between a service that is refusing and one
                 ;; that never answers, and the two want different fixes.
                 (format (current-error-port)
-                        "wikimusic mail: attempt ~a did not land after ~,1fs; trying again in ~ams~%"
-                        attempt elapsed pause)
+                 "wikimusic mail: attempt ~a did not land after ~,1fs; trying again in ~ams~%"
+                 attempt elapsed pause)
                 (force-output (current-error-port))
                 (usleep (* pause 1000))
-                (loop (+ attempt 1) (* 2 pause) started)))))))
+                (loop (+ attempt 1)
+                      (* 2 pause) started)))))))
 
 (define (request-password-reset u)
   "Mail U, the row of the account, a link to choose a new password.
@@ -554,12 +586,13 @@ exists and that a mail was expected -- can say that it was not."
          ;; refuses to open it once that hour is up.  Nothing has to be stored,
          ;; expired links leave nothing behind, and the link cannot be edited
          ;; into somebody else's.
-         (reset-token (encrypt-object #:payload `((user . ,user-identifier)
-                                                  (action
-                                                   . reset-password))
+         (reset-token (encrypt-object #:payload `((user unquote
+                                                        user-identifier)
+                                                  (action . reset-password))
                                       #:encryption-key encryption-key
                                       #:signing-key signing-key
-                                      #:ttl-seconds password-reset-validity-seconds))
+                                      #:ttl-seconds
+                                      password-reset-validity-seconds))
          (mail-payload `((task-type . send-email) (template . password-reset)
                          (template-vars (system-name . Wikimusic)
                                         (user unquote
@@ -572,7 +605,8 @@ exists and that a mail was expected -- can say that it was not."
                          ;; Who the mail comes from is the deployment's to
                          ;; name: an instance's own domain, and its own name on
                          ;; the envelope (see `(wikimusic config)').
-                         (sender-name unquote (mail-sender-name))
+                         (sender-name unquote
+                                      (mail-sender-name))
                          (sender-address unquote
                                          (mail-sender-address))
                          (subject . "Wikimusic - Password Reset")
@@ -615,14 +649,15 @@ exists and that a mail was expected -- can say that it was not."
           ;; A mail that could not be sent is recorded in the log the sender
           ;; keeps, where an operator can see it.
           (redirect-to rc
-                       (string->uri
-                        (format #f "~a/?sent-password-reset=true~a"
-                                (current-myhost)
-                                (notice-query
-                                 #:title (G_ "check your email")
-                                 #:body
-                                 (G_ "if an account uses that address, a link to choose a new password is on its way")
-                                 #:duration-millis 8000)))
+                       (string->uri (format #f
+                                            "~a/?sent-password-reset=true~a"
+                                            (current-myhost)
+                                            (notice-query #:title (G_
+                                                                   "check your email")
+                                                          #:body (G_
+                                                                  "if an account uses that address, a link to choose a new password is on its way")
+                                                          #:duration-millis
+                                                          8000)))
                        #:status 302))))
 
 (post "/password/do-reset"
@@ -649,53 +684,58 @@ exists and that a mail was expected -- can say that it was not."
                ;; a link that no longer opens never reaches the KDF.
                (link-works? (and (not (nil? sealed-payload))
                                  (equal? 'reset-password
-                                         (assoc-ref sealed-payload 'action)))))
+                                         (assoc-ref sealed-payload
+                                                    'action)))))
           (cond
-           ((not link-works?)
-            (redirect-to rc
-                         (string->uri (format #f
-                                       "~a/login?reset-link-expired=true"
-                                       (current-myhost)))
-                         #:status 302))
-           ;; Which of the two reasons it was is kept, because the form says
-           ;; it back: a reader sent to the same form with no explanation
-           ;; types the same password again.
-           ((not (and (string? new-password)
-                      (equal? new-password confirm-password)
-                      (strong-password? #:password new-password)))
-            (redirect-to rc
-                         (string->uri (format #f
-                                       "~a/password/reset/token/~a?password-rejected=~a"
-                                       (current-myhost)
-                                       (uri-encode reset-token)
-                                       (if (equal? new-password confirm-password)
-                                           "weak"
-                                           "mismatch")))
-                         #:status 302))
-           (else
-            (sql-execute! rc
-                          (sql-update 'users
-                                      `((password
-                                         . ,(hash-password new-password))
-                                        (salt . ""))
-                                      #:where `((identifier
-                                                 . ,(assoc-ref sealed-payload
-                                                               'user))))
-                          #:name "reset-user-password")
-            (:cookies-set! rc
-                           'x-bewaking-wikimusic "x-bewaking-wikimusic" "")
-            (:cookies-setattr! rc
-                               'x-bewaking-wikimusic
-                               #:expires 1
-                               #:path "/"
-                               #:secure #t
-                               #:http-only #t)
-            (redirect-to rc
-                         (string->uri
-                          (format #f "~a/login?has-reset-password=true~a"
-                                  (current-myhost)
-                                  (notice-query
-                                   #:title (G_ "your password has been changed")
-                                   #:body (G_ "sign in with the new one")
-                                   #:duration-millis 8000)))
-                         #:status 302))))))
+            ((not link-works?)
+             (redirect-to rc
+                          (string->uri (format #f
+                                        "~a/login?reset-link-expired=true"
+                                        (current-myhost)))
+                          #:status 302))
+            ;; Which of the two reasons it was is kept, because the form says
+            ;; it back: a reader sent to the same form with no explanation
+            ;; types the same password again.
+            ((not (and (string? new-password)
+                       (equal? new-password confirm-password)
+                       (strong-password? #:password new-password)))
+             (redirect-to rc
+                          (string->uri (format #f
+                                        "~a/password/reset/token/~a?password-rejected=~a"
+                                        (current-myhost)
+                                        (uri-encode reset-token)
+                                        (if (equal? new-password
+                                                    confirm-password) "weak"
+                                            "mismatch")))
+                          #:status 302))
+            (else (sql-execute! rc
+                                (sql-update 'users
+                                            `((password unquote
+                                                        (hash-password
+                                                         new-password))
+                                              (salt . ""))
+                                            #:where `((identifier unquote
+                                                                  (assoc-ref
+                                                                   sealed-payload
+                                                                   'user))))
+                                #:name "reset-user-password")
+                  (:cookies-set! rc
+                                 'x-bewaking-wikimusic "x-bewaking-wikimusic"
+                                 "")
+                  (:cookies-setattr! rc
+                                     'x-bewaking-wikimusic
+                                     #:expires 1
+                                     #:path "/"
+                                     #:secure #t
+                                     #:http-only #t)
+                  (redirect-to rc
+                               (string->uri (format #f
+                                             "~a/login?has-reset-password=true~a"
+                                             (current-myhost)
+                                             (notice-query #:title (G_
+                                                                    "your password has been changed")
+                                                           #:body (G_
+                                                                   "sign in with the new one")
+                                                           #:duration-millis
+                                                           8000)))
+                               #:status 302))))))

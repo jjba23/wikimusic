@@ -47,9 +47,10 @@
                                                                token))
                                            #:limit 1)))
            (mapped-rows (map (lambda (r)
-                               (cons (assq-ref r 'reset-token)
-                                     (assq-ref r 'user-id)))
-                             rows)))
+                               (cons (assq-ref r
+                                               'reset-token)
+                                     (assq-ref r
+                                               'user-id))) rows)))
       (if (nil? mapped-rows) #f
           (car mapped-rows))))
 

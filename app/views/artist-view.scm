@@ -43,29 +43,36 @@
                            grid-size
                            pages
                            is-logged-in)
-  (let* ((page (if (and limit (> limit 0)) (+ 1 (quotient offset limit)) 1))
+  (let* ((page (if (and limit
+                        (> limit 0))
+                   (+ 1
+                      (quotient offset limit)) 1))
          (searching? (and (string? search-query)
                           (not (string-null? search-query))))
          (list-title (if searching?
-                         (format #f "Artists matching “~a” | WikiMusic" search-query)
-                         "Artists: bands and musicians, with their songs and tabs | WikiMusic"))
+                      (format #f "Artists matching “~a” | WikiMusic"
+                              search-query)
+                      "Artists: bands and musicians, with their songs and tabs | WikiMusic"))
          (list-description (if searching?
-                               (format #f "Artists on WikiMusic matching “~a”, with their songs, tabs and chords."
-                                       search-query)
-                               "Every artist and band on WikiMusic, with the songs, guitar and bass tabs and chords written about them."))
-         (page-buttons (if (and pages (> pages 1))
+                            (format #f
+                             "Artists on WikiMusic matching “~a”, with their songs, tabs and chords."
+                             search-query)
+                            "Every artist and band on WikiMusic, with the songs, guitar and bass tabs and chords written about them."))
+         (page-buttons (if (and pages
+                                (> pages 1))
                            (pagination #:current page
                                        #:total pages
                                        #:base-url (format #f
-                                                          "/artists?limit=~a&sort=~a~a&page="
-                                                          limit (or user-sort "")
-                                                          (if (and search-query
-                                                                   (not (equal? search-query
-                                                                                "")))
-                                                              (format #f
-                                                                      "&search=~a"
-                                                                      search-query)
-                                                              ""))
+                                                   "/artists?limit=~a&sort=~a~a&page="
+                                                   limit
+                                                   (or user-sort "")
+                                                   (if (and search-query
+                                                            (not (equal?
+                                                                  search-query
+                                                                  "")))
+                                                       (format #f "&search=~a"
+                                                               search-query)
+                                                       ""))
                                        #:prev-label (G_ "previous")
                                        #:next-label (G_ "next"))
                            '()))
@@ -106,8 +113,7 @@
                                                             ,(grid-size-select
                                                               G_
                                                               #:entity 'artist
-                                                              #:size
-                                                              grid-size
+                                                              #:size grid-size
                                                               #:search-query
                                                               search-query))
                                                        (div (@ (class ,(mk-class '
@@ -121,8 +127,8 @@
                                                             ,(search-box G_
                                                               #:search-query
                                                               search-query)))
-                      (div (div (@ (class ,(item-tile-grid-face
-                                            #:size grid-size)))
+                      (div (div (@ (class ,(item-tile-grid-face #:size
+                                                                grid-size)))
                                 ,(map (lambda (x)
                                         `(div ,(item-tile G_
                                                           'artist x
@@ -141,14 +147,17 @@
                    #:body body
                    #:title list-title
                    #:description list-description
-                   #:path (if (and (= page 1) (not searching?)) "/artists" #f)
-                   #:robots (if (or searching? (> page 1)) "noindex, follow" #f)
+                   #:path (if (and (= page 1)
+                                   (not searching?)) "/artists" #f)
+                   #:robots (if (or searching?
+                                    (> page 1)) "noindex, follow" #f)
                    #:json-ld (list (page-json-ld #:type "CollectionPage"
-                                                 #:url (if searching?
-                                                          #f
-                                                          (absolute-url "/artists"))
+                                                 #:url (if searching? #f
+                                                           (absolute-url
+                                                            "/artists"))
                                                  #:name list-title
-                                                 #:description list-description))
+                                                 #:description
+                                                 list-description))
                    #:is-logged-in is-logged-in)))
 
 (define* (artist-detail-page G_
@@ -160,55 +169,71 @@
                              song-fragment
                              external-sources
                              is-logged-in)
-  (let* ((artist-name (assq-ref artist 'display-name))
-         (artist-path (format #f "/artists/uuid/~a" (assq-ref artist 'identifier)))
+  (let* ((artist-name (assq-ref artist
+                                'display-name))
+         (artist-path (format #f "/artists/uuid/~a"
+                              (assq-ref artist
+                                        'identifier)))
          (page-title (format #f "~a — songs, guitar tabs & chords | WikiMusic"
                              artist-name))
-         (page-description (summarize
-                            (string-append
-                             artist-name
-                             " on WikiMusic: the songs written about them, with their chords, keys and tabs. "
-                             (let ((written (assq-ref artist 'description)))
-                               (if (string? written) written "")))
-                            #:limit 300)))
+         (page-description (summarize (string-append artist-name
+                                       " on WikiMusic: the songs written about them, with their chords, keys and tabs. "
+                                       (let ((written (assq-ref artist
+                                                                'description)))
+                                         (if (string? written) written "")))
+                                      #:limit 300)))
     (html-template G_
-                 #:is-logged-in is-logged-in
-                 #:title page-title
-                 #:description page-description
-                 #:path artist-path
-                 #:image (artwork-social-image artworks
-                                              #:fallback
-                                              (announced-image))
-                 #:image-alt (format #f "artwork for ~a" artist-name)
-                 #:og-type "profile"
-                 #:json-ld (list (page-json-ld
-                                  #:type "ProfilePage"
-                                  #:url (absolute-url artist-path)
-                                  #:name page-title
-                                  #:description page-description
-                                  #:main-entity
-                                  (append (list (schema-name "MusicGroup")
-                                                (cons "name" artist-name))
-                                          (if (string? (assq-ref artist 'description))
-                                              (list (cons "description"
-                                                          (summarize (assq-ref artist 'description)
-                                                                     #:limit 300)))
-                                              '()))))
-                 #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
-                                                           md:py-4))))
-                               ((div (@ (class ,(mk-class '(py-4))))
-                                     ,(h2 (assq-ref artist
-                                                    'display-name)
-                                          #:size '(text-3xl md:text-10)
-                                          #:family '(font-sans)
-                                          #:weight '(font-light leading-10)))
-                                (div (div ,(entity-details G_
-                                                           #:entity 'artist
-                                                           #:x artist
-                                                           #:artworks artworks
-                                                           #:opinions opinions
-                                                           #:comments comments
-                                                           #:user-alist
-                                                           user-alist)))))
-                          ,(render-external-sources G_ external-sources)
-                          (div ,song-fragment)))))
+                   #:is-logged-in is-logged-in
+                   #:title page-title
+                   #:description page-description
+                   #:path artist-path
+                   #:image (artwork-social-image artworks
+                                                 #:fallback (announced-image))
+                   #:image-alt (format #f "artwork for ~a" artist-name)
+                   #:og-type "profile"
+                   #:json-ld (list (page-json-ld #:type "ProfilePage"
+                                                 #:url (absolute-url
+                                                        artist-path)
+                                                 #:name page-title
+                                                 #:description
+                                                 page-description
+                                                 #:main-entity (append (list (schema-name
+                                                                              "MusicGroup")
+                                                                             (cons
+                                                                              "name"
+                                                                              artist-name))
+                                                                       (if (string?
+                                                                            (assq-ref
+                                                                             artist
+                                                                             'description))
+                                                                           (list
+                                                                            (cons
+                                                                             "description"
+                                                                             (summarize
+                                                                              (assq-ref
+                                                                               artist
+                                                                               'description)
+                                                                              #:limit
+                                                                              300)))
+                                                                           '()))))
+                   #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
+                                                             md:py-4))))
+                                 ((div (@ (class ,(mk-class '(py-4))))
+                                       ,(h2 (assq-ref artist
+                                                      'display-name)
+                                            #:size '(text-3xl md:text-10)
+                                            #:family '(font-sans)
+                                            #:weight '(font-light leading-10)))
+                                  (div (div ,(entity-details G_
+                                                             #:entity 'artist
+                                                             #:x artist
+                                                             #:artworks
+                                                             artworks
+                                                             #:opinions
+                                                             opinions
+                                                             #:comments
+                                                             comments
+                                                             #:user-alist
+                                                             user-alist)))))
+                            ,(render-external-sources G_ external-sources)
+                            (div ,song-fragment)))))

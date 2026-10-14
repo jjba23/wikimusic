@@ -59,9 +59,8 @@
   #:use-module (srfi srfi-13)
   #:use-module (rnrs bytevectors)
   #:use-module (ice-9 format)
-  #:export (base64-decode-string data-url? data-url-payload
-                                gp5-bytes-metadata gp5-metadata-of-data-url
-                                gp5-key-name))
+  #:export (base64-decode-string data-url? data-url-payload gp5-bytes-metadata
+                                 gp5-metadata-of-data-url gp5-key-name))
 
 ;;; ====== The base64 a data URL carries ======
 ;;;
@@ -88,19 +87,23 @@ stopping at the padding that ends the text.
 Raise an error on a character no base64 text contains: the value this reads
 comes from a form, so refusing loudly at this edge is what keeps the rest of
 the reader working on digits alone."
-  (let loop ((chars (string->list text))
-             (digits '()))
+  (let loop
+    ((chars (string->list text))
+     (digits '()))
     (cond
-     ((null? chars)
-      (reverse digits))
-     ((char=? (car chars) #\=)
-      (reverse digits))
-     ((char-whitespace? (car chars))
-      (loop (cdr chars) digits))
-     ((base64-digit (car chars))
-      => (lambda (digit) (loop (cdr chars) (cons digit digits))))
-     (else
-      (error "base64-decode-string: not a base64 character" (car chars))))))
+      ((null? chars)
+       (reverse digits))
+      ((char=? (car chars) #\=)
+       (reverse digits))
+      ((char-whitespace? (car chars))
+       (loop (cdr chars) digits))
+      ((base64-digit (car chars))
+       =>
+       (lambda (digit)
+         (loop (cdr chars)
+               (cons digit digits))))
+      (else (error "base64-decode-string: not a base64 character"
+                   (car chars))))))
 
 (define (base64-digits->bytes digits)
   "Return DIGITS -- six-bit values, most significant first -- as the bytes they
@@ -111,35 +114,37 @@ bytes (three digits) or the single byte (two digits) those digits can spell,
 which is what the padding of a base64 text stands for.  A text that ends in a
 lone digit spells no byte at all and is an error."
   (define (three-of first second)
-    (logior (ash first 2) (ash second -4)))
+    (logior (ash first 2)
+            (ash second -4)))
   (define (two-of second third)
-    (logior (ash (logand second #xf) 4) (ash third -2)))
+    (logior (ash (logand second #xf) 4)
+            (ash third -2)))
   (define (one-of third fourth)
     (logior (ash (logand third #x3) 6) fourth))
-  (let loop ((digits digits)
-             (bytes '()))
+  (let loop
+    ((digits digits)
+     (bytes '()))
     (cond
-     ((null? digits)
-      (reverse bytes))
-     ((null? (cdr digits))
-      (error "base64-decode-string: the text ends in a lone base64 character"))
-     (else
-      (let* ((first (car digits))
-             (second (cadr digits))
-             (rest (cddr digits)))
-        (if (null? rest)
-            (reverse (cons (three-of first second) bytes))
-            (let ((third (car rest))
-                  (rest (cdr rest)))
+      ((null? digits)
+       (reverse bytes))
+      ((null? (cdr digits))
+       (error "base64-decode-string: the text ends in a lone base64 character"))
+      (else (let* ((first (car digits))
+                   (second (cadr digits))
+                   (rest (cddr digits)))
               (if (null? rest)
-                  (reverse (cons (two-of second third)
-                                 (cons (three-of first second) bytes)))
-                  (let ((fourth (car rest)))
-                    (loop (cdr rest)
-                          (cons (one-of third fourth)
-                                (cons (two-of second third)
-                                      (cons (three-of first second)
-                                            bytes)))))))))))))
+                  (reverse (cons (three-of first second) bytes))
+                  (let ((third (car rest))
+                        (rest (cdr rest)))
+                    (if (null? rest)
+                        (reverse (cons (two-of second third)
+                                       (cons (three-of first second) bytes)))
+                        (let ((fourth (car rest)))
+                          (loop (cdr rest)
+                                (cons (one-of third fourth)
+                                      (cons (two-of second third)
+                                            (cons (three-of first second)
+                                                  bytes)))))))))))))
 
 (define (base64-decode-string text)
   "Return the bytes the base64 TEXT spells, as a bytevector.
@@ -153,8 +158,7 @@ decoded by handing over everything after its comma."
 the empty string a version that carries no file holds."
   (and (string? url)
        (string-prefix? "data:" url)
-       (string-index url #\,)
-       #t))
+       (string-index url #\,) #t))
 
 (define (data-url-payload url)
   "Return the bytes the base64 data URL URL carries, or #f when URL is not a
@@ -164,13 +168,15 @@ The value comes from a form and is stored as it arrived, so it is read as
 untrusted: anything that is not a decodable data URL is answered with #f."
   (and (data-url? url)
        (catch #t
-         (lambda ()
-           (let* ((comma (string-index url #\,))
-                  (head (substring url 0 comma))
-                  (payload (substring url (+ comma 1))))
-             (and (string-contains head ";base64")
-                  (base64-decode-string payload))))
-         (lambda (key . args) #f))))
+              (lambda ()
+                (let* ((comma (string-index url #\,))
+                       (head (substring url 0 comma))
+                       (payload (substring url
+                                           (+ comma 1))))
+                  (and (string-contains head ";base64")
+                       (base64-decode-string payload))))
+              (lambda (key . args)
+                #f))))
 
 ;;; ====== Walking the file ======
 
@@ -182,12 +188,13 @@ has in reach copies a whole bytevector or nothing, so the slice is written
 here.  Nothing large goes through it: the longest field a page reads is a
 title."
   (let ((slice (make-bytevector count)))
-    (let loop ((index 0))
-      (if (= index count)
-          slice
+    (let loop
+      ((index 0))
+      (if (= index count) slice
           (begin
             (bytevector-u8-set! slice index
-                                (bytevector-u8-ref bytes (+ start index)))
+                                (bytevector-u8-ref bytes
+                                                   (+ start index)))
             (loop (+ index 1)))))))
 
 ;; A reader is a bytevector with a position in it.  The position is the only
@@ -195,8 +202,7 @@ title."
 ;; by advancing through it, and threading an index through every one of the
 ;; thirty-odd reads below would say the same thing less clearly.
 (define-record-type <gp5-reader>
-  (%make-gp5-reader bytes position)
-  gp5-reader?
+  (%make-gp5-reader bytes position) gp5-reader?
   (bytes gp5-reader-bytes)
   (position gp5-reader-position set-gp5-reader-position!))
 
@@ -211,58 +217,66 @@ title."
 This is the check that keeps a truncated -- or simply unrecognised -- file from
 being read as if it were whole: every read goes through it, so the first field
 the file is too short for is where the header ends."
-  (when (> count (reader-remaining reader))
-    (throw 'gp5-header-unreadable 'gp5-file
-           (format #f "the file ends after ~a bytes, where the header still needed ~a more"
-                   (gp5-reader-position reader)
-                   count))))
+  (when (> count
+           (reader-remaining reader))
+    (throw 'gp5-header-unreadable
+           'gp5-file
+           (format #f
+            "the file ends after ~a bytes, where the header still needed ~a more"
+            (gp5-reader-position reader) count))))
 
 (define (reader-bytes reader count)
   "Return the next COUNT bytes of READER as a bytevector, or raise when it
 holds fewer."
   (when (< count 0)
-    (throw 'gp5-header-unreadable 'gp5-file
+    (throw 'gp5-header-unreadable
+           'gp5-file
            (format #f "a field declares a length of ~a bytes" count)))
   (reader-need! reader count)
   (let ((start (gp5-reader-position reader)))
-    (set-gp5-reader-position! reader (+ start count))
+    (set-gp5-reader-position! reader
+                              (+ start count))
     (bytevector-slice (gp5-reader-bytes reader) start count)))
 
 (define (reader-skip! reader count)
   "Advance READER past COUNT bytes it does not read."
   (reader-need! reader count)
-  (set-gp5-reader-position! reader (+ (gp5-reader-position reader) count)))
+  (set-gp5-reader-position! reader
+                            (+ (gp5-reader-position reader) count)))
 
 (define (reader-u8 reader)
   "Return the next byte of READER, as an unsigned number."
   (reader-need! reader 1)
   (let* ((position (gp5-reader-position reader))
          (value (bytevector-u8-ref (gp5-reader-bytes reader) position)))
-    (set-gp5-reader-position! reader (+ position 1))
-    value))
+    (set-gp5-reader-position! reader
+                              (+ position 1)) value))
 
 (define (reader-s8 reader)
   "Return the next byte of READER, as a signed number."
   (reader-need! reader 1)
   (let* ((position (gp5-reader-position reader))
          (value (bytevector-s8-ref (gp5-reader-bytes reader) position)))
-    (set-gp5-reader-position! reader (+ position 1))
-    value))
+    (set-gp5-reader-position! reader
+                              (+ position 1)) value))
 
 (define (reader-s16 reader)
   "Return the next sixteen bits of READER, little-endian and signed.
 
 Signed is the reading that matters: the navigation marks a file may carry are
 measure numbers, and an unused one is written as -1."
-  (bytevector-s16-ref (reader-bytes reader 2) 0 (endianness little)))
+  (bytevector-s16-ref (reader-bytes reader 2) 0
+                      (endianness little)))
 
 (define (reader-u16 reader)
   "Return the next sixteen bits of READER, little-endian and unsigned."
-  (bytevector-u16-ref (reader-bytes reader 2) 0 (endianness little)))
+  (bytevector-u16-ref (reader-bytes reader 2) 0
+                      (endianness little)))
 
 (define (reader-s32 reader)
   "Return the next thirty-two bits of READER, little-endian and signed."
-  (bytevector-s32-ref (reader-bytes reader 4) 0 (endianness little)))
+  (bytevector-s32-ref (reader-bytes reader 4) 0
+                      (endianness little)))
 
 ;;; --- The three strings a Guitar Pro file writes ---
 
@@ -276,9 +290,11 @@ decoding them as single bytes would show mojibake; anything that is not valid
 UTF-8 is read byte by byte instead, which is exact for the ASCII of a title
 written in English and no worse than any other guess for the rest."
   (catch #t
-    (lambda () (utf8->string bytes))
-    (lambda (key . args)
-      (list->string (map integer->char (bytevector->u8-list bytes))))))
+         (lambda ()
+           (utf8->string bytes))
+         (lambda (key . args)
+           (list->string (map integer->char
+                              (bytevector->u8-list bytes))))))
 
 (define (reader-byte-size-string reader size)
   "Read a byte-size string of SIZE bytes from READER.
@@ -290,9 +306,10 @@ why the header of every file starts with a length byte and ends its first
 thirty-one bytes on padding."
   (let ((length (reader-u8 reader)))
     (when (> length size)
-      (throw 'gp5-header-unreadable 'gp5-file
-             (format #f "a string declares ~a bytes in a ~a byte field"
-                     length size)))
+      (throw 'gp5-header-unreadable
+             'gp5-file
+             (format #f "a string declares ~a bytes in a ~a byte field" length
+                     size)))
     (bytevector-text (bytevector-slice (reader-bytes reader size) 0 length))))
 
 (define (reader-int-byte-size-string reader)
@@ -305,10 +322,12 @@ not -- a single string read out of step would be enough to make everything
 after it nonsense."
   (let ((total (reader-s32 reader)))
     (let ((length (reader-u8 reader)))
-      (unless (= total (+ length 1))
-        (throw 'gp5-header-unreadable 'gp5-file
-               (format #f "a string declares ~a bytes and then ~a more"
-                       total length)))
+      (unless (= total
+                 (+ length 1))
+        (throw 'gp5-header-unreadable
+               'gp5-file
+               (format #f "a string declares ~a bytes and then ~a more" total
+                       length)))
       (bytevector-text (reader-bytes reader length)))))
 
 (define (reader-int-size-string reader)
@@ -324,7 +343,14 @@ many bytes of text, with no length byte of its own."
 ;;; one long procedure.
 
 (define *score-information-fields*
-  '(title subtitle artist album words music copyright tabber instructions))
+  '(title subtitle
+          artist
+          album
+          words
+          music
+          copyright
+          tabber
+          instructions))
 
 (define (reader-score-information reader)
   "Read the nine text fields a score carries about itself, and the notice lines
@@ -336,15 +362,21 @@ and who wrote the music, the copyright line, who tabbed it and any
 instructions.  The notices are the numbered notes of a published edition, and
 a file usually has none."
   (let ((fields (map (lambda (name)
-                       (cons name (reader-int-byte-size-string reader)))
+                       (cons name
+                             (reader-int-byte-size-string reader)))
                      *score-information-fields*)))
     (let ((notice-count (reader-s32 reader)))
       (when (< notice-count 0)
-        (throw 'gp5-header-unreadable 'gp5-file
+        (throw 'gp5-header-unreadable
+               'gp5-file
                (format #f "a file declares ~a notice lines" notice-count)))
-      (let loop ((remaining notice-count) (notices '()))
+      (let loop
+        ((remaining notice-count)
+         (notices '()))
         (if (zero? remaining)
-            (append fields (list (cons 'notices (reverse notices))))
+            (append fields
+                    (list (cons 'notices
+                                (reverse notices))))
             (loop (- remaining 1)
                   (cons (reader-int-byte-size-string reader) notices)))))))
 
@@ -355,9 +387,12 @@ Five lines are written, each with the measure it starts at; a line an author
 did not write is empty.  The track the lyrics belong to is written first and is
 not read: the lines themselves are what a page can show."
   (reader-s32 reader)
-  (let loop ((remaining 5) (lines '()))
+  (let loop
+    ((remaining 5)
+     (lines '()))
     (if (zero? remaining)
-        (reverse (filter (lambda (line) (not (string-null? line))) lines))
+        (reverse (filter (lambda (line)
+                           (not (string-null? line))) lines))
         (begin
           (reader-s32 reader)
           (loop (- remaining 1)
@@ -380,8 +415,10 @@ each -- so the region is skipped rather than read: nothing here is shown."
 The margin of a printed page, the size of the score on it, the header and
 footer flags, and the ten placeholders a file writes for its own title and
 page number."
-  (reader-skip! reader (+ (* 7 4) 2))
-  (let loop ((remaining 10))
+  (reader-skip! reader
+                (+ (* 7 4) 2))
+  (let loop
+    ((remaining 10))
     (unless (zero? remaining)
       (reader-int-byte-size-string reader)
       (loop (- remaining 1)))))
@@ -393,7 +430,8 @@ Four ports of sixteen channels are written in order, each as a thirty-two bit
 instrument number, the six signed bytes of its mixing values and two blank
 bytes.  They are read past and not read: an instrument number is what the
 author's synth played through, not what the page is about."
-  (let loop ((remaining 64))
+  (let loop
+    ((remaining 64))
     (unless (zero? remaining)
       (reader-skip! reader 12)
       (loop (- remaining 1)))))
@@ -404,7 +442,8 @@ author's synth played through, not what the page is about."
 Each is the sixteen-bit number of the measure it points at -- a coda, a segno,
 a fine and the fifteen signs that jump to and from them -- or -1 when it is
 unused, which is the common case."
-  (let loop ((remaining 19))
+  (let loop
+    ((remaining 19))
     (unless (zero? remaining)
       (reader-s16 reader)
       (loop (- remaining 1)))))
@@ -425,31 +464,49 @@ unused, which is the common case."
 PRO v5.10\" -- as the list of its numbers."
   (map string->number
        (string-split (substring version-string
-                                (string-length *gp5-format-name*))
-                     #\.)))
+                                (string-length *gp5-format-name*)) #\.)))
 
 (define (version-after? version base)
   "Return #t when VERSION is a later release than BASE, both lists of numbers."
   (cond
-   ((null? version) #f)
-   ((null? base) #t)
-   ((< (car version) (car base)) #f)
-   ((> (car version) (car base)) #t)
-   (else (version-after? (cdr version) (cdr base)))))
+    ((null? version)
+     #f)
+    ((null? base)
+     #t)
+    ((< (car version)
+        (car base))
+     #f)
+    ((> (car version)
+        (car base))
+     #t)
+    (else (version-after? (cdr version)
+                          (cdr base)))))
 
 ;; A key signature is written as the number of accidentals it has, negative for
 ;; flats and positive for sharps, which is a count and not a name; a reader is
 ;; shown the name.  Guitar Pro's own range is the seven either way.
 (define *gp5-keys*
-  '((-7 . "Cb") (-6 . "Gb") (-5 . "Db") (-4 . "Ab") (-3 . "Eb") (-2 . "Bb")
-    (-1 . "F") (0 . "C") (1 . "G") (2 . "D") (3 . "A") (4 . "E") (5 . "B")
-    (6 . "F#") (7 . "C#")))
+  '((-7 . "Cb") (-6 . "Gb")
+    (-5 . "Db")
+    (-4 . "Ab")
+    (-3 . "Eb")
+    (-2 . "Bb")
+    (-1 . "F")
+    (0 . "C")
+    (1 . "G")
+    (2 . "D")
+    (3 . "A")
+    (4 . "E")
+    (5 . "B")
+    (6 . "F#")
+    (7 . "C#")))
 
 (define (gp5-key-name key)
   "Return the name of the key signature KEY names, or #f when the number is
 none of Guitar Pro's fifteen."
   (let ((named (assv key *gp5-keys*)))
-    (and named (cdr named))))
+    (and named
+         (cdr named))))
 
 ;;; ====== The whole header ======
 
@@ -494,54 +551,60 @@ header that has come out of step rather than as a song: the answer is #f,
 because a number no file means only ever means the reader lost its place
 earlier."
   (catch 'gp5-header-unreadable
-    (lambda ()
-      (let* ((reader (%make-gp5-reader bytes 0))
-             (version-string (reader-byte-size-string reader 30)))
-        (and (string-prefix? *gp5-fifth-generation* version-string)
-             (let* ((version (gp5-version-number version-string))
-                    (later-than-5.0? (version-after? version '(5 0)))
-                    (information (reader-score-information reader))
-                    (lyrics (reader-lyrics reader)))
-               (reader-rse-master-effect! reader later-than-5.0?)
-               (reader-page-setup! reader)
-               ;; The tempo has a name -- "Allegro" -- written before the
-               ;; number itself, and the sheet's own tempo is the number.
-               (reader-int-byte-size-string reader)
-               (let* ((tempo (reader-s32 reader))
-                      ;; Releases after 5.0 write whether the sheet should show
-                      ;; the tempo at all; a page shows the song's tempo
-                      ;; whatever the sheet is set to display.
-                      (hidden-tempo (and later-than-5.0? (reader-u8 reader)))
-                      (key (reader-s8 reader))
-                      (octave (reader-s32 reader)))
-                 (reader-midi-channels! reader)
-                 (reader-directions! reader)
-                 ;; The master reverb, the last field before the counts.
-                 (reader-s32 reader)
-                 (let ((measures (reader-s32 reader))
-                       (tracks (reader-s32 reader))
-                       (header-bytes (gp5-reader-position reader)))
-                   ;; A count out of a misread field is where a header that
-                   ;; has come out of step shows itself, and the shape it
-                   ;; takes is a number no score could have.
-                   (when (or (< measures 0)
-                             (< tracks 0))
-                     (throw 'gp5-header-unreadable 'gp5-file
-                            (format #f "a file declares ~a measures and ~a tracks"
-                                    measures tracks)))
-                   (append information
-                           (list (cons 'lyrics lyrics)
-                                 (cons 'version version)
-                                 (cons 'version-string version-string)
-                                 (cons 'tempo tempo)
-                                 (cons 'hidden-tempo hidden-tempo)
-                                 (cons 'key key)
-                                 (cons 'key-name (gp5-key-name key))
-                                 (cons 'octave octave)
-                                 (cons 'measures measures)
-                                 (cons 'tracks tracks)
-                                 (cons 'header-bytes header-bytes)))))))))
-    (lambda (key . args) #f)))
+         (lambda ()
+           (let* ((reader (%make-gp5-reader bytes 0))
+                  (version-string (reader-byte-size-string reader 30)))
+             (and (string-prefix? *gp5-fifth-generation* version-string)
+                  (let* ((version (gp5-version-number version-string))
+                         (later-than-5.0? (version-after? version
+                                                          '(5 0)))
+                         (information (reader-score-information reader))
+                         (lyrics (reader-lyrics reader)))
+                    (reader-rse-master-effect! reader later-than-5.0?)
+                    (reader-page-setup! reader)
+                    ;; The tempo has a name -- "Allegro" -- written before the
+                    ;; number itself, and the sheet's own tempo is the number.
+                    (reader-int-byte-size-string reader)
+                    (let* ((tempo (reader-s32 reader))
+                           ;; Releases after 5.0 write whether the sheet should show
+                           ;; the tempo at all; a page shows the song's tempo
+                           ;; whatever the sheet is set to display.
+                           (hidden-tempo (and later-than-5.0?
+                                              (reader-u8 reader)))
+                           (key (reader-s8 reader))
+                           (octave (reader-s32 reader)))
+                      (reader-midi-channels! reader)
+                      (reader-directions! reader)
+                      ;; The master reverb, the last field before the counts.
+                      (reader-s32 reader)
+                      (let ((measures (reader-s32 reader))
+                            (tracks (reader-s32 reader))
+                            (header-bytes (gp5-reader-position reader)))
+                        ;; A count out of a misread field is where a header that
+                        ;; has come out of step shows itself, and the shape it
+                        ;; takes is a number no score could have.
+                        (when (or (< measures 0)
+                                  (< tracks 0))
+                          (throw 'gp5-header-unreadable
+                                 'gp5-file
+                                 (format #f
+                                  "a file declares ~a measures and ~a tracks"
+                                  measures tracks)))
+                        (append information
+                                (list (cons 'lyrics lyrics)
+                                      (cons 'version version)
+                                      (cons 'version-string version-string)
+                                      (cons 'tempo tempo)
+                                      (cons 'hidden-tempo hidden-tempo)
+                                      (cons 'key key)
+                                      (cons 'key-name
+                                            (gp5-key-name key))
+                                      (cons 'octave octave)
+                                      (cons 'measures measures)
+                                      (cons 'tracks tracks)
+                                      (cons 'header-bytes header-bytes)))))))))
+         (lambda (key . args)
+           #f)))
 
 (define (gp5-metadata-of-data-url url)
   "Return the header metadata of the Guitar Pro file the data URL URL carries,
@@ -551,4 +614,5 @@ This is how a stored version is read: the file itself is in the row as the
 data URL the browser made of it, so a page that wants to say what the tab
 holds decodes it here and nowhere else."
   (let ((bytes (data-url-payload url)))
-    (and bytes (gp5-bytes-metadata bytes))))
+    (and bytes
+         (gp5-bytes-metadata bytes))))

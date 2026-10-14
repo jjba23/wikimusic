@@ -142,7 +142,8 @@
                                                border-stone-300
                                                dark:border-stone-700
                                                dark:text-stone-300
-                                               hg-frost bg-stone-100/75
+                                               hg-frost
+                                               bg-stone-100/75
                                                dark:bg-onyx-900/75
                                                border-2
                                                min-h-72
@@ -158,7 +159,8 @@
                                                border-stone-300
                                                dark:border-stone-700
                                                dark:text-stone-300
-                                               hg-frost bg-stone-100/75
+                                               hg-frost
+                                               bg-stone-100/75
                                                dark:bg-onyx-900/75
                                                border-2
                                                min-h-256
@@ -181,14 +183,15 @@
                (input (@ (type file)
                          (id guitarpro-upload)
                          (accept ".gp5,application/x-guitar-pro")
-                         (onchange "translateFileToBase64AddToInput(document.getElementById('guitarpro-upload'), document.getElementById('guitarpro-contents'))")
+                         (onchange
+                          "translateFileToBase64AddToInput(document.getElementById('guitarpro-upload'), document.getElementById('guitarpro-contents'))")
                          (class ,(mk-class '(bg-stone-300 dark:bg-stone-900
-                                             my-2
-                                             px-3
-                                             py-2
-                                             text-onyx-300
-                                             dark:text-stone-300
-                                             rounded-xl)))
+                                                          my-2
+                                                          px-3
+                                                          py-2
+                                                          text-onyx-300
+                                                          dark:text-stone-300
+                                                          rounded-xl)))
                          (value "")) "")
                (input (@ (id guitarpro-contents)
                          (name guitarpro-contents)

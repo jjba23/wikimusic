@@ -58,16 +58,22 @@
   "Return TEXT as a base64 text, which is what a browser makes of an uploaded
 file before the data URL is posted."
   (let* ((bytes (bytevector->u8-list (string->utf8 text)))
-         (padding (modulo (- 3 (modulo (length bytes) 3)) 3)))
-    (let loop ((bytes bytes)
-               (chars '()))
+         (padding (modulo (- 3
+                             (modulo (length bytes) 3)) 3)))
+    (let loop
+      ((bytes bytes)
+       (chars '()))
       (if (null? bytes)
-          (list->string (append chars (make-list padding #\=)))
-          (let* ((step (min 3 (length bytes)))
+          (list->string (append chars
+                                (make-list padding #\=)))
+          (let* ((step (min 3
+                            (length bytes)))
                  (group (take bytes step))
                  (first (car group))
-                 (second (if (> (length group) 1) (list-ref group 1) 0))
-                 (third (if (> (length group) 2) (list-ref group 2) 0))
+                 (second (if (> (length group) 1)
+                             (list-ref group 1) 0))
+                 (third (if (> (length group) 2)
+                            (list-ref group 2) 0))
                  (digits (list (ash first -2)
                                (logior (ash (logand first #x3) 4)
                                        (ash second -4))
@@ -80,18 +86,20 @@ file before the data URL is posted."
                  ;; character written for a byte that is not there decodes
                  ;; back as a zero byte, which is how a round trip through an
                  ;; encoder that does this wrongly comes to hold NULs.
-                 (written (take digits (+ step 1))))
+                 (written (take digits
+                                (+ step 1))))
             (loop (drop bytes step)
                   (append chars
-                          (map (lambda (digit) (string-ref alphabet digit))
-                               written))))))))
+                          (map (lambda (digit)
+                                 (string-ref alphabet digit)) written))))))))
 
 (define (integer-bytes value width)
   "Return VALUE as WIDTH little-endian bytes, two's complement, which is how
 every number in a Guitar Pro file is written."
-  (let loop ((remaining width)
-             (value value)
-             (bytes '()))
+  (let loop
+    ((remaining width)
+     (value value)
+     (bytes '()))
     (if (zero? remaining)
         ;; The bytes come back most significant last, which is how the file
         ;; writes them: a number no reader could read otherwise is exactly the
@@ -103,28 +111,31 @@ every number in a Guitar Pro file is written."
 
 (define (text-bytes text)
   "Return TEXT as the bytes a file writes it as: one byte per character."
-  (map char->integer (string->list text)))
+  (map char->integer
+       (string->list text)))
 
 (define (byte-size-string-field size text)
   "Return a byte-size string of SIZE bytes: a length byte and then the field
 itself, the text first and the padding after it."
   (append (integer-bytes (string-length text) 1)
           (text-bytes text)
-          (make-list (- size (string-length text)) 0)))
+          (make-list (- size
+                        (string-length text)) 0)))
 
 (define (int-byte-size-string-field text)
   "Return an int-byte-size string: a length that counts the string's own length
 byte, then that byte, then the text."
-  (append (integer-bytes (+ 1 (string-length text)) 4)
+  (append (integer-bytes (+ 1
+                            (string-length text)) 4)
           (integer-bytes (string-length text) 1)
           (text-bytes text)))
 
 (define (int-size-string-field text)
   "Return an int-size string: a length and then that many bytes of text."
-  (append (integer-bytes (string-length text) 4) (text-bytes text)))
+  (append (integer-bytes (string-length text) 4)
+          (text-bytes text)))
 
-(define* (gp5-file-bytes #:key
-                         (version "5.10")
+(define* (gp5-file-bytes #:key (version "5.10")
                          (title "a title")
                          (artist "")
                          (notices '())
@@ -140,43 +151,65 @@ with the two fields a release after 5.0 added -- the master volume and the flag
 saying whether the sheet shows its tempo -- left out of a 5.0 file, so that
 both generations are written the way they really are."
   (let ((later-than-5.0? (not (equal? version "5.00"))))
-    (u8-list->bytevector
-     (append (byte-size-string-field 30
-                                     (string-append "FICHIER GUITAR PRO v"
-                                                    version))
-             ;; The nine text fields of the score.
-             (append-map int-byte-size-string-field
-                         (list title "" artist "" "" "" "" "" ""))
-             (integer-bytes (length notices) 4)
-             (append-map int-byte-size-string-field notices)
-             ;; The lyrics: the track they belong to, then five lines of the
-             ;; measure each starts at and the words themselves.
-             (integer-bytes 0 4)
-             (append-map (lambda (line)
-                           (append (integer-bytes 1 4)
-                                   (int-size-string-field line)))
-                         (append lyrics
-                                 (make-list (- 5 (length lyrics)) "")))
-             (if later-than-5.0? (integer-bytes 100 4) '())
-             (integer-bytes 0 4)
-             (make-list 11 0)
-             ;; Page setup: the page, its four margins, the score's proportion
-             ;; of it, the header and footer flags, and ten placeholders.
-             (append (make-list 28 0) (integer-bytes 0 2))
-             (append-map int-byte-size-string-field (make-list 10 ""))
-             ;; The tempo, under the name an edition gives it.
-             (int-byte-size-string-field "")
-             (integer-bytes tempo 4)
-             (if later-than-5.0? (integer-bytes 0 1) '())
-             (integer-bytes key 1)
-             (integer-bytes 0 4)
-             ;; Sixty-four MIDI channels, then the navigation marks.
-             (append-map (lambda (channel) (make-list 12 0)) (iota 64))
-             (make-list 38 0)
-             ;; The master reverb, and the two counts the music follows.
-             (integer-bytes 0 4)
-             (integer-bytes measures 4)
-             (integer-bytes tracks 4)))))
+    (u8-list->bytevector (append (byte-size-string-field 30
+                                                         (string-append
+                                                          "FICHIER GUITAR PRO v"
+                                                          version))
+                                 ;; The nine text fields of the score.
+                                 (append-map int-byte-size-string-field
+                                             (list title
+                                                   ""
+                                                   artist
+                                                   ""
+                                                   ""
+                                                   ""
+                                                   ""
+                                                   ""
+                                                   ""))
+                                 (integer-bytes (length notices) 4)
+                                 (append-map int-byte-size-string-field
+                                             notices)
+                                 ;; The lyrics: the track they belong to, then five lines of the
+                                 ;; measure each starts at and the words themselves.
+                                 (integer-bytes 0 4)
+                                 (append-map (lambda (line)
+                                               (append (integer-bytes 1 4)
+                                                       (int-size-string-field
+                                                        line)))
+                                             (append lyrics
+                                                     (make-list (- 5
+                                                                   (length
+                                                                    lyrics))
+                                                                "")))
+                                 (if later-than-5.0?
+                                     (integer-bytes 100 4)
+                                     '())
+                                 (integer-bytes 0 4)
+                                 (make-list 11 0)
+                                 ;; Page setup: the page, its four margins, the score's proportion
+                                 ;; of it, the header and footer flags, and ten placeholders.
+                                 (append (make-list 28 0)
+                                         (integer-bytes 0 2))
+                                 (append-map int-byte-size-string-field
+                                             (make-list 10 ""))
+                                 ;; The tempo, under the name an edition gives it.
+                                 (int-byte-size-string-field "")
+                                 (integer-bytes tempo 4)
+                                 (if later-than-5.0?
+                                     (integer-bytes 0 1)
+                                     '())
+                                 (integer-bytes key 1)
+                                 (integer-bytes 0 4)
+                                 ;; Sixty-four MIDI channels, then the navigation marks.
+                                 (append-map (lambda (channel
+                                                       )
+                                               (make-list 12 0))
+                                             (iota 64))
+                                 (make-list 38 0)
+                                 ;; The master reverb, and the two counts the music follows.
+                                 (integer-bytes 0 4)
+                                 (integer-bytes measures 4)
+                                 (integer-bytes tracks 4)))))
 
 (define (bytes-up-to bytes count)
   "Return the first COUNT bytes of BYTES."
@@ -190,9 +223,9 @@ both generations are written the way they really are."
 (define (file-data-url bytes)
   "Return BYTES as the data URL a browser makes of an uploaded file."
   (string-append "data:application/octet-stream;base64,"
-                 (base64-encode-string
-                  (list->string
-                   (map integer->char (bytevector->u8-list bytes))))))
+                 (base64-encode-string (list->string (map integer->char
+                                                          (bytevector->u8-list
+                                                           bytes))))))
 
 (define (metadata-of options)
   "Return what the reader makes of the file written with OPTIONS.
@@ -232,10 +265,12 @@ The counts of measures and tracks are the last thing a header holds, so a file
 that stops just short of them is the shape a truncated -- or partly written --
 file really has."
   (let ((bytes (written-file)))
-    (bytes-up-to bytes (- (bytevector-length bytes) count))))
+    (bytes-up-to bytes
+                 (- (bytevector-length bytes) count))))
 
 (define posted-file-options
-  '(#:title "through a data url" #:tempo 90))
+  '(#:title "through a data url"
+    #:tempo 90))
 
 ;; The data URL a browser would post the file above as.
 (define posted-file-url
@@ -256,7 +291,8 @@ file really has."
                              #:got (utf8->string (base64-decode-string "aGk=")))
                (assert-equal #:name "five characters"
                              #:expect "hello"
-                             #:got (utf8->string (base64-decode-string "aGVsbG8=")))
+                             #:got (utf8->string (base64-decode-string
+                                                  "aGVsbG8=")))
                (assert-equal #:name "six characters is two whole groups"
                              #:expect "hello!"
                              #:got (utf8->string (base64-decode-string
@@ -267,41 +303,46 @@ file really has."
                ;; are what it must produce for them: with that pinned, a round
                ;; trip says the two agree on every byte.
                (let ((text "a"))
-                 (assert-equal #:name "one character, the shortest text that needs padding"
-                               #:expect text
-                               #:got (utf8->string (base64-decode-string
-                                                    (base64-encode-string text)))))
+                 (assert-equal #:name
+                  "one character, the shortest text that needs padding"
+                  #:expect text
+                  #:got (utf8->string (base64-decode-string (base64-encode-string
+                                                             text)))))
                (let ((text "abc"))
                  (assert-equal #:name "one whole group of three"
                                #:expect text
-                               #:got (utf8->string (base64-decode-string
-                                                    (base64-encode-string text)))))
+                               #:got (utf8->string (base64-decode-string (base64-encode-string
+                                                                          text)))))
                (let ((text "wikimusic"))
                  (assert-equal #:name "a word"
                                #:expect text
-                               #:got (utf8->string (base64-decode-string
-                                                    (base64-encode-string text)))))
+                               #:got (utf8->string (base64-decode-string (base64-encode-string
+                                                                          text)))))
                (let ((text "a title with an accent: café"))
-                 (assert-equal #:name "a text whose bytes are not its characters"
+                 (assert-equal #:name
+                               "a text whose bytes are not its characters"
                                #:expect text
-                               #:got (utf8->string (base64-decode-string
-                                                    (base64-encode-string text))))))
+                               #:got (utf8->string (base64-decode-string (base64-encode-string
+                                                                          text))))))
 
          (test "a text broken across lines is read as one"
                ;; A data URL is one long line, but nothing about base64 says
                ;; the padding has to be the only thing that ends a group.
-               (assert-equal #:name "whitespace between the characters is ignored"
+               (assert-equal #:name
+                             "whitespace between the characters is ignored"
                              #:expect "hello"
-                             #:got (utf8->string
-                                    (base64-decode-string "aGVs\n bG8=\n"))))
+                             #:got (utf8->string (base64-decode-string
+                                                  "aGVs\n bG8=\n"))))
 
          (test "a text that is not base64 is refused rather than guessed at"
-               (assert-error (lambda () (base64-decode-string "aGk*="))
+               (assert-error (lambda ()
+                               (base64-decode-string "aGk*="))
                              #:name "a character outside the alphabet")
                ;; A text is read in groups of four, so what cannot happen is a
                ;; single character left over at the end: "aGVsbG8" is seven
                ;; characters and perfectly good, "aGVsb" is five and is not.
-               (assert-error (lambda () (base64-decode-string "aGVsb"))
+               (assert-error (lambda ()
+                               (base64-decode-string "aGVsb"))
                              #:name "a text that ends in a lone character"))))
 
 (define data-url-suite
@@ -323,19 +364,19 @@ file really has."
                                  "data:application/octet-stream;base64,aGk="))
                (assert-equal #:name "the bytes after the comma"
                              #:expect "hi"
-                             #:got (utf8->string
-                                    (data-url-payload
-                                     "data:application/octet-stream;base64,aGk="))))
+                             #:got (utf8->string (data-url-payload
+                                                  "data:application/octet-stream;base64,aGk="))))
 
-         (test "a data URL that holds something other than base64 holds no bytes"
-               ;; Answers #f rather than raising: the value comes from a form.
-               (assert-eq #:name "a text data URL"
-                          #:expect #f
-                          #:got (data-url-payload "data:text/plain,hello"))
-               (assert-eq #:name "a base64 text that does not decode"
-                          #:expect #f
-                          #:got (data-url-payload
-                                 "data:application/octet-stream;base64,aGk*=")))
+         (test
+          "a data URL that holds something other than base64 holds no bytes"
+          ;; Answers #f rather than raising: the value comes from a form.
+          (assert-eq #:name "a text data URL"
+                     #:expect #f
+                     #:got (data-url-payload "data:text/plain,hello"))
+          (assert-eq #:name "a base64 text that does not decode"
+                     #:expect #f
+                     #:got (data-url-payload
+                            "data:application/octet-stream;base64,aGk*=")))
 
          (test "a version's own file is read through its data URL"
                (assert-equal #:name "the title"
@@ -393,30 +434,38 @@ file really has."
                (let ((bytes (gp5-file-bytes)))
                  (assert-eqv #:name "the plain file"
                              #:expect (bytevector-length bytes)
-                             #:got (assq-ref (header-alist bytes) 'header-bytes)))
+                             #:got (assq-ref (header-alist bytes)
+                                             'header-bytes)))
                (let ((bytes (gp5-file-bytes #:title "")))
                  (assert-eqv #:name "a file with no title"
                              #:expect (bytevector-length bytes)
-                             #:got (assq-ref (header-alist bytes) 'header-bytes)))
-               (let ((bytes (gp5-file-bytes #:title "a much longer title than the last one")))
+                             #:got (assq-ref (header-alist bytes)
+                                             'header-bytes)))
+               (let ((bytes (gp5-file-bytes #:title
+                             "a much longer title than the last one")))
                  (assert-eqv #:name "a file with a long title"
                              #:expect (bytevector-length bytes)
-                             #:got (assq-ref (header-alist bytes) 'header-bytes)))
-               (let ((bytes (gp5-file-bytes #:notices '("a notice" "another one"))))
+                             #:got (assq-ref (header-alist bytes)
+                                             'header-bytes)))
+               (let ((bytes (gp5-file-bytes #:notices '("a notice"
+                                                        "another one"))))
                  (assert-eqv #:name "a file with two notice lines"
                              #:expect (bytevector-length bytes)
-                             #:got (assq-ref (header-alist bytes) 'header-bytes)))
+                             #:got (assq-ref (header-alist bytes)
+                                             'header-bytes)))
                (let ((bytes (gp5-file-bytes #:version "5.00")))
                  (assert-eqv #:name "a file of the earlier release"
                              #:expect (bytevector-length bytes)
-                             #:got (assq-ref (header-alist bytes) 'header-bytes)))
+                             #:got (assq-ref (header-alist bytes)
+                                             'header-bytes)))
                (let ((bytes (gp5-file-bytes #:tempo 40
                                             #:key 4
                                             #:measures 400
                                             #:tracks 32)))
                  (assert-eqv #:name "a file with numbers at their widest"
                              #:expect (bytevector-length bytes)
-                             #:got (assq-ref (header-alist bytes) 'header-bytes))))
+                             #:got (assq-ref (header-alist bytes)
+                                             'header-bytes))))
 
          (test "a header written by a release after 5.0 is read the same way"
                ;; The two fields 5.1 added sit between the lyrics and the
@@ -447,48 +496,50 @@ file really has."
                                                           #:tracks 5))
                                            'tracks)))
 
-         (test "a file that is not a readable Guitar Pro 5 file is answered with #f"
-               ;; Nothing here may raise: the page a version is shown on asks
-               ;; for its metadata every time it is rendered, and a file the
-               ;; site cannot read is still a file its author may download.
-               (let ((bytes (make-bytevector 0)))
-                 (assert-eq #:name "nothing at all"
-                            #:expect #f
-                            #:got (gp5-bytes-metadata bytes)))
-               (let ((bytes (string->utf8 "hello, this is not a tab")))
-                 (assert-eq #:name "a text file"
-                            #:expect #f
-                            #:got (gp5-bytes-metadata bytes)))
-               (let ((bytes (string->utf8
-                             "%PDF-1.4 and some padding after the header")))
-                 (assert-eq #:name "a pdf"
-                            #:expect #f
-                            #:got (gp5-bytes-metadata bytes)))
-               (let ((bytes (string->utf8 "FICHIER GUITAR PRO v4.06 padding")))
-                 (assert-eq #:name "a Guitar Pro 4 file"
-                            #:expect #f
-                            #:got (gp5-bytes-metadata bytes))))
+         (test
+          "a file that is not a readable Guitar Pro 5 file is answered with #f"
+          ;; Nothing here may raise: the page a version is shown on asks
+          ;; for its metadata every time it is rendered, and a file the
+          ;; site cannot read is still a file its author may download.
+          (let ((bytes (make-bytevector 0)))
+            (assert-eq #:name "nothing at all"
+                       #:expect #f
+                       #:got (gp5-bytes-metadata bytes)))
+          (let ((bytes (string->utf8 "hello, this is not a tab")))
+            (assert-eq #:name "a text file"
+                       #:expect #f
+                       #:got (gp5-bytes-metadata bytes)))
+          (let ((bytes (string->utf8
+                        "%PDF-1.4 and some padding after the header")))
+            (assert-eq #:name "a pdf"
+                       #:expect #f
+                       #:got (gp5-bytes-metadata bytes)))
+          (let ((bytes (string->utf8 "FICHIER GUITAR PRO v4.06 padding")))
+            (assert-eq #:name "a Guitar Pro 4 file"
+                       #:expect #f
+                       #:got (gp5-bytes-metadata bytes))))
 
          (test "a file of the right generation that is cut short is refused"
                (assert-eq #:name "a header missing its last fields"
                           #:expect #f
-                          #:got (gp5-bytes-metadata
-                                 (written-file-short-by 10)))
+                          #:got (gp5-bytes-metadata (written-file-short-by 10)))
                (assert-eq #:name "a file missing its whole header"
                           #:expect #f
-                          #:got (gp5-bytes-metadata
-                                 (bytes-up-to (written-file) 40))))
+                          #:got (gp5-bytes-metadata (bytes-up-to (written-file)
+                                                                 40))))
 
          (test "a field whose two lengths disagree is refused"
                ;; The reader checks every int-byte-size string's length against
                ;; its length byte, which is what stops a file that has come out
                ;; of step from being read as though it had not.
-               (let ((tampered (bytevector-copy (gp5-file-bytes #:title "a title"))))
+               (let ((tampered (bytevector-copy (gp5-file-bytes #:title
+                                                                "a title"))))
                  ;; The title's length is the first field after the version's
                  ;; thirty-one bytes, and its low byte is written over with one
                  ;; the text does not have.
                  (bytevector-u8-set! tampered 31 99)
-                 (assert-eq #:name "a string that claims a length it does not have"
+                 (assert-eq #:name
+                            "a string that claims a length it does not have"
                             #:expect #f
                             #:got (gp5-bytes-metadata tampered))))
 
@@ -498,8 +549,8 @@ file really has."
                ;; believe a negative one.
                (assert-eq #:name "a negative measure count"
                           #:expect #f
-                          #:got (gp5-bytes-metadata
-                                 (gp5-file-bytes #:measures -1))))))
+                          #:got (gp5-bytes-metadata (gp5-file-bytes #:measures
+                                                                    -1))))))
 
 (define key-suite
   (suite "The key a header names"

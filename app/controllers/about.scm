@@ -36,6 +36,5 @@
      (lambda (rc)
        (response-emit (:mime rc
                              (about-page (:i18n rc)
-                                         #:is-logged-in (:cookies-value
-                                                         rc
+                                         #:is-logged-in (:cookies-value rc
                                                          "x-bewaking-wikimusic"))))))

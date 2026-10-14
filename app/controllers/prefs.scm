@@ -45,10 +45,10 @@
                (target (if (and (string? return-to)
                                 (string-prefix? "/" return-to)
                                 (not (string-prefix? "//" return-to)))
-                           return-to
-                           "/")))
+                           return-to "/")))
           (when (assoc user-lang wikimusic-locales)
-            (:cookies-set! rc 'lang "lang" user-lang)
+            (:cookies-set! rc
+                           'lang "lang" user-lang)
             (:cookies-setattr! rc
                                'lang
                                #:expires (* 3600 24 365)
@@ -57,4 +57,5 @@
                                #:http-only #t))
           ;; The reader is sent back to the page the choice was made on,
           ;; which is where a language change is easiest to read.
-          (redirect-to rc target #:status 302))))
+          (redirect-to rc target
+                       #:status 302))))

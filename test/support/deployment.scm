@@ -51,7 +51,8 @@
 ;; bound at all, told apart from one bound to #f -- which is a deployment
 ;; turning something off, and a value that has to be restored rather than
 ;; removed.
-(define unbound (list 'unbound))
+(define unbound
+  (list 'unbound))
 
 (define* (with-deployment name value thunk)
   "Answer what THUNK answers, with NAME bound to VALUE in `(wikimusic env)'.
@@ -73,13 +74,12 @@ off for the cases that follow it.
 @end example"
   (let* ((module (resolve-module '(wikimusic env)))
          (variable (module-variable module name))
-         (was (if (and variable (variable-bound? variable))
-                  (variable-ref variable)
-                  unbound)))
-    (dynamic-wind
-      (lambda () (module-define! module name value))
-      thunk
-      (lambda ()
-        (if (eq? was unbound)
-            (module-remove! module name)
-            (module-set! module name was))))))
+         (was (if (and variable
+                       (variable-bound? variable))
+                  (variable-ref variable) unbound)))
+    (dynamic-wind (lambda ()
+                    (module-define! module name value)) thunk
+                  (lambda ()
+                    (if (eq? was unbound)
+                        (module-remove! module name)
+                        (module-set! module name was))))))

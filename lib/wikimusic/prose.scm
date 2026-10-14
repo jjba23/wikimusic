@@ -40,15 +40,14 @@
 (define-module (wikimusic prose)
   #:declarative? #t
   #:use-module (ice-9 format)
-  #:export (project-tagline
-            project-summary
-            project-account
-            project-lead-in
-            project-promises
-            project-foundation
-            project-support-ask
-            project-support-note
-            project-invitation))
+  #:export (project-tagline project-summary
+                            project-account
+                            project-lead-in
+                            project-promises
+                            project-foundation
+                            project-support-ask
+                            project-support-note
+                            project-invitation))
 
 (define (project-tagline G_)
   "Return what the project is called, in one line.
@@ -68,15 +67,18 @@ page's own description, which is what a search result is shown instead, says
 the same thing in the register of a search result -- a sentence that has to
 stand alone, so it names the project as well -- and the two are separate
 sentences for that reason rather than by oversight."
-  (G_ "Songs, artists and genres, with guitar and bass tabs, chords, lyrics, keys, tunings and sheet music — written by musicians, for anyone learning to play."))
+  (G_
+   "Songs, artists and genres, with guitar and bass tabs, chords, lyrics, keys, tunings and sheet music — written by musicians, for anyone learning to play."))
 
 (define (project-account G_)
   "Return what the project is, in one paragraph."
-  (G_ "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."))
+  (G_
+   "The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms."))
 
 (define (project-lead-in G_)
   "Return the sentence the list of promises is read under."
-  (G_ "Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:"))
+  (G_
+   "Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:"))
 
 (define (project-promises G_)
   "Return the four things a reader can do here, in the order they are read.
@@ -85,9 +87,12 @@ The order is the order of the prose rather than of importance: what a reader
 comes to read, what they can file it with, what they can write, and what they
 can learn from it."
   (list (G_ "Discover music from diverse genres and traditions.")
-        (G_ "Organize information with structured metadata and multimedia content.")
-        (G_ "Contribute by adding new compositions, analyses, or educational materials.")
-        (G_ "Learn through curated resources that connect music theory, history, and practice.")))
+        (G_
+         "Organize information with structured metadata and multimedia content.")
+        (G_
+         "Contribute by adding new compositions, analyses, or educational materials.")
+        (G_
+         "Learn through curated resources that connect music theory, history, and practice.")))
 
 (define (project-foundation G_)
   "Return what the project is built on, one paragraph per sentence.
@@ -97,9 +102,12 @@ is written in, the shape of the data behind it, and what that shape is for."
   (list
    ;; The trailing space in the second one is the catalog's, not a typo: the
    ;; msgid a translator was given ends with it.
-   (G_ "At its core, WikiMusic leverages the expressive power of Lisp to build a dynamic interactive Music Gallery and Content Management System (CMS).")
-   (G_ "WikiMusic leverages a database-backed architecture to ensure all content is easily searchable, linkable, and reusable. ")
-   (G_ "The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively.")))
+   (G_
+    "At its core, WikiMusic leverages the expressive power of Lisp to build a dynamic interactive Music Gallery and Content Management System (CMS).")
+   (G_
+    "WikiMusic leverages a database-backed architecture to ensure all content is easily searchable, linkable, and reusable. ")
+   (G_
+    "The user interface provides a seamless experience, inviting both beginners and experts to engage with the world of music collaboratively.")))
 
 (define (project-support-ask G_)
   "Return the words on the one control that asks a reader for something.
@@ -110,8 +118,10 @@ front page's control and the about page's are the same control."
 
 (define (project-support-note G_)
   "Return what the money pays for, in one sentence."
-  (G_ "This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong."))
+  (G_
+   "This helps us keep the underlying cloud infrastructure and the contributor's work hours going strong."))
 
 (define (project-invitation G_)
   "Return the line both pages end on."
-  (G_ "Join us in building an ever-growing library of musical knowledge — where every note tells a story."))
+  (G_
+   "Join us in building an ever-growing library of musical knowledge — where every note tells a story."))

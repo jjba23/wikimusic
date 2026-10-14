@@ -67,24 +67,31 @@
                  ;; first: its creator decides whether this session may change
                  ;; it (see `guard-owner').
                  (row (entity-or-404 (car ($artists 'get
-                                                   #:condition (where #:identifier
-                                                                      (params
-                                                                       rc
-                                                                       "uuid"))))
-                                     "artist" (params rc "uuid")))
+                                                    #:condition (where
+                                                                       #:identifier
+                                                                       (params
+                                                                        rc
+                                                                        "uuid"))))
+                                     "artist"
+                                     (params rc "uuid")))
                  (created-by (assoc-ref row "created_by")))
-            (when (guard-owner #:rc rc #:created-by created-by)
+            (when (guard-owner #:rc rc
+                               #:created-by created-by)
               (sql-execute! rc
                             (sql-update 'artists
-                                        `((display-name
-                                           . ,(html-escape (assoc-ref body
+                                        `((display-name unquote
+                                                        (html-escape (assoc-ref
+                                                                      body
                                                                       "display-name")))
-                                          (description
-                                           . ,(html-escape (assoc-ref body
-                                                                      "description")))
-                                          (last-edited-at . ,(current-time)))
-                                        #:where `((identifier
-                                                   . ,(params rc "uuid"))))
+                                          (description unquote
+                                                       (html-escape (assoc-ref
+                                                                     body
+                                                                     "description")))
+                                          (last-edited-at unquote
+                                                          (current-time)))
+                                        #:where `((identifier unquote
+                                                              (params rc
+                                                                      "uuid"))))
                             #:name "edit-artist")
               (redirect-to rc
                            (string->uri (format #f
@@ -111,26 +118,31 @@
             ;; or a holder of the super grant, may rewrite them.
             (require-row-owner #:rc rc
                                #:table 'artist_external_sources
-                               #:where `((identifier
-                                          . ,(params rc "sourcesuuid"))))
+                               #:where `((identifier unquote
+                                                     (params rc "sourcesuuid"))))
             (sql-execute! rc
                           (sql-update 'artist_external_sources
-                                      `((wikipedia-url
-                                         . ,(uri-encode (assoc-ref body
-                                                                  "wikipedia-url")))
-                                        (spotify-url
-                                         . ,(uri-encode (assoc-ref body
+                                      `((wikipedia-url unquote
+                                                       (uri-encode (assoc-ref
+                                                                    body
+                                                                    "wikipedia-url")))
+                                        (spotify-url unquote
+                                                     (uri-encode (assoc-ref
+                                                                  body
                                                                   "spotify-url")))
-                                        (youtube-url
-                                         . ,(uri-encode (assoc-ref body
+                                        (youtube-url unquote
+                                                     (uri-encode (assoc-ref
+                                                                  body
                                                                   "youtube-url")))
-                                        (soundcloud-url
-                                         . ,(uri-encode (assoc-ref body
-                                                                  "soundcloud-url")))
-                                        (last-edited-at . ,(current-time)))
-                                      #:where `((identifier
-                                                 . ,(params rc
-                                                           "sourcesuuid"))))
+                                        (soundcloud-url unquote
+                                                        (uri-encode (assoc-ref
+                                                                     body
+                                                                     "soundcloud-url")))
+                                        (last-edited-at unquote
+                                                        (current-time)))
+                                      #:where `((identifier unquote
+                                                            (params rc
+                                                             "sourcesuuid"))))
                           #:name "edit-artist-external-sources")
             (redirect-to rc
                          (string->uri (format #f
@@ -158,23 +170,27 @@
             ;; of the super grant -- is who may rewrite it.
             (require-row-owner #:rc rc
                                #:table 'artist_artworks
-                               #:where `((identifier
-                                          . ,(params rc "artwork-uuid"))))
+                               #:where `((identifier unquote
+                                                     (params rc "artwork-uuid"))))
             (sql-execute! rc
                           (sql-update 'artist_artworks
-                                      `((content-url
-                                         . ,(uri-encode (assoc-ref body
+                                      `((content-url unquote
+                                                     (uri-encode (assoc-ref
+                                                                  body
                                                                   "content-url")))
-                                        (content-caption
-                                         . ,(html-escape (assoc-ref body
-                                                                    "content-caption")))
-                                        (order-value
-                                         . ,(html-escape (assoc-ref body
-                                                                    "order-value")))
-                                        (last-edited-at . ,(current-time)))
-                                      #:where `((identifier
-                                                 . ,(params rc
-                                                           "artwork-uuid"))))
+                                        (content-caption unquote
+                                                         (html-escape (assoc-ref
+                                                                       body
+                                                                       "content-caption")))
+                                        (order-value unquote
+                                                     (html-escape (assoc-ref
+                                                                   body
+                                                                   "order-value")))
+                                        (last-edited-at unquote
+                                                        (current-time)))
+                                      #:where `((identifier unquote
+                                                            (params rc
+                                                             "artwork-uuid"))))
                           #:name "edit-artist-artwork")
             (redirect-to rc
                          (string->uri (format #f "~a/artists/uuid/~a/edit"

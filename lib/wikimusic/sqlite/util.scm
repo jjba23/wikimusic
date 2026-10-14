@@ -45,16 +45,15 @@
   #:use-module (kracht prelude)
   #:use-module (kracht sql)
   #:use-module (artanis db)
-  #:export (sql-query->dbi-sql
-            order-by-clauses
-            sql-order-by-sql
-            attrs->row
-            sql-log?
-            log-sql
-            db-read
-            db-write
-            sql-rows
-            sql-execute!))
+  #:export (sql-query->dbi-sql order-by-clauses
+                               sql-order-by-sql
+                               attrs->row
+                               sql-log?
+                               log-sql
+                               db-read
+                               db-write
+                               sql-rows
+                               sql-execute!))
 
 ;;; ====== Logging ======
 ;;;
@@ -67,23 +66,21 @@
   "Return #t when WIKIMUSIC_SQL_LOG asks for the executed statements to be
 printed to the current error port."
   (let ((value (getenv "WIKIMUSIC_SQL_LOG")))
-    (and value (not (string-null? value)))))
+    (and value
+         (not (string-null? value)))))
 
 (define (log-sql name query)
   "Print QUERY, labelled NAME, when SQL logging is enabled."
   (when (sql-log?)
-    (format (current-error-port)
-            "[wikimusic sql] ~a~%~t~a~%"
-            name
-            query)))
+    (format (current-error-port) "[wikimusic sql] ~a~%~t~a~%" name query)))
 
 (define (require-sql-query who q)
   "Return Q unchanged when it is a <sql-query> or a statement string, and
 raise an error naming WHO otherwise."
-  (unless (or (string? q) (sql-query? q))
-    (error (format #f "~a: expected a kracht SQL query or a statement string" who)
-           q))
-  q)
+  (unless (or (string? q)
+              (sql-query? q))
+    (error (format #f "~a: expected a kracht SQL query or a statement string"
+                   who) q)) q)
 
 (define (sql-query->dbi-sql q)
   "Render Q into the single statement string guile-dbi can run.
@@ -98,11 +95,11 @@ strings and doubles their single quotes.  A count mismatch is an error rather
 than a quietly wrong statement, which also means a template holding a literal
 `?' is refused: kracht's `sql-parameterize' makes the same promise."
   (require-sql-query "sql-query->dbi-sql" q)
-  (if (string? q)
-      q
-      (let loop ((chars (string->list (sql-query-sql q)))
-                 (params (sql-query-params q))
-                 (out '()))
+  (if (string? q) q
+      (let loop
+        ((chars (string->list (sql-query-sql q)))
+         (params (sql-query-params q))
+         (out '()))
         (cond
           ((null? chars)
            (when (pair? params)
@@ -112,12 +109,14 @@ than a quietly wrong statement, which also means a template holding a literal
           ((char=? (car chars) #\?)
            (when (null? params)
              (error "sql-query->dbi-sql: fewer bound values than placeholders"
-                    q))
-           (loop (cdr chars) (cdr params)
-                 (append (reverse
-                          (string->list (value->sql-literal (car params))))
+              q))
+           (loop (cdr chars)
+                 (cdr params)
+                 (append (reverse (string->list (value->sql-literal (car
+                                                                     params))))
                          out)))
-          (else (loop (cdr chars) params (cons (car chars) out)))))))
+          (else (loop (cdr chars) params
+                      (cons (car chars) out)))))))
 
 (define (order-by-clauses order-by)
   "Return ORDER-BY as the list of clause lists `sql-select' expects.
@@ -133,7 +132,8 @@ clauses, so both spellings are accepted:
   (cond
     ((null? order-by)
      '())
-    ((and (pair? (car order-by)) (not (null? (car order-by))))
+    ((and (pair? (car order-by))
+          (not (null? (car order-by))))
      order-by)
     (else (list order-by))))
 
@@ -148,21 +148,22 @@ clause here comes from `entity-sort-from-query', which maps one query string
 onto a fixed list, so only columns wikimusic itself names can reach it.
 
 Raise an error on a direction that is none of `asc', `desc' or absent."
-  (string-join
-   (map (lambda (clause)
-          (let ((column (quote-sql-identifier
-                         (symbol->sql-column (car clause))))
-                (direction (and (pair? (cdr clause))
-                                (cadr clause))))
-            (case direction
-              ((#f) column)
-              ((asc asc!) (string-append column " ASC"))
-              ((desc desc!) (string-append column " DESC"))
-              (else (error
-                     "sql-order-by-sql: unknown ORDER BY direction"
-                     direction)))))
-        (order-by-clauses clauses))
-   ", "))
+  (string-join (map (lambda (clause)
+                      (let ((column (quote-sql-identifier (symbol->sql-column (car
+                                                                               clause))))
+                            (direction (and (pair? (cdr clause))
+                                            (cadr clause))))
+                        (case direction
+                          ((#f)
+                           column)
+                          ((asc asc!)
+                           (string-append column " ASC"))
+                          ((desc desc!)
+                           (string-append column " DESC"))
+                          (else (error
+                                 "sql-order-by-sql: unknown ORDER BY direction"
+                                 direction)))))
+                    (order-by-clauses clauses)) ", "))
 
 (define (attrs->row attrs columns)
   "Return ATTRS as the row `sql-insert' takes, keeping only COLUMNS and
@@ -174,11 +175,9 @@ mentions cannot become part of a statement.  A column ATTRS does not carry is
 left to the table's own default, and ATTRS holding nothing at all is an error
 rather than an empty insert."
   (let ((row (filter-map (lambda (column)
-                           (assq column attrs))
-                         columns)))
+                           (assq column attrs)) columns)))
     (when (null? row)
-      (error "attrs->row: none of the given columns is present" attrs))
-    row))
+      (error "attrs->row: none of the given columns is present" attrs)) row))
 
 ;;; ====== Running statements ======
 
@@ -192,8 +191,8 @@ symbols."
       (let ((rows (map sql-row->scheme-alist
                        (DB-get-all-rows (DB-query conn sql)))))
         (log-sql (format #f "~a (rows)" name)
-                 (format #f "~a rows" (length rows)))
-        rows))))
+                 (format #f "~a rows"
+                         (length rows))) rows))))
 
 (define (db-write conn)
   "Return a procedure of NAME and QUERY that runs QUERY as a write against CONN.
@@ -208,10 +207,14 @@ A statement SQLite refuses raises Artanis' 500 error, as it should."
 ;;; hold it, so these two take the request context instead, which is what the
 ;;; controllers below them already work with.
 
-(define* (sql-rows rc query #:key (name "sql-rows"))
+(define* (sql-rows rc query
+                   #:key (name "sql-rows"))
   "Run QUERY as a read in request context RC and return its rows."
-  ((db-read (DB-open rc)) name query))
+  ((db-read (DB-open rc))
+   name query))
 
-(define* (sql-execute! rc query #:key (name "sql-execute!"))
+(define* (sql-execute! rc query
+                       #:key (name "sql-execute!"))
   "Run QUERY as a write in request context RC."
-  ((db-write (DB-open rc)) name query))
+  ((db-write (DB-open rc))
+   name query))

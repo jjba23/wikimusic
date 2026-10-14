@@ -55,22 +55,21 @@
     (db-read conn))
 
   (define* (get-artworks-by-entity-ids entity ids
-                                       #:key (order-by
-                                              '((order-value asc))))
+                                       #:key (order-by '((order-value asc))))
     (execute-read "get-artworks-by-entity-ids"
                   (sql-select (table entity)
                               #:columns (columns entity)
-                              #:where (list (list (string->symbol
-                                                   (format #f "~a-identifier"
-                                                           entity))
-                                                  'in
-                                                  ids))
+                              #:where (list (list (string->symbol (format #f
+                                                                   "~a-identifier"
+                                                                   entity))
+                                                  'in ids))
                               #:order-by order-by)))
 
   (define (update-artwork-by-id entity id attrs)
     (execute-write "update-artwork-by-id"
                    (sql-update (table entity)
-                               (attrs->row attrs (columns entity))
+                               (attrs->row attrs
+                                           (columns entity))
                                #:where (list (cons 'identifier id)))))
 
   (define (delete-artwork-by-id entity id)
@@ -81,7 +80,8 @@
   (define (insert-artwork entity attrs)
     (execute-write "insert-artwork"
                    (sql-insert (table entity)
-                               (attrs->row attrs (columns entity)))))
+                               (attrs->row attrs
+                                           (columns entity)))))
 
   (mk-artwork-repository #:get-artworks-by-entity-ids-proc
                          get-artworks-by-entity-ids

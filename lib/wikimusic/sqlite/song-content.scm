@@ -55,23 +55,25 @@
     (execute-read "get-song-contents-by-ids"
                   (sql-select 'song_contents
                               #:columns columns
-                              #:where (list (list 'identifier 'in ids))
+                              #:where (list (list 'identifier
+                                                  'in ids))
                               #:order-by order-by)))
 
   (define* (get-song-contents-by-song-ids ids
-                                          #:key (order-by '((version-name
-                                                             desc))))
+                                          #:key (order-by '((version-name desc))))
     (execute-read "get-song-contents-by-song-ids"
                   (sql-select 'song_contents
                               #:columns columns
-                              #:where (list (list 'song-identifier 'in ids))
+                              #:where (list (list 'song-identifier
+                                                  'in ids))
                               #:order-by order-by)))
 
   (define (get-song-content-ids-by-song-ids ids)
     (execute-read "get-song-content-ids-by-song-ids"
                   (sql-select 'song_contents
                               #:columns '(identifier song-identifier)
-                              #:where (list (list 'song-identifier 'in ids)))))
+                              #:where (list (list 'song-identifier
+                                                  'in ids)))))
 
   (define (update-song-content-by-id id attrs)
     (execute-write "update-song-content-by-id"

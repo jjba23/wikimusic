@@ -71,39 +71,51 @@
                  ;; read first: its creator decides whether this session may
                  ;; change it (see `guard-owner').
                  (row (entity-or-404 (car ($songs 'get
-                                                  #:condition (where #:identifier
+                                                  #:condition (where
+                                                                     #:identifier
                                                                      (params
                                                                       rc
                                                                       "uuid"))))
-                                     "song" (params rc "uuid")))
+                                     "song"
+                                     (params rc "uuid")))
                  (created-by (assoc-ref row "created_by")))
-            (when (guard-owner #:rc rc #:created-by created-by)
+            (when (guard-owner #:rc rc
+                               #:created-by created-by)
               (sql-execute! rc
                             (sql-update 'songs
-                                        `((display-name
-                                           . ,(html-escape (assoc-ref body
+                                        `((display-name unquote
+                                                        (html-escape (assoc-ref
+                                                                      body
                                                                       "display-name")))
-                                          (description
-                                           . ,(html-escape (assoc-ref body
-                                                                      "description")))
-                                          (music-key
-                                           . ,(html-escape (assoc-ref body
-                                                                      "music-key")))
-                                          (music-tuning
-                                           . ,(html-escape (assoc-ref body
+                                          (description unquote
+                                                       (html-escape (assoc-ref
+                                                                     body
+                                                                     "description")))
+                                          (music-key unquote
+                                                     (html-escape (assoc-ref
+                                                                   body
+                                                                   "music-key")))
+                                          (music-tuning unquote
+                                                        (html-escape (assoc-ref
+                                                                      body
                                                                       "music-tuning")))
-                                          (music-creation-date
-                                           . ,(html-escape (assoc-ref body
-                                                                      "music-creation-date")))
-                                          (album-name
-                                           . ,(html-escape (assoc-ref body
-                                                                      "album-name")))
-                                          (album-info-link
-                                           . ,(uri-encode (assoc-ref body
-                                                                     "album-info-link")))
-                                          (last-edited-at . ,(current-time)))
-                                        #:where `((identifier
-                                                   . ,(params rc "uuid"))))
+                                          (music-creation-date unquote
+                                                               (html-escape (assoc-ref
+                                                                             body
+                                                                             "music-creation-date")))
+                                          (album-name unquote
+                                                      (html-escape (assoc-ref
+                                                                    body
+                                                                    "album-name")))
+                                          (album-info-link unquote
+                                                           (uri-encode (assoc-ref
+                                                                        body
+                                                                        "album-info-link")))
+                                          (last-edited-at unquote
+                                                          (current-time)))
+                                        #:where `((identifier unquote
+                                                              (params rc
+                                                                      "uuid"))))
                             #:name "edit-song")
               (redirect-to rc
                            (string->uri (format #f
@@ -130,31 +142,37 @@
             ;; of the super grant, may rewrite it.
             (require-row-owner #:rc rc
                                #:table 'song_contents
-                               #:where `((identifier
-                                          . ,(params rc "version-uuid"))))
+                               #:where `((identifier unquote
+                                                     (params rc "version-uuid"))))
             (sql-execute! rc
                           (sql-update 'song_contents
-                                      `((instrument-type
-                                         . ,(html-escape (assoc-ref body
-                                                                    "instrument-type")))
-                                        (version-name
-                                         . ,(html-escape (assoc-ref body
+                                      `((instrument-type unquote
+                                                         (html-escape (assoc-ref
+                                                                       body
+                                                                       "instrument-type")))
+                                        (version-name unquote
+                                                      (html-escape (assoc-ref
+                                                                    body
                                                                     "version-name")))
-                                        (ascii-legend
-                                         . ,(html-escape (assoc-ref body
+                                        (ascii-legend unquote
+                                                      (html-escape (assoc-ref
+                                                                    body
                                                                     "ascii-legend")))
-                                        (ascii-contents
-                                         . ,(html-escape (assoc-ref body
-                                                                    "ascii-contents")))
-                                        (pdf-contents
-                                         . ,(assoc-ref body "pdf-contents"))
-                                        (guitarpro-contents
-                                         . ,(assoc-ref body
-                                                       "guitarpro-contents"))
-                                        (last-edited-at . ,(current-time)))
-                                      #:where `((identifier
-                                                 . ,(params rc
-                                                           "version-uuid"))))
+                                        (ascii-contents unquote
+                                                        (html-escape (assoc-ref
+                                                                      body
+                                                                      "ascii-contents")))
+                                        (pdf-contents unquote
+                                                      (assoc-ref body
+                                                       "pdf-contents"))
+                                        (guitarpro-contents unquote
+                                                            (assoc-ref body
+                                                             "guitarpro-contents"))
+                                        (last-edited-at unquote
+                                                        (current-time)))
+                                      #:where `((identifier unquote
+                                                            (params rc
+                                                             "version-uuid"))))
                           #:name "edit-song-contents")
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a"
@@ -179,23 +197,27 @@
             ;; of the super grant -- is who may rewrite it.
             (require-row-owner #:rc rc
                                #:table 'song_artworks
-                               #:where `((identifier
-                                          . ,(params rc "artwork-uuid"))))
+                               #:where `((identifier unquote
+                                                     (params rc "artwork-uuid"))))
             (sql-execute! rc
                           (sql-update 'song_artworks
-                                      `((content-url
-                                         . ,(uri-encode (assoc-ref body
+                                      `((content-url unquote
+                                                     (uri-encode (assoc-ref
+                                                                  body
                                                                   "content-url")))
-                                        (content-caption
-                                         . ,(html-escape (assoc-ref body
-                                                                    "content-caption")))
-                                        (order-value
-                                         . ,(html-escape (assoc-ref body
-                                                                    "order-value")))
-                                        (last-edited-at . ,(current-time)))
-                                      #:where `((identifier
-                                                 . ,(params rc
-                                                           "artwork-uuid"))))
+                                        (content-caption unquote
+                                                         (html-escape (assoc-ref
+                                                                       body
+                                                                       "content-caption")))
+                                        (order-value unquote
+                                                     (html-escape (assoc-ref
+                                                                   body
+                                                                   "order-value")))
+                                        (last-edited-at unquote
+                                                        (current-time)))
+                                      #:where `((identifier unquote
+                                                            (params rc
+                                                             "artwork-uuid"))))
                           #:name "edit-song-artwork")
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a/edit"
@@ -570,13 +592,13 @@
             ;; holder of the super grant, may take it away.
             (require-row-owner #:rc rc
                                #:table 'song_contents
-                               #:where `((identifier
-                                          . ,(params rc "version-uuid"))))
+                               #:where `((identifier unquote
+                                                     (params rc "version-uuid"))))
             (sql-execute! rc
                           (sql-delete 'song_contents
-                                      #:where `((identifier
-                                                 . ,(params rc
-                                                           "version-uuid"))))
+                                      #:where `((identifier unquote
+                                                            (params rc
+                                                             "version-uuid"))))
                           #:name "delete-song-content")
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a"
@@ -599,16 +621,19 @@
             ;; holder of the super grant, may take it away.
             (require-row-owner #:rc rc
                                #:table 'song_artists
-                               #:where `((artist-identifier
-                                          . ,(params rc "artist-uuid"))
-                                         (song-identifier
-                                          . ,(params rc "uuid"))))
+                               #:where `((artist-identifier unquote
+                                                            (params rc
+                                                             "artist-uuid"))
+                                         (song-identifier unquote
+                                                          (params rc "uuid"))))
             (sql-execute! rc
                           (sql-delete 'song_artists
-                                      #:where `((artist-identifier
-                                                 . ,(params rc "artist-uuid"))
-                                                (song-identifier
-                                                 . ,(params rc "uuid"))))
+                                      #:where `((artist-identifier unquote
+                                                                   (params rc
+                                                                    "artist-uuid"))
+                                                (song-identifier unquote
+                                                                 (params rc
+                                                                  "uuid"))))
                           #:name "delete-song-artist")
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a/edit"
@@ -631,16 +656,19 @@
             ;; holder of the super grant, may take it away.
             (require-row-owner #:rc rc
                                #:table 'song_genres
-                               #:where `((genre-identifier
-                                          . ,(params rc "genre-uuid"))
-                                         (song-identifier
-                                          . ,(params rc "uuid"))))
+                               #:where `((genre-identifier unquote
+                                                           (params rc
+                                                            "genre-uuid"))
+                                         (song-identifier unquote
+                                                          (params rc "uuid"))))
             (sql-execute! rc
                           (sql-delete 'song_genres
-                                      #:where `((genre-identifier
-                                                 . ,(params rc "genre-uuid"))
-                                                (song-identifier
-                                                 . ,(params rc "uuid"))))
+                                      #:where `((genre-identifier unquote
+                                                                  (params rc
+                                                                   "genre-uuid"))
+                                                (song-identifier unquote
+                                                                 (params rc
+                                                                  "uuid"))))
                           #:name "delete-song-genre")
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a/edit"
@@ -664,26 +692,31 @@
             ;; or a holder of the super grant, may rewrite them.
             (require-row-owner #:rc rc
                                #:table 'song_external_sources
-                               #:where `((identifier
-                                          . ,(params rc "sourcesuuid"))))
+                               #:where `((identifier unquote
+                                                     (params rc "sourcesuuid"))))
             (sql-execute! rc
                           (sql-update 'song_external_sources
-                                      `((wikipedia-url
-                                         . ,(uri-encode (assoc-ref body
-                                                                  "wikipedia-url")))
-                                        (spotify-url
-                                         . ,(uri-encode (assoc-ref body
+                                      `((wikipedia-url unquote
+                                                       (uri-encode (assoc-ref
+                                                                    body
+                                                                    "wikipedia-url")))
+                                        (spotify-url unquote
+                                                     (uri-encode (assoc-ref
+                                                                  body
                                                                   "spotify-url")))
-                                        (youtube-url
-                                         . ,(uri-encode (assoc-ref body
+                                        (youtube-url unquote
+                                                     (uri-encode (assoc-ref
+                                                                  body
                                                                   "youtube-url")))
-                                        (soundcloud-url
-                                         . ,(uri-encode (assoc-ref body
-                                                                  "soundcloud-url")))
-                                        (last-edited-at . ,(current-time)))
-                                      #:where `((identifier
-                                                 . ,(params rc
-                                                           "sourcesuuid"))))
+                                        (soundcloud-url unquote
+                                                        (uri-encode (assoc-ref
+                                                                     body
+                                                                     "soundcloud-url")))
+                                        (last-edited-at unquote
+                                                        (current-time)))
+                                      #:where `((identifier unquote
+                                                            (params rc
+                                                             "sourcesuuid"))))
                           #:name "edit-song-external-sources")
             (redirect-to rc
                          (string->uri (format #f

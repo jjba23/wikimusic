@@ -38,7 +38,8 @@
   #:use-module (wikimusic env)
   #:export (spec))
 
-(define password "correct horse battery staple")
+(define password
+  "correct horse battery staple")
 
 (define (owned-permissions permissions)
   "Return the permission list a session sealed for a reader holding
@@ -71,14 +72,17 @@ shape `generate-token' reads."
 (define password-suite
   (suite "Passwords on file"
          (test "a hash names the scheme it was derived with"
-               (let ((argon (hash-password password #:algorithm 'argon2id))
-                     (pbkdf2 (hash-password password #:algorithm 'pbkdf2-sha256)))
+               (let ((argon (hash-password password
+                                           #:algorithm 'argon2id))
+                     (pbkdf2 (hash-password password
+                                            #:algorithm 'pbkdf2-sha256)))
                  (assert-equal #:name "an argon2id hash says so"
                                #:expect "argon2id"
                                #:got (car (fields argon)))
-                 (assert-equal #:name "and carries iterations, memory, lanes, salt and key"
-                               #:expect 6
-                               #:got (length (fields argon)))
+                 (assert-equal #:name
+                  "and carries iterations, memory, lanes, salt and key"
+                  #:expect 6
+                  #:got (length (fields argon)))
                  (assert-equal #:name "a pbkdf2 hash says so"
                                #:expect "pbkdf2-sha256"
                                #:got (car (fields pbkdf2)))
@@ -91,8 +95,10 @@ shape `generate-token' reads."
                ;; PBKDF2 fallback asks for 210000 iterations, which is where
                ;; wikimusic set it; the point of the assertion is that the
                ;; cost is recorded in the hash and cannot be lowered quietly.
-               (let ((argon (fields (hash-password password #:algorithm 'argon2id)))
-                     (pbkdf2 (fields (hash-password password #:algorithm 'pbkdf2-sha256))))
+               (let ((argon (fields (hash-password password
+                                                   #:algorithm 'argon2id)))
+                     (pbkdf2 (fields (hash-password password
+                                                    #:algorithm 'pbkdf2-sha256))))
                  (assert-true (>= (string->number (cadr argon)) 2)
                               #:name "argon2id does at least two passes")
                  (assert-true (>= (string->number (caddr argon)) 19456)
@@ -113,8 +119,7 @@ shape `generate-token' reads."
                             #:name "the preferred scheme round trips")
                (assert-true (verify-password password
                                              #:hash (hash-password password
-                                                                   #:algorithm
-                                                                   'pbkdf2-sha256)
+                                                                   #:algorithm 'pbkdf2-sha256)
                                              #:salt "")
                             #:name "and so does the fallback scheme")
                (assert-true (verify-password password
@@ -128,20 +133,26 @@ shape `generate-token' reads."
                                                 #:salt "")
                                #:name "a password missing its last character")
                  (assert-false (verify-password "Correct horse battery staple"
+                                #:hash hash
+                                #:salt "")
+                               #:name "a password with the wrong case")
+                 (assert-false (verify-password ""
                                                 #:hash hash
                                                 #:salt "")
-                               #:name "a password with the wrong case")
-                 (assert-false (verify-password "" #:hash hash #:salt "")
                                #:name "the empty password")))
          (test "a hash that cannot be read is not a match"
-               (assert-false (verify-password password #:hash #f #:salt "")
+               (assert-false (verify-password password
+                                              #:hash #f
+                                              #:salt "")
                              #:name "no hash at all")
                (assert-false (verify-password password
-                                              #:hash "argon2id$3$65536$1$nothex$aa"
+                                              #:hash
+                                              "argon2id$3$65536$1$nothex$aa"
                                               #:salt "")
                              #:name "an argon2id salt that is not hexadecimal")
                (assert-false (verify-password password
-                                              #:hash "argon2id$three$65536$1$ab$cd"
+                                              #:hash
+                                              "argon2id$three$65536$1$ab$cd"
                                               #:salt "")
                              #:name "an argon2id cost that is not a number")
                (assert-false (verify-password password
@@ -156,7 +167,8 @@ shape `generate-token' reads."
                ;; The old scheme was SHA-256 over the password followed by the
                ;; salt kept in its own column; nobody is locked out by the
                ;; change, and the sign-in route re-hashes it afterwards.
-               (let ((legacy (string->sha-256 (string-append "hunter2" "pepper"))))
+               (let ((legacy (string->sha-256 (string-append "hunter2"
+                                                             "pepper"))))
                  (assert-true (verify-password "hunter2"
                                                #:hash legacy
                                                #:salt "pepper")
@@ -166,7 +178,8 @@ shape `generate-token' reads."
                                                 #:salt "pepper")
                                #:name "the wrong one still does not")
                  (assert-true (password-hash-legacy? legacy)
-                              #:name "and the row is recognisable as an old one")
+                              #:name
+                              "and the row is recognisable as an old one")
                  (assert-false (password-hash-legacy? (hash-password "hunter2"))
                                #:name "while a derived hash is not")))
          (test "a row with no usable hash is refused rather than crashed on"
@@ -192,12 +205,14 @@ shape `generate-token' reads."
                ;; `eval-string' would have run it: this is the difference
                ;; between a column that decides who may write and a column
                ;; that decides what the server does.
-               (assert-equal #:name "a form naming a procedure comes back as data"
+               (assert-equal #:name
+                             "a form naming a procedure comes back as data"
                              #:expect '(system "rm -rf /")
                              #:got (permissions-from-column
                                     "(system \"rm -rf /\")"))
                (assert-equal #:name "and so does a lambda"
-                             #:expect '(lambda (x) x)
+                             #:expect '(lambda (x)
+                                         x)
                              #:got (permissions-from-column "(lambda (x) x)")))
          (test "a row written before the change still yields its permissions"
                (assert-equal #:name "a quasiquoted list is unwrapped"
@@ -232,33 +247,32 @@ shape `generate-token' reads."
                (let ((payload (authorized-payload #:token (sealed-token))))
                  (assert-equal #:name "the owner's identifier comes back"
                                #:expect "8b3f6a1e-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
-                               #:got (assoc-ref payload 'owner-id))
+                               #:got (assoc-ref payload
+                                                'owner-id))
                  (assert-equal #:name "and the permissions it was sealed with"
-                               #:expect (owned-permissions
-                                         '(wikimusic:song-create))
-                               #:got (assoc-ref payload 'owner-permissions))
-                 (assert-true (number? (assoc-ref payload 'token-expires-at))
+                               #:expect (owned-permissions '(wikimusic:song-create))
+                               #:got (assoc-ref payload
+                                                'owner-permissions))
+                 (assert-true (number? (assoc-ref payload
+                                                  'token-expires-at))
                               #:name "the payload carries its own expiry")))
          (test "a route's permission has to be one the session holds"
                (let ((token (sealed-token #:permissions '(wikimusic:song-create
                                                           wikimusic:song-edit))))
-                 (assert-true (and (authorized-payload
-                                    #:token token
-                                    #:needed '(wikimusic:song-create))
+                 (assert-true (and (authorized-payload #:token token
+                                                       #:needed '(wikimusic:song-create))
                                    #t)
                               #:name "the permission it holds is granted")
-                 (assert-true (and (authorized-payload
-                                    #:token token
-                                    #:needed '(wikimusic:song-create
-                                               wikimusic:song-edit))
+                 (assert-true (and (authorized-payload #:token token
+                                                       #:needed '(wikimusic:song-create
+                                                                  wikimusic:song-edit))
                                    #t)
                               #:name "and so is a set it holds in full")
-                 (assert-false (authorized-payload
-                                #:token token
-                                #:needed '(wikimusic:user-delete))
+                 (assert-false (authorized-payload #:token token
+                                                   #:needed '(wikimusic:user-delete))
                                #:name "one it does not hold is refused")
                  (assert-true (and (authorized-payload #:token token) #t)
-                              #:name "with no permission asked for, a session is enough")))
+                  #:name "with no permission asked for, a session is enough")))
          (test "every way of failing is the same no"
                (assert-false (authorized-payload)
                              #:name "no token at all")
@@ -268,32 +282,31 @@ shape `generate-token' reads."
                              #:name "an empty cookie")
                (assert-false (authorized-payload #:token "not-a-token")
                              #:name "a cookie that is not even an envelope")
-               (assert-false (authorized-payload
-                              #:token (number->string (current-time)))
+               (assert-false (authorized-payload #:token (number->string (current-time)))
                              #:name "a cookie of some other shape"))
          (test "a token that has been altered does not open"
                (let ((token (sealed-token)))
-                 (assert-false (authorized-payload
-                                #:token (substring token 0
-                                                   (- (string-length token) 8)))
+                 (assert-false (authorized-payload #:token (substring token 0
+                                                                      (- (string-length
+                                                                          token)
+                                                                         8)))
                                #:name "a truncated token")
-                 (assert-false (authorized-payload
-                                #:token (string-append token "x"))
+                 (assert-false (authorized-payload #:token (string-append
+                                                            token "x"))
                                #:name "a token with something appended")))
          (test "an expired session is no session"
-               (assert-false (authorized-payload
-                              #:token (sealed-token #:validity -10))
+               (assert-false (authorized-payload #:token (sealed-token
+                                                                       #:validity
+                                                                       -10))
                              #:name "a validity that is already behind it"))
          (test "a token sealed under another key is not ours"
-               (assert-false (authorized-payload
-                              #:token (sealed-token
-                                       #:encryption-key
-                                       "00000000-0000-0000-0000-000000000000"))
+               (assert-false (authorized-payload #:token (sealed-token
+                                                          #:encryption-key
+                                                          "00000000-0000-0000-0000-000000000000"))
                              #:name "a token sealed with a key we do not hold")
-               (assert-false (authorized-payload
-                              #:token (sealed-token
-                                       #:signing-key
-                                       "00000000-0000-0000-0000-000000000000"))
+               (assert-false (authorized-payload #:token (sealed-token
+                                                          #:signing-key
+                                                          "00000000-0000-0000-0000-000000000000"))
                              #:name "nor one signed with another"))))
 
 (define (spec)

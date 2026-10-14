@@ -61,51 +61,62 @@
 ;; Every section of the page stands in the same column, so the page reads as
 ;; one document rather than as a pile of panels of different widths.
 (define front-page-column-classes
-  '(w-full max-w-256 mx-auto flex flex-col gap-4 px-4 py-2))
+  '(w-full max-w-256
+           mx-auto
+           flex
+           flex-col
+           gap-4
+           px-4
+           py-2))
 
 ;; The frame the panels are cut from: the frosted pane the about page uses, so
 ;; that a visitor who goes on to read about the project is still on the same
 ;; site.
 (define front-page-panel-classes
-  '(hg-frost
-    bg-stone-100/75
-    dark:bg-onyx-900/75
-    rounded-2xl
-    shadow-md
-    border-2
-    border-persia-pink-500/25
-    dark:border-persia-pink-900/10))
+  '(hg-frost bg-stone-100/75
+             dark:bg-onyx-900/75
+             rounded-2xl
+             shadow-md
+             border-2
+             border-persia-pink-500/25
+             dark:border-persia-pink-900/10))
 
 (define* (welcome-page G_
-                       #:key is-logged-in selected-locale
+                       #:key is-logged-in
+                       selected-locale
                        song-fragment
                        artist-fragment
                        genres
                        counts)
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:title "WikiMusic: guitar tabs, chords and lyrics for every song"
+                 #:title
+                 "WikiMusic: guitar tabs, chords and lyrics for every song"
                  #:description front-page-description
                  #:path "/"
                  #:json-ld (list (append (list (schema-name "WebSite")
                                                (cons "name" "WikiMusic")
                                                (cons "alternateName"
-                                                     "the free music knowledge encyclopaedia")
+                                                "the free music knowledge encyclopaedia")
                                                (cons "description"
                                                      front-page-description))
                                          (if (absolute-url "/")
-                                             (list (cons "url" (absolute-url "/")))
+                                             (list (cons "url"
+                                                         (absolute-url "/")))
                                              '())))
-                 #:body `(div (@ (class ,(mk-class '(w-full flex flex-col
-                                                     items-center gap-6
-                                                     py-4 pb-8))))
-                              ,(front-page-opening G_)
+                 #:body `(div (@ (class ,(mk-class '(w-full flex
+                                                            flex-col
+                                                            items-center
+                                                            gap-6
+                                                            py-4
+                                                            pb-8))))
+                              ,(front-page-opening G_ selected-locale)
                               ,(front-page-promises G_)
                               ,@(front-page-holding G_ counts genres)
                               ,(front-page-newest G_ song-fragment)
                               ,@(front-page-artists G_ artist-fragment)
                               ,(front-page-project G_)
-                              ,(front-page-closing G_ selected-locale))))
+                              ,(front-page-closing G_))))
 
 ;;; ====== The first screen ======
 
@@ -122,34 +133,53 @@
 ;; visitors came for, and the door for the musician who came to write something
 ;; down.  None of it is instruction: what a reader can do here is spelled out
 ;; in the list below, and a landing page's buttons are for starting.
-(define (front-page-opening G_)
-  `((section (@ (class ,(mk-class '(w-full max-w-196 mx-auto
-                                    flex flex-col items-center gap-4
-                                    px-4 py-6 text-center))))
-      (h1 (@ (class ,(mk-class '(font-sans font-bold
-                                 text-4xl sm:text-5xl
-                                 hg-gradient-text hg-leading-display))))
-          ,(project-tagline G_))
-      (p (@ (class ,(mk-class '(max-w-prose font-sans text-lg font-light
-                                 text-onyx-500 dark:text-stone-300))))
-         ,(project-summary G_))
-      ,(front-page-search G_)
-      (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-3
-                                   items-center justify-center pt-2))))
-           ,@(front-page-action (G_ "browse the songs") "/songs"
-                                '(bg-persia-pink-500/75
-                                  hover:bg-persia-pink-500
-                                  text-stone-100
-                                  border-persia-pink-500/25))
-           ,@(front-page-action (G_ "add a song") "/songs/new"
-                                '(bg-stone-100/75
-                                  dark:bg-onyx-900/75
-                                  hover:bg-stone-300/75
-                                  dark:hover:bg-onyx-700/75
-                                  text-onyx-500
-                                  dark:text-stone-300
-                                  border-stone-500/25
-                                  dark:border-onyx-100/25))))))
+(define (front-page-opening G_ selected-locale)
+  `((section (@ (class ,(mk-class '(w-full max-w-196
+                                           mx-auto
+                                           flex
+                                           flex-col
+                                           items-center
+                                           gap-4
+                                           px-4
+                                           py-6
+                                           text-center))))
+             (h1 (@ (class ,(mk-class '(font-sans font-bold text-4xl
+                                                  sm:text-5xl hg-gradient-text
+                                                  hg-leading-display))))
+                 ,(project-tagline G_))
+             (div (@ (class ,(mk-class '(flex flex-row
+                                              flex-wrap
+                                              gap-5
+                                              px-3
+                                              items-center
+                                              justify-center
+                                              py-2))))
+                  ,(locale-choose-form G_
+                                       #:selected-locale selected-locale))
+             (p (@ (class ,(mk-class '(max-w-prose font-sans text-lg
+                                                   font-light text-onyx-500
+                                                   dark:text-stone-300))))
+                ,(project-summary G_))
+             ,(front-page-search G_)
+             (div (@ (class ,(mk-class '(flex flex-row
+                                              flex-wrap
+                                              gap-3
+                                              items-center
+                                              justify-center
+                                              pt-2))))
+                  ,@(front-page-action (G_ "browse the songs") "/songs"
+                                       '(bg-persia-pink-500/75
+                                         hover:bg-persia-pink-500
+                                         text-stone-100
+                                         border-persia-pink-500/25))
+                  ,@(front-page-action (G_ "add a song") "/songs/new"
+                                       '(bg-stone-100/75 dark:bg-onyx-900/75
+                                         hover:bg-stone-300/75
+                                         dark:hover:bg-onyx-700/75
+                                         text-onyx-500
+                                         dark:text-stone-300
+                                         border-stone-500/25
+                                         dark:border-onyx-100/25))))))
 
 ;; One of the two doors into the place: a link wearing the shape of a button,
 ;; because a landing page's first two links are an instruction and should look
@@ -157,13 +187,18 @@
 (define* (front-page-action label href classes)
   "Return LABEL as a link to HREF, dressed as a button by CLASSES."
   `((a (@ (href ,href)
-          (class ,(mk-class (append
-                             '(inline-flex items-center no-underline
-                               rounded-xl px-6 py-3
-                               font-sans font-bold text-md
-                               border-2 shadow-md
-                               transition-colors duration-200)
-                             classes))))
+          (class ,(mk-class (append '(inline-flex items-center
+                                                  no-underline
+                                                  rounded-xl
+                                                  px-6
+                                                  py-3
+                                                  font-sans
+                                                  font-bold
+                                                  text-md
+                                                  border-2
+                                                  shadow-md
+                                                  transition-colors
+                                                  duration-200) classes))))
        ,label)))
 
 ;; The way in for a reader who is not browsing: the list pages' own search
@@ -191,32 +226,36 @@
 ;; introduces them is the one the about page introduces them with, colon and
 ;; all: the list is the same list.
 (define front-page-promise-icons
-  '(music-notes-simple
-    tag
-    pencil-simple
-    graduation-cap))
+  '(music-notes-simple tag pencil-simple graduation-cap))
 
 (define (front-page-promises G_)
   (let ((promises (project-promises G_)))
     `((section (@ (class ,(mk-class front-page-column-classes)))
-        (p (@ (class ,(mk-class '(text-center font-sans text-lg font-light
-                                   text-onyx-500 dark:text-stone-300))))
-           ,(project-lead-in G_))
-        (ul (@ (class ,(mk-class '(list-none p-0 grid grid-cols-1
-                                    sm:grid-cols-2 lg:grid-cols-4 gap-4))))
-            ,@(map (lambda (promise glyph)
-                     `(li (@ (class ,(mk-class (append
-                                                front-page-panel-classes
-                                                '(flex flex-col gap-2 p-5)))))
-                          ,(icon #:type glyph
-                                 #:icon-css '(text-3xl
-                                              text-persia-pink-500
-                                              dark:text-persia-pink-300))
-                          (span (@ (class ,(mk-class '(font-sans text-md
-                                                        text-onyx-500
-                                                        dark:text-stone-300))))
-                                ,promise)))
-                   promises front-page-promise-icons))))))
+               (p (@ (class ,(mk-class '(text-center font-sans text-lg
+                                                     font-light text-onyx-500
+                                                     dark:text-stone-300))))
+                  ,(project-lead-in G_))
+               (ul (@ (class ,(mk-class '(list-none p-0
+                                                    grid
+                                                    grid-cols-1
+                                                    sm:grid-cols-2
+                                                    lg:grid-cols-4
+                                                    gap-4))))
+                   ,@(map (lambda (promise glyph)
+                            `(li (@ (class ,(mk-class (append
+                                                       front-page-panel-classes
+                                                       '(flex flex-col gap-2
+                                                              p-5)))))
+                                 ,(icon #:type glyph
+                                        #:icon-css '(text-3xl
+                                                     text-persia-pink-500
+                                                     dark:text-persia-pink-300))
+                                 (span (@ (class ,(mk-class '(font-sans
+                                                              text-md
+                                                              text-onyx-500
+                                                              dark:text-stone-300))))
+                                       ,promise))) promises
+                          front-page-promise-icons))))))
 
 ;;; ====== What the place holds ======
 
@@ -229,55 +268,75 @@
 ;; the genres it has been given, ordered newest first so that the strip moves as
 ;; the place grows.
 (define (front-page-holding G_ counts genres)
-  (let* ((songs (assq-ref counts 'songs))
-         (artists (assq-ref counts 'artists))
-         (genres-count (assq-ref counts 'genres))
-         (counts-section
-          `(section (@ (class ,(mk-class front-page-column-classes)))
-                    (div (@ (class ,(mk-class (append
-                                              front-page-panel-classes
-                                              '(grid grid-cols-3 gap-4
-                                                p-6 justify-items-center)))))
-                         ,@(stat-card #:value (format #f "~a" songs)
-                                      #:label (G_ "songs"))
-                         ,@(stat-card #:value (format #f "~a" artists)
-                                      #:label (G_ "artists"))
-                         ,@(stat-card #:value (format #f "~a" genres-count)
-                                      #:label (G_ "genres")))))
-         (genres-section
-          (if (or (not (list? genres)) (null? genres))
-              #f
-              `(section (@ (class ,(mk-class front-page-column-classes)))
-                        (h2 (@ (class ,(mk-class '(text-center
-                                                   font-sans font-bold
-                                                   text-2xl
-                                                   text-onyx-500
-                                                   dark:text-stone-300))))
-                            ,(G_ "browse by genre"))
-                        (ul (@ (class ,(mk-class '(list-none p-0 flex flex-row
-                                                    flex-wrap gap-2
-                                                    items-center justify-center))))
-                            ,@(map (lambda (genre)
-                                     `(li ,@(a (assq-ref genre 'display-name)
-                                               #:href (format #f "/genres/uuid/~a"
-                                                              (assq-ref genre
-                                                                        'identifier))
-                                               #:size '(text-md)
-                                               #:weight '(font-medium)
-                                               #:color '(text-onyx-500
-                                                         dark:text-stone-300)
-                                               #:hover '(hover:text-persia-pink-900
-                                                         dark:hover:text-persia-pink-300)
-                                               #:extra-classes
-                                               '(no-underline rounded-full
-                                                 px-3 py-1
-                                                 bg-stone-300/75
-                                                 dark:bg-onyx-700/75
-                                                 hover:bg-persia-pink-500/25
-                                                 dark:hover:bg-persia-pink-500/25
-                                                 transition-colors
-                                                 duration-200))))
-                                   genres))))))
+  (let* ((songs (assq-ref counts
+                          'songs))
+         (artists (assq-ref counts
+                            'artists))
+         (genres-count (assq-ref counts
+                                 'genres))
+         (counts-section `(section (@ (class ,(mk-class
+                                               front-page-column-classes)))
+                                   (div (@ (class ,(mk-class (append
+                                                              front-page-panel-classes
+                                                              '(grid
+                                                                grid-cols-3
+                                                                gap-4 p-6
+                                                                justify-items-center)))))
+                                        ,@(stat-card #:value (format #f "~a"
+                                                                     songs)
+                                                     #:label (G_ "songs"))
+                                        ,@(stat-card #:value (format #f "~a"
+                                                                     artists)
+                                                     #:label (G_ "artists"))
+                                        ,@(stat-card #:value (format #f "~a"
+                                                              genres-count)
+                                                     #:label (G_ "genres")))))
+         (genres-section (if (or (not (list? genres))
+                                 (null? genres)) #f
+                             `(section (@ (class ,(mk-class
+                                                   front-page-column-classes)))
+                                       (h2 (@ (class ,(mk-class '(text-center
+                                                                  font-sans
+                                                                  font-bold
+                                                                  text-2xl
+                                                                  text-onyx-500
+                                                                  dark:text-stone-300))))
+                                           ,(G_ "browse by genre"))
+                                       (ul (@ (class ,(mk-class '(list-none
+                                                                  p-0
+                                                                  flex
+                                                                  flex-row
+                                                                  flex-wrap
+                                                                  gap-2
+                                                                  items-center
+                                                                  justify-center))))
+                                           ,@(map (lambda (genre)
+                                                    `(li ,@(a (assq-ref genre
+                                                                        'display-name)
+                                                              #:href (format
+                                                                             #f
+                                                                             "/genres/uuid/~a"
+                                                                             (assq-ref
+                                                                              genre
+                                                                              'identifier))
+                                                              #:size '(text-md)
+                                                              #:weight '(font-medium)
+                                                              #:color '(text-onyx-500
+                                                                        dark:text-stone-300)
+                                                              #:hover '(hover:text-persia-pink-900
+                                                                        dark:hover:text-persia-pink-300)
+                                                              #:extra-classes '
+                                                              (no-underline
+                                                               rounded-full
+                                                               px-3
+                                                               py-1
+                                                               bg-stone-300/75
+                                                               dark:bg-onyx-700/75
+                                                               hover:bg-persia-pink-500/25
+                                                               dark:hover:bg-persia-pink-500/25
+                                                               transition-colors
+                                                               duration-200))))
+                                                  genres))))))
     (if genres-section
         (list counts-section genres-section)
         (list counts-section))))
@@ -292,14 +351,16 @@
 ;; link.
 (define (front-page-newest G_ song-fragment)
   `((section (@ (class ,(mk-class front-page-column-classes)))
-      (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                   items-baseline justify-between))))
-           (h2 (@ (class ,(mk-class '(font-sans font-bold text-2xl
-                                      text-onyx-500 dark:text-stone-300))))
-               ,(G_ "newest songs"))
-           ,@(a (G_ "see all the songs") #:href "/songs"
-                #:size '(text-md)))
-      ,song-fragment)))
+             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                              items-baseline justify-between))))
+                  (h2 (@ (class ,(mk-class '(font-sans font-bold text-2xl
+                                                       text-onyx-500
+                                                       dark:text-stone-300))))
+                      ,(G_ "newest songs"))
+                  ,@(a (G_ "see all the songs")
+                       #:href "/songs"
+                       #:size '(text-md)))
+             ,song-fragment)))
 
 ;;; ====== The newest artists ======
 
@@ -315,18 +376,19 @@
 ;; in nothing gets no section at all, so a page rendered without a database -- by
 ;; the tests, say -- is still the whole page it was.
 (define (front-page-artists G_ artist-fragment)
-  (if (or (not artist-fragment) (null? artist-fragment))
+  (if (or (not artist-fragment)
+          (null? artist-fragment))
       '()
       (list `(section (@ (class ,(mk-class front-page-column-classes)))
-                      (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                  items-baseline
-                                                  justify-between))))
+                      (div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                       gap-2 items-baseline
+                                                       justify-between))))
                            (h2 (@ (class ,(mk-class '(font-sans font-bold
-                                                      text-2xl
-                                                      text-onyx-500
+                                                      text-2xl text-onyx-500
                                                       dark:text-stone-300))))
                                ,(G_ "newest artists"))
-                           ,@(a (G_ "see all the artists") #:href "/artists"
+                           ,@(a (G_ "see all the artists")
+                                #:href "/artists"
                                 #:size '(text-md)))
                       ,artist-fragment))))
 
@@ -343,14 +405,18 @@
 (define (front-page-project G_)
   (let ((picture (wikimusic-img))
         (ask (wikimusic-support G_)))
-    (if (null? ask)
-        picture
-        `((section (@ (class ,(mk-class '(w-full max-w-196 mx-auto
-                                          flex flex-col items-center gap-4
-                                          px-4 py-2))))
-            ,@picture
-            (div (@ (class ,(mk-class '(flex flex-col items-center))))
-                 ,@ask))))))
+    (if (null? ask) picture
+        `((section (@ (class ,(mk-class '(w-full max-w-196
+                                                 mx-auto
+                                                 flex
+                                                 flex-col
+                                                 items-center
+                                                 gap-4
+                                                 px-4
+                                                 py-2))))
+                   ,@picture
+                   (div (@ (class ,(mk-class '(flex flex-col items-center))))
+                        ,@ask))))))
 
 ;;; ====== The way out ======
 
@@ -358,32 +424,37 @@
 ;; The invitation is the project's own closing sentence -- "every note tells a
 ;; story" -- and it belongs at the end of the page that opened with the music;
 ;; the language control is furniture, and furniture goes under the line.
-(define (front-page-closing G_ selected-locale)
-  `((section (@ (class ,(mk-class '(w-full max-w-196 mx-auto
-                                    flex flex-col items-center gap-5
-                                    px-4 py-4 text-center))))
-      (p (@ (class ,(mk-class '(font-sans text-lg font-light
-                                 text-onyx-500 dark:text-stone-300))))
-         ,(project-invitation G_))
-      (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-5
-                                   px-3 items-center justify-center py-2))))
-           ,(locale-choose-form G_ #:selected-locale selected-locale)))))
+(define (front-page-closing G_)
+  `((section (@ (class ,(mk-class '(w-full max-w-196
+                                           mx-auto
+                                           flex
+                                           flex-col
+                                           items-center
+                                           gap-5
+                                           px-4
+                                           py-4
+                                           text-center))))
+             (p (@ (class ,(mk-class '(font-sans text-lg font-light
+                                                 text-onyx-500
+                                                 dark:text-stone-300))))
+                ,(project-invitation G_)))))
 
 ;; The picture of the project, kept below the music and the lines that name
 ;; it: a picture of the place is not what a visitor came for.
 (define* (wikimusic-img)
-  `((div (div (@ (class ,(mk-class '(hg-frost bg-stone-100/75 dark:bg-onyx-900/75
-                                     p-4
-                                     rounded-xl
-                                     shadow-xl
-                                     py-4
-                                     md:px-8
-                                     xl:px-12
-                                     px-6
-                                     md:px-12
-                                     xl:px-20
-                                     border-persia-pink-500/25
-                                     border-3))))
+  `((div (div (@ (class ,(mk-class '(hg-frost bg-stone-100/75
+                                              dark:bg-onyx-900/75
+                                              p-4
+                                              rounded-xl
+                                              shadow-xl
+                                              py-4
+                                              md:px-8
+                                              xl:px-12
+                                              px-6
+                                              md:px-12
+                                              xl:px-20
+                                              border-persia-pink-500/25
+                                              border-3))))
               (figure (img (@ (class ,(mk-class '(rounded-2xl h-auto max-w-64
                                                               sm:max-w-96)))
                               (loading lazy)

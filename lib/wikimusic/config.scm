@@ -40,18 +40,17 @@
   #:use-module (ice-9 format)
   #:use-module (ice-9 string-fun)
   #:use-module (srfi srfi-1)
-  #:export (config-value
-            source-repository-url
-            manual-url
-            licence-url
-            copyright-holder
-            donate-url
-            donation-shown?
-            social-image-url
-            assets-url
-            asset-address
-            mail-sender-name
-            mail-sender-address))
+  #:export (config-value source-repository-url
+                         manual-url
+                         licence-url
+                         copyright-holder
+                         donate-url
+                         donation-shown?
+                         social-image-url
+                         assets-url
+                         asset-address
+                         mail-sender-name
+                         mail-sender-address))
 
 ;;; ====== Reading the deployment's own module ======
 
@@ -59,7 +58,8 @@
 ;; no deployment can write down, so that a variable deliberately set to `#f' --
 ;; which is how a switch is turned off -- is told apart from one that is not
 ;; there at all.
-(define unbound (list 'unbound))
+(define unbound
+  (list 'unbound))
 
 (define (deployment-binding name)
   "Return what this deployment bound NAME to, or `unbound' when it bound nothing.
@@ -74,10 +74,11 @@ itself."
          (lambda ()
            (let ((variable (module-variable (resolve-module '(wikimusic env))
                                             name)))
-             (if (and variable (variable-bound? variable))
-                 (variable-ref variable)
-                 unbound)))
-         (lambda (key . args) unbound)))
+             (if (and variable
+                      (variable-bound? variable))
+                 (variable-ref variable) unbound)))
+         (lambda (key . args)
+           unbound)))
 
 (define (deployment-value name)
   "Return what this deployment set NAME to as text, or #f.
@@ -90,7 +91,8 @@ operator commented out cannot leave the instance with nothing to say."
          (let ((trimmed (string-trim-both value)))
            (and (not (string-null? trimmed)) trimmed)))))
 
-(define* (config-value name #:key default)
+(define* (config-value name
+                       #:key default)
   "Return this deployment's NAME, or DEFAULT when it sets none.
 
 DEFAULT is what the upstream project uses, so a caller never has to test the
@@ -98,7 +100,8 @@ result: what comes back is either what the operator wrote down or the value the
 project ships with."
   (or (deployment-value name) default))
 
-(define* (config-switch name #:key (default #t))
+(define* (config-switch name
+                        #:key (default #t))
   "Return whether this deployment's NAME says yes.
 
 NAME is a switch rather than a value, so what is read is not text: `#f' is a
@@ -112,12 +115,13 @@ all: a blank is read as the absent line it looks like, which is the reading a
 deployment might leave empty."
   (let ((value (deployment-binding name)))
     (cond
-      ((eq? value unbound) default)
+      ((eq? value unbound)
+       default)
       ((string? value)
        (let ((word (string-trim-both value)))
-         (if (string-null? word)
-             default
-             (not (any (lambda (no) (string-ci=? no word))
+         (if (string-null? word) default
+             (not (any (lambda (no)
+                         (string-ci=? no word))
                        '("false" "no" "off" "0"))))))
       (else (and value #t)))))
 
@@ -146,7 +150,8 @@ else's README."
 
 (define (copyright-holder)
   "Return who the instance's copyright line names."
-  (config-value 'copyright-holder #:default "Josep Bigorra"))
+  (config-value 'copyright-holder
+                #:default "Josep Bigorra"))
 
 ;;; ====== What a reader can do about it ======
 
@@ -184,7 +189,8 @@ money pays for.  Shown unless it says otherwise."
   "Return the picture a page is previewed and introduced with.
 
 An absolute address, or a path on this instance, which a page turns into one."
-  (config-value 'social-image-url #:default "/img/wikimusic.jpg"))
+  (config-value 'social-image-url
+                #:default "/img/wikimusic.jpg"))
 
 ;;; ====== Where the interface's own assets are read from ======
 
@@ -205,7 +211,8 @@ mirror -- names the address they hang off, without a trailing slash:
 @example
 (define-public assets-url \"https://assets.example.org/wikimusic\")
 @end example"
-  (config-value 'assets-url #:default ""))
+  (config-value 'assets-url
+                #:default ""))
 
 (define (asset-address path)
   "Return PATH as the address a page reads one of the interface's assets at.
@@ -226,7 +233,8 @@ a file."
 
 (define (mail-sender-name)
   "Return the name a reader sees on the mail this instance sends."
-  (config-value 'mail-sender-name #:default "No Reply - Wikimusic"))
+  (config-value 'mail-sender-name
+                #:default "No Reply - Wikimusic"))
 
 (define (mail-sender-address)
   "Return the address this instance's mail comes from."

@@ -53,8 +53,7 @@
 (get "/genres"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-genre-sort
-                       wikimusic-grid-size
+     #:cookies '(names wikimusic-genre-sort wikimusic-grid-size
                        x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
@@ -116,7 +115,8 @@
               ;; carry, so a page is a plain `offset = (page - 1) * 40'.
               (query-page (let ((p (get-from-qstr rc "page")))
                             (if (nil? p) 1
-                                (max 1 (or (string->number p) 1)))))
+                                (max 1
+                                     (or (string->number p) 1)))))
               (query-limit 40)
               (query-offset (* (- query-page 1) query-limit))
               (genres (cond
@@ -135,8 +135,7 @@
                                                        (html-escape
                                                         user-search))))
               (genre-pages (max 1
-                                (ceiling (/ genre-total
-                                            query-limit))))
+                                (ceiling (/ genre-total query-limit))))
               (genre-ids (map (lambda (s)
                                 (assq-ref s
                                           'identifier)) genres))
@@ -267,10 +266,12 @@
                                                                            (filter (lambda 
                                                                                            (sc)
                                                                                      
+                                                                                     
                                                                                      (equal?
                                                                                       (assq-ref
                                                                                        sc
                                                                                        'song-identifier)
+
                                                                                       
                                                                                       (assq-ref
                                                                                        song

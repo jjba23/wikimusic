@@ -46,14 +46,12 @@
   '((identifier . "genre-1")))
 
 (define related
-  '((artist-identifier . "artist-1")
-    (genre-identifier . "genre-1")
+  '((artist-identifier . "artist-1") (genre-identifier . "genre-1")
     (song-identifier . "song-1")
     (display-name . "the one that matches")))
 
 (define unrelated
-  '((artist-identifier . "artist-2")
-    (genre-identifier . "genre-2")
+  '((artist-identifier . "artist-2") (genre-identifier . "genre-2")
     (song-identifier . "song-2")
     (display-name . "the one that does not")))
 
@@ -84,25 +82,23 @@
                ;; Which key of a related row is read is the whole of the rule,
                ;; and an entry's rows are exactly the rows naming it: a row
                ;; that names some *other* entry is nobody's here.
-               (assert-equal #:name "a row naming a song is not the artist's row"
+               (assert-equal #:name
+                             "a row naming a song is not the artist's row"
                              #:expect '()
                              #:got (relevant-entities 'artist
-                                                      (list '((song-identifier
-                                                               . "song-1")))
+                                                      (list '((song-identifier . "song-1")))
                                                       artist))
                (assert-equal #:name "nor is another entry's row this one's"
                              #:expect '()
                              #:got (relevant-entities 'song
-                                                      (list unrelated)
-                                                      song)))))
+                                                      (list unrelated) song)))))
 
 (define sort-suite
   (suite "What a sort control means"
          (test "every sort the pages offer maps onto its own clause"
                (assert-equal #:name "newest first"
                              #:expect '((created-at desc))
-                             #:got (entity-sort-from-query
-                                    "created-at-desc"))
+                             #:got (entity-sort-from-query "created-at-desc"))
                (assert-equal #:name "oldest first"
                              #:expect '((created-at asc))
                              #:got (entity-sort-from-query "created-at-asc"))
@@ -116,8 +112,7 @@
                                     "last-edited-at-asc"))
                (assert-equal #:name "by name, descending"
                              #:expect '((display-name desc))
-                             #:got (entity-sort-from-query
-                                    "display-name-desc"))
+                             #:got (entity-sort-from-query "display-name-desc"))
                (assert-equal #:name "by name, ascending"
                              #:expect '((display-name asc))
                              #:got (entity-sort-from-query "display-name-asc"))
@@ -142,13 +137,13 @@
                ;; statement: what a reader types is only ever looked up.
                (for-each (lambda (hostile)
                            (let ((clause (entity-sort-from-query hostile)))
-                             (assert-equal #:name (format #f "~s sorts by default"
-                                                          hostile)
+                             (assert-equal #:name (format #f
+                                                   "~s sorts by default"
+                                                   hostile)
                                            #:expect '((last-edited-at desc))
                                            #:got clause)))
                          '("views desc; DROP TABLE songs"
-                           "display-name asc --"
-                           "(drop-table)"
+                           "display-name asc --" "(drop-table)"
                            "views\") desc")))
 
          (test "the clause names a column and a direction, and nothing else"
@@ -158,7 +153,8 @@
                                #:got (symbol? (car clause)))
                  (assert-equal #:name "the direction is one of the two words"
                                #:expect #t
-                               #:got (and (memq (cadr clause) '(asc desc)) #t))
+                               #:got (and (memq (cadr clause)
+                                                '(asc desc)) #t))
                  (assert-equal #:name "and a clause is all there is to it"
                                #:expect 2
                                #:got (length clause))))))

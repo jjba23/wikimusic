@@ -76,7 +76,9 @@
   ;; kracht's builders -- an `IN (SELECT ...)' subquery would have to be
   ;; written out by hand, and kracht would no longer own the statement.
   (define (song-ids-in-relation name related-table related-column id)
-    (map (lambda (row) (assq-ref row 'song-identifier))
+    (map (lambda (row)
+           (assq-ref row
+                     'song-identifier))
          (execute-read name
                        (sql-select related-table
                                    #:columns '(song-identifier)
@@ -92,8 +94,7 @@
                                                   (song-ids-in-relation
                                                    "song-ids-by-artist-id"
                                                    'song_artists
-                                                   'artist-identifier
-                                                   id)))
+                                                   'artist-identifier id)))
                               #:order-by order-by)))
 
   (define* (get-songs-by-genre-id id
@@ -106,8 +107,7 @@
                                                   (song-ids-in-relation
                                                    "song-ids-by-genre-id"
                                                    'song_genres
-                                                   'genre-identifier
-                                                   id)))
+                                                   'genre-identifier id)))
                               #:order-by order-by)))
 
   ;; The one statement kracht's builders cannot write: a search matches the
@@ -121,19 +121,19 @@
                          (offset 0))
     (let ((search (format #f "%~a%" s)))
       (execute-read "search-songs"
-                    (sql-parameterize
-                     (format #f
-                             "SELECT ~a FROM songs WHERE (display_name LIKE ? OR description LIKE ?) ORDER BY ~a LIMIT ? OFFSET ?"
-                             (symbols->sql-columns-list columns)
-                             (sql-order-by-sql order-by))
-                     (list search search limit offset)))))
+                    (sql-parameterize (format #f
+                                       "SELECT ~a FROM songs WHERE (display_name LIKE ? OR description LIKE ?) ORDER BY ~a LIMIT ? OFFSET ?"
+                                       (symbols->sql-columns-list columns)
+                                       (sql-order-by-sql order-by))
+                                      (list search search limit offset)))))
 
   ;; A count is a statement kracht's `sql-select' cannot express -- it takes
   ;; column names, and `COUNT(*)' is not a column -- so `sql-parameterize',
   ;; kracht's own escape hatch, carries it.  The `WHERE' is the same one
   ;; `search-songs' uses, so a page count and a page of hits always agree.
   (define* (count-songs #:key search)
-    (let* ((term (and search (format #f "%~a%" search)))
+    (let* ((term (and search
+                      (format #f "%~a%" search)))
            (rows (if term
                      (execute-read "count-songs"
                                    (sql-parameterize
@@ -144,20 +144,23 @@
                                     "SELECT COUNT(*) AS count FROM songs"
                                     '())))))
       (if (nil? rows) 0
-          (or (assq-ref (car rows) 'count) 0))))
+          (or (assq-ref (car rows)
+                        'count) 0))))
 
   (define* (get-song-artists-by-ids ids)
     (execute-read "get-song-artists-by-ids"
                   (sql-select 'song_artists
                               #:columns '(song-identifier artist-identifier)
-                              #:where (list (list 'song-identifier 'in ids))
+                              #:where (list (list 'song-identifier
+                                                  'in ids))
                               #:order-by '((created-at desc)))))
 
   (define* (get-song-genres-by-ids ids)
     (execute-read "get-song-genres-by-ids"
                   (sql-select 'song_genres
                               #:columns '(song-identifier genre-identifier)
-                              #:where (list (list 'song-identifier 'in ids))
+                              #:where (list (list 'song-identifier
+                                                  'in ids))
                               #:order-by '((created-at desc)))))
 
   (define (update-song-by-id id attrs)

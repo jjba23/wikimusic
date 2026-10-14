@@ -63,13 +63,22 @@
 (define content-tables
   '("artists" "genres"
     "songs"
-    "artist_artworks" "genre_artworks" "song_artworks"
-    "artist_external_sources" "genre_external_sources"
+    "artist_artworks"
+    "genre_artworks"
+    "song_artworks"
+    "artist_external_sources"
+    "genre_external_sources"
     "song_external_sources"
-    "artist_genres" "song_artists" "song_genres"
+    "artist_genres"
+    "song_artists"
+    "song_genres"
     "song_contents"
-    "artist_opinions" "genre_opinions" "song_opinions"
-    "artist_comments" "genre_comments" "song_comments"))
+    "artist_opinions"
+    "genre_opinions"
+    "song_opinions"
+    "artist_comments"
+    "genre_comments"
+    "song_comments"))
 
 (define (table-name? name)
   "Return #t when NAME is one of the tables a share may carry."
@@ -81,7 +90,8 @@
 TABLE is always one of `content-tables', never a request value, so naming it
 in the statement is naming a constant."
   (sql-rows rc
-            (sql-parameterize (format #f "SELECT * FROM ~a" table) '())
+            (sql-parameterize (format #f "SELECT * FROM ~a" table)
+                              '())
             #:name (format #f "export-~a" table)))
 
 ;;; ====== The machine's view ======
@@ -90,29 +100,31 @@ in the statement is naming a constant."
      #:mime 'json
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let ((tables (list->vector
-                      (map (lambda (table)
-                             ;; Vectors, not lists, are what the JSON writer
-                             ;; reads as arrays -- a Scheme list in a value
-                             ;; position is what it refuses.
-                             `((table . ,table)
-                               (rows . ,(list->vector
-                                         (read-table rc table)))))
-                           content-tables))))
+       (let ((tables (list->vector (map (lambda (table)
+                                          ;; Vectors, not lists, are what the JSON writer
+                                          ;; reads as arrays -- a Scheme list in a value
+                                          ;; position is what it refuses.
+                                          `((table unquote table)
+                                            (rows unquote
+                                                  (list->vector (read-table rc
+                                                                 table)))))
+                                        content-tables))))
          ;; `(:mime rc OBJ)' is returned, not wrapped in `response-emit':
          ;; it answers with two values -- the body and the content-type
          ;; header it must go with -- and `response-emit' would keep only
          ;; the first, serving the dump as text/html.  The route's
          ;; `#:mime 'json' is what serialises OBJ, so the object itself is
          ;; handed over rather than a string it would encode twice.
-         (:mime rc `((format . "wikimusic-export")
-                     (version . 1)
-                     (exported-at . ,(current-time))
-                     (tables . ,tables))))))
+         (:mime rc
+                `((format . "wikimusic-export") (version . 1)
+                  (exported-at unquote
+                               (current-time))
+                  (tables unquote tables))))))
 
 ;;; ====== The reader's view ======
 
-(define* (export-section G_ #:key heading rows)
+(define* (export-section G_
+                         #:key heading rows)
   "Return one entity's section of the rendered export: a heading and, under
 it, one paragraph per row, its name linked to its page and its description
 rendered from Org."
@@ -121,17 +133,19 @@ rendered from Org."
             (ul ,@(map (lambda (row)
                          `(li (@ (class "py-2"))
                               (a (@ (href ,(format #f "/~as/uuid/~a"
-                                                   (assq-ref row 'entity-name)
-                                                   (assq-ref row 'identifier))))
-                                 ,(assq-ref row 'display-name))
-                              ,(let ((description
-                                      (assq-ref row 'description)))
+                                                   (assq-ref row
+                                                             'entity-name)
+                                                   (assq-ref row
+                                                             'identifier))))
+                                 ,(assq-ref row
+                                            'display-name))
+                              ,(let ((description (assq-ref row
+                                                            'description)))
                                  (if (and (string? description)
                                           (not (string=? description "")))
                                      `(div ,(org2html (html-unescape
                                                        description)))
-                                     '()))))
-                       rows))))
+                                     '())))) rows))))
 
 (get "/export/html"
      #:mime 'xml
@@ -142,33 +156,44 @@ rendered from Org."
                            (map (lambda (row)
                                   (cons (cons 'entity-name entity) row))
                                 (read-table rc table)))))
-         (response-emit
-          (:mime rc
-                 (html-template G_
-                   #:title "wikimusic export"
-                   ;; The archive is a copy of every page this instance serves,
-                   ;; so it is a copy of their content under one address: it is
-                   ;; linked from the footer and followed, but the pages
-                   ;; themselves are what should answer a search.
-                   #:robots "noindex, follow"
-                   #:body
-                   `(div (@ (class "px-4 md:px-8 py-4 max-w-prose"))
-                         (h1 "wikimusic export")
-                         (p ,(format #f "~a ~a"
-                                     (G_ "exported at")
-                                     (current-time)))
-                         (p ,(G_ "This page is a self-contained copy of the knowledge this instance holds. It can be saved, archived and read without a server; the JSON export carries the same rows for a machine to read."))
-                         (a (@ (href "/export/json"))
-                            ,(G_ "Download the JSON export"))
-                         ,(export-section G_
-                                          #:heading (G_ "artists")
-                                          #:rows (with-name 'artist "artists"))
-                         ,(export-section G_
-                                          #:heading (G_ "genres")
-                                          #:rows (with-name 'genre "genres"))
-                         ,(export-section G_
-                                          #:heading (G_ "songs")
-                                          #:rows (with-name 'song "songs")))))))))
+         (response-emit (:mime rc
+                               (html-template G_
+                                              #:title "wikimusic export"
+                                              ;; The archive is a copy of every page this instance serves,
+                                              ;; so it is a copy of their content under one address: it is
+                                              ;; linked from the footer and followed, but the pages
+                                              ;; themselves are what should answer a search.
+                                              #:robots "noindex, follow"
+                                              #:body `(div (@ (class
+                                                               "px-4 md:px-8 py-4 max-w-prose"))
+                                                           (h1
+                                                            "wikimusic export")
+                                                           (p ,(format #f
+                                                                "~a ~a"
+                                                                (G_
+                                                                 "exported at")
+                                                                (current-time)))
+                                                           (p ,(G_
+                                                                "This page is a self-contained copy of the knowledge this instance holds. It can be saved, archived and read without a server; the JSON export carries the same rows for a machine to read."))
+                                                           (a (@ (href
+                                                                  "/export/json"))
+                                                              ,(G_
+                                                                "Download the JSON export"))
+                                                           ,(export-section G_
+                                                             #:heading (G_
+                                                                        "artists")
+                                                             #:rows (with-name 'artist
+                                                                     "artists"))
+                                                           ,(export-section G_
+                                                             #:heading (G_
+                                                                        "genres")
+                                                             #:rows (with-name 'genre
+                                                                     "genres"))
+                                                           ,(export-section G_
+                                                             #:heading (G_
+                                                                        "songs")
+                                                             #:rows (with-name 'song
+                                                                     "songs")))))))))
 
 ;;; ====== The door back in ======
 
@@ -181,16 +206,15 @@ the row does not carry keeps whatever the table would give it."
   (let ((attrs (filter-map (lambda (cell)
                              (let ((column (car cell))
                                    (value (cdr cell)))
-                               (and (not (eq? value 'null))
+                               (and (not (eq? value
+                                              'null))
                                     (not (vector? value))
-                                    (cons column value))))
-                           row)))
-    (if (null? attrs)
-        #f
-        (begin (sql-execute! rc
-                             (sql-insert table attrs)
-                             #:name (format #f "import-~a" table))
-               #t))))
+                                    (cons column value)))) row)))
+    (if (null? attrs) #f
+        (begin
+          (sql-execute! rc
+                        (sql-insert table attrs)
+                        #:name (format #f "import-~a" table)) #t))))
 
 (define* (import-payload rc payload)
   "Insert every row the export PAYLOAD carries, and answer with what happened.
@@ -200,30 +224,42 @@ list holding `tables', a vector of `(table . name)' and `(rows . vector)'
 entries.  A row that cannot be inserted -- a duplicate key, a foreign key
 that points nowhere on this instance -- is counted under `skipped' and left
 behind rather than stopping the share."
-  (let* ((tables (assoc-ref payload 'tables))
-         (entries (if (vector? tables) (vector->list tables) '())))
-    (let loop ((entries entries)
-               (inserted 0)
-               (skipped 0))
+  (let* ((tables (assoc-ref payload
+                            'tables))
+         (entries (if (vector? tables)
+                      (vector->list tables)
+                      '())))
+    (let loop
+      ((entries entries)
+       (inserted 0)
+       (skipped 0))
       (if (null? entries)
           (list (cons 'inserted inserted)
                 (cons 'skipped skipped))
           (let* ((entry (car entries))
-                 (name (assoc-ref entry 'table))
-                 (rows (assoc-ref entry 'rows))
-                 (rows (if (vector? rows) (vector->list rows) '())))
-            (if (or (not (string? name)) (not (table-name? name)))
+                 (name (assoc-ref entry
+                                  'table))
+                 (rows (assoc-ref entry
+                                  'rows))
+                 (rows (if (vector? rows)
+                           (vector->list rows)
+                           '())))
+            (if (or (not (string? name))
+                    (not (table-name? name)))
                 (loop (cdr entries) inserted skipped)
-                (let row-loop ((rows rows)
-                               (inserted inserted)
-                               (skipped skipped))
+                (let row-loop
+                  ((rows rows)
+                   (inserted inserted)
+                   (skipped skipped))
                   (if (null? rows)
                       (loop (cdr entries) inserted skipped)
-                      (let ((ok? (false-if-exception
-                                  (import-row! rc name (car rows)))))
+                      (let ((ok? (false-if-exception (import-row! rc name
+                                                                  (car rows)))))
                         (row-loop (cdr rows)
-                                  (if ok? (1+ inserted) inserted)
-                                  (if ok? skipped (1+ skipped))))))))))))
+                                  (if ok?
+                                      (1+ inserted) inserted)
+                                  (if ok? skipped
+                                      (1+ skipped))))))))))))
 
 (post "/import/json"
       #:mime 'json
@@ -232,17 +268,21 @@ behind rather than stopping the share."
       (lambda (rc)
         (define (do-import)
           (let* ((body (rc-body rc))
-                 (payload (false-if-exception
-                           (json-string->scm (if (bytevector? body)
-                                                 (utf8->string body)
-                                                 body))))
-                 (summary (if (and payload (assoc-ref payload 'tables))
+                 (payload (false-if-exception (json-string->scm (if (bytevector?
+                                                                     body)
+                                                                    (utf8->string
+                                                                     body)
+                                                                    body))))
+                 (summary (if (and payload
+                                   (assoc-ref payload
+                                              'tables))
                               (import-payload rc payload)
-                              (list (cons 'inserted 0) (cons 'skipped 0)))))
+                              (list (cons 'inserted 0)
+                                    (cons 'skipped 0)))))
             ;; Returned, not emitted, for the same reason the export is:
             ;; the answer is JSON and says so.
-            (:mime rc `((format . "wikimusic-import")
-                        ,@summary))))
+            (:mime rc
+                   `((format . "wikimusic-import") ,@summary))))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:modify-permissions)
                            #:rc rc

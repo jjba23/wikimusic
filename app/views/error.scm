@@ -20,11 +20,16 @@
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 format)
   #:use-module (ice-9 i18n)
-  #:use-module ((artanis artanis) #:select (http-status))
-  #:use-module ((artanis utils) #:select (sxml->xml-string))
+  #:use-module ((artanis artanis)
+                #:select (http-status))
+  #:use-module ((artanis utils)
+                #:select (sxml->xml-string))
   #:use-module (wikimusic config)
-  #:export (error-page error-page-html install-error-pages!
-                       error-headline error-detail error-note
+  #:export (error-page error-page-html
+                       install-error-pages!
+                       error-headline
+                       error-detail
+                       error-note
                        error-statuses))
 
 ;;; What a reader is told when a page cannot be served.
@@ -53,42 +58,33 @@
 ;;; the site's own voice for a door that is shut, and the red the framework
 ;;; already marks an error with for a failure on the server's side.
 (define error-notes
-  '((400
-     plugs
-     (text-onyx-300 dark:text-stone-300)
-     "that request did not make sense"
+  '((400 plugs
+     (text-onyx-300 dark:text-stone-300) "that request did not make sense"
      "the request arrived in a shape the server does not understand.  going
 back and submitting the form again is the way to retry.")
-    (401
-     lock-key
+    (401 lock-key
      (text-persia-pink-500/90 dark:text-persia-pink-300)
-     "you need to sign in first"
-     "signing in gives you access to this page.")
-    (403
-     shield-slash
+     "you need to sign in first" "signing in gives you access to this page.")
+    (403 shield-slash
      (text-persia-pink-500/90 dark:text-persia-pink-300)
      "you are not allowed to see that"
      "this entry exists, but it is not public and your account may not read
 it.")
-    (404
-     magnifying-glass
-     (text-onyx-300 dark:text-stone-300)
-     "we could not find that page"
+    (404 magnifying-glass
+     (text-onyx-300 dark:text-stone-300) "we could not find that page"
      "the address may have been mistyped, or the entry may have been moved
 or renamed since it was linked.  the pages below are a good place to pick
 the thread back up.")
     ;; A request kept so long that the server gave up on it is a refusal
     ;; artanis raises itself, and the page it answers with is empty: a
     ;; reader who waited gets nothing at all unless there is a page here.
-    (408
-     arrow-clockwise
+    (408 arrow-clockwise
      (text-onyx-300 dark:text-stone-300)
      "that request took too long to arrive"
      "the request was still on its way when the server stopped waiting for
 it, so it was left unread and nothing was changed.  sending it again
 usually settles it.")
-    (500
-     warning
+    (500 warning
      (text-redwood-700 dark:text-redwood-300)
      "something went wrong on our side"
      "the server failed while building this page.  nothing was written, and
@@ -105,10 +101,11 @@ one: it is described by its class when it has one, and as a server failure
 when it has not, because that is what a page rendered for it would mean."
   (let ((row (assv status error-notes)))
     (cond
-     (row (cdr row))
-     ((and (>= status 400) (< status 500))
-      (cdr (assv 400 error-notes)))
-     (else (cdr (assv 500 error-notes))))))
+      (row (cdr row))
+      ((and (>= status 400)
+            (< status 500))
+       (cdr (assv 400 error-notes)))
+      (else (cdr (assv 500 error-notes))))))
 
 (define (error-headline status)
   "Return the one-line headline the page for STATUS leads with, in English.
@@ -117,7 +114,8 @@ when it has not, because that is what a page rendered for it would mean."
 wording of its own is described by its class -- the page still says what
 happened, even when nothing named that code."
   (let ((row (assv status error-notes)))
-    (if row (caddr (cdr row))
+    (if row
+        (caddr (cdr row))
         (format #f "the server answered ~a" status))))
 
 (define (error-detail status)
@@ -126,7 +124,8 @@ happened, even when nothing named that code."
 The detail says what the reader can do next rather than what the server
 did wrong: a reader cannot act on the second and can act on the first."
   (let ((row (assv status error-notes)))
-    (if row (cadddr (cdr row))
+    (if row
+        (cadddr (cdr row))
         "the server could not serve this request.  the pages below are still
 there.")))
 
@@ -143,15 +142,24 @@ there.")))
 
 (define (error-links G_)
   "Return the row of links a reader can leave an error page by."
-  `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
-                                         gap-4 items-center justify-center
-                                         py-2))))
+  `((div (@ (class ,(mk-class '(flex flex-row
+                                     flex-wrap
+                                     gap-4
+                                     items-center
+                                     justify-center
+                                     py-2))))
          ,(a (G_ "the front page")
              #:href "/"
              #:size '(text-md))
-         ,(a (G_ "songs") #:href "/songs" #:size '(text-md))
-         ,(a (G_ "artists") #:href "/artists" #:size '(text-md))
-         ,(a (G_ "genres") #:href "/genres" #:size '(text-md))
+         ,(a (G_ "songs")
+             #:href "/songs"
+             #:size '(text-md))
+         ,(a (G_ "artists")
+             #:href "/artists"
+             #:size '(text-md))
+         ,(a (G_ "genres")
+             #:href "/genres"
+             #:size '(text-md))
          ;; The one link on an error page that leaves the instance: where the
          ;; code that produced this refusal is read, which is the deployment's
          ;; own address to name (see `(wikimusic config)').
@@ -159,7 +167,9 @@ there.")))
              #:href (source-repository-url)
              #:size '(text-md)))))
 
-(define* (error-page status #:key (G_ gettext) (is-logged-in #f))
+(define* (error-page status
+                     #:key (G_ gettext)
+                     (is-logged-in #f))
   "Return the SXML of the page shown for HTTP @var{status}.
 
 @var{G_} is the translation procedure to render the wording with.  It
@@ -186,29 +196,33 @@ invited to sign in again."
                    ;; stale address still leads a crawler somewhere real.
                    #:robots "noindex, follow"
                    #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class
-                                             '(w-full flex flex-col
-                                                     items-center
-                                                     justify-center
-                                                     gap-6 py-8
-                                                     px-2 sm:px-4))))
-                                 (div (@ (class ,(mk-class
-                                                  '(hg-frost
-                                                    bg-stone-100/75
-                                                    dark:bg-onyx-900/75
-                                                    rounded-2xl
-                                                    sm:rounded-3xl
-                                                    shadow-xl
-                                                    border-3
-                                                    border-persia-pink-500/25
-                                                    dark:border-persia-pink-900/10
-                                                    max-w-196
-                                                    w-full
-                                                    flex flex-col
-                                                    items-center
-                                                    text-center
-                                                    gap-4
-                                                    p-6 sm:p-8 md:p-12))))
+                   #:body `((div (@ (class ,(mk-class '(w-full flex
+                                                               flex-col
+                                                               items-center
+                                                               justify-center
+                                                               gap-6
+                                                               py-8
+                                                               px-2
+                                                               sm:px-4))))
+                                 (div (@ (class ,(mk-class '(hg-frost
+                                                             bg-stone-100/75
+                                                             dark:bg-onyx-900/75
+                                                             rounded-2xl
+                                                             sm:rounded-3xl
+                                                             shadow-xl
+                                                             border-3
+                                                             border-persia-pink-500/25
+                                                             dark:border-persia-pink-900/10
+                                                             max-w-196
+                                                             w-full
+                                                             flex
+                                                             flex-col
+                                                             items-center
+                                                             text-center
+                                                             gap-4
+                                                             p-6
+                                                             sm:p-8
+                                                             md:p-12))))
                                       ;; The code is shown beside a glyph of the
                                       ;; same tone, so which kind of refusal a
                                       ;; reader is reading is legible before a
@@ -227,20 +241,18 @@ invited to sign in again."
                                                   #:icon-css (append tone
                                                                      '(text-4xl
                                                                        sm:text-5xl)))
-                                           (span (@ (class ,(mk-class
-                                                             (append
-                                                              '(font-bold
-                                                                text-4xl
-                                                                sm:text-5xl)
-                                                              tone))))
+                                           (span (@ (class ,(mk-class (append '
+                                                                       (font-bold
+                                                                        text-4xl
+                                                                        sm:text-5xl)
+                                                                       tone))))
                                                  ,(format #f "~a" status)))
                                       ,(sub-h3 (G_ (error-headline status))
                                                #:family '(font-sans))
-                                      (p (@ (class ,(mk-class
-                                                     '(text-onyx-300
-                                                       dark:text-stone-300
-                                                       leading-6
-                                                       max-w-96))))
+                                      (p (@ (class ,(mk-class '(text-onyx-300
+                                                                dark:text-stone-300
+                                                                leading-6
+                                                                max-w-96))))
                                          ,(G_ (error-detail status)))
                                       ,(error-links G_)))))))
 
@@ -263,5 +275,6 @@ its own plain page, so registering here is what replaces that page.  The
 call belongs in ENTRY, in the section artanis reserves for work that has to
 happen before the server serves a request."
   (for-each (lambda (status)
-              (http-status status (lambda () (error-page-html status))))
-            error-statuses))
+              (http-status status
+                           (lambda ()
+                             (error-page-html status)))) error-statuses))
