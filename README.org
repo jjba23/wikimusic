@@ -99,7 +99,7 @@ maak dev
 maak test
 #+end_src
 
-"Running Wikimusic" below explains the environment file a deployment needs, the migration that creates the tables, and how to run Wikimusic as a daemon.
+"Running Wikimusic" below explains the environment file a deployment needs, the migrations that create the tables, and how to run Wikimusic as a daemon.
 
 --------
 
@@ -187,20 +187,21 @@ You will need a database to be present in the root folder of the project (alongs
 
 Wikimusic uses SQLite by default but is also compatible with PostgreSQL and MySQL.
 
-You can automate the creation of the database and the enabling of WAL mode for concurrent writes with ~maak init-db~:
+You can automate the creation of the database, the enabling of WAL mode for concurrent writes, and the applying of the schema with ~maak init-db~:
 
 #+begin_src sh
 maak init-db
 #+end_src
 
-That task creates an empty database.  The schema is the migration kept in the tree, and applying it is what gives the instance its tables:
+The schema is the migrations kept in the tree, under ~resources/migrations/sqlite~, and they are applied by [[https://codeberg.org/jjba23/mutastructura][mutastructura]], the migration tool pinned in ~manifest.scm~.  It keeps a ledger of what it has run in a ~migrations_history~ table of the database, applies only the migrations that are missing from it -- oldest first -- and records each file with a SHA256 so a change to one is noticed.
+
+To apply migrations to a database that already exists -- which is safe to run at any time, and the way to bring a deployment up to what the source in front of it expects -- run the same tool through its own task:
 
 #+begin_src sh
-guix shell -m manifest.scm -- sqlite3 wikimusic.db \
-  < resources/migrations/sqlite/2026-04-19_23:14:00_init_wikimusic_schema.sql
+maak migrate
 #+end_src
 
-Neither the server nor a task applies that migration on its own, so a fresh deployment runs the two commands once; a copy of the SQLite file, or a JSON dump loaded into a fresh database (see "Export, archival, and exchanging between instances"), are the other ways to arrive at the tables.
+Neither the server nor any other task applies migrations, and nothing reads the SQL files and hands them to ~sqlite3~ itself: ~maak init-db~ and ~maak migrate~ are the two ways in.  A copy of the SQLite file, or a JSON dump loaded into a fresh database (see "Export, archival, and exchanging between instances"), are the other ways to arrive at the tables.
 
 Upon starting a blank new wikimusic deployment you will have no users in the database, and there is no sign-up route: the first account is made from the shell, and it should hold two permissions -- =wikimusic:modify-permissions=, the super grant, and =wikimusic:user-create=, which is what the routes that make an account ask for.  The second is not covered by the first: a route asks for the permissions it names, and what the super grant overrides is ownership, not that (see "Accounts, permissions and ownership").
 

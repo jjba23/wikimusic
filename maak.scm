@@ -32,6 +32,12 @@
 (define wikimusic-db
   "wikimusic.db")
 
+;; The SQL migrations.  Mutastructura reads this directory itself and applies
+;; the files in it oldest first, as the file names sort, so this is the directory
+;; rather than a shell glob.
+(define migrations-dir
+  "resources/migrations/sqlite")
+
 ;; The main copyright holders of the project.
 (define copyright-holders
   '("Josep Bigorra"))
@@ -210,14 +216,39 @@ which is where a reader of the site is sent."
   (kill-server)
   (time-machine-manifest-shell '("art work -c conf/production.conf")))
 
+(define (migrate)
+  "Apply the SQL migrations to the database in this directory with mutastructura.
+
+Mutastructura does the applying: it keeps a ledger of what it has run in the
+`migrations_history' table of the database, runs only the migrations that are
+not in it and records each one with a SHA256 of its file, all inside a single
+transaction.  That is what makes this safe to run at any time, and it is also
+the way to bring a database made by an earlier deployment up to what the source
+in front of it expects.  Mutastructura is the only thing that applies
+migrations; no task reads the SQL files and hands them to sqlite3 itself."
+  (time-machine-manifest-shell
+   (list (format #f
+                 "mutastructura --database sqlite3 --connection ~a --migrations ~a"
+                 wikimusic-db migrations-dir))
+   #:verbose? #t))
+
 (define (init-db)
-  "Initialize a new database and enable WAL mode
-for higher concurrent writes to SQLite 3."
+  "Initialize a new database, enable WAL mode, and apply the schema.
+
+WAL mode is what gives SQLite 3 the concurrent writes the web workers want.
+The database that comes out is otherwise ready for the server: every migration
+under resources/migrations/sqlite has been applied to it, by mutastructura
+(`maak migrate').  It deletes whatever wikimusic.db is already there, which is
+why a deployment that has data runs `maak migrate' instead."
   (delete-file-recursively wikimusic-db)
   (delete-file-recursively (~ "~a-shm" wikimusic-db))
   (delete-file-recursively (~ "~a-wal" wikimusic-db))
-  (time-machine-manifest-shell (~ "sqlite3 ~a 'PRAGMA journal_mode=WAL;'"
-                                  wikimusic-db)))
+  ;; The command list, not the bare string: `time-machine-manifest-shell'
+  ;; appends what it is given to the `guix time-machine ... shell' it builds,
+  ;; so a string here would make the whole command an improper list.
+  (time-machine-manifest-shell
+   (list (~ "sqlite3 ~a 'PRAGMA journal_mode=WAL;'" wikimusic-db)))
+  (migrate))
 
 ;; ====== Maak i18n tasks ======
 
