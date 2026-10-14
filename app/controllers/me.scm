@@ -21,6 +21,7 @@
         (web uri)
         (ice-9 string-fun)
         (app models users)
+        (wikimusic config)
         (wikimusic env)
         (wikimusic auth)
         (wikimusic controller)
@@ -568,8 +569,12 @@ exists and that a mail was expected -- can say that it was not."
                                                      "~a/password/reset/token/~a"
                                                      (current-myhost)
                                                      reset-token)))
-                         (sender-name . "No Reply - Wikimusic")
-                         (sender-address . "noreply@mail.jointhefreeworld.org")
+                         ;; Who the mail comes from is the deployment's to
+                         ;; name: an instance's own domain, and its own name on
+                         ;; the envelope (see `(wikimusic config)').
+                         (sender-name unquote (mail-sender-name))
+                         (sender-address unquote
+                                         (mail-sender-address))
                          (subject . "Wikimusic - Password Reset")
                          (recipients . #(((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email"))))))))
     (send-to-pingwing #:body mail-payload)))

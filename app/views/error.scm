@@ -22,6 +22,7 @@
   #:use-module (ice-9 i18n)
   #:use-module ((artanis artanis) #:select (http-status))
   #:use-module ((artanis utils) #:select (sxml->xml-string))
+  #:use-module (wikimusic config)
   #:export (error-page error-page-html install-error-pages!
                        error-headline error-detail error-note
                        error-statuses))
@@ -151,8 +152,11 @@ there.")))
          ,(a (G_ "songs") #:href "/songs" #:size '(text-md))
          ,(a (G_ "artists") #:href "/artists" #:size '(text-md))
          ,(a (G_ "genres") #:href "/genres" #:size '(text-md))
+         ;; The one link on an error page that leaves the instance: where the
+         ;; code that produced this refusal is read, which is the deployment's
+         ;; own address to name (see `(wikimusic config)').
          ,(a "source code"
-             #:href "https://codeberg.org/jjba23/wikimusic"
+             #:href (source-repository-url)
              #:size '(text-md)))))
 
 (define* (error-page status #:key (G_ gettext) (is-logged-in #f))

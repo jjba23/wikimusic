@@ -16,7 +16,9 @@
 ;; along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (app views index)
+  #:use-module (wikimusic config)
   #:use-module (wikimusic html)
+  #:use-module (wikimusic prose)
   #:use-module (wikimusic seo)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
@@ -26,7 +28,10 @@
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (welcome-page))
+  ;; `wikimusic-support' is exported beside the page: the front page's own ask
+  ;; is the ask anywhere else a reader is told about the project, so the about
+  ;; page links the one donation control rather than growing a second one.
+  #:export (welcome-page wikimusic-support))
 
 ;;; The words the front page is found by: what wikimusic is, and the things a
 ;;; reader looks for in it -- the chords, the tabs and the lyrics of the songs
@@ -68,7 +73,11 @@
                               ;; The two lines that remain: what the place is
                               ;; called, and what it is for.  Both are already
                               ;; said elsewhere on the page, so they are said
-                              ;; once each and not expanded into a pitch.
+                              ;; once each and not expanded into a pitch.  The
+                              ;; words are the project's, read from the one
+                              ;; module that holds them (see `(wikimusic
+                              ;; prose)'), so the about page -- where the rest
+                              ;; of them are read -- cannot say something else.
                               (div (@ (class ,(mk-class '(mx-auto
                                                           max-w-196
                                                           px-6
@@ -79,10 +88,9 @@
                                                           flex
                                                           flex-col
                                                           gap-2))))
-                                   ,(sub-h3 (G_ "the free music knowledge encyclopaedia")
+                                   ,(sub-h3 (project-tagline G_)
                                             #:family '(font-sans))
-                                   (p ,(G_
-                                        "Join us in building an ever-growing library of musical knowledge — where every note tells a story.")))
+                                   (p ,(project-invitation G_)))
 
                               ;; What is left of the furniture: the control a
                               ;; reader changes language with, and the one link
@@ -126,12 +134,18 @@
               (figure (img (@ (class ,(mk-class '(rounded-2xl h-auto max-w-64
                                                               sm:max-w-96)))
                               (loading lazy)
-                              (src
-                               "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg"))))))))
+                              ;; The picture is the deployment's own asset,
+                              ;; named where every other address an instance
+                              ;; owns is named (see `(wikimusic config)').
+                              (src ,(social-image-url)))))))))
 
 ;; The one link on the front page that asks a reader for something, kept to a
-;; line: what the money pays for is the project's own business, and is said in
-;; the manual, not in front of every visitor.
+;; line: what the money pays for is the project's own business, and is said on
+;; the about page and in the manual, not in front of every visitor.
+;;
+;; It is exported because the about page offers the same control rather than a
+;; second one: one project, one ask, one address to send a reader to -- and that
+;; address is the deployment's, not this view's (see `(wikimusic config)').
 (define (wikimusic-support G_)
   `((div (@ (class ,(mk-class '(text-center))))
          (a (@ (class ,(mk-class '(font-bold text-china-violet-100
@@ -143,7 +157,7 @@
                                    no-underline
                                    hover:underline
                                    gap-3)))
-               (href "https://www.buymeacoffee.com/jjbigorra"))
+               (href ,(donate-url)))
             (span "🩷")
-            ,(G_ "donate what you can, by clicking here")
+            ,(project-support-ask G_)
             (span "🩷")))))

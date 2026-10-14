@@ -37,6 +37,7 @@
   #:use-module (hygguile abstraction)
   #:use-module (srfi srfi-19)
   #:use-module (orgwebalchemy html)
+  #:use-module (wikimusic config)
   #:use-module (wikimusic seo)
   #:use-module (kracht prelude)
   #:use-module (ice-9 textual-ports)
@@ -300,13 +301,24 @@ the menu with @code{for}, so it reaches assistive technology as well."
                                            gap-2 sm:gap-4
                                            justify-start
                                            items-center))))
+             ;; What the place is, first: a reader who has read the collection
+             ;; and wants to know who writes it is offered the one page that
+             ;; says so, without having to work out that a tagline is a page.
+             ,(a (G_ "about")
+                 #:href "/about"
+                 #:size '(text-md))
+             ;; Where the code is, where the manual is and where the licence is
+             ;; written out are the deployment's to name, not this view's: a
+             ;; fork reads its own source, and an instance that mirrors the
+             ;; project says so in its own `env.scm'.  Each falls back to the
+             ;; upstream address (see `(wikimusic config)').
              ,(a (G_ "source code")
-                 #:href "https://codeberg.org/jjba23/wikimusic"
+                 #:href (source-repository-url)
                  #:size '(text-md))
              ;; The manual is the README -- one document to keep true rather
              ;; than two that drift -- so the link leads to that document.
              ,(a (G_ "manual")
-                 #:href "https://codeberg.org/jjba23/wikimusic/src/branch/trunk/README.org"
+                 #:href (manual-url)
                  #:size '(text-md))
              ,(a (G_ "export")
                  #:href "/export/html"
@@ -328,9 +340,9 @@ the menu with @code{for}, so it reaches assistive technology as well."
                          #:size '(text-sm)
                          #:weight '(font-light)))
              ,(a (G_ "AGPL-3.0-or-later")
-                 #:href "https://www.gnu.org/licenses/agpl-3.0.html"
+                 #:href (licence-url)
                  #:size '(text-sm))
-             ,(em "© Josep Bigorra"
+             ,(em (format #f "© ~a" (copyright-holder))
                   #:size '(text-sm))
              (a (@ (href "javascript:void(0)")
                    (class ,(mk-class '(no-underline

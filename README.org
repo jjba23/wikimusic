@@ -58,6 +58,10 @@ wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Olive CSS, GNU Make,
 - *Everything out and back in*: a JSON dump of every content table and a
   rendered HTML archive of the whole instance, with an import route to load a
   dump into another instance.
+- *A page about the project*, at =/about=: what the community is, what a
+  reader can do here, what it is built on, and the one control that asks for
+  support.  The front page opens on the collection rather than on a pitch, so
+  the introduction lives here and is linked from every page's footer.
 - *Translated* into English, Dutch, Spanish and Japanese.
 
 Wikimusic and Artanis are written using GNU Guile, one of the best implementations of Scheme language, which is what makes the following true of the whole interface:
@@ -121,6 +125,33 @@ For running wikimusic yourself, you'll need to define and load a module called ~
 #+end_src
 
 The two keys are the instance's own secrets and they are what seals a session, so a deployment generates its own rather than reusing these; the rest name the mail service the instance sends through.
+
+The same module is where an instance says what it says about itself.  Every one of these is optional -- an instance that names none of them is wikimusic, unchanged -- and each of them is read where it is used rather than written into the page that shows it:
+
+#+begin_src scheme
+(define-public source-repository-url "https://codeberg.org/jjba23/wikimusic")
+
+;; Defaults to the README in the repository above.
+(define-public manual-url "https://codeberg.org/jjba23/wikimusic/src/branch/trunk/README.org")
+
+(define-public licence-url "https://www.gnu.org/licenses/agpl-3.0.html")
+
+(define-public copyright-holder "Josep Bigorra")
+
+;; Where the about page's donation control sends a reader.
+(define-public donate-url "https://www.buymeacoffee.com/jjbigorra")
+
+;; The picture a pasted link is previewed with, and the one the front page shows.
+(define-public social-image-url
+  "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg")
+
+(define-public mail-sender-name "No Reply - Wikimusic")
+(define-public mail-sender-address "noreply@mail.jointhefreeworld.org")
+#+end_src
+
+They reach the footer (where the code, the manual and the licence are linked), the about page and the front page (the donation control, the closing picture), every page's link preview, and the mail the instance sends.  A value that is blank, or of something other than text, is read as unset: commenting a line out is enough to go back to the project's own value.
+
+What an instance may name, and what each one falls back to, is written down in ~lib/wikimusic/config.scm~.  One of them is derived rather than defaulted: the manual's address is built from =source-repository-url=, so a fork that says where its code is read gets its own README link without having to name it separately.
 
 Pingwing is a mail and notification solution written in Guile Scheme and also part of the jointhefreeworld project.  It's used in WikiMusic for password resets, among other notifications.  Find more about it here: https://codeberg.org/jjba23/pingwing
 

@@ -42,6 +42,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-13)
   #:use-module ((artanis utils) #:select (sxml->xml-string))
+  #:use-module (wikimusic config)
   #:use-module (wikimusic html)
   #:export (spec))
 
@@ -210,18 +211,21 @@
 
 (define footer-suite
   (suite "The footer"
+         ;; The addresses are asked of the configuration rather than written
+         ;; out here: what the footer owes a reader is that the link leads to
+         ;; where *this* deployment says the code, the manual and the licence
+         ;; are, and an instance that names its own is not a failure.
          (test "it points at the code, the manual and the licence"
                (assert-true (and (string-contains
-                                  (footer-html) "codeberg.org/jjba23/wikimusic")
+                                  (footer-html) (source-repository-url))
                                  #t)
                             #:name "where the source is")
                (assert-true (and (string-contains
-                                  (footer-html)
-                                  "codeberg.org/jjba23/wikimusic/src/branch/trunk/README.org")
+                                  (footer-html) (manual-url))
                                  #t)
                             #:name "where the manual is")
                (assert-true (and (string-contains
-                                  (footer-html) "gnu.org/licenses/agpl-3.0")
+                                  (footer-html) (licence-url))
                                  #t)
                             #:name "and where the licence is written out"))
 

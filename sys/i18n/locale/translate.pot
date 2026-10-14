@@ -676,6 +676,10 @@ msgstr ""
 msgid "export"
 msgstr ""
 
+#: lib/wikimusic/html.scm:306
+msgid "about"
+msgstr ""
+
 #: lib/wikimusic/html.scm:306 lib/wikimusic/html.scm:340
 #: lib/wikimusic/html.scm:345
 msgid "back to the top"

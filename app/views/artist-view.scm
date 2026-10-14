@@ -17,6 +17,7 @@
 
 (define-module (app views artist-view)
   #:use-module (wikimusic html)
+  #:use-module (wikimusic config)
   #:use-module (wikimusic seo)
   #:use-module (wikimusic domain)
   #:use-module (artanis artanis)
@@ -177,7 +178,7 @@
                  #:path artist-path
                  #:image (artwork-social-image artworks
                                               #:fallback
-                                              default-social-image)
+                                              (social-image-url))
                  #:image-alt (format #f "artwork for ~a" artist-name)
                  #:og-type "profile"
                  #:json-ld (list (page-json-ld

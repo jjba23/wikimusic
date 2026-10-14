@@ -17,6 +17,7 @@
 
 (define-module (app views genre-view)
   #:use-module (wikimusic html)
+  #:use-module (wikimusic config)
   #:use-module (wikimusic seo)
   #:use-module (wikimusic domain)
   #:use-module (artanis artanis)
@@ -176,7 +177,7 @@
                  #:path genre-path
                  #:image (artwork-social-image artworks
                                               #:fallback
-                                              default-social-image)
+                                              (social-image-url))
                  #:image-alt (format #f "artwork for ~a" genre-name)
                  #:json-ld (list (page-json-ld
                                   #:type "CollectionPage"

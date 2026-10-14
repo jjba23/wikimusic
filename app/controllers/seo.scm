@@ -101,7 +101,7 @@ and the address is what a crawler acts on."
 (define (sitemap-entries rc)
   "Return every address this instance offers a crawler, as sitemap entries.
 
-The four standing pages come first and are described with the frequency they
+The five standing pages come first and are described with the frequency they
 actually change at; then every song, artist and genre, each with the date it was
 last written to.  Nothing that a reader cannot reach without signing in is
 listed, and no address is listed twice: each kind of page has one address per
@@ -114,7 +114,12 @@ row, and a row has one identifier."
          (sitemap-entry #:loc (absolute-url "/artists")
                         #:changefreq "weekly" #:priority "0.8")
          (sitemap-entry #:loc (absolute-url "/genres")
-                        #:changefreq "weekly" #:priority "0.8"))
+                        #:changefreq "weekly" #:priority "0.8")
+         ;; What the project is changes when the project does, which is
+         ;; seldomer than the corpus -- a monthly-revisit hint, and a
+         ;; standing page ranked below the three doors into the collection.
+         (sitemap-entry #:loc (absolute-url "/about")
+                        #:changefreq "monthly" #:priority "0.5"))
    (entity-sitemap-entries
     (get-songs (make-sqlite-song-repository rc)
                #:order-by '((display-name asc))

@@ -17,6 +17,7 @@
 
 (define-module (app views song-view)
   #:use-module (wikimusic html)
+  #:use-module (wikimusic config)
   #:use-module (wikimusic seo)
   #:use-module (wikimusic domain)
   #:use-module (artanis artanis)
@@ -378,7 +379,7 @@
                             #:limit 300))
          (page-image (artwork-social-image artworks
                                            #:fallback
-                                           default-social-image))
+                                           (social-image-url)))
          ;; A click track, at the tempo the first tab declares when one does:
          ;; a reader practising a passage wants it at the speed the tab is
          ;; written in, and the page already knows what that is.

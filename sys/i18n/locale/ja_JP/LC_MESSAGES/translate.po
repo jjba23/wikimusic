@@ -695,6 +695,10 @@ msgstr "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"
 msgid "export"
 msgstr ""
 
+#: lib/wikimusic/html.scm:306
+msgid "about"
+msgstr "概要"
+
 #: lib/wikimusic/html.scm:306 lib/wikimusic/html.scm:340
 #: lib/wikimusic/html.scm:345
 msgid "back to the top"

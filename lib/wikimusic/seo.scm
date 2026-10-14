@@ -45,19 +45,19 @@
   #:use-module (web uri)
   #:use-module (json)
   #:use-module (artanis artanis)
+  #:use-module (wikimusic config)
   #:export (site-origin absolute-url
             summarize org-plain-text language-of
             seo-head json-ld-script
-            page-json-ld schema-name schema-node named-nodes
-            default-social-image))
+            page-json-ld schema-name schema-node named-nodes))
 
 ;;; ====== The instance's own address ======
 
-;; The image a page without one of its own is announced with.  It is the
-;; project's own asset host, which every wikimusic instance may point at, and a
-;; view that knows a better picture for its page passes it instead.
-(define default-social-image
-  "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg")
+;; The image a page without one of its own is announced with is the one the
+;; deployment names -- the project's own asset host by default, and an
+;; instance's own picture when it has one (see `(wikimusic config)').  It is
+;; read per page rather than kept here, so an instance that points at its own
+;; assets says so in one place instead of in every view that shows a picture.
 
 (define (loopback-host? host)
   "Return #t when HOST names the machine the server is running on.
@@ -97,14 +97,8 @@ one file a deployment writes for itself -- so an instance behind a proxy that
 terminates TLS somewhere else can simply say what its address is.  Nothing
 needs to set it: an instance that does not is described by its own configured
 host name."
-  (catch #t
-         (lambda ()
-           (let ((value (module-ref (resolve-module '(wikimusic env))
-                                    'site-origin)))
-             (and (string? value)
-                  (not (string-null? value))
-                  (string-trim value #\/))))
-         (lambda (key . args) #f)))
+  (let ((value (config-value 'site-origin)))
+    (and value (string-trim value #\/))))
 
 (define* (site-origin)
   "Return this instance's public origin, without a trailing slash.
@@ -348,7 +342,7 @@ A list of JSON-LD nodes, each written into a script of its own.
          (description (if (and (string? description) (not (string-null? description)))
                           description
                           #f))
-         (image (or image default-social-image)))
+         (image (or image (social-image-url))))
     (filter (lambda (element) element)
             (append
              (if description
