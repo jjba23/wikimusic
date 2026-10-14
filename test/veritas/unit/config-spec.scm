@@ -28,6 +28,18 @@
 ;;; every instance -- so no test has to write into the deployment's own module
 ;;; to prove what a value in it would do.
 ;;;
+;;; The rest is read the other way round.  A switch is not a value but a rule
+;;; with two halves -- the ask is shown *unless* the deployment turns it off --
+;;; and the interface's own files are read from this instance *unless* it names
+;;; a host -- and only one half of each is the deployment a suite is running
+;;; under.  The other is therefore written into the loaded `(wikimusic env)'
+;;; module for the length of one case and put back afterwards (see `(support
+;;; deployment)'), which is why a case reads a deployment the suite is running
+;;; on and the one it made up beside it, in the same test.  Nothing here is
+;;; pinned to what *this* deployment happens to say: the value read back is
+;;; compared against the rule, not against the project's own address, so a fork
+;;; that has correctly named its own host or turned its own ask off still passes.
+;;;
 ;;; The addresses are then checked for the only thing that can be checked
 ;;; without an opinion about where they lead: that each is an absolute address
 ;;; rather than an empty string, a path, or a mistake.  Which host a deployment
@@ -48,8 +60,10 @@
   #:use-module (veritas veritas)
   #:use-module (ice-9 format)
   #:use-module (srfi srfi-13)
+  #:use-module (support deployment)
   #:use-module (wikimusic config)
   #:use-module (wikimusic env)
+  #:use-module (wikimusic seo)
   #:export (spec))
 
 (define (absolute-address? value)
@@ -88,9 +102,7 @@
                (assert-true (absolute-address? (licence-url))
                             #:name "where the licence is written out")
                (assert-true (absolute-address? (donate-url))
-                            #:name "where a reader supports the project")
-               (assert-true (absolute-address? (social-image-url))
-                            #:name "the picture a link is previewed with"))
+                            #:name "where a reader supports the project"))
 
          (test "the copyright line names somebody"
                (assert-true (and (string? (copyright-holder))
@@ -112,6 +124,145 @@
                                  #t)
                             #:name "and a name beside it"))))
 
+;; The picture a page is announced with is the one thing an instance names that
+;; is not necessarily an address: the project's own picture is a file this
+;; instance serves, so what the configuration holds is a path on it, and the
+;; address a crawler is handed is built where the page is built -- from the host
+;; that page is being answered on.  Two things are pinned: a path is joined onto
+;; an origin rather than left as one, and an address the deployment gave is
+;; passed through as it is.  Both are read with a picture the test names, so a
+;; fork that has a picture of its own is not asked to have this one.
+(define picture-suite
+  (suite "The picture a page is announced with"
+         (test "a path is turned into an address of the instance serving it"
+               (assert-equal #:name "the path is joined onto the origin"
+                             #:expect "https://example.org/img/cover.jpg"
+                             #:got (with-deployment
+                                     'social-image-url "/img/cover.jpg"
+                                     (lambda ()
+                                       (absolute-url (social-image-url)
+                                                     #:origin "https://example.org")))))
+
+         (test "an address the deployment gave is left alone"
+               (assert-equal #:name "an address is already one"
+                             #:expect "https://pictures.example.org/cover.jpg"
+                             #:got (with-deployment
+                                     'social-image-url
+                                     "https://pictures.example.org/cover.jpg"
+                                     (lambda ()
+                                       (absolute-url (social-image-url)
+                                                     #:origin "https://example.org")))))
+
+         (test "and with no host to build one on, no address is invented"
+               ;; An origin is what an address is built from, and there are
+               ;; requests -- and whole runs -- where an instance has none to
+               ;; name: the answer is then nothing at all, and the page states
+               ;; the path it has.  That fallback is the whole reason the
+               ;; configuration may hold a path, so what it rests on is pinned:
+               ;; no origin, no address, rather than an address guessed at from
+               ;; whatever the machine happens to be called.
+               (assert-false (with-deployment
+                              'social-image-url "/img/cover.jpg"
+                              (lambda ()
+                                (absolute-url (social-image-url)
+                                              #:origin "")))
+                             #:name "no origin, no address"))))
+
+;; The switch an instance that raises no money turns off.  It is not read as a
+;; value: it is *on* unless the deployment says otherwise, and a deployment
+;; says otherwise in whatever way its own file or a shell hands it over --
+;; `#f', or the word every environment file in the world spells "no" with.
+(define switch-suite
+  (suite "The control an instance turns off"
+         (test "an instance that says nothing about it asks"
+               ;; The project does fundraise, so an instance that has not
+               ;; thought about it keeps the control.  A blank value is the
+               ;; reading an operator who commented the line out gets, which is
+               ;; this half of the rule however the deployment's file is
+               ;; written today.
+               (assert-true (with-deployment 'show-donation? "" donation-shown?)
+                            #:name "the ask is shown unless it says otherwise"))
+
+         (test "an instance that raises nothing says so with #f"
+               (assert-false (with-deployment 'show-donation? #f donation-shown?)
+                             #:name "the switch itself"))
+
+         (test "and may say so in words"
+               ;; A switch written in a shell's environment or a `.env' file
+               ;; arrives as text, and an operator should not have to check how
+               ;; this particular instance spells it.
+               (assert-false (with-deployment 'show-donation? "false"
+                                              donation-shown?)
+                             #:name "false")
+               (assert-false (with-deployment 'show-donation? "No"
+                                              donation-shown?)
+                             #:name "No, however it is capitalised")
+               (assert-false (with-deployment 'show-donation? " off "
+                                              donation-shown?)
+                             #:name "off, with room around it")
+               (assert-false (with-deployment 'show-donation? "0"
+                                              donation-shown?)
+                             #:name "0"))
+
+         (test "and words that are not a no leave it on"
+               (assert-true (with-deployment 'show-donation? "yes"
+                                             donation-shown?)
+                            #:name "yes")
+               (assert-true (with-deployment 'show-donation? #t donation-shown?)
+                            #:name "or the switch itself"))))
+
+;; Where the interface's own files are read from: the stylesheets a page is set
+;; and painted with, and the icon its tab is marked with.  They are this
+;; project's files, served by the instance that read them, so a deployment that
+;; names nothing answers a path on itself -- and one behind a CDN, or serving
+;; them from another path, or pointing at a mirror of its own, says where they
+;; hang off once and every one of them moves with it.
+(define asset-suite
+  (suite "Where the interface's own files are read from"
+         (test "an instance serving its own reads them off itself"
+               (assert-equal #:name "a path on this instance"
+                             #:expect "/vendor/fonts/lucida.css"
+                             #:got (with-deployment
+                                     'assets-url ""
+                                     (lambda ()
+                                       (asset-address "vendor/fonts/lucida.css"))))
+               (assert-equal #:name "and the page's own stylesheet with it"
+                             #:expect "/css/wikimusic.olive.min.css"
+                             #:got (with-deployment
+                                     'assets-url ""
+                                     (lambda ()
+                                       (asset-address
+                                        "css/wikimusic.olive.min.css")))))
+
+         (test "a deployment that serves them elsewhere says where"
+               (assert-equal #:name "every file hangs off the host it named"
+                             #:expect
+                             "https://assets.example.org/wikimusic/vendor/fonts/lucida.css"
+                             #:got (with-deployment
+                                     'assets-url
+                                     "https://assets.example.org/wikimusic"
+                                     (lambda ()
+                                       (asset-address "vendor/fonts/lucida.css")))))
+
+         (test "a host written with a trailing slash does not double it"
+               (assert-equal #:name "one slash between the two"
+                             #:expect "https://assets.example.org/wikimusic/favicon.ico"
+                             #:got (with-deployment
+                                     'assets-url
+                                     "https://assets.example.org/wikimusic/"
+                                     (lambda ()
+                                       (asset-address "favicon.ico")))))
+
+         (test "a file named with a leading slash is one file"
+               ;; A caller writes the path it has, and the two spellings of
+               ;; `pub/css/wikimusic.olive.min.css' are the same file.
+               (assert-equal #:name "the leading slash is not doubled"
+                             #:expect "/css/wikimusic.olive.min.css"
+                             #:got (with-deployment 'assets-url ""
+                                                    (lambda ()
+                                                      (asset-address
+                                                       "/css/wikimusic.olive.min.css")))))))
+
 (define derived-suite
   (suite "The manual is read where the code is"
          ;; The manual is the README, and it is read in the repository the
@@ -129,4 +280,9 @@
                              #:got (manual-url)))))
 
 (define (spec)
-  (veritas-run reader-suite address-suite derived-suite))
+  (veritas-run reader-suite
+               address-suite
+               picture-suite
+               switch-suite
+               asset-suite
+               derived-suite))

@@ -178,7 +178,7 @@
                  #:path artist-path
                  #:image (artwork-social-image artworks
                                               #:fallback
-                                              (social-image-url))
+                                              (announced-image))
                  #:image-alt (format #f "artwork for ~a" artist-name)
                  #:og-type "profile"
                  #:json-ld (list (page-json-ld

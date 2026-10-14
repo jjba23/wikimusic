@@ -41,6 +41,7 @@
   #:declarative? #t
   #:use-module (ice-9 format)
   #:export (project-tagline
+            project-summary
             project-account
             project-lead-in
             project-promises
@@ -56,6 +57,18 @@ It is the words the site signs itself with, the title a reader meets first on
 the about page and last on the front page, so the two pages agree about the
 name of the place they are."
   (G_ "the free music knowledge encyclopaedia"))
+
+(define (project-summary G_)
+  "Return what the encyclopaedia holds, in one line.
+
+It is the line the front page reads under its tagline: a visitor who has just
+read what the place is *called* asks what is *in* it next, and this answers
+that with the things they came for rather than with another adjective.  The
+page's own description, which is what a search result is shown instead, says
+the same thing in the register of a search result -- a sentence that has to
+stand alone, so it names the project as well -- and the two are separate
+sentences for that reason rather than by oversight."
+  (G_ "Songs, artists and genres, with guitar and bass tabs, chords, lyrics, keys, tunings and sheet music — written by musicians, for anyone learning to play."))
 
 (define (project-account G_)
   "Return what the project is, in one paragraph."

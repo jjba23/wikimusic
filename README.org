@@ -58,10 +58,21 @@ wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Olive CSS, GNU Make,
 - *Everything out and back in*: a JSON dump of every content table and a
   rendered HTML archive of the whole instance, with an import route to load a
   dump into another instance.
+- *A front page that is a way in*: what the place is called and what it holds,
+  a line under it, a field that searches the collection, the two things a
+  visitor came to do, the promises the community makes, the instance's own
+  numbers, the genres to browse, and the newest songs and the newest artists --
+  each shelf drawn with the tiles the list pages draw, so a tile on the front
+  page and a tile on a list page are the same tile.
 - *A page about the project*, at =/about=: what the community is, what a
   reader can do here, what it is built on, and the one control that asks for
-  support.  The front page opens on the collection rather than on a pitch, so
-  the introduction lives here and is linked from every page's footer.
+  support -- which an instance that raises no money turns off.  The front page
+  opens on what the place holds rather than on the introduction, so the account
+  of the project lives here and is linked from every page's footer.
+- *Nothing fetched from anybody else before a page can be read*: the type the
+  interface is set in, the glyphs its controls wear and the picture the project
+  shows of itself are files the instance serves, and the address they hang off
+  is a deployment's to name.
 - *Translated* into English, Dutch, Spanish and Japanese.
 
 Wikimusic and Artanis are written using GNU Guile, one of the best implementations of Scheme language, which is what makes the following true of the whole interface:
@@ -141,15 +152,30 @@ The same module is where an instance says what it says about itself.  Every one 
 ;; Where the about page's donation control sends a reader.
 (define-public donate-url "https://www.buymeacoffee.com/jjbigorra")
 
-;; The picture a pasted link is previewed with, and the one the front page shows.
-(define-public social-image-url
-  "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg")
+;; Whether the instance asks for support at all.  A deployment that raises no
+;; money says #f here, and both the front page and the about page drop the
+;; control -- and the note about what the money pays for -- rather than point a
+;; reader at somebody else's page.  #f, "no", "off" and "0" all mean no.
+(define-public show-donation? #t)
+
+;; The picture a pasted link is previewed with, and the one near the front
+;; page's closing: an address of its own, or a path on this instance, which is
+;; what the project's own picture is.
+(define-public social-image-url "/img/wikimusic.jpg")
+
+;; Where the interface's own stylesheets, type and glyphs are read from.  Empty
+;; -- which is what an instance serving them itself says -- reads them off this
+;; instance; a deployment behind a CDN, or serving them from another path, names
+;; the address they hang off.
+(define-public assets-url "")
 
 (define-public mail-sender-name "No Reply - Wikimusic")
 (define-public mail-sender-address "noreply@mail.jointhefreeworld.org")
 #+end_src
 
-They reach the footer (where the code, the manual and the licence are linked), the about page and the front page (the donation control, the closing picture), every page's link preview, and the mail the instance sends.  A value that is blank, or of something other than text, is read as unset: commenting a line out is enough to go back to the project's own value.
+They reach the footer (where the code, the manual and the licence are linked), the about page and the front page (the donation control, the closing picture), every page's link preview, the address every stylesheet the page is set and painted with hangs off, and the mail the instance sends.  A value that is blank, or of something other than text, is read as unset: commenting a line out is enough to go back to the project's own value.
+
+Two of them are read as rules rather than as values.  =show-donation?= is on unless the deployment turns it off, and =assets-url= means this instance's own copy unless it names somewhere else -- so an instance that never thought about either is wikimusic as it ships.
 
 What an instance may name, and what each one falls back to, is written down in ~lib/wikimusic/config.scm~.  One of them is derived rather than defaulted: the manual's address is built from =source-repository-url=, so a fork that says where its code is read gets its own README link without having to name it separately.
 
@@ -209,6 +235,8 @@ If running locally, it's recommended to use ~localhost~ instead of ~127.0.0.1~ a
 If you are hacking away at the project, I would suggest using ~maak dev~ since this will effectively run the project with hot-reloading capabilities and it will use the default ~artanis.conf~ where we configure hostname, db path, etc.
 
 Running the test suite is ~maak test~, and ~maak --list~ names every other task the project defines.  ~maak build-manual~ renders this document to HTML, and ~maak deploy~ copies that rendering to the instance that serves it.
+
+The unit tests live in ~test/veritas/unit~, one file per area, and each is run by the framework with the deployment's own ~env.scm~ loaded.  What a spec needs beyond that -- being a *deployment* for the length of an assertion, when what it is proving is a switch a deployment turns off or a host it names -- is a helper module rather than a test of its own, and it lives outside the unit directory for that reason: ~test/support/deployment.scm~.
 
 ** Running it for real: a Shepherd service
 
@@ -641,11 +669,30 @@ at run time and works with no network of its own:
   and plays it back;
 - the *SONiVOX SoundFont* (Apache-2.0, © Sonic Network Inc.) is what makes a
   played-back tab audible, and fits beside it;
-- *Bravura* (SIL OFL 1.1) is the music font a tablature is drawn with.
+- *Bravura* (SIL OFL 1.1) is the music font a tablature is drawn with;
+- *Intel One Mono* and *Plus Jakarta Sans* (both SIL OFL 1.1) are the two web
+  families the interface is set in beside Lucida, and their licence texts
+  travel with them;
+- *Phosphor* (MIT) is the icon set every control on the site wears;
+- the three *Lucida* families the interface is set in, and the *picture the
+  project shows of itself*, which are the author's own files rather than a third
+  party's -- what the project takes the position on the Lucida files to be is
+  set out below, under *On Lucida fonts*.
 
-Their licences, their provenance and the task that fetches them are written
-down beside the files, in =pub/vendor/alphatab/README.md=.  They are unmodified,
-and their source stays where it came from.
+Two tasks fetch them, and each is the only way its own files should change:
+=maak vendor-assets= brings the typefaces, the glyphs and the project's picture
+into =pub/= -- writing =google.css= and =phosphor.css= with every address made
+relative on the way -- and =maak alphatab= brings the renderer, the music font
+and the SoundFont into =pub/vendor/alphatab/=.  Their licences, their provenance
+and the task that fetches them are written down beside the files, in
+=pub/vendor/alphatab/README.md=, =pub/vendor/fonts/README.md= and
+=pub/vendor/phosphor/README.md=.  They are unmodified, and their source stays
+where it came from.
+
+The rewriting a refresh does is the part of it that no fetch can be trusted to
+show -- a copy that went on naming the host it came from would be a tree full of
+files nobody reads -- so it is pinned by the test suite against a written
+stylesheet rather than a live one, with no network: ~test/veritas/unit/assets-spec.scm~.
 
 -------
 

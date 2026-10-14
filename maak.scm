@@ -259,6 +259,18 @@ for higher concurrent writes to SQLite 3."
   ($ '("curl --output \"./pub/css/wikimusic.olive.min.css\""
        "\"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/wikimusic.olive.min.css\"")))
 
+;; The type and the glyphs are fetched rather than written: the three Lucida
+;; families, the two web families and the Phosphor set are somebody else's work,
+;; and the files a page reads are copies of it kept in `pub/' and served by this
+;; instance itself (see `resources/assets/fetch.scm').  Running this is only
+;; needed to refresh those copies -- they are checked in, because they are what
+;; an instance serves -- and it fetches every one of them, from the addresses
+;; the stylesheets themselves name.
+(define (vendor-assets)
+  "Fetch the assets the interface is painted with into `pub/'."
+  (time-machine-manifest-shell
+   '("guile -L ./lib -L . resources/assets/fetch.scm")))
+
 ;; ====== The vendored Guitar Pro renderer ======
 
 ;; The release of alphaTab whose files are kept under `pub/vendor/alphatab'.

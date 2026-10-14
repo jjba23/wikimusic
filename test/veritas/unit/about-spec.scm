@@ -39,6 +39,13 @@
 ;;; instance uses is its own business, and a spec that pinned the upstream
 ;;; ones would fail for a deployment that had correctly named its own.
 ;;;
+;;; One thing is read the other way round: *whether* there is an ask at all is
+;;; the deployment's too -- a project that funds itself another way turns the
+;;; control off rather than pointing it at somebody's page -- and that half of
+;;; the rule is proved by being that deployment for one case (see `(support
+;;; deployment)').  Both pages are read with the ask turned off, so a view that
+;;; went on asking anyway is what fails.
+;;;
 ;;; The page is rendered through the shell, so what is asserted against is what
 ;;; a browser is actually served: the head a crawler reads and the body a
 ;;; reader does.
@@ -59,6 +66,7 @@
   #:use-module (ice-9 rdelim)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-13)
+  #:use-module (support deployment)
   #:use-module ((artanis utils) #:select (sxml->xml-string))
   #:use-module (app views about)
   #:use-module (app views index)
@@ -218,6 +226,16 @@ missing translation is a missing entry here and nothing else."
   "Return the front page as HTML, with a stand-in for the songs it lists."
   (sxml->xml-string (welcome-page G_ #:song-fragment '((p "songs")))))
 
+(define (front-html-with-shelves)
+  "Return the front page as HTML, with a stand-in for each shelf it lists.
+
+Both shelves are given one, which is what a page built by the controller has:
+what this reads is that neither is dropped and that they stand in the order a
+reader meets them, songs before artists."
+  (sxml->xml-string (welcome-page G_
+                                  #:song-fragment '((p "SONG-SHELF-MARKER"))
+                                  #:artist-fragment '((p "ARTIST-SHELF-MARKER")))))
+
 (define shared-suite
   (suite "The words the two pages share"
          (test "both pages name the place the same way"
@@ -262,6 +280,106 @@ missing translation is a missing entry here and nothing else."
                                               (project-support-ask G_))
                                  #t)
                             #:name "offered in the project's own words"))))
+
+;;; ====== The front page as a way in ======
+;;;
+;;; The first screen is what a visitor decides on, so it is pinned for what it
+;;; gives them rather than for how it is written: what the place holds, said
+;;; under the tagline; a control that carries the words of a reader who knows
+;;; what they came for to the collection; and both shelves of the collection
+;;; itself, in the order they are read.
+(define front-page-suite
+  (suite "The front page as a way in"
+         (test "the first screen says what is in the place"
+               (assert-true (and (position-of (front-html)
+                                              (project-summary G_))
+                                 #t)
+                            #:name "the summary is read under the tagline")
+               (assert-true (< (at (front-html) (project-tagline G_))
+                               (at (front-html) (project-summary G_)))
+                            #:name "and it is read after it"))
+
+         (test "the search control carries the words to the collection"
+               ;; A form that names another page is an ordinary GET, which is
+               ;; what makes the same control work with scripting and without
+               ;; it: the address and the field are the whole contract.
+               (assert-true (and (position-of (front-html) "action=\"/songs\"")
+                                 #t)
+                            #:name "the form names the collection")
+               (assert-true (and (position-of (front-html) "name=\"search\"")
+                                 #t)
+                            #:name "and the field its words are read from"))
+
+         (test "both shelves of the collection are shown, songs first"
+               (assert-true (and (position-of (front-html-with-shelves)
+                                              "SONG-SHELF-MARKER")
+                                 #t)
+                            #:name "the songs are there")
+               (assert-true (and (position-of (front-html-with-shelves)
+                                              "ARTIST-SHELF-MARKER")
+                                 #t)
+                            #:name "and so are the artists")
+               (assert-true (< (at (front-html-with-shelves)
+                                   "SONG-SHELF-MARKER")
+                               (at (front-html-with-shelves)
+                                   "ARTIST-SHELF-MARKER"))
+                            #:name "in the order they are read")
+               (assert-true (and (position-of (front-html-with-shelves)
+                                              "href=\"/artists\"")
+                                 #t)
+                            #:name "with a way to the rest of them"))
+
+         (test "a page with no artists to show is still the whole page"
+               ;; The controller always asks; a caller that has no rows -- a
+               ;; test, a page rendered before a database is there -- gets no
+               ;; empty shelf with a heading over it.
+               (assert-false (position-of (front-html) (G_ "newest artists"))
+                             #:name "no heading over nothing"))))
+
+;; The other half of the ask: an instance that raises nothing.  The control, the
+;; words written on it and the note about what the money pays for are all the
+;; project's, and a deployment that funds itself another way turns them off
+;; rather than sending a reader to a page that is not its own.  What both pages
+;; were saying before the ask is exactly what they say after it, so the switch
+;; is proved from both ends: the ask is nowhere in either page, and the account
+;; of the place and the invitation are still in the one they belong to.
+(define quiet-suite
+  (suite "The pages of an instance that asks for nothing"
+         (test "the about page asks for nothing"
+               (assert-false (position-of
+                              (with-deployment 'show-donation? #f about-html)
+                              (donate-url))
+                             #:name "there is no control")
+               (assert-false (position-of
+                              (with-deployment 'show-donation? #f about-html)
+                              (project-support-ask G_))
+                             #:name "and none of the words that are on one")
+               (assert-false (position-of
+                              (with-deployment 'show-donation? #f about-html)
+                              (project-support-note G_))
+                             #:name "and nothing about what the money pays for"))
+
+         (test "and the front page asks for nothing either"
+               (assert-false (position-of
+                              (with-deployment 'show-donation? #f front-html)
+                              (donate-url))
+                             #:name "there is no control")
+               (assert-false (position-of
+                              (with-deployment 'show-donation? #f front-html)
+                              (project-support-ask G_))
+                             #:name "and none of the words that are on one"))
+
+         (test "what the pages are for is still said"
+               (assert-true (and (position-of
+                                  (with-deployment 'show-donation? #f about-html)
+                                  (car (doings)))
+                                 #t)
+                            #:name "the promises are still made")
+               (assert-true (and (position-of
+                                  (with-deployment 'show-donation? #f front-html)
+                                  (project-invitation G_))
+                                 #t)
+                            #:name "and the front page still invites"))))
 
 (define seo-suite
   (suite "What the page tells a crawler"
@@ -312,6 +430,8 @@ missing translation is a missing entry here and nothing else."
   (veritas-run account-suite
                doings-suite
                shared-suite
+               front-page-suite
+               quiet-suite
                order-suite
                seo-suite
                link-suite

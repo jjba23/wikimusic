@@ -1,0 +1,115 @@
+/*
+  wikimusic - the free music knowledge encyclopaedia
+
+  Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
+  wikimusic is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  wikimusic is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/*
+  The three Lucida families the interface is set in.
+
+  They were declared by the interface library, whose stylesheet had them
+  pointed at one host in the author's own domain: a page was readable in its
+  own type only for as long as that machine was up and still serving those
+  nine files at that address.  The files are now this project's own, fetched
+  into the directory this stylesheet sits in (see `maak vendor-assets'), and
+  every address below is relative, so a copy of these assets may be served
+  from anywhere -- this instance, a mirror, a CDN in front of either -- without
+  a line of CSS having to be told where they went.
+
+  Declared in the order the interface asks for them: the text face at the four
+  weights and slopes it is set in, then the typewriter face, then the Unicode
+  face the interface reaches for when it needs a character the other two do
+  not carry.  The order of the `font-style' and `font-weight' pairs is what
+  lets a browser pick the right file without downloading the rest.
+*/
+
+/* --- Lucida Sans --- */
+
+@font-face {
+  font-family: 'Lucida Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('LSANS.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Lucida Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('LSANSI.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Lucida Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('LSANSD.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Lucida Sans';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('LSANSDI.woff') format('woff');
+}
+
+/* --- Lucida Sans Typewriter --- */
+
+@font-face {
+  font-family: 'Lucida Sans Typewriter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('LTYPE.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Lucida Sans Typewriter';
+  font-style: oblique;
+  font-weight: 400;
+  font-display: swap;
+  src: url('LTYPEO.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Lucida Sans Typewriter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('LTYPEB.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Lucida Sans Typewriter';
+  font-style: oblique;
+  font-weight: 700;
+  font-display: swap;
+  src: url('LTYPEBO.woff') format('woff');
+}
+
+/* --- Lucida Sans Unicode --- */
+
+@font-face {
+  font-family: 'Lucida Sans Unicode';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('l_10646.woff') format('woff');
+}

@@ -46,7 +46,7 @@
   #:use-module (json)
   #:use-module (artanis artanis)
   #:use-module (wikimusic config)
-  #:export (site-origin absolute-url
+  #:export (site-origin absolute-url announced-image
             summarize org-plain-text language-of
             seo-head json-ld-script
             page-json-ld schema-name schema-node named-nodes))
@@ -54,10 +54,30 @@
 ;;; ====== The instance's own address ======
 
 ;; The image a page without one of its own is announced with is the one the
-;; deployment names -- the project's own asset host by default, and an
-;; instance's own picture when it has one (see `(wikimusic config)').  It is
-;; read per page rather than kept here, so an instance that points at its own
-;; assets says so in one place instead of in every view that shows a picture.
+;; deployment names -- the project's own picture by default, and an instance's
+;; own when it has one (see `(wikimusic config)').  It is read per page rather
+;; than kept here, so an instance that points at its own picture says so in one
+;; place instead of in every view that shows one.
+;;
+;; What is announced has to be an address a crawler can fetch from outside this
+;; request, and what the configuration holds may be a path on this instance --
+;; which is what the project's own picture is, since the instance serves it
+;; itself.  The two are therefore joined here, at the point a page states one,
+;; where the host being answered is known; an address the deployment gave
+;; outright is passed through as it is.
+(define (announced-image)
+  "Return the address a page without a picture of its own is announced with."
+  (let ((picture (social-image-url)))
+    (or (absolute-url picture) picture)))
+
+;; How big the picture this project ships is, as the tags that describe it have
+;; to say.  They are read off the file itself rather than guessed: a preview
+;; half the width a client was promised is one it lays out wrong.  A deployment
+;; that announces a picture of its own has one of a different size, and these
+;; are the one tag here that describe the project's default rather than the
+;; deployment's choice.
+(define announced-image-width "2048")
+(define announced-image-height "2048")
 
 (define (loopback-host? host)
   "Return #t when HOST names the machine the server is running on.
@@ -342,7 +362,7 @@ A list of JSON-LD nodes, each written into a script of its own.
          (description (if (and (string? description) (not (string-null? description)))
                           description
                           #f))
-         (image (or image (social-image-url))))
+         (image (or image (announced-image))))
     (filter (lambda (element) element)
             (append
              (if description
@@ -370,8 +390,10 @@ A list of JSON-LD nodes, each written into a script of its own.
                    (meta #:property "og:locale" #:content locale))
              (if image
                  (append (list (meta #:property "og:image" #:content image)
-                               (meta #:property "og:image:width" #:content "1200")
-                               (meta #:property "og:image:height" #:content "630"))
+                               (meta #:property "og:image:width"
+                                     #:content announced-image-width)
+                               (meta #:property "og:image:height"
+                                     #:content announced-image-height))
                          (if image-alt
                              (list (meta #:property "og:image:alt"
                                          #:content image-alt))

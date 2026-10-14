@@ -41,6 +41,7 @@
   #:use-module (ice-9 regex)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-13)
+  #:use-module (support deployment)
   #:use-module ((artanis utils) #:select (sxml->xml-string))
   #:use-module (wikimusic config)
   #:use-module (wikimusic html)
@@ -274,5 +275,97 @@
                                              (lambda (match tail) #t))
                                #:name "each one is closed, not reopened")))))
 
+;; Where the shell reads the files it is made of.  The type a page is set in,
+;; the glyphs its controls wear, the stylesheet it is laid out with and the icon
+;; its tab is marked with are all files this project serves, so all four are
+;; read off the instance that answered the request -- and a deployment behind a
+;; CDN, or serving them from a path of its own, moves every one of them by
+;; naming one address.  The two halves are read the same way as the switch
+;; above: this instance with nothing said about it, and an instance that named
+;; a host (see `(support deployment)').
+(define (shell-html)
+  "Return the shell as HTML, which the asset tests below read."
+  (render (html-template G_ #:body '((p "a page")))))
+
+(define assets-suite
+  (suite "Where the shell reads its own files"
+         (test "an instance that serves its own reads them off itself"
+               (assert-true (and (string-contains
+                                  (with-deployment 'assets-url "" shell-html)
+                                  "href=\"/css/wikimusic.olive.min.css\"")
+                                 #t)
+                            #:name "the stylesheet the page is laid out with")
+               (assert-true (and (string-contains
+                                  (with-deployment 'assets-url "" shell-html)
+                                  "href=\"/favicon.ico\"")
+                                 #t)
+                            #:name "and the icon the tab is marked with"))
+
+         (test "a deployment that serves them elsewhere moves every one of them"
+               (assert-true (and (string-contains
+                                  (with-deployment
+                                   'assets-url "https://assets.example.org/theme"
+                                   shell-html)
+                                  (string-append
+                                   "href=\"https://assets.example.org/theme"
+                                   "/css/wikimusic.olive.min.css\""))
+                                 #t)
+                            #:name "the stylesheet")
+               (assert-true (and (string-contains
+                                  (with-deployment
+                                   'assets-url "https://assets.example.org/theme"
+                                   shell-html)
+                                  (string-append
+                                   "href=\"https://assets.example.org/theme"
+                                   "/vendor/fonts/lucida.css\""))
+                                 #t)
+                            #:name "the type the page is set in")
+               (assert-true (and (string-contains
+                                  (with-deployment
+                                   'assets-url "https://assets.example.org/theme"
+                                   shell-html)
+                                  (string-append
+                                   "href=\"https://assets.example.org/theme"
+                                   "/vendor/phosphor/phosphor.css\""))
+                                 #t)
+                            #:name "the glyphs its controls wear")
+               (assert-true (and (string-contains
+                                  (with-deployment 'assets-url
+                                                   "https://assets.example.org/theme"
+                                                   shell-html)
+                                  "href=\"https://assets.example.org/theme/favicon.ico\"")
+                                 #t)
+                            #:name "and the icon, with no address left behind"))
+
+         (test "no file of the interface is somebody else's to serve"
+               ;; Every one of these was a request a reader's browser made to
+               ;; a host this project does not run: a font host for the two web
+               ;; families, an icon CDN for the glyphs, and the author's own
+               ;; domain for the Lucida files.  They are files in `pub/' now,
+               ;; and a page that named one of them again would be a page that
+               ;; stops being readable when that host is.
+               (assert-false (string-contains (shell-html)
+                                              "fonts.googleapis.com")
+                             #:name "no font host")
+               (assert-false (string-contains (shell-html)
+                                              "fonts.gstatic.com")
+                             #:name "and none of the hosts a face was fetched from")
+               (assert-false (string-contains (shell-html) "cdn.jsdelivr.net")
+                             #:name "no icon CDN")
+               ;; The Lucida families used to be read from the author's own
+               ;; static assets, and that path is the one thing here that has to
+               ;; be named rather than counted: the page carries the address of
+               ;; an events endpoint on that domain as well, and a service is
+               ;; not an asset -- what must not be there is a *file* of the
+               ;; interface waiting on somebody else's machine to be up.
+               (assert-false (string-contains (shell-html)
+                                              "static-assets/fonts")
+                             #:name "and no typeface read from somebody's static assets"))))
+
 (define (spec)
-  (veritas-run locale-suite choose-suite reading-suite footer-suite shell-suite))
+  (veritas-run locale-suite
+               choose-suite
+               reading-suite
+               footer-suite
+               shell-suite
+               assets-suite))

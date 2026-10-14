@@ -25,6 +25,7 @@
         (wikimusic domain artist)
         (wikimusic domain artwork)
         (wikimusic domain comment)
+        (wikimusic domain genre)
         (wikimusic domain song)
         (wikimusic domain song-content)
         (wikimusic domain)
@@ -32,6 +33,7 @@
         (wikimusic sqlite artist)
         (wikimusic sqlite artwork)
         (wikimusic sqlite comment)
+        (wikimusic sqlite genre)
         (wikimusic sqlite song)
         (wikimusic sqlite song-content))
 
@@ -41,6 +43,39 @@
 ;; a second way of listing it -- `/songs' is where a reader browses, sorts and
 ;; searches, and every tile here leads to the same song that page would.
 (define front-page-song-count 12)
+
+;; How many genres the front page offers as ways in.  Twelve is the same
+;; number the song wall shows and for the same reason: it fills a row or two,
+;; and it is a first choice rather than the whole list -- `/genres' is where a
+;; reader browses them, and a visitor who wants a genre that is not here is one
+;; click from it.
+(define front-page-genre-count 12)
+
+;; What the front page says the instance holds.
+;;
+;; Three figures off its own rows, which is the only thing a landing page can
+;; honestly say about a wiki: not what it *will* hold, but what is in it.  They
+;; are counted one at a time because each is a table of its own, and the count
+;; of a table is a question its own repository answers.
+(define (front-page-counts rc)
+  "Return how many songs, artists and genres this instance holds."
+  `((songs . ,(count-songs (make-sqlite-song-repository rc)))
+    (artists . ,(count-artists (make-sqlite-artist-repository rc)))
+    (genres . ,(count-genres (make-sqlite-genre-repository rc)))))
+
+;; How many artists the front page offers, the same number the song wall shows
+;; and for the same reason: it fills a row or two, and a visitor who wants a
+;; name that is not here is one click from `/artists'.
+(define front-page-artist-count 12)
+
+;; The genres a visitor can start from, newest first: the strip is a way into
+;; the collection rather than a catalogue of it, so it moves as the place grows
+;; and leads to the same page `/genres' would.
+(define (front-page-genres rc)
+  "Return the genres the front page offers as ways in."
+  (get-genres (make-sqlite-genre-repository rc)
+              #:order-by (entity-sort-from-query "created-at-desc")
+              #:limit front-page-genre-count))
 
 ;; The newest songs a reader can be shown, in the tiles the list pages draw.
 ;;
@@ -111,6 +146,41 @@
                     #:search-query ""
                     #:user-sort "created-at-desc")))
 
+;; The newest artists, in the tiles the artist list page draws: the same rows
+;; `/artists' asks for, in the same order a reader's own sort choice names, with
+;; the covers and the comment counts a tile is drawn with.  A tile is a tile.
+;;
+;; The rows a tile is shown with are the ones that name *that* artist: the
+;; covers and the comments are fetched for every artist on the shelf at once,
+;; so each tile is handed its own -- which is the same thing the artist list
+;; page does, and the reason it can be asked for a page of artists rather than
+;; for one artist at a time.
+(define (front-page-artist-fragment rc)
+  "Return the front page's grid of the newest artists, as SXML."
+  (let* ((artist-repo (make-sqlite-artist-repository rc))
+         (artwork-repo (make-sqlite-artwork-repository rc))
+         (comment-repo (make-sqlite-comment-repository rc))
+         (artists (get-artists artist-repo
+                               #:order-by (entity-sort-from-query
+                                           "created-at-desc")
+                               #:limit front-page-artist-count))
+         (artist-ids (map (lambda (a)
+                            (assq-ref a 'identifier)) artists))
+         (artworks (if (nil? artist-ids)
+                       '()
+                       (get-artworks-by-entity-ids artwork-repo
+                                                   'artist artist-ids)))
+         (comments (if (nil? artist-ids)
+                       '()
+                       (get-comments-by-entity-ids comment-repo
+                                                   'artist artist-ids))))
+    `(div (@ (class ,(item-tile-grid-face #:size "medium")))
+          ,@(map (lambda (x)
+                   `(div ,(item-tile (:i18n rc) 'artist x
+                                     (relevant-entities 'artist artworks x)
+                                     (relevant-entities 'artist comments x))))
+                 artists))))
+
 (get "/"
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -123,8 +193,12 @@
                                            #:is-logged-in (:cookies-value rc
                                                            "x-bewaking-wikimusic")
                                            #:song-fragment
-                                           (front-page-song-fragment
-                                            rc))))))
+                                           (front-page-song-fragment rc)
+                                           #:artist-fragment
+                                           (front-page-artist-fragment rc)
+                                           #:genres (front-page-genres rc)
+                                           #:counts (front-page-counts
+                                                     rc))))))
 
 ;; `/robots.txt' and `/sitemap.xml' are served by the controller in
 ;; `app/controllers/seo.scm': both state this instance's own address, which is

@@ -275,6 +275,53 @@ the menu with @code{for}, so it reaches assistive technology as well."
 ;; page uses only sometimes -- the renderer a Guitar Pro tab is drawn with, and
 ;; the SoundFont that makes it audible -- is fetched by the script below when a
 ;; reader asks for a tab, and the renderer itself is never inlined.
+;;; ====== The type and the glyphs ======
+;;;
+;;; The interface is set in three Lucida families and a pair of web families,
+;;; and its controls wear Phosphor glyphs.  All of it used to be somebody else's
+;;; address: a font host for the web families, an icon CDN for the glyphs, and
+;;; the author's own domain for the Lucida files -- so every page of every
+;;; instance made three third-party requests before it could be read, and the
+;;; type was only there while those hosts were.
+;;;
+;;; They are now files this project ships, fetched into `pub/' (see `maak
+;;; vendor-assets'), and a page points at them where the deployment said they
+;;; are read from (see `(wikimusic config)') -- nowhere by default, which is
+;;; this instance's own copy.  Every address in each stylesheet is relative, so
+;;; the three files carry their own fonts to whatever host serves them.
+(define theme-stylesheets
+  '("vendor/fonts/lucida.css"
+    "vendor/fonts/google.css"
+    "vendor/phosphor/phosphor.css"))
+
+;; The stylesheet the rest of the page is laid out with, and the icon a tab or a
+;; bookmark is shown with.  They are this project's own files rather than
+;; somebody else's, but a page reads them the same way and from the same place
+;; as the three above: an instance that serves its assets from another host says
+;; so once, and everything the document itself reads moves with it.
+(define page-stylesheet "css/wikimusic.olive.min.css")
+(define page-icon "favicon.ico")
+
+;; Every address of the interface's own assets a document head states, built at
+;; the one place a document is built: a page reads what this instance serves,
+;; or what the deployment said it serves instead of it.
+(define (theme-stylesheet-links)
+  "Return the links a page reads the interface's type and glyphs with."
+  (map (lambda (path)
+         `(link (@ (rel stylesheet)
+                   (href ,(asset-address path)))
+                ""))
+       theme-stylesheets))
+
+(define (hosted-elsewhere? fragment host)
+  "Return #t when FRAGMENT names HOST anywhere in it.
+
+A fragment is a piece of SXML, so what is read is its written form: the name of
+somebody else's host can only reach a page through an address, and an address is
+the same string however it is nested."
+  (let ((written (format #f "~s" fragment)))
+    (and (string-contains written host) #t)))
+
 (define* asset-library
   (build-asset-library '("pub/js/song-auto-scroll.js" "pub/js/symbanta.js"
                          "pub/js/song-chord-highlighter.js"
@@ -703,18 +750,27 @@ and six.
                                          #:locale locale
                                          #:robots robots
                                          #:json-ld json-ld)
-                              ,(hygguile-recommended-resources #:fonts (custom-fonts))
+                              ;; What the framework recommends a page carry, with
+                              ;; its own icon stylesheet left out: that link points
+                              ;; at a CDN, and the glyphs are served from here
+                              ;; instead (`theme-stylesheet-links' below).
+                              ,@(filter (lambda (fragment)
+                                          (not (hosted-elsewhere? fragment
+                                                                  "cdn.jsdelivr.net")))
+                                        (hygguile-recommended-resources
+                                         #:fonts (theme-stylesheet-links)))
 
                               (link (@ (rel "shortcut icon")
-                                       (href "/favicon.ico")
+                                       (href ,(asset-address page-icon))
                                        (type "image/x-icon")) "")
 
                               (link (@ (rel "icon")
-                                       (href "/favicon.ico")
+                                       (href ,(asset-address page-icon))
                                        (type "image/x-icon")) "")
 
                               (link (@ (rel stylesheet)
-                                       (href "/css/wikimusic.olive.min.css"))
+                                       (href ,(asset-address
+                                               page-stylesheet)))
                                     "")
 
                               (script (@ (type speculationrules))
@@ -1047,23 +1103,50 @@ and six.
          ;; with no scripting is told to scroll the track instead of being
          ;; offered controls that do nothing.
          (artwork-count (length (if (list? artworks) artworks '())))
+         ;; A picture is sized by the room it is standing in and not by itself,
+         ;; and the room is the same on every page: a figure of one height per
+         ;; breakpoint, growing with the slide beside it and then stopping, with
+         ;; the picture fitted inside it and never made bigger than it already
+         ;; is.
+         ;;
+         ;; Both halves of that are corrections.  Filling the slide outright
+         ;; -- what this did -- blew a small portrait up to the width of the
+         ;; track, where it stood taller than the photograph beside it and set
+         ;; the height of the whole row: a band of empty panel under one
+         ;; picture on a phone, a column of nothing on a desk.  And a *limit*
+         ;; alone still let the row be as tall as the tallest thing in it, so
+         ;; the page moved -- and the facts a reader came for moved with it --
+         ;; according to which pictures a contributor had happened to upload.
+         ;; A figure of its own height is the same on every song: the pictures
+         ;; inside it are shown at the size they were made at when that fits,
+         ;; shrunk to fit when it does not, and centred either way, with their
+         ;; own proportions kept.
          (rendered-artworks (map (lambda (art)
-                                   `(figure (@ (class ,(mk-class '(py-3
+                                   `(figure (@ (class ,(mk-class '(w-full
+                                                                   h-48
+                                                                   sm:h-72
+                                                                   md:h-96
+                                                                   flex flex-col
+                                                                   items-center
+                                                                   justify-center
+                                                                   gap-2))))
 
-                                                                        ))))
-
-                                            (img (@ (loading lazy)
-                                                    (class ,(mk-class '(rounded-xl
-                                                                        shadow-md
-                                                                        w-72
-                                                                        sm:w-96
-                                                                        md:w-96
-                                                                        lg:w-128
-                                                                        max-w-full
-                                                                        h-auto)))
-                                                    (src ,(uri-decode (assq-ref
-                                                                       art
-                                                                       'content-url)))))
+                                            (div (@ (class ,(mk-class '(flex-1
+                                                                        min-h-0
+                                                                        w-full
+                                                                        flex
+                                                                        items-center
+                                                                        justify-center))))
+                                                 (img (@ (loading lazy)
+                                                         (class ,(mk-class '(max-w-full
+                                                                             max-h-full
+                                                                             w-auto
+                                                                             h-auto
+                                                                             rounded-xl
+                                                                             shadow-md)))
+                                                         (src ,(uri-decode (assq-ref
+                                                                            art
+                                                                            'content-url))))))
                                             ,(render-if-nempty (lambda (fc)
                                                                  `(figcaption (@
                                                                                (class ,
@@ -1197,20 +1280,35 @@ and six.
                  (carousel #:id (format #f "artworks-~a-~a" entity
                                         (assq-ref x 'identifier))
                            #:fragments rendered-artworks
-                           ;; The frame is a fraction of the panel's own: a
-                           ;; detail card is already a frosted panel with a
-                           ;; border, and a second heavy surround inside it
-                           ;; would read as a box in a box.
+                           ;; The track is as wide as the panel and no
+                           ;; wider: without this the list is sized by the
+                           ;; pictures in it, so a card holding four of them
+                           ;; stretches to their width and takes the whole
+                           ;; page sideways with it -- the arrows land off the
+                           ;; screen and the right-hand one cannot be pressed.
+                           #:carousel-list-wrapper-css '(relative min-w-0 w-full)
                            #:carousel-list-css '(flex
-                                                 gap-4
-                                                 sm:gap-6
+                                                 gap-3
+                                                 sm:gap-4
+                                                 lg:gap-6
                                                  list-none
-                                                 overflow-x-scroll
+                                                 w-full
+                                                 overflow-x-auto
                                                  scroll-smooth
                                                  snap-x
                                                  rounded-xl
                                                  my-2)
-                           #:item-width '(w-72 sm:w-96 lg:w-128)
+                           ;; A slide on a phone is a share of the track
+                           ;; rather than a width in `rem': a fixed width that
+                           ;; fits one phone overflows the next one down, and
+                           ;; the point of the sliver of the next picture left
+                           ;; showing is that it is a share of whatever width
+                           ;; the track turned out to be.  From the small
+                           ;; breakpoint up the track is wide enough to size a
+                           ;; slide in `rem' again, and a reader sees one and a
+                           ;; half of them at every width from there to the
+                           ;; widest desk.
+                           #:item-width '(w-5/6 sm:w-72 md:w-96 lg:w-128)
                            #:item-height '(h-auto)
                            #:carousel-item-content-css '(flex items-center
                                                               justify-center)
@@ -1544,14 +1642,32 @@ throw the results away."
                          ("text-12" . "text-12")
                          ("text-16" . "text-16")))))))
 
+;; The search control, and where it takes the words it is given.
+;;
+;; A list page searches itself: the words are added to the query string the page
+;; is already read with, so the sort order, the tile size and the page number a
+;; reader chose survive their search.  A page *about* something else -- the
+;; front page -- names the collection instead, and the form is then an ordinary
+;; GET: a browser without scripting submits it to `/songs?search=…' and the
+;; script below navigates to the same address, so the control behaves the same
+;; with and without it.
 (define* (search-box G_
-                     #:key search-query)
+                     #:key search-query (action "") (centered? #f))
   `((script
      "
 function addSearchQueryParam(form) {
   const searchInput = document.getElementsByName('search')[0];
 
   if (searchInput.value) {
+    // A form that names another page is asking *there*: the words travel with
+    // it and the query string this page carries stays where it is.
+    const action = form.getAttribute('action');
+
+    if (action) {
+      window.location.href = `${action}?search=${encodeURIComponent(searchInput.value)}`;
+      return false; // Prevent the default form submission
+    }
+
     const urlSearchParams = new URLSearchParams(window.location.search);
     var params = Object.fromEntries(urlSearchParams.entries());
 
@@ -1569,14 +1685,21 @@ function addSearchQueryParam(form) {
 }
 ")
     (div (@ (class ,(mk-class '(my-3))))
-         (form (@ (onsubmit "addSearchQueryParam(this)"))
-               (div (@ (class ,(mk-class '(flex flex-row
-                                                items-center
-                                                flex-wrap
-                                                items-center
-                                                justify-center
-                                                md:justify-start
-                                                gap-2))))
+         (form (@ (action ,action)
+                  (onsubmit "addSearchQueryParam(this)"))
+               ;; A list page reads its words at the end of its own toolbar, so
+               ;; they line up with the left of it; a page that offers the
+               ;; control on its own -- the front page -- asks for it centred
+               ;; at every width.
+               (div (@ (class ,(mk-class
+                                (append
+                                 '(flex flex-row
+                                        items-center
+                                        flex-wrap
+                                        gap-2)
+                                 (if centered?
+                                     '(justify-center)
+                                     '(justify-center md:justify-start)))))))
                     ,(input #:label ""
                             #:name "search"
                             #:value (cond
@@ -1596,7 +1719,7 @@ function addSearchQueryParam(form) {
                                                text-onyx-300
                                                shadow-md)
                             #:input-flex-css #f)
-                    ,(submit-button (G_ "search")))))))
+                    ,(submit-button (G_ "search"))))))
 
 (define* (render-external-link #:key link label)
   (render-if-nestring (lambda (l)

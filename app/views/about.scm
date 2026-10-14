@@ -34,6 +34,7 @@
 ;;; crawler is told about them.
 
 (define-module (app views about)
+  #:use-module (wikimusic config)
   #:use-module (wikimusic html)
   #:use-module (wikimusic prose)
   #:use-module (wikimusic seo)
@@ -130,9 +131,16 @@ and the foundation last."
         ;; account of the place from the ask.  The control itself is the front
         ;; page's own, so the two pages cannot drift into asking for the same
         ;; thing two ways.
-        (div (@ (class ,(mk-class about-ask-classes)))
-             ,(wikimusic-support G_)
-             (p ,(project-support-note G_)))
+        ;;
+        ;; An instance that asks for nothing says nothing here, rule and note
+        ;; as well as control: a line drawn across the page with nothing under
+        ;; it, or a paragraph about what donations pay for, is the ask by
+        ;; another name (see `(wikimusic config)').
+        ,@(if (donation-shown?)
+              `((div (@ (class ,(mk-class about-ask-classes)))
+                     ,@(wikimusic-support G_)
+                     (p ,(project-support-note G_))))
+              '())
 
         (p ,(project-invitation G_))))
 

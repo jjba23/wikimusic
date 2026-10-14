@@ -379,7 +379,7 @@
                             #:limit 300))
          (page-image (artwork-social-image artworks
                                            #:fallback
-                                           (social-image-url)))
+                                           (announced-image)))
          ;; A click track, at the tempo the first tab declares when one does:
          ;; a reader practising a passage wants it at the speed the tab is
          ;; written in, and the page already knows what that is.
