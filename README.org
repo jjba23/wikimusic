@@ -1,22 +1,45 @@
-#+title: Wikimusic
+#+title: WikiMusic — the free music knowledge encyclopaedia
 #+author: Josep Bigorra
 #+email: jjbigorra@gmail.com
 #+language: en
-#+options: html-style:nil
+#+options: toc:1
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://jointhefreeworld.org/static/css/jointhefreeworld.css" />
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" />
 
 [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]]
 [[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]]
 [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
 
-The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms.
+*the free music knowledge encyclopaedia*: a community-run catalogue of songs,
+artists and genres with guitar and bass tabs, chords, lyrics, keys, tunings and
+sheet music, written by musicians for anyone learning to play.
+
+WikiMusic is two things at once: a *music encyclopaedia* that anyone can read,
+and the *content management system* a community runs it with — both written in
+Guile Scheme, both hackable down to the last button, and both free software in
+the strict sense of the word.
+
+#+caption: A minute in WikiMusic: the front page, the songs list, a song page with its tablature, its chord guide and its click track, and the same page in dark mode.
+[[https://codeberg.org/jjba23/wikimusic/raw/branch/trunk/pub/img/wikimusic-demo.gif]]
+
+- 🌍 *Read the biggest instance:* [[https://wikimusic.jointhefreeworld.org][wikimusic.jointhefreeworld.org]]
+- 📖 *Read this document rendered as HTML:* [[https://jointhefreeworld.org/manuals/wikimusic/][the WikiMusic manual]]
+- 💾 *Read the source (and send PRs/patches):* [[https://codeberg.org/jjba23/wikimusic][codeberg.org/jjba23/wikimusic]]
+- 🗺️ *Follow what is next:* [[https://lucidplan.jointhefreeworld.org/tickets/wikimusic][the WikiMusic board]]
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
+
+#+TOC: headlines 2
+
+--------
+
+* What WikiMusic is
+
+The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms.
 
 At its core, WikiMusic leverages the expressive power of Lisp (Guile Scheme) to build a dynamic interactive Music Gallery and Content Management System (CMS).
 
 Whether you're a musician, educator, researcher, or simply a music lover, WikiMusic empowers you to:
+
 - Discover music from diverse genres and traditions.
 - Organize information with structured metadata and multimedia content.
 - Contribute by adding new compositions, analyses, or educational materials.
@@ -32,11 +55,9 @@ Join us in building an ever-growing library of musical knowledge — where every
 
 This document is the project's README and its manual at once: it documents wikimusic, what it does, how to run an instance of it, how to work on it, and what administering one involves.  Everything below is here to be read, and the sections that describe a feature are the ones a contributor changes the behaviour of.  The same text is published as HTML at [[https://jointhefreeworld.org/manuals/wikimusic/][jointhefreeworld.org/manuals/wikimusic]].
 
-[[https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic-small.jpg]]
+--------
 
--------
-
-* What Wikimusic offers
+* What WikiMusic offers
 
 wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Olive CSS, GNU Make, Emacs.
 
@@ -49,8 +70,14 @@ wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Olive CSS, GNU Make,
   whose own header the page reads, which the page draws as notation and
   tablature, and which it plays back -- so a reader can see, hear and download
   the same file without leaving the page.
+- *A page to practise from*: an ASCII tablature a reader can scroll by itself,
+  the *chords the tab names* turned into a fingering guide under it, and a
+  *metronome* whose click is made in the browser rather than fetched -- so a
+  song page is something to play along with, not only to read.
 - *A responsive interface* -- the same shell on a phone and on a desktop -- with
   sorting, search and a subtle, icon-first tile-size control on every list.
+- *Light and dark*, with the reader's choice remembered, and four interface
+  languages to read the whole site in.
 - *Pretty error pages* for the refusals a reader actually meets (404, 403, 500
   and the rest), rendered by the application itself in the site's own shell.
 - *Accounts and permissions*: sign-in, per-row ownership, and a super grant that
@@ -69,6 +96,10 @@ wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Olive CSS, GNU Make,
   support -- which an instance that raises no money turns off.  The front page
   opens on what the place holds rather than on the introduction, so the account
   of the project lives here and is linked from every page's footer.
+- *Pages a crawler can read too*: a canonical address, a link preview for the
+  chat client a link is pasted into, JSON-LD that says what each page is about,
+  and a =/sitemap.xml= and =/robots.txt= built from the instance's own rows
+  (see =lib/wikimusic/seo.scm= and =app/controllers/seo.scm=).
 - *Nothing fetched from anybody else before a page can be read*: the type the
   interface is set in, the glyphs its controls wear and the picture the project
   shows of itself are files the instance serves, and the address they hang off
@@ -81,31 +112,96 @@ Wikimusic and Artanis are written using GNU Guile, one of the best implementatio
 - *Cross-platform:* Runs anywhere that Guile Scheme can run, and exposes web endpoints, and is thus accessible from computers, phones, etc.
 - *Free Software*: Contribute to its development or extend it with your own custom features.
 
--------
+--------
 
-* Development quick start
+* Try it in five minutes
+
+The short version, for the impatient: clone the repository, step into the
+project's environment, make a database, and run the site.
 
 #+begin_src sh
-# enter the project's environment (all dependencies, pinned)
+# 1. get the source
+git clone https://codeberg.org/jjba23/wikimusic.git
+cd wikimusic
+
+# 2. enter the project's environment (all dependencies, pinned)
 guix shell -m manifest.scm
 
-# create the database and add your first users (see "Running Wikimusic")
+# 3. create the database and add your first users (see "Running WikiMusic")
 maak init-db
 
-# run the site with hot reloading on http://localhost:50050
+# 4. run the site with hot reloading on http://localhost:50050
 maak dev
 
-# run the test suite
+# 5. run the test suite
 maak test
 #+end_src
 
-"Running Wikimusic" below explains the environment file a deployment needs, the migrations that create the tables, and how to run Wikimusic as a daemon.
+That is the whole of it: step 2 is the only one that needs anything installed
+beforehand (GNU Guix), and steps 3 to 5 are one command each.  Open
+[[http://localhost:50050][http://localhost:50050]] and you are reading your own instance -- empty, and
+yours to fill.
 
---------
+To run it *without* the hot-reloading development wrapper, the server is simply
+this:
 
-* Running Wikimusic
+#+begin_src sh
+guix shell -m manifest.scm -- art work
+#+end_src
 
-If you are thinking of running Wikimusic yourself and hosting it on your own, here follow some tips.
+"Running WikiMusic" below explains the environment file a deployment needs, the migrations that create the tables, and how to run Wikimusic as a daemon.
+
+* Requirements, and what is pinned for you
+** What you need
+
+- *GNU Guix*, whether as a standalone distro (Guix System) or on top of any
+  other GNU/Linux distribution.  This is the one thing to install yourself, and
+  it is also the whole of the setup: ~manifest.scm~ in the repository names
+  every package and tool the project uses -- Guile, Artanis, SQLite, GNU Make,
+  gettext, watchexec, Emacs, and the Guile libraries wikimusic is built on --
+  and ~channels.scm~ pins the Guile and Guix revision behind them.
+- *Not on Guix?*  You can still run wikimusic: read ~manifest.scm~ as the list
+  of exactly what you need, and install those packages with your own package
+  manager.  The manifest is the honest answer to "what does this need", and it
+  is what a non-Guix setup should be measured against.
+- *A database*, created for you: SQLite by default, and the project is
+  compatible with PostgreSQL and MySQL too (=db.dbd= in ~conf/artanis.conf= picks
+  one).
+- *Optional:* ~direnv~, which reads the =.envrc= in the repository and enters
+  the same environment for you as you cd into it.
+
+A first run downloads the pinned toolchain, which takes a while; after that the
+environment is in the store and starting the site is seconds.
+
+** The tasks maak defines
+
+Every task the project defines lives in ~maak.scm~, and each runs inside the
+pinned environment described above.  ~maak --list~ names them all; the ones you
+will reach for most:
+
+| Task                            | What it does                                                            |
+|---------------------------------+-------------------------------------------------------------------------|
+| =maak init-db=                  | Create ~wikimusic.db=, turn on WAL, apply every migration (deletes the database first) |
+| =maak migrate=                  | Apply the migrations a database is missing; safe to run at any time      |
+| =maak dev= (=maak hr=)          | Run the site on port 50050 and restart it when a =scm=, =css= or =js= file changes |
+| =maak server=                   | Run the site once, with ~conf/artanis.conf=                              |
+| =maak production-server=        | Run the site with ~conf/production.conf=                                |
+| =maak kill-server=              | Stop whatever is listening on the project's port                        |
+| =maak test=                     | Run the whole suite under ~test/veritas~                                 |
+| =maak build-manual=             | Render this document to ~README.html=                                   |
+| =maak deploy=                   | Render this document and copy the rendering to the instance that serves it |
+| =maak fmt=                      | Format every Scheme file the way the Guix style guide does               |
+| =maak repl=                     | A Guile REPL in the project's environment, with its load paths           |
+| =maak i18n-update-template=     | Re-extract the translatable strings into the =.pot= template             |
+| =maak i18n-merge=               | Merge the template into every locale's =.po= file                        |
+| =maak i18n-compile=             | Compile every =.po= into the =.mo= the server reads                      |
+| =maak vendor-assets=            | Refresh the typefaces, the glyphs and the project's picture in ~pub/=    |
+| =maak alphatab=                 | Refresh the vendored Guitar Pro renderer, music font and SoundFont       |
+| =maak olive-css=                | Refresh the Olive CSS stylesheet the interface is painted with           |
+
+* Running WikiMusic
+
+If you are thinking of running WikiMusic yourself and hosting it on your own, here follow some tips.
 
 Firstly, make sure you use the Guix package manager, whether as a standalone distro (Guix system) or on top of any other GNU/Linux distribution.
 
@@ -113,7 +209,9 @@ I include a ~manifest.scm~ in the repo so that it's easy to run the project if y
 
 If you want to run without Guix you should check that ~manifest.scm~ anyway since it will give you exactly the packages that you need.
 
-** The environment file
+** Configuring an instance
+
+*** The environment file
 
 For running wikimusic yourself, you'll need to define and load a module called ~(wikimusic env)~ where you add some required environment variables.  I recommend in the root of the project create a ~env.scm~ and exclude it from Git.
 
@@ -136,6 +234,10 @@ For running wikimusic yourself, you'll need to define and load a module called ~
 #+end_src
 
 The two keys are the instance's own secrets and they are what seals a session, so a deployment generates its own rather than reusing these; the rest name the mail service the instance sends through.
+
+Pingwing is a mail and notification solution written in Guile Scheme and also part of the jointhefreeworld project.  It's used in WikiMusic for password resets, among other notifications.  Find more about it here: https://codeberg.org/jjba23/pingwing
+
+*** What an instance says about itself
 
 The same module is where an instance says what it says about itself.  Every one of these is optional -- an instance that names none of them is wikimusic, unchanged -- and each of them is read where it is used rather than written into the page that shows it:
 
@@ -178,8 +280,6 @@ They reach the footer (where the code, the manual and the licence are linked), t
 Two of them are read as rules rather than as values.  =show-donation?= is on unless the deployment turns it off, and =assets-url= means this instance's own copy unless it names somewhere else -- so an instance that never thought about either is wikimusic as it ships.
 
 What an instance may name, and what each one falls back to, is written down in ~lib/wikimusic/config.scm~.  One of them is derived rather than defaulted: the manual's address is built from =source-repository-url=, so a fork that says where its code is read gets its own README link without having to name it separately.
-
-Pingwing is a mail and notification solution written in Guile Scheme and also part of the jointhefreeworld project.  It's used in WikiMusic for password resets, among other notifications.  Find more about it here: https://codeberg.org/jjba23/pingwing
 
 ** The database, and the first user
 
@@ -238,6 +338,34 @@ If you are hacking away at the project, I would suggest using ~maak dev~ since t
 Running the test suite is ~maak test~, and ~maak --list~ names every other task the project defines.  ~maak build-manual~ renders this document to HTML, and ~maak deploy~ copies that rendering to the instance that serves it.
 
 The unit tests live in ~test/veritas/unit~, one file per area, and each is run by the framework with the deployment's own ~env.scm~ loaded.  What a spec needs beyond that -- being a *deployment* for the length of an assertion, when what it is proving is a switch a deployment turns off or a host it names -- is a helper module rather than a test of its own, and it lives outside the unit directory for that reason: ~test/support/deployment.scm~.
+
+*** A map of the tree
+
+- ~app/controllers/~ -- the routes: one file per area of the site, plus
+  =interchange.scm= (export and import), =seo.scm= (the sitemap and the robots
+  file), =prefs.scm= and =me.scm= (a reader's own settings and page);
+- ~app/models/~ -- one file per table, the definitions Artanis reads when it
+  starts and creates when a table is missing;
+- ~app/views/~ -- the pages, as SXML: the front page, the three entities and
+  their forms, sign-in, the about page and the error pages;
+- ~lib/wikimusic/~ -- the library every one of the above is written with:
+  =domain/~ (what a song, an artist, a genre *is*), =sqlite/~ (how each is
+  stored and read), =html.scm= (the shell and every component a page is built
+  from), =controller.scm= (=guard-owner=, =may-mutate?=), =auth.scm=,
+  =config.scm=, =seo.scm=, =guitarpro.scm=, =prose.scm= and
+  =domain/guitar-chord-guide.scm=;
+- ~pub/~ -- everything the browser is served, and nothing else:
+  =css/=, =js/=, =img/= and =vendor/= (the typefaces, the glyphs and the
+  tablature renderer, which an instance serves itself);
+- ~resources/~ -- =migrations/sqlite/= (the schema, oldest first) and
+  =assets/=.  ~sys/~ -- =i18n/= (the translation catalogs) and =pages/=;
+- ~test/~ -- =veritas/unit/= (one spec per area) and =support/= (the helpers);
+- ~conf/~ -- =artanis.conf= and =production.conf=: the port, the database, the
+  server core, the cookie lifetime;
+- ~ENTRY= -- Artanis's entry file: the file types it serves, the text domain it
+  translates with, and the error pages it installs before the first request;
+- ~maak.scm=, ~manifest.scm=, ~channels.scm= -- the tasks, the packages, and the
+  revision they are pinned to.
 
 ** Running it for real: a Shepherd service
 
@@ -488,6 +616,27 @@ them is not therefore a file the site will not hold.
 The list of file extensions artanis serves statically -- in =ENTRY= -- carries
 =sf2= for the SoundFont, so a deployment that narrows that list should keep it.
 
+** Practising from the page: the ASCII tab, the chords and the metronome
+
+A version that carries an ASCII tab -- the plain-text transcription so many
+players have written and passed around -- is a page to practise from rather than
+only to read.
+
+- *Auto-scrolling* moves the tab down the screen at a speed the reader chooses,
+  a few lines at a time, so a hand is free to play.
+- The *chords the tab names* are collected and shown under it as a small
+  *guitar chord guide*, each chord with the fingering the transposition implies
+  (=Am  x02210=, =F  133211=), and a control highlights those chord names in
+  the tab itself.
+- The *metronome* under the song is a click track whose sound is *made* in the
+  browser -- twenty milliseconds of a shaped tone per beat -- rather than
+  fetched, so a reader who never opens it pays nothing for it, and its tempo,
+  its meter and its beat lamps are all the page's own Scheme.
+
+None of the three is needed to read the song, and none of them is a video or a
+third-party widget: they are three small scripts in =pub/js/=, offered by the
+page, hidden until the script that drives them is there.
+
 ------
 
 * Export, archival, and exchanging between instances
@@ -572,8 +721,61 @@ The routes live in =app/controllers/interchange.scm=.
   content tables, so a crafted body cannot reach a table of its own choosing.
 
 For a whole-instance backup the SQLite file may simply be copied -- see
-"Running Wikimusic" -- but the two export routes and the import are the
+"Running WikiMusic" -- but the two export routes and the import are the
 supported, format-stable way to move content between instances.
+
+------
+
+* Translated into four languages
+
+The interface is offered in *English (US)*, *Nederlands*, *Español* and
+*日本語*, and a reader picks one from the language control on the front page;
+the choice is written to a cookie and posted to =/preferences/locale=, so every
+page after it is read in that language.
+
+** How the strings are kept
+
+Every sentence a reader sees is written in the source as a literal argument of
+=G_=, which is what puts it in the template and in front of a translator:
+
+#+begin_src scheme
+(G_ "browse the songs")
+#+end_src
+
+The sentences are extracted from the source into a template
+(~sys/i18n/locale/translate.pot~), each language has its own catalog beside it
+(~sys/i18n/locale/<lang>/LC_MESSAGES/translate.po~ and the compiled =.mo= the
+server reads), and the server is told where they are in =ENTRY= -- the text
+domain is bound to =./sys/i18n/locale= and =conf/artanis.conf= sets
+=session.i18n = locale=.
+
+** Translating, or adding a language
+
+#+begin_src sh
+# after changing a string in the source: refresh the template, then the catalogs
+maak i18n-update-template
+maak i18n-merge
+
+# a new catalog for a language that has none yet (en, nl, es and ja ship with one)
+maak i18n-init-nl
+
+# compile every catalog into the .mo the server reads
+maak i18n-compile
+#+end_src
+
+A language that is not in ~maak.scm~'s =i18n-locales= is not compiled, and one
+that is not in =wikimusic-locales= in ~lib/wikimusic/html.scm~ is not offered
+in the language control; adding both is what makes a new language a first-class
+one.  Translators are very welcome -- a catalog is ordinary gettext, and no
+Scheme is needed to fill one in.
+
+** One rule for the source
+
+A string that is reworded is a string no catalog holds any more, so it silently
+falls back to English in the three translated locales.  The sentences the
+project says about itself are therefore written once, in
+~lib/wikimusic/prose.scm~, where that rule is stated; everywhere else, the
+words a page shows are written where they are read.
 
 ------
 
@@ -646,7 +848,85 @@ History
     19th January, 2015 - offers Artanis to FSF/GNU, and RMS inducts it as an official GNU project. Artanis becomes GNU Artanis.
     29 December 2021 - GNU Artanis donates to HardenedLinux community to connect with product environment more tightly.
 
------
+--------
+
+* Contributing
+
+Contributing to free software is a uniquely beautiful act because it embodies principles of generosity, collaboration, and empowerment.
+
+We welcome everyone to feel invited to the wikimusic Project, and encourage active contribution in all forms, to improve it and/or suggest improvements, brainstorm with me, make it more modular/flexible, etc, feel free to contact me <jjbigorra@gmail.com> to chat, discuss or report feedback.
+
+Find here the Backlog and Kanban boards for wikimusic: https://lucidplan.jointhefreeworld.org/tickets/wikimusic
+
+[[https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic-small.jpg]]
+
+/A picture the project shows of itself -- and the one a pasted link of the site is previewed with./
+
+** Ways in
+
+Nothing here is a big ask, and every one of these is a real contribution:
+
+- *Tell me what is missing or awkward.*  A ticket on the
+  [[https://lucidplan.jointhefreeworld.org/tickets/wikimusic][board]], a message to
+  <jjbigorra@gmail.com>, or a note under the entry you were reading -- a bug
+  report from somebody actually using the thing is worth more than a feature
+  list.
+- *Send a PR/patch.*  Branches and patches on
+  [[https://codeberg.org/jjba23/wikimusic][the forge]] are how the code arrives;
+  a small, explained change is easier to review than a large one, and a change
+  that comes with the story of *why* is easier still.
+- *Translate, or fix a translation.*  Dutch, Spanish and Japanese are in; more
+  are welcome.  See "Translated into four languages" -- a catalog is ordinary
+  gettext and needs no Scheme.
+- *Write a description.*  The encyclopaedia is the point, and an artist, a
+  genre or a song with a good description in Org mode is worth several commits
+  of code.
+- *Run an instance.*  Fork it, name it, fill it with your own corner of music;
+  every one of these sections is a description of a thing you are free to
+  change.
+
+** Running the tests before you send anything
+
+#+begin_src sh
+maak test      # the whole suite, one spec at a time
+maak fmt       # format every Scheme file the way the Guix style guide does
+#+end_src
+
+The suite lives in ~test/veritas/unit~, one file per area of the project, and
+each spec is run with the deployment's own =env.scm= loaded -- the same file
+the server loads, so a test proves the thing a deployment runs.  A spec that
+needs to *be* a deployment for one assertion (a host it names, a switch it
+turns off) uses the helper in ~test/support/deployment.scm~ instead of a test of
+its own.
+
+** Continuous integration
+
+A push to the =trunk= branch is picked up by
+[[https://woodpecker-ci.org/][Woodpecker]] (~.woodpecker/byggsteg.yaml~), which
+submits a job to the jointhefreeworld *Byggsteg* service.  The job that runs on
+the deployment is the project's own tasks, in order: =maak-test=,
+=pull-and-restart=, =maak-deploy= -- so what is merged is what is tested, and
+then what is served.
+
+** AI Policy
+
+This project adheres to the [[https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-ai-policy/index.html][jointhefreeworld AI (Artificial Intelligence) policy]].
+
+Our core principle is simple: *AI should assist human creativity and problem-solving, never replace human reasoning.*
+
+While tools like Large Language Models (LLMs) and interactive chatbots can be beneficial for reviewing, refactoring small functions, or acting as a sounding board, they should be used with moderation.
+
+We require a human in the loop for all contributions. The use of autonomous AI agents to automatically generate and submit pull requests to this project is strictly prohibited.
+
+** Code of conduct
+
+This project adheres to the jointhefreeworld code of conduct. Find it here:
+
+https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-code-of-conduct/index.html
+
+In summary, we foster an inclusive, respectful, and cooperative environment for all contributors and users of this free software project. Inspired by the ideals of the GNU Project, we strive to uphold freedom, equality, and community as guiding principles. We believe that collaboration in a community of mutual respect is essential to creating excellent free software.
+
+-------
 
 * Licensing
 
@@ -658,9 +938,7 @@ The documentation and examples, including this document, which are provided with
 
 https://www.gnu.org/licenses/fdl-1.3.html
 
--------
-
-* On bundled third-party assets
+** On bundled third-party assets
 
 wikimusic serves its own assets, and some of them are somebody else's work,
 vendored into the tree rather than linked to, so that an instance reaches no CDN
@@ -695,41 +973,6 @@ show -- a copy that went on naming the host it came from would be a tree full of
 files nobody reads -- so it is pinned by the test suite against a written
 stylesheet rather than a live one, with no network: ~test/veritas/unit/assets-spec.scm~.
 
--------
-
-* AI Policy
-
-This project adheres to the [[https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-ai-policy/index.html][jointhefreeworld AI (Artificial Intelligence) policy]].
-
-Our core principle is simple: *AI should assist human creativity and problem-solving, never replace human reasoning.*
-
-While tools like Large Language Models (LLMs) and interactive chatbots can be beneficial for reviewing, refactoring small functions, or acting as a sounding board, they should be used with moderation.
-
-We require a human in the loop for all contributions. The use of autonomous AI agents to automatically generate and submit pull requests to this project is strictly prohibited.
-
-
------------------------
-
-* Code of conduct
-
-This project adheres to the jointhefreeworld code of conduct. Find it here:
-
-https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-code-of-conduct/index.html
-
-In summary, we foster an inclusive, respectful, and cooperative environment for all contributors and users of this free software project. Inspired by the ideals of the GNU Project, we strive to uphold freedom, equality, and community as guiding principles. We believe that collaboration in a community of mutual respect is essential to creating excellent free software.
-
--------
-
-* Wikimusic Project
-
-Contributing to free software is a uniquely beautiful act because it embodies principles of generosity, collaboration, and empowerment.
-
-We welcome everyone to feel invited to the wikimusic Project, and encourage active contribution in all forms, to improve it and/or suggest improvements, brainstorm with me, make it more modular/flexible, etc, feel free to contact me <jjbigorra@gmail.com> to chat, discuss or report feedback.
-
-Find here the Backlog and Kanban boards for wikimusic: https://lucidplan.jointhefreeworld.org/tickets/wikimusic
-
------
-
 ** On Lucida fonts
 
 Lucida fonts are proprietary typefaces originally developed by Bigelow & Holmes. They remain a long-time favorite for many people and are very legible in many situations and hardware/software. While they are bundled pre-installed on many operating systems and platforms, they remain proprietary fonts.
@@ -753,3 +996,19 @@ A build should never fail because "it worked on my machine." Reliable software d
 - *Time Travel:* Rebuild the exact system state from any point in git history using ~guix time-machine~.
 - *Atomic Operations:* Instantly upgrade or roll back environments without leaving orphaned dependencies or broken states.
 - *Unified Tooling:* One tool manages development shells, isolated containers, package builds, and full system configurations.
+
+Wikimusic is built on that: ~channels.scm~ pins the Guile and Guix revision
+every task runs under, ~manifest.scm~ names the packages, and each =maak= task
+is run through both -- which is why a bug report that says "it fails on trunk"
+is a reproducible statement rather than a conversation about toolchains.
+
+----------
+
+* Thanks
+
+WikiMusic stands on a lot of other free software -- [[https://codeberg.org/jjba23/hygguile][hygguile]],
+[[https://codeberg.org/jjba23/kracht][kracht]], [[https://codeberg.org/jjba23/scriba][scriba]], [[https://codeberg.org/jjba23/bewaking][bewaking]], [[https://codeberg.org/jjba23/orgwebalchemy][orgwebalchemy]],
+[[https://codeberg.org/jjba23/mutastructura][mutastructura]], [[https://codeberg.org/jjba23/veritas][veritas]], [[https://codeberg.org/jjba23/maak][maak]],
+[[https://codeberg.org/jjba23/olive-css][Olive CSS]], [[https://codeberg.org/jjba23/pingwing][pingwing]] and
+[[https://codeberg.org/jjba23/byggsteg][byggsteg]] -- most of them part of
+[[https://jointhefreeworld.org/][jointhefreeworld]], all of them worth a look.
