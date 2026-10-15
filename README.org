@@ -3,7 +3,7 @@
 #+author: Josep Bigorra
 #+email: jjbigorra@gmail.com
 #+language: en
-#+options: toc:nil
+#+options: toc:nil num:nil
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://jointhefreeworld.org/static/css/jointhefreeworld.css" />
 
 [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]]
@@ -160,7 +160,7 @@ this:
 guix shell -m manifest.scm -- art work
 #+end_src
 
-"Running WikiMusic" below explains the environment file a deployment needs, the migrations that create the tables, and how to run Wikimusic as a daemon.
+[[#running-wikimusic][Running WikiMusic]] below explains the environment file a deployment needs, the migrations that create the tables, and how to run Wikimusic as a daemon.
 
 * Requirements, and what is pinned for you
 :PROPERTIES:
@@ -196,7 +196,7 @@ environment is in the store and starting the site is seconds.
 :END:
 
 Every task the project defines lives in ~maak.scm~, and each runs inside the
-pinned environment described above.  ~maak --list~ names them all; the ones you
+[[#what-you-need][pinned environment]] described above.  ~maak --list~ names them all; the ones you
 will reach for most:
 
 | Task                            | What it does                                                            |
@@ -336,9 +336,9 @@ To apply migrations to a database that already exists -- which is safe to run at
 maak migrate
 #+end_src
 
-Neither the server nor any other task applies migrations, and nothing reads the [[https://en.wikipedia.org/wiki/SQL][SQL]] files and hands them to ~sqlite3~ itself: ~maak init-db~ and ~maak migrate~ are the two ways in.  A copy of the SQLite file, or a JSON dump loaded into a fresh database (see "Export, archival, and exchanging between instances"), are the other ways to arrive at the tables.
+Neither the server nor any other task applies migrations, and nothing reads the [[https://en.wikipedia.org/wiki/SQL][SQL]] files and hands them to ~sqlite3~ itself: ~maak init-db~ and ~maak migrate~ are the two ways in.  A copy of the SQLite file, or a JSON dump loaded into a fresh database (see [[#export-archival-and-exchanging-between-instances][Export, archival, and exchanging between instances]]), are the other ways to arrive at the tables.
 
-Upon starting a blank new wikimusic deployment you will have no users in the database, and there is no sign-up route: the first account is made from the shell, and it should hold two permissions -- =wikimusic:modify-permissions=, the super grant, and =wikimusic:user-create=, which is what the routes that make an account ask for.  The second is not covered by the first: a route asks for the permissions it names, and what the super grant overrides is ownership, not that (see "Accounts, permissions and ownership").
+Upon starting a blank new wikimusic deployment you will have no users in the database, and there is no sign-up route: the first account is made from the shell, and it should hold two permissions -- =wikimusic:modify-permissions=, the super grant, and =wikimusic:user-create=, which is what the routes that make an account ask for.  The second is not covered by the first: a route asks for the permissions it names, and what the super grant overrides is ownership, not that (see [[#accounts-permissions-and-ownership][Accounts, permissions and ownership]]).
 
 A password is stored as what ~hash-password~ derives -- Argon2id where this build's libgcrypt offers it, and PBKDF2-SHA256 otherwise -- with the algorithm, its cost and its salt written into the stored string itself.  Any characters may be in a password: the string reaches ~hash-password~ as a string and is never evaluated, and the salt is drawn fresh inside that call, which is why the ~users~ table's own ~salt~ column is left empty here.
 
@@ -362,7 +362,7 @@ The heredoc is quoted, so nothing in it is expanded by the shell: the hash
 contains =$= and may as well contain anything else, and it is stored as the
 bytes ~hash-password~ printed rather than as whatever a shell made of them.
 
-The rest of the accounts are then made from the running site, by a holder of =wikimusic:user-create= (see "Accounts, permissions and ownership").  Sign in with the email and the password you hashed, and the instance is yours to fill.
+The rest of the accounts are then made from the running site, by a holder of =wikimusic:user-create= (see [[#accounts-permissions-and-ownership][Accounts, permissions and ownership]]).  Sign in with the email and the password you hashed, and the instance is yours to fill.
 
 If running locally, it's recommended to use ~localhost~ instead of ~127.0.0.1~ as this will work better with the authentication/authorization and other cookies.
 
@@ -776,7 +776,7 @@ The routes live in =app/controllers/interchange.scm=.
   The same rows, as one long self-contained page: every artist, genre and song
   with its name linked to its page and its description already rendered from
   Org.  It is what an archivist wants -- a copy that reads in a browser with no
-  server behind it -- and it links to the JSON dump above for the machine's
+  server behind it -- and it links to the [[#the-machine-s-view-a-json-dump][JSON dump]] above for the machine's
   copy.
 
 ** Loading a dump into another instance
@@ -790,7 +790,7 @@ The routes live in =app/controllers/interchange.scm=.
        --data @wikimusic-export.json https://other.example/import/json
   #+end_src
 
-  The body is the JSON the export above produced.  Import is the one *write*
+  The body is the JSON the [[#the-machine-s-view-a-json-dump][export above]] produced.  Import is the one *write*
   here and the change is to the whole database, so it is gated: the session
   must hold =wikimusic:modify-permissions=, the super grant, and the route is
   never reachable anonymously.  Rows are inserted one at a time, and a row that
@@ -807,7 +807,7 @@ The routes live in =app/controllers/interchange.scm=.
   content tables, so a crafted body cannot reach a table of its own choosing.
 
 For a whole-instance backup the SQLite file may simply be copied -- see
-"Running WikiMusic" -- but the two export routes and the import are the
+[[#running-wikimusic][Running WikiMusic]] -- but the two export routes and the import are the
 supported, format-stable way to move content between instances.
 
 ------
@@ -990,7 +990,7 @@ Nothing here is a big ask, and every one of these is a real contribution:
   a small, explained change is easier to review than a large one, and a change
   that comes with the story of *why* is easier still.
 - *Translate, or fix a translation.*  Dutch, Spanish and Japanese are in; more
-  are welcome.  See "Translated into four languages" -- a catalog is ordinary
+  are welcome.  See [[#translated-into-four-languages][Translated into four languages]] -- a catalog is ordinary
   gettext and needs no Scheme.
 - *Write a description.*  The encyclopaedia is the point, and an artist, a
   genre or a song with a good description in Org mode is worth several commits
@@ -1088,7 +1088,7 @@ at run time and works with no network of its own:
 - the three *Lucida* families the interface is set in, and the *picture the
   project shows of itself*, which are the author's own files rather than a third
   party's -- what the project takes the position on the Lucida files to be is
-  set out below, under *On Lucida fonts*.
+  set out below, under [[#on-lucida-fonts][On Lucida fonts]].
 
 Two tasks fetch them, and each is the only way its own files should change:
 =maak vendor-assets= brings the typefaces, the glyphs and the project's picture
