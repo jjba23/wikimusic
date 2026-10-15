@@ -25,7 +25,7 @@ the strict sense of the word.
 
 - 🌍 *Read the biggest instance:* [[https://wikimusic.jointhefreeworld.org][wikimusic.jointhefreeworld.org]]
 - 📖 *Read this document rendered as HTML:* [[https://jointhefreeworld.org/manuals/wikimusic/][the WikiMusic manual]]
-- 💾 *Read the source (and send PRs/patches):* [[https://codeberg.org/jjba23/wikimusic][codeberg.org/jjba23/wikimusic]]
+- 💾 *Read the source (and send PR/issues/patches):* [[https://codeberg.org/jjba23/wikimusic][codeberg.org/jjba23/wikimusic]]
 - 🗺️ *Follow what is next:* [[https://lucidplan.jointhefreeworld.org/tickets/wikimusic][the WikiMusic board]]
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
