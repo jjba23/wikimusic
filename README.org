@@ -1,4 +1,5 @@
-#+title: WikiMusic — the free music knowledge encyclopaedia
+#+title: WikiMusic
+#+subtitle: the free music knowledge encyclopaedia
 #+author: Josep Bigorra
 #+email: jjbigorra@gmail.com
 #+language: en
