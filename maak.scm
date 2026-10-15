@@ -62,8 +62,14 @@
 ;; HTML, rather than two that say the same thing and drift apart.  The export
 ;; lands beside it, as `README.html', and the deploy task below is what moves it
 ;; in front of the instance that serves it.
+;; The manual's figures and example blocks carry a `#+name:', and this makes the
+;; exporter use those names as the HTML ids instead of inventing a fresh
+;; `orgXXXXXX' one on every build -- an id that changes on every build is an
+;; anchor no reader can keep.
 (define emacs-lisp-manual-publish-cmd
-  '(progn (find-file "./README.org")
+  '(progn (require 'ox-html)
+          (setq org-html-prefer-user-labels t)
+          (find-file "./README.org")
           (org-html-export-to-html)
           (message "finished publishing Wikimusic manual")))
 

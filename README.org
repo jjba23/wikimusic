@@ -19,6 +19,7 @@ and the *content management system* a community runs it with — both written in
 Guile Scheme, both hackable down to the last button, and both free software in
 the strict sense of the word.
 
+#+name: wikimusic-demo
 #+caption: A minute in WikiMusic: the front page, the songs list, a song page with its tablature, its chord guide and its click track, and the same page in dark mode.
 [[https://codeberg.org/jjba23/wikimusic/raw/branch/trunk/pub/img/wikimusic-demo.gif]]
 
@@ -34,6 +35,9 @@ If you like my work, please support me by [[https://bmc.link/jjbigorra][buying m
 --------
 
 * What WikiMusic is
+:PROPERTIES:
+:CUSTOM_ID: what-wikimusic-is
+:END:
 
 The WikiMusic project is an non-profit community, with the goal of knowledge sharing and musical education, providing an open platform for exploring, sharing, and learning about music in all its forms.
 
@@ -59,15 +63,18 @@ This document is the project's README and its manual at once: it documents wikim
 --------
 
 * What WikiMusic offers
+:PROPERTIES:
+:CUSTOM_ID: what-wikimusic-offers
+:END:
 
-wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Olive CSS, GNU Make, Emacs.
+wikimusic is powered by: [[https://www.gnu.org/software/guile/][Guile Scheme]], [[https://artanis.dev/][GNU Artanis]], [[https://sqlite.org/][SQLite]], [[https://codeberg.org/jjba23/olive-css][Olive CSS]], [[https://www.gnu.org/software/make/][GNU Make]], [[https://www.gnu.org/software/emacs/][Emacs]].
 
 - *A gallery and a CMS in one*, built on Guile Scheme, GNU Artanis and SQLite,
   and written to be hacked: every piece of the interface is Scheme.
 - *Songs, artists and genres*, each with a description written in Org mode,
   artworks, external sources, cross-references to the other entities, opinions
   and comments.
-- *Song versions* that can carry an ASCII tab, a PDF, and a *Guitar Pro 5 tab*
+- *Song versions* that can carry an [[https://en.wikipedia.org/wiki/ASCII][ASCII]] tab, a [[https://en.wikipedia.org/wiki/PDF][PDF]], and a *[[https://www.guitar-pro.com/][Guitar Pro 5]] tab*
   whose own header the page reads, which the page draws as notation and
   tablature, and which it plays back -- so a reader can see, hear and download
   the same file without leaving the page.
@@ -83,8 +90,8 @@ wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Olive CSS, GNU Make,
   and the rest), rendered by the application itself in the site's own shell.
 - *Accounts and permissions*: sign-in, per-row ownership, and a super grant that
   overrides ownership for an instance's maintainers.
-- *Everything out and back in*: a JSON dump of every content table and a
-  rendered HTML archive of the whole instance, with an import route to load a
+- *Everything out and back in*: a [[https://www.json.org/][JSON]] dump of every content table and a
+  rendered [[https://html.spec.whatwg.org/multipage/][HTML]] archive of the whole instance, with an import route to load a
   dump into another instance.
 - *A front page that is a way in*: what the place is called and what it holds,
   a line under it, a field that searches the collection, the two things a
@@ -98,7 +105,7 @@ wikimusic is powered by: Guile Scheme, GNU Artanis, SQLite, Olive CSS, GNU Make,
   opens on what the place holds rather than on the introduction, so the account
   of the project lives here and is linked from every page's footer.
 - *Pages a crawler can read too*: a canonical address, a link preview for the
-  chat client a link is pasted into, JSON-LD that says what each page is about,
+  chat client a link is pasted into, [[https://json-ld.org/][JSON-LD]] that says what each page is about,
   and a =/sitemap.xml= and =/robots.txt= built from the instance's own rows
   (see =lib/wikimusic/seo.scm= and =app/controllers/seo.scm=).
 - *Nothing fetched from anybody else before a page can be read*: the type the
@@ -116,6 +123,9 @@ Wikimusic and Artanis are written using GNU Guile, one of the best implementatio
 --------
 
 * Try it in five minutes
+:PROPERTIES:
+:CUSTOM_ID: try-it-in-five-minutes
+:END:
 
 The short version, for the impatient: clone the repository, step into the
 project's environment, make a database, and run the site.
@@ -139,7 +149,7 @@ maak test
 #+end_src
 
 That is the whole of it: step 2 is the only one that needs anything installed
-beforehand (GNU Guix), and steps 3 to 5 are one command each.  Open
+beforehand ([[https://guix.gnu.org/][GNU Guix]]), and steps 3 to 5 are one command each.  Open
 [[http://localhost:50050][http://localhost:50050]] and you are reading your own instance -- empty, and
 yours to fill.
 
@@ -153,20 +163,26 @@ guix shell -m manifest.scm -- art work
 "Running WikiMusic" below explains the environment file a deployment needs, the migrations that create the tables, and how to run Wikimusic as a daemon.
 
 * Requirements, and what is pinned for you
+:PROPERTIES:
+:CUSTOM_ID: requirements-and-what-is-pinned-for-you
+:END:
 ** What you need
+:PROPERTIES:
+:CUSTOM_ID: what-you-need
+:END:
 
 - *GNU Guix*, whether as a standalone distro (Guix System) or on top of any
   other GNU/Linux distribution.  This is the one thing to install yourself, and
   it is also the whole of the setup: ~manifest.scm~ in the repository names
   every package and tool the project uses -- Guile, Artanis, SQLite, GNU Make,
-  gettext, watchexec, Emacs, and the Guile libraries wikimusic is built on --
+  [[https://www.gnu.org/software/gettext/][gettext]], [[https://watchexec.github.io/][watchexec]], Emacs, and the Guile libraries wikimusic is built on --
   and ~channels.scm~ pins the Guile and Guix revision behind them.
 - *Not on Guix?*  You can still run wikimusic: read ~manifest.scm~ as the list
   of exactly what you need, and install those packages with your own package
   manager.  The manifest is the honest answer to "what does this need", and it
   is what a non-Guix setup should be measured against.
 - *A database*, created for you: SQLite by default, and the project is
-  compatible with PostgreSQL and MySQL too (=db.dbd= in ~conf/artanis.conf= picks
+  compatible with [[https://www.postgresql.org/][PostgreSQL]] and [[https://www.mysql.com/][MySQL]] too (=db.dbd= in ~conf/artanis.conf= picks
   one).
 - *Optional:* ~direnv~, which reads the =.envrc= in the repository and enters
   the same environment for you as you cd into it.
@@ -175,6 +191,9 @@ A first run downloads the pinned toolchain, which takes a while; after that the
 environment is in the store and starting the site is seconds.
 
 ** The tasks maak defines
+:PROPERTIES:
+:CUSTOM_ID: the-tasks-maak-defines
+:END:
 
 Every task the project defines lives in ~maak.scm~, and each runs inside the
 pinned environment described above.  ~maak --list~ names them all; the ones you
@@ -201,6 +220,9 @@ will reach for most:
 | =maak olive-css=                | Refresh the Olive CSS stylesheet the interface is painted with           |
 
 * Running WikiMusic
+:PROPERTIES:
+:CUSTOM_ID: running-wikimusic
+:END:
 
 If you are thinking of running WikiMusic yourself and hosting it on your own, here follow some tips.
 
@@ -211,8 +233,14 @@ I include a ~manifest.scm~ in the repo so that it's easy to run the project if y
 If you want to run without Guix you should check that ~manifest.scm~ anyway since it will give you exactly the packages that you need.
 
 ** Configuring an instance
+:PROPERTIES:
+:CUSTOM_ID: configuring-an-instance
+:END:
 
 *** The environment file
+:PROPERTIES:
+:CUSTOM_ID: the-environment-file
+:END:
 
 For running wikimusic yourself, you'll need to define and load a module called ~(wikimusic env)~ where you add some required environment variables.  I recommend in the root of the project create a ~env.scm~ and exclude it from Git.
 
@@ -236,9 +264,12 @@ For running wikimusic yourself, you'll need to define and load a module called ~
 
 The two keys are the instance's own secrets and they are what seals a session, so a deployment generates its own rather than reusing these; the rest name the mail service the instance sends through.
 
-Pingwing is a mail and notification solution written in Guile Scheme and also part of the jointhefreeworld project.  It's used in WikiMusic for password resets, among other notifications.  Find more about it here: https://codeberg.org/jjba23/pingwing
+[[https://codeberg.org/jjba23/pingwing][Pingwing]] is a mail and notification solution written in Guile Scheme and also part of the jointhefreeworld project.  It's used in WikiMusic for password resets, among other notifications.
 
 *** What an instance says about itself
+:PROPERTIES:
+:CUSTOM_ID: what-an-instance-says-about-itself
+:END:
 
 The same module is where an instance says what it says about itself.  Every one of these is optional -- an instance that names none of them is wikimusic, unchanged -- and each of them is read where it is used rather than written into the page that shows it:
 
@@ -283,18 +314,21 @@ Two of them are read as rules rather than as values.  =show-donation?= is on unl
 What an instance may name, and what each one falls back to, is written down in ~lib/wikimusic/config.scm~.  One of them is derived rather than defaulted: the manual's address is built from =source-repository-url=, so a fork that says where its code is read gets its own README link without having to name it separately.
 
 ** The database, and the first user
+:PROPERTIES:
+:CUSTOM_ID: the-database-and-the-first-user
+:END:
 
 You will need a database to be present in the root folder of the project (alongside ~app~, ~lib~, etc.).
 
 Wikimusic uses SQLite by default but is also compatible with PostgreSQL and MySQL.
 
-You can automate the creation of the database, the enabling of WAL mode for concurrent writes, and the applying of the schema with ~maak init-db~:
+You can automate the creation of the database, the enabling of [[https://sqlite.org/wal.html][WAL mode]] for concurrent writes, and the applying of the schema with ~maak init-db~:
 
 #+begin_src sh
 maak init-db
 #+end_src
 
-The schema is the migrations kept in the tree, under ~resources/migrations/sqlite~, and they are applied by [[https://codeberg.org/jjba23/mutastructura][mutastructura]], the migration tool pinned in ~manifest.scm~.  It keeps a ledger of what it has run in a ~migrations_history~ table of the database, applies only the migrations that are missing from it -- oldest first -- and records each file with a SHA256 so a change to one is noticed.
+The schema is the migrations kept in the tree, under ~resources/migrations/sqlite~, and they are applied by [[https://codeberg.org/jjba23/mutastructura][mutastructura]], the migration tool pinned in ~manifest.scm~.  It keeps a ledger of what it has run in a ~migrations_history~ table of the database, applies only the migrations that are missing from it -- oldest first -- and records each file with a [[https://en.wikipedia.org/wiki/SHA-2][SHA256]] so a change to one is noticed.
 
 To apply migrations to a database that already exists -- which is safe to run at any time, and the way to bring a deployment up to what the source in front of it expects -- run the same tool through its own task:
 
@@ -302,7 +336,7 @@ To apply migrations to a database that already exists -- which is safe to run at
 maak migrate
 #+end_src
 
-Neither the server nor any other task applies migrations, and nothing reads the SQL files and hands them to ~sqlite3~ itself: ~maak init-db~ and ~maak migrate~ are the two ways in.  A copy of the SQLite file, or a JSON dump loaded into a fresh database (see "Export, archival, and exchanging between instances"), are the other ways to arrive at the tables.
+Neither the server nor any other task applies migrations, and nothing reads the [[https://en.wikipedia.org/wiki/SQL][SQL]] files and hands them to ~sqlite3~ itself: ~maak init-db~ and ~maak migrate~ are the two ways in.  A copy of the SQLite file, or a JSON dump loaded into a fresh database (see "Export, archival, and exchanging between instances"), are the other ways to arrive at the tables.
 
 Upon starting a blank new wikimusic deployment you will have no users in the database, and there is no sign-up route: the first account is made from the shell, and it should hold two permissions -- =wikimusic:modify-permissions=, the super grant, and =wikimusic:user-create=, which is what the routes that make an account ask for.  The second is not covered by the first: a route asks for the permissions it names, and what the super grant overrides is ownership, not that (see "Accounts, permissions and ownership").
 
@@ -333,6 +367,9 @@ The rest of the accounts are then made from the running site, by a holder of =wi
 If running locally, it's recommended to use ~localhost~ instead of ~127.0.0.1~ as this will work better with the authentication/authorization and other cookies.
 
 ** Hacking on it
+:PROPERTIES:
+:CUSTOM_ID: hacking-on-it
+:END:
 
 If you are hacking away at the project, I would suggest using ~maak dev~ since this will effectively run the project with hot-reloading capabilities and it will use the default ~artanis.conf~ where we configure hostname, db path, etc.
 
@@ -341,6 +378,9 @@ Running the test suite is ~maak test~, and ~maak --list~ names every other task 
 The unit tests live in ~test/veritas/unit~, one file per area, and each is run by the framework with the deployment's own ~env.scm~ loaded.  What a spec needs beyond that -- being a *deployment* for the length of an assertion, when what it is proving is a switch a deployment turns off or a host it names -- is a helper module rather than a test of its own, and it lives outside the unit directory for that reason: ~test/support/deployment.scm~.
 
 *** A map of the tree
+:PROPERTIES:
+:CUSTOM_ID: a-map-of-the-tree
+:END:
 
 - ~app/controllers/~ -- the routes: one file per area of the site, plus
   =interchange.scm= (export and import), =seo.scm= (the sitemap and the robots
@@ -369,8 +409,11 @@ The unit tests live in ~test/veritas/unit~, one file per area, and each is run b
   revision they are pinned to.
 
 ** Running it for real: a Shepherd service
+:PROPERTIES:
+:CUSTOM_ID: running-it-for-real-a-shepherd-service
+:END:
 
-If you are hosting this for production, I would suggest running Wikimusic as a Shepherd service/daemon.
+If you are hosting this for production, I would suggest running Wikimusic as a [[https://www.gnu.org/software/shepherd/][Shepherd]] service/daemon.
 
 You can alternatively just feel free to do this any other way, I recommend using the ~manifest.scm~ . Check ~maak.scm~ for every task the project defines.
 
@@ -416,10 +459,13 @@ Here follows an example of a Guix (Shepherd service):
 --------
 
 * Accounts, permissions and ownership
+:PROPERTIES:
+:CUSTOM_ID: accounts-permissions-and-ownership
+:END:
 
-Bewaking is a nice library to help you secure your web applications with Guile Scheme: https://codeberg.org/jjba23/bewaking
+[[https://codeberg.org/jjba23/bewaking][Bewaking]] is a nice library to help you secure your web applications with Guile Scheme.
 
-With bewaking we use secure tokens encrypted and stored in secure cookies (for browsers) and headers (for REST API)
+With bewaking we use secure tokens encrypted and stored in secure cookies (for browsers) and headers (for [[https://en.wikipedia.org/wiki/Representational_state_transfer][REST]] [[https://en.wikipedia.org/wiki/API][API]])
 
 If you want to be a super user in wikimusic your token will need to have the ~wikimusic:modify-permissions~ permission: it is what lets its holder change or delete any row, on any entity, whoever created it.  That grant overrides *ownership*, and only ownership -- a route also asks for the permissions it names, and the super grant does not stand in for those, which is why the account that hands out permissions needs ~wikimusic:user-create~ as well.
 
@@ -438,6 +484,9 @@ See more of the permissions here:
 Wikimusic requires an authenticated session for performing administrative tasks such as creating/deleting the content of an instance.
 
 ** Who may edit what: permissions and ownership
+:PROPERTIES:
+:CUSTOM_ID: who-may-edit-what-permissions-and-ownership
+:END:
 
 A session is a sealed token that names the signed-in user and the permissions
 they hold.  A route states the permission it needs, and a request that lacks it
@@ -481,6 +530,9 @@ row you did not create needs the super grant.
 ------
 
 * Writing descriptions in Org mode
+:PROPERTIES:
+:CUSTOM_ID: writing-descriptions-in-org-mode
+:END:
 
 Every description field -- a song's, an artist's, a genre's -- is stored as
 plain text and rendered as Org markup when the page is read.  The rendering is
@@ -514,6 +566,9 @@ this page to find out.
 ------
 
 * Browsing the lists: sorting, tile size and search
+:PROPERTIES:
+:CUSTOM_ID: browsing-the-lists-sorting-tile-size-and-search
+:END:
 
 Every list page -- =/songs=, =/artists=, =/genres= -- is the same grid of tiles
 with the same three controls above it, and each control is an ordinary address
@@ -545,6 +600,9 @@ what a reader scrolls to.
 ------
 
 * Guitar Pro 5 tablature
+:PROPERTIES:
+:CUSTOM_ID: guitar-pro-5-tablature
+:END:
 
 A song version may carry a *Guitar Pro 5* tab: the =.gp5= file the editors of
 that generation write, and the tablature a reader can practise from in the
@@ -553,12 +611,18 @@ hands it back for download, and reads the file's own *header* to describe it on
 the page.
 
 ** Uploading a tab
+:PROPERTIES:
+:CUSTOM_ID: uploading-a-tab
+:END:
 
 The =.gp5= is picked on the version form exactly as a PDF is: the browser turns
 the chosen file into a data URL and posts that, and the row keeps it.  The file
 field accepts =.gp5= files.
 
 ** What the page shows
+:PROPERTIES:
+:CUSTOM_ID: what-the-page-shows
+:END:
 
 When a version carries a tab, its section lists what the tab's own header
 declares -- the title, artist and album its author typed, who tabbed it, its
@@ -569,6 +633,9 @@ the download holds before spending it.  A field the author left blank is left
 out, and the numbers a readable header always carries are always listed.
 
 ** How much of the file is read
+:PROPERTIES:
+:CUSTOM_ID: how-much-of-the-file-is-read
+:END:
 
 The reader stops at the counts of measures and tracks.  Everything a player
 would play -- measure headers, tracks, beats, notes -- lies behind them and is
@@ -587,6 +654,9 @@ and its module -- =(wikimusic guitarpro)= -- is the one place that knows the
 file's byte layout.
 
 ** Seeing and hearing the tab in the page
+:PROPERTIES:
+:CUSTOM_ID: seeing-and-hearing-the-tab-in-the-page
+:END:
 
 The tab is not only offered for download.  Beside it is an offer to draw the
 tablature in the page itself, notation and tablature staff together, and to play
@@ -606,7 +676,7 @@ stays translated while a tablature loads.
 What the renderer and the sound are, where they came from, and the licences they
 travel under are written down beside them in =pub/vendor/alphatab/README.md=.
 They are fetched by =maak alphatab= and committed, so an instance serves its own
-files and reaches no CDN at run time; raising the release in =maak.scm= and
+files and reaches no [[https://en.wikipedia.org/wiki/Content_delivery_network][CDN]] at run time; raising the release in =maak.scm= and
 running that task again is how they are updated.
 
 A tab the site's own reader cannot follow is still offered to the renderer, and
@@ -618,6 +688,9 @@ The list of file extensions artanis serves statically -- in =ENTRY= -- carries
 =sf2= for the SoundFont, so a deployment that narrows that list should keep it.
 
 ** Practising from the page: the ASCII tab, the chords and the metronome
+:PROPERTIES:
+:CUSTOM_ID: practising-from-the-page-the-ascii-tab-the-chords-and-the-metronome
+:END:
 
 A version that carries an ASCII tab -- the plain-text transcription so many
 players have written and passed around -- is a page to practise from rather than
@@ -641,6 +714,9 @@ page, hidden until the script that drives them is there.
 ------
 
 * Export, archival, and exchanging between instances
+:PROPERTIES:
+:CUSTOM_ID: export-archival-and-exchanging-between-instances
+:END:
 
 Wikimusic can hand out *everything* it knows so that the whole corpus can be
 archived, read offline, or loaded into another instance.  The unit of exchange
@@ -651,6 +727,9 @@ views of the same rows are offered, and one door back in.
 The routes live in =app/controllers/interchange.scm=.
 
 ** The machine's view: a JSON dump
+:PROPERTIES:
+:CUSTOM_ID: the-machine-s-view-a-json-dump
+:END:
 
   GET /export/json
   #+begin_src sh
@@ -685,6 +764,9 @@ The routes live in =app/controllers/interchange.scm=.
   own.
 
 ** The reader's view: a rendered HTML archive
+:PROPERTIES:
+:CUSTOM_ID: the-reader-s-view-a-rendered-html-archive
+:END:
 
   GET /export/html
   #+begin_src sh
@@ -698,6 +780,9 @@ The routes live in =app/controllers/interchange.scm=.
   copy.
 
 ** Loading a dump into another instance
+:PROPERTIES:
+:CUSTOM_ID: loading-a-dump-into-another-instance
+:END:
 
   POST /import/json
   #+begin_src sh
@@ -728,6 +813,9 @@ supported, format-stable way to move content between instances.
 ------
 
 * Translated into four languages
+:PROPERTIES:
+:CUSTOM_ID: translated-into-four-languages
+:END:
 
 The interface is offered in *English (US)*, *Nederlands*, *Español* and
 *日本語*, and a reader picks one from the language control on the front page;
@@ -735,6 +823,9 @@ the choice is written to a cookie and posted to =/preferences/locale=, so every
 page after it is read in that language.
 
 ** How the strings are kept
+:PROPERTIES:
+:CUSTOM_ID: how-the-strings-are-kept
+:END:
 
 Every sentence a reader sees is written in the source as a literal argument of
 =G_=, which is what puts it in the template and in front of a translator:
@@ -751,6 +842,9 @@ domain is bound to =./sys/i18n/locale= and =conf/artanis.conf= sets
 =session.i18n = locale=.
 
 ** Translating, or adding a language
+:PROPERTIES:
+:CUSTOM_ID: translating-or-adding-a-language
+:END:
 
 #+begin_src sh
 # after changing a string in the source: refresh the template, then the catalogs
@@ -771,6 +865,9 @@ one.  Translators are very welcome -- a catalog is ordinary gettext, and no
 Scheme is needed to fill one in.
 
 ** One rule for the source
+:PROPERTIES:
+:CUSTOM_ID: one-rule-for-the-source
+:END:
 
 A string that is reworded is a string no catalog holds any more, so it silently
 falls back to English in the three translated locales.  The sentences the
@@ -781,6 +878,9 @@ words a page shows are written where they are read.
 ------
 
 * When a page cannot be served
+:PROPERTIES:
+:CUSTOM_ID: when-a-page-cannot-be-served
+:END:
 
 A reader who mistypes an address, follows a stale link, or meets a failure on
 the server's side is shown a page of the site's own rather than the framework's
@@ -816,6 +916,9 @@ request, and the pages live in =app/views/error.scm=.
 --------
 
 * On accessibility
+:PROPERTIES:
+:CUSTOM_ID: on-accessibility
+:END:
 
 We believe creating accessible websites for everyone, including people with disabilities, is crucial for equality, helps provide a good user experience.
 
@@ -824,6 +927,9 @@ Wikimusic chooses lots of its UI to appeal to the widest public possible by defa
 -------
 
 * On GNU Artanis
+:PROPERTIES:
+:CUSTOM_ID: on-gnu-artanis
+:END:
 
 Find the documentation for Artanis here: https://www.gnu.org/software/artanis/manual/
 
@@ -835,7 +941,7 @@ Here lies not just a framework, but a canvas where your ideas take flight with r
 
 It's about harnessing the power of a robust and mature language to build something truly your own, something beautiful, nimble, flexible, powerful, efficient, understandable and maintainable. GNU Artanis was Certificated as Awesome Project at 2013 Lisp in summer projects.
 
-One day, the folks at GNU were discussing what language they would write the GNU website in - and many chose Python. But I found that strange, because the official extension language of GNU is GNU Guile. And I wondered aloud - why not start a brand new project to provide a web framework written with GNU Guile? To which RMS said, "It's cool, I like this idea."
+One day, the folks at GNU were discussing what language they would write the GNU website in - and many chose [[https://www.python.org/][Python]]. But I found that strange, because the official extension language of GNU is GNU Guile. And I wondered aloud - why not start a brand new project to provide a web framework written with GNU Guile? To which [[https://stallman.org/][RMS]] said, "It's cool, I like this idea."
 
 But at that time, it was just an idea without a plan.
 
@@ -846,24 +952,31 @@ History
     February 2013 - Artanis born at the GNU Guile hack-potluck.
     2013 - Artanis submitted to "Lisp In Summer Projects" contest. Received "Certificated awesome project award" in 2014.
     1st January, 2015 - the first stable version Artanis-0.0.1 was released.
-    19th January, 2015 - offers Artanis to FSF/GNU, and RMS inducts it as an official GNU project. Artanis becomes GNU Artanis.
+    19th January, 2015 - offers Artanis to [[https://www.fsf.org/][FSF]]/GNU, and RMS inducts it as an official GNU project. Artanis becomes GNU Artanis.
     29 December 2021 - GNU Artanis donates to HardenedLinux community to connect with product environment more tightly.
 
 --------
 
 * Contributing
+:PROPERTIES:
+:CUSTOM_ID: contributing
+:END:
 
 Contributing to free software is a uniquely beautiful act because it embodies principles of generosity, collaboration, and empowerment.
 
 We welcome everyone to feel invited to the wikimusic Project, and encourage active contribution in all forms, to improve it and/or suggest improvements, brainstorm with me, make it more modular/flexible, etc, feel free to contact me <jjbigorra@gmail.com> to chat, discuss or report feedback.
 
-Find here the Backlog and Kanban boards for wikimusic: https://lucidplan.jointhefreeworld.org/tickets/wikimusic
+Find here the [[https://lucidplan.jointhefreeworld.org/tickets/wikimusic][Backlog and Kanban]] boards for wikimusic.
 
+#+name: wikimusic-logo
 [[https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic-small.jpg]]
 
 /A picture the project shows of itself -- and the one a pasted link of the site is previewed with./
 
 ** Ways in
+:PROPERTIES:
+:CUSTOM_ID: ways-in
+:END:
 
 Nothing here is a big ask, and every one of these is a real contribution:
 
@@ -887,6 +1000,9 @@ Nothing here is a big ask, and every one of these is a real contribution:
   change.
 
 ** Running the tests before you send anything
+:PROPERTIES:
+:CUSTOM_ID: running-the-tests-before-you-send-anything
+:END:
 
 #+begin_src sh
 maak test      # the whole suite, one spec at a time
@@ -901,15 +1017,21 @@ turns off) uses the helper in ~test/support/deployment.scm~ instead of a test of
 its own.
 
 ** Continuous integration
+:PROPERTIES:
+:CUSTOM_ID: continuous-integration
+:END:
 
 A push to the =trunk= branch is picked up by
 [[https://woodpecker-ci.org/][Woodpecker]] (~.woodpecker/byggsteg.yaml~), which
-submits a job to the jointhefreeworld *Byggsteg* service.  The job that runs on
+submits a job to the jointhefreeworld [[https://codeberg.org/jjba23/byggsteg][Byggsteg]] service.  The job that runs on
 the deployment is the project's own tasks, in order: =maak-test=,
 =pull-and-restart=, =maak-deploy= -- so what is merged is what is tested, and
 then what is served.
 
 ** AI Policy
+:PROPERTIES:
+:CUSTOM_ID: ai-policy
+:END:
 
 This project adheres to the [[https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-ai-policy/index.html][jointhefreeworld AI (Artificial Intelligence) policy]].
 
@@ -920,6 +1042,9 @@ While tools like Large Language Models (LLMs) and interactive chatbots can be be
 We require a human in the loop for all contributions. The use of autonomous AI agents to automatically generate and submit pull requests to this project is strictly prohibited.
 
 ** Code of conduct
+:PROPERTIES:
+:CUSTOM_ID: code-of-conduct
+:END:
 
 This project adheres to the jointhefreeworld code of conduct. Find it here:
 
@@ -930,6 +1055,9 @@ In summary, we foster an inclusive, respectful, and cooperative environment for 
 -------
 
 * Licensing
+:PROPERTIES:
+:CUSTOM_ID: licensing
+:END:
 
 wikimusic and all of its source code are free software, licensed under the GNU Affero General Public License v3 (or newer at your convenience).
 
@@ -940,6 +1068,9 @@ The documentation and examples, including this document, which are provided with
 https://www.gnu.org/licenses/fdl-1.3.html
 
 ** On bundled third-party assets
+:PROPERTIES:
+:CUSTOM_ID: on-bundled-third-party-assets
+:END:
 
 wikimusic serves its own assets, and some of them are somebody else's work,
 vendored into the tree rather than linked to, so that an instance reaches no CDN
@@ -951,9 +1082,9 @@ at run time and works with no network of its own:
   played-back tab audible, and fits beside it;
 - *Bravura* (SIL OFL 1.1) is the music font a tablature is drawn with;
 - *Intel One Mono* and *Plus Jakarta Sans* (both SIL OFL 1.1) are the two web
-  families the interface is set in beside Lucida, and their licence texts
+  families the interface is set in beside [[https://en.wikipedia.org/wiki/Lucida][Lucida]], and their licence texts
   travel with them;
-- *Phosphor* (MIT) is the icon set every control on the site wears;
+- [[https://phosphoricons.com/][*Phosphor*]] ([[https://opensource.org/license/mit][MIT]]) is the icon set every control on the site wears;
 - the three *Lucida* families the interface is set in, and the *picture the
   project shows of itself*, which are the author's own files rather than a third
   party's -- what the project takes the position on the Lucida files to be is
@@ -975,6 +1106,9 @@ files nobody reads -- so it is pinned by the test suite against a written
 stylesheet rather than a live one, with no network: ~test/veritas/unit/assets-spec.scm~.
 
 ** On Lucida fonts
+:PROPERTIES:
+:CUSTOM_ID: on-lucida-fonts
+:END:
 
 Lucida fonts are proprietary typefaces originally developed by Bigelow & Holmes. They remain a long-time favorite for many people and are very legible in many situations and hardware/software. While they are bundled pre-installed on many operating systems and platforms, they remain proprietary fonts.
 
@@ -983,6 +1117,9 @@ You may use these font files under principles of fair use or for local developme
 -------
 
 * On Reproducibility: Why GNU Guix?
+:PROPERTIES:
+:CUSTOM_ID: on-reproducibility-why-gnu-guix
+:END:
 
 A build should never fail because "it worked on my machine." Reliable software development requires explicit, bit-for-bit reproducibility and a functional approach to package management and system deployment.
 
@@ -994,7 +1131,7 @@ A build should never fail because "it worked on my machine." Reliable software d
 
 - *Declarative Build Graphs:* Packages are pure functions of their inputs with no implicit system state.
 - *Programmable with Guile:* Full system and package configurations written in [[https://www.gnu.org/software/guile/][Guile Scheme]] rather than rigid DSLs or static files.
-- *Time Travel:* Rebuild the exact system state from any point in git history using ~guix time-machine~.
+- *Time Travel:* Rebuild the exact system state from any point in [[https://git-scm.com/][git]] history using ~guix time-machine~.
 - *Atomic Operations:* Instantly upgrade or roll back environments without leaving orphaned dependencies or broken states.
 - *Unified Tooling:* One tool manages development shells, isolated containers, package builds, and full system configurations.
 
@@ -1006,6 +1143,9 @@ is a reproducible statement rather than a conversation about toolchains.
 ----------
 
 * Thanks
+:PROPERTIES:
+:CUSTOM_ID: thanks
+:END:
 
 WikiMusic stands on a lot of other free software -- [[https://codeberg.org/jjba23/hygguile][hygguile]],
 [[https://codeberg.org/jjba23/kracht][kracht]], [[https://codeberg.org/jjba23/scriba][scriba]], [[https://codeberg.org/jjba23/bewaking][bewaking]], [[https://codeberg.org/jjba23/orgwebalchemy][orgwebalchemy]],
