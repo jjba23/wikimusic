@@ -43,6 +43,8 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route)
   #:export (asset-library page-footer
+                          link-ink
+                          link-hover-ink
                           nav
                           wikimusic-locales
                           locale-choose-form
@@ -337,6 +339,22 @@ the same string however it is nested."
                          "pub/js/password-strength.js"
                          "pub/js/guitarpro-player.js")))
 
+;; What a link on this instance is painted with, handed to hygguile's `a' as
+;; `#:color' and `#:hover'.
+;;
+;; A link could take that component's own default ink, and half of it is the
+;; palette this instance is painted with: the light half is a pair of Olive's
+;; blues.  The dark half names `moonstone', which the Olive bundle this instance
+;; ships has no utility for at all -- the bundle was cut before the component
+;; asked for it, so the class is a no-op and a link keeps its light ink, or the
+;; browser's own blue, on the dark theme.  What a link is painted with is the
+;; interface's decision in any case, so it is named here, once, in inks the
+;; sheet does define: the same pair the front page's one ask is painted with.
+(define link-ink
+  '(text-jeans-blue-500 dark:text-persia-pink-300))
+(define link-hover-ink
+  '(hover:text-jeans-blue-900 dark:hover:text-persia-pink-700))
+
 ;; The two lines every page ends with: where the rest of the project is, and
 ;; what this running copy is.
 ;;
@@ -363,7 +381,9 @@ the same string however it is nested."
                     ;; says so, without having to work out that a tagline is a page.
                     ,(a (G_ "about")
                         #:href "/about"
-                        #:size '(text-md))
+                        #:size '(text-md)
+                        #:color link-ink
+                        #:hover link-hover-ink)
                     ;; Where the code is, where the manual is and where the licence is
                     ;; written out are the deployment's to name, not this view's: a
                     ;; fork reads its own source, and an instance that mirrors the
@@ -371,15 +391,21 @@ the same string however it is nested."
                     ;; upstream address (see `(wikimusic config)').
                     ,(a (G_ "source code")
                         #:href (source-repository-url)
-                        #:size '(text-md))
+                        #:size '(text-md)
+                        #:color link-ink
+                        #:hover link-hover-ink)
                     ;; The manual is the README -- one document to keep true rather
                     ;; than two that drift -- so the link leads to that document.
                     ,(a (G_ "manual")
                         #:href (manual-url)
-                        #:size '(text-md))
+                        #:size '(text-md)
+                        #:color link-ink
+                        #:hover link-hover-ink)
                     ,(a (G_ "export")
                         #:href "/export/html"
-                        #:size '(text-md)))
+                        #:size '(text-md)
+                        #:color link-ink
+                        #:hover link-hover-ink))
 
                ;; What this copy is, who made it, and the way back up.
                (div (@ (class ,(mk-class '(flex flex-row
@@ -398,7 +424,9 @@ the same string however it is nested."
                                 #:weight '(font-light)))
                     ,(a (G_ "AGPL-3.0-or-later")
                         #:href (licence-url)
-                        #:size '(text-sm))
+                        #:size '(text-sm)
+                        #:color link-ink
+                        #:hover link-hover-ink)
                     ,(em (format #f "© ~a"
                                  (copyright-holder))
                          #:size '(text-sm))
@@ -421,6 +449,12 @@ the same string however it is nested."
 (define* (nav G_
               #:key is-logged-in
               (reading? #f))
+  "Return the bar every page is navigated with, as SXML.
+
+It is a `nav' element rather than a styled `div': the bar is the document's
+navigation, and a landmark is what lets a reader's assistive technology (or a
+browser's own reader mode) skip to it or past it.  Its look comes from the
+classes it carries, so the element name is about what the bar *is*."
   (let ((nav-link (lambda (href icon content)
                     `(a (@ (href ,href)
                            (class ,(mk-class '(shrink-0 no-underline))))
@@ -441,7 +475,7 @@ the same string however it is nested."
                                                         md:px-3
                                                         cursor-pointer
                                                         whitespace-nowrap))))))
-    `((div (@ (class ,(mk-class (append
+    `((nav (@ (class ,(mk-class (append
                                  ;; The bar is a strip, not a panel: a reader
                                  ;; looks past it on every page, so it keeps
                                  ;; just enough height for its controls and

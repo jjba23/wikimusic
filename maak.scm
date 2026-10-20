@@ -162,8 +162,8 @@ Args: update? represents whether we should update a template or create a new one
 ;; this is the test run reading the project's keys the way the server does.
 (define (test)
   "Run the project's test suite, one spec at a time, from test/veritas."
-  (time-machine-manifest-shell '("guile -L ./lib -L ./test -L ."
-                                 "-c '(load \"env.scm\") ((@ (veritas runner) run-tests))'")))
+  (time-machine-manifest-shell '("guile  --fresh-auto-compile -L ./lib -L ./test -L ."
+                                 "-c '(load \"env.scm\")(begin (setlocale LC_ALL \"C.UTF-8\") (use-modules (veritas runner)) (run-tests))'")))
 
 (define (build-manual)
   "Render the project's manual, which is the README."

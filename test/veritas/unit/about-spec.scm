@@ -51,12 +51,12 @@
 ;;; reader does.
 ;;;
 ;;; Every assertion below is a sibling of its test's other cases.  That is not
-;;; a style choice: a veritas assertion is a procedure the test invokes, and
-;;; the cases of a test are the *procedure* arguments it was given -- so an
-;;; assertion written inside a `let', a `for-each' or a `when' is built, is
-;;; passed along as that form's value, and never runs.  A test whose cases all
-;;; vanished that way passes while asserting nothing, which is worse than
-;;; failing.  The per-item tests are therefore expanded one case per test
+;;; a style choice.  A veritas test body is a sequence of forms evaluated when
+;;; the test runs, and every assertion a form builds while it is evaluated is a
+;;; case of that test -- so an assertion written inside a `let', a `for-each' or
+;;; a `when' does run, but the report names it as a case of the form rather than
+;;; of the thing it checks.  Written as siblings, each case is read, and fails,
+;;; on its own.  The per-item tests are therefore expanded one case per test
 ;;; through `test-each', and everything else is written out.
 
 (define-module (veritas unit about-spec)

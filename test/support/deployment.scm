@@ -24,19 +24,23 @@
 ;;; off, and the interface's own files are read from this instance unless the
 ;;; deployment names a host they hang off instead.  A rule has two halves, and
 ;;; only one of them is the deployment the suite is running under -- so a spec
-;;; has to *be* the other instance for the length of an assertion, and the
-;;; variable is therefore bound in the loaded `(wikimusic env)' module and put
-;;; back exactly as it was found.  The deployment's own `env.scm' is never read
-;;; for it and never written: what changes is one binding in the running
-;;; process, and only while a case is being built.
+;;; has to *be* the other instance for the length of an assertion.
 ;;;
-;;; That last part is worth saying plainly, because it is what makes this small
-;;; helper enough.  A veritas assertion is a *value* -- the expected and the
-;;; got are both computed where the assertion is written, inside the suite, and
-;;; compared when the test runs -- so the value read with a deployment's switch
-;;; flipped is the value the assertion carries, and the switch is back before
-;;; the next case is even written.  A suite is therefore free to hold an
-;;; instance that raises nothing beside the one it is running on.
+;;; Being that instance is a value laid over the deployment's own for the length
+;;; of the call, rather than a binding written into the deployment's module (see
+;;; `deployment-overrides' in `(wikimusic config)').  That is what keeps a case
+;;; to itself: a veritas suite runs its cases concurrently, and a case that wrote
+;;; its switch into the module every case reads would be turning it off for the
+;;; cases beside it -- an assertion that asks for something failing while its
+;;; sibling asserts that nothing is asked for.  A parameter's binding is
+;;; fiber-local, so the instance a case lays down reaches as far as the page,
+;;; control or answer that case is building, and no further.
+;;;
+;;; The deployment's own `env.scm' is never read for it and never written: what
+;;; changes is one binding in the running process, for one call, and only while
+;;; that call is being made.  It is put back when the call returns, whether it
+;;; returned or raised, so a case that fails cannot leave the deployment turned
+;;; off for the cases that follow it.
 ;;;
 ;;; It is a module of its own, and not under `test/veritas/unit/', because it is
 ;;; not a spec: the runner discovers every Scheme file under the unit directory
@@ -45,17 +49,12 @@
 ;;; spec imports it as `(support deployment)'.
 
 (define-module (support deployment)
+  #:use-module ((wikimusic config)
+                #:select (deployment-overrides))
   #:export (with-deployment))
 
-;; What `with-deployment' answers when the variable it is asked for was not
-;; bound at all, told apart from one bound to #f -- which is a deployment
-;; turning something off, and a value that has to be restored rather than
-;; removed.
-(define unbound
-  (list 'unbound))
-
 (define* (with-deployment name value thunk)
-  "Answer what THUNK answers, with NAME bound to VALUE in `(wikimusic env)'.
+  "Answer what THUNK answers, with NAME read as VALUE instead of the deployment.
 
 NAME is a symbol rather than text, because that is what the deployment's module
 names its own variables by: `show-donation?', `assets-url'.  VALUE is whatever
@@ -64,22 +63,16 @@ that variable should be read as -- `#f' for a switch turned off, a word such as
 that serves its files elsewhere -- and a blank string is the same as an unset
 variable, since that is how the instance's own reader treats one.
 
-The binding is made before THUNK is called and put back afterwards, whether
-THUNK raised or not, so a case that fails cannot leave the deployment turned
-off for the cases that follow it.
+The value is laid over the deployment's own before THUNK is called and put back
+afterwards, whether THUNK returned or raised, so a case that fails cannot leave
+the deployment turned off for the cases that follow it.  The binding is this
+fiber's rather than the process's, which is what lets a suite hold one instance
+beside the one the run is on while its cases run concurrently.
 
 @example
 (assert-false (with-deployment 'show-donation? #f donation-shown?)
               #:name \"the switch is off\")
 @end example"
-  (let* ((module (resolve-module '(wikimusic env)))
-         (variable (module-variable module name))
-         (was (if (and variable
-                       (variable-bound? variable))
-                  (variable-ref variable) unbound)))
-    (dynamic-wind (lambda ()
-                    (module-define! module name value)) thunk
-                  (lambda ()
-                    (if (eq? was unbound)
-                        (module-remove! module name)
-                        (module-set! module name was))))))
+  (parameterize ((deployment-overrides (acons name value
+                                              (deployment-overrides))))
+    (thunk)))

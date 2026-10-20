@@ -69,77 +69,112 @@ shape `generate-token' reads."
   "Return the `$'-separated fields of a stored password HASH."
   (string-split hash #\$))
 
+;;; ====== The hashes and the verifications the suites read ======
+;;;
+;;; A veritas test body is evaluated when the test runs, and it runs in a fiber
+;;; -- so work a case does is work done on the fiber scheduler's stack.  An
+;;; Argon2id derivation is not something libgcrypt will do there: the call fails
+;;; with "gcry_kdf_final (Argon2id) failed" inside a fiber and answers exactly as
+;;; it should on this process's main thread or on a thread of its own (it asks
+;;; for 64 MiB per call besides, see `hash-password').  The derivations the two
+;;; password suites are about are therefore made here, once, when this module is
+;;; loaded, and the cases compare the facts they produced.
+;;;
+;;; That is how the suite reads anyway: a hash is a fact about a password, and
+;;; what the tests are about is what the interface makes of one -- which scheme
+;;; it names, what cost it records, and whether the right password is the only
+;;; one that verifies.
+(define preferred-hash
+  (hash-password password))
+(define another-hash
+  (hash-password password))
+(define argon2id-hash
+  (hash-password password
+                 #:algorithm 'argon2id))
+(define argon2id-fields
+  (fields argon2id-hash))
+(define pbkdf2-hash
+  (hash-password password
+                 #:algorithm 'pbkdf2-sha256))
+(define pbkdf2-fields
+  (fields pbkdf2-hash))
+(define preferred-verifies?
+  (verify-password password
+                   #:hash preferred-hash
+                   #:salt ""))
+(define fallback-verifies?
+  (verify-password password
+                   #:hash pbkdf2-hash
+                   #:salt ""))
+(define salt-column-ignored?
+  (verify-password password
+                   #:hash preferred-hash
+                   #:salt "irrelevant"))
+(define near-miss-refused?
+  (verify-password "correct horse battery stapl"
+                   #:hash preferred-hash
+                   #:salt ""))
+(define wrong-case-refused?
+  (verify-password "Correct horse battery staple"
+                   #:hash preferred-hash
+                   #:salt ""))
+(define empty-refused?
+  (verify-password ""
+                   #:hash preferred-hash
+                   #:salt ""))
+;; The hash a sign-in re-derives from a password that was on file in the old
+;; scheme (see the legacy test below).
+(define rehashed-legacy
+  (hash-password "hunter2"))
+
 (define password-suite
   (suite "Passwords on file"
          (test "a hash names the scheme it was derived with"
-               (let ((argon (hash-password password
-                                           #:algorithm 'argon2id))
-                     (pbkdf2 (hash-password password
-                                            #:algorithm 'pbkdf2-sha256)))
-                 (assert-equal #:name "an argon2id hash says so"
-                               #:expect "argon2id"
-                               #:got (car (fields argon)))
-                 (assert-equal #:name
-                  "and carries iterations, memory, lanes, salt and key"
-                  #:expect 6
-                  #:got (length (fields argon)))
-                 (assert-equal #:name "a pbkdf2 hash says so"
-                               #:expect "pbkdf2-sha256"
-                               #:got (car (fields pbkdf2)))
-                 (assert-equal #:name "and carries iterations, salt and key"
-                               #:expect 4
-                               #:got (length (fields pbkdf2)))))
+               (assert-equal #:name "an argon2id hash says so"
+                             #:expect "argon2id"
+                             #:got (car argon2id-fields))
+               (assert-equal #:name
+                "and carries iterations, memory, lanes, salt and key"
+                #:expect 6
+                #:got (length argon2id-fields))
+               (assert-equal #:name "a pbkdf2 hash says so"
+                             #:expect "pbkdf2-sha256"
+                             #:got (car pbkdf2-fields))
+               (assert-equal #:name "and carries iterations, salt and key"
+                             #:expect 4
+                             #:got (length pbkdf2-fields)))
          (test "the recorded cost is at least the cost that was chosen"
                ;; Argon2id is the scheme a build with libgcrypt uses, and its
                ;; figures are OWASP's: two passes and at least 19 MiB.  The
                ;; PBKDF2 fallback asks for 210000 iterations, which is where
                ;; wikimusic set it; the point of the assertion is that the
                ;; cost is recorded in the hash and cannot be lowered quietly.
-               (let ((argon (fields (hash-password password
-                                                   #:algorithm 'argon2id)))
-                     (pbkdf2 (fields (hash-password password
-                                                    #:algorithm 'pbkdf2-sha256))))
-                 (assert-true (>= (string->number (cadr argon)) 2)
-                              #:name "argon2id does at least two passes")
-                 (assert-true (>= (string->number (caddr argon)) 19456)
-                              #:name "and asks for at least 19 MiB a pass")
-                 (assert-true (>= (string->number (cadr pbkdf2)) 210000)
-                              #:name "pbkdf2 does at least 210000 iterations")))
+               (assert-true (>= (string->number (cadr argon2id-fields)) 2)
+                            #:name "argon2id does at least two passes")
+               (assert-true (>= (string->number (caddr argon2id-fields)) 19456)
+                            #:name "and asks for at least 19 MiB a pass")
+               (assert-true (>= (string->number (cadr pbkdf2-fields)) 210000)
+                            #:name "pbkdf2 does at least 210000 iterations"))
          (test "the same password hashed twice is never the same hash"
-               (assert-true (not (equal? (hash-password password)
-                                         (hash-password password)))
+               (assert-true (not (equal? preferred-hash another-hash))
                             #:name "the salt is drawn fresh every time"))))
 
 (define verification-suite
   (suite "Checking a password"
          (test "the password a hash was derived from verifies"
-               (assert-true (verify-password password
-                                             #:hash (hash-password password)
-                                             #:salt "")
+               (assert-true preferred-verifies?
                             #:name "the preferred scheme round trips")
-               (assert-true (verify-password password
-                                             #:hash (hash-password password
-                                                                   #:algorithm 'pbkdf2-sha256)
-                                             #:salt "")
+               (assert-true fallback-verifies?
                             #:name "and so does the fallback scheme")
-               (assert-true (verify-password password
-                                             #:hash (hash-password password)
-                                             #:salt "irrelevant")
+               (assert-true salt-column-ignored?
                             #:name "the salt column no longer decides"))
          (test "a hash was only derived from the one password"
-               (let ((hash (hash-password password)))
-                 (assert-false (verify-password "correct horse battery stapl"
-                                                #:hash hash
-                                                #:salt "")
-                               #:name "a password missing its last character")
-                 (assert-false (verify-password "Correct horse battery staple"
-                                #:hash hash
-                                #:salt "")
-                               #:name "a password with the wrong case")
-                 (assert-false (verify-password ""
-                                                #:hash hash
-                                                #:salt "")
-                               #:name "the empty password")))
+               (assert-false near-miss-refused?
+                             #:name "a password missing its last character")
+               (assert-false wrong-case-refused?
+                             #:name "a password with the wrong case")
+               (assert-false empty-refused?
+                             #:name "the empty password"))
          (test "a hash that cannot be read is not a match"
                (assert-false (verify-password password
                                               #:hash #f
@@ -180,7 +215,7 @@ shape `generate-token' reads."
                  (assert-true (password-hash-legacy? legacy)
                               #:name
                               "and the row is recognisable as an old one")
-                 (assert-false (password-hash-legacy? (hash-password "hunter2"))
+                 (assert-false (password-hash-legacy? rehashed-legacy)
                                #:name "while a derived hash is not")))
          (test "a row with no usable hash is refused rather than crashed on"
                (assert-false (password-hash-legacy? #f)

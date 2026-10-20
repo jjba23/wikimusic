@@ -40,7 +40,8 @@
   #:use-module (ice-9 format)
   #:use-module (ice-9 string-fun)
   #:use-module (srfi srfi-1)
-  #:export (config-value source-repository-url
+  #:export (config-value deployment-overrides
+                         source-repository-url
                          manual-url
                          licence-url
                          copyright-holder
@@ -61,6 +62,23 @@
 (define unbound
   (list 'unbound))
 
+;; What a caller has laid over the deployment's own answers for the length of a
+;; dynamic extent, as an alist of names to values.  It is empty in an instance,
+;; which is what makes the deployment's module the only thing read; a *test*
+;; that proves what an instance says with a switch turned off has to be that
+;; instance for one assertion, and its suites run their cases concurrently (see
+;; `test/support/deployment.scm').  Laying the value over the deployment's rather
+;; than writing it into the deployment's own module is what keeps one case's
+;; instance from being read by its siblings: a parameter's binding is
+;; fiber-local, so what a case laid down is visible exactly as far as the page,
+;; control or answer it is building, and no other case in the run sees it.
+;;
+;; The overlay answers for the deployment, so it is read through the same
+;; functions: `config-value' still falls back to the project's own value, and a
+;; switch is still read the way a shell would have written it.
+(define deployment-overrides
+  (make-parameter '()))
+
 (define (deployment-binding name)
   "Return what this deployment bound NAME to, or `unbound' when it bound nothing.
 
@@ -69,16 +87,25 @@ own `env.scm' before it serves anything.  A module that is not there and a
 variable it does not name are the same answer, and it is one a caller can tell
 apart from a variable that was set to `#f'.  A name is read as a symbol, never
 as a request value: nothing a reader sends chooses what the instance says about
-itself."
-  (catch #t
-         (lambda ()
-           (let ((variable (module-variable (resolve-module '(wikimusic env))
-                                            name)))
-             (if (and variable
-                      (variable-bound? variable))
-                 (variable-ref variable) unbound)))
-         (lambda (key . args)
-           unbound)))
+itself.
+
+A name laid over the deployment for the current dynamic extent (see
+@code{deployment-overrides}) is answered instead of the module's, innermost
+first, so that a caller can say what the deployment it is building for had bound
+without editing the deployment's file."
+  (let ((overlaid (assq name
+                        (deployment-overrides))))
+    (if overlaid
+        (cdr overlaid)
+        (catch #t
+               (lambda ()
+                 (let ((variable (module-variable (resolve-module '(wikimusic
+                                                                    env)) name)))
+                   (if (and variable
+                            (variable-bound? variable))
+                       (variable-ref variable) unbound)))
+               (lambda (key . args)
+                 unbound)))))
 
 (define (deployment-value name)
   "Return what this deployment set NAME to as text, or #f.

@@ -141,7 +141,11 @@ there.")))
   '(400 401 403 404 408 500))
 
 (define (error-links G_)
-  "Return the row of links a reader can leave an error page by."
+  "Return the row of links a reader can leave an error page by.
+
+Each one is painted with the interface's own ink (see `link-ink' in
+`(wikimusic html)'), so a reader who lands here on the dark theme gets the link
+colours every other page uses instead of the browser's own blue."
   `((div (@ (class ,(mk-class '(flex flex-row
                                      flex-wrap
                                      gap-4
@@ -150,22 +154,32 @@ there.")))
                                      py-2))))
          ,(a (G_ "the front page")
              #:href "/"
-             #:size '(text-md))
+             #:size '(text-md)
+             #:color link-ink
+             #:hover link-hover-ink)
          ,(a (G_ "songs")
              #:href "/songs"
-             #:size '(text-md))
+             #:size '(text-md)
+             #:color link-ink
+             #:hover link-hover-ink)
          ,(a (G_ "artists")
              #:href "/artists"
-             #:size '(text-md))
+             #:size '(text-md)
+             #:color link-ink
+             #:hover link-hover-ink)
          ,(a (G_ "genres")
              #:href "/genres"
-             #:size '(text-md))
+             #:size '(text-md)
+             #:color link-ink
+             #:hover link-hover-ink)
          ;; The one link on an error page that leaves the instance: where the
          ;; code that produced this refusal is read, which is the deployment's
          ;; own address to name (see `(wikimusic config)').
          ,(a "source code"
              #:href (source-repository-url)
-             #:size '(text-md)))))
+             #:size '(text-md)
+             #:color link-ink
+             #:hover link-hover-ink))))
 
 (define* (error-page status
                      #:key (G_ gettext)
