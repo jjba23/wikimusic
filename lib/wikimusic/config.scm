@@ -99,8 +99,8 @@ without editing the deployment's file."
         (cdr overlaid)
         (catch #t
                (lambda ()
-                 (let ((variable (module-variable (resolve-module '(wikimusic
-                                                                    env)) name)))
+                 (let* ((module (resolve-module '(wikimusic env)))
+                        (variable (module-variable module name)))
                    (if (and variable
                             (variable-bound? variable))
                        (variable-ref variable) unbound)))

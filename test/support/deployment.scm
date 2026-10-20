@@ -37,10 +37,10 @@
 ;;; control or answer that case is building, and no further.
 ;;;
 ;;; The deployment's own `env.scm' is never read for it and never written: what
-;;; changes is one binding in the running process, for one call, and only while
-;;; that call is being made.  It is put back when the call returns, whether it
-;;; returned or raised, so a case that fails cannot leave the deployment turned
-;;; off for the cases that follow it.
+;;; changes is one binding of the overlay, and only while the call being made
+;;; has it.  It is put back when the call returns, whether it returned or
+;;; raised, so a case that fails cannot leave the deployment turned off for the
+;;; cases that follow it.
 ;;;
 ;;; It is a module of its own, and not under `test/veritas/unit/', because it is
 ;;; not a spec: the runner discovers every Scheme file under the unit directory
