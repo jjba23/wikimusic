@@ -38,15 +38,21 @@ run_tool() {
   shift
   if command -v "$tool" >/dev/null 2>&1; then
     "$tool" "$@"
-  elif command -v guix >/dev/null 2>&1; then
-    guix shell "$tool" -- "$tool" "$@"
-  elif command -v nix-shell >/dev/null 2>&1; then
-    nix-shell -p "$tool" --run "$(printf '%q ' "$tool" "$@")"
-  else
-    echo "encode: $tool is not installed, and neither Guix nor Nix is here to" \
-         "borrow it from" >&2
-    exit 1
+    return
   fi
+  # Guix does not carry every tool (gifski, for one), so ask it for the
+  # package before handing it the real command.
+  if command -v guix >/dev/null 2>&1 \
+      && guix shell "$tool" -- "$tool" --version >/dev/null 2>&1; then
+    guix shell "$tool" -- "$tool" "$@"
+    return
+  fi
+  if command -v nix-shell >/dev/null 2>&1; then
+    nix-shell -p "$tool" --run "$(printf '%q ' "$tool" "$@")"
+    return
+  fi
+  echo "encode: $tool is not installed, and neither Guix nor Nix can lend it" >&2
+  exit 1
 }
 
 echo "encode: $capture -> $output (${width}px, ${fps}fps, quality ${quality}, lossy ${lossy})"

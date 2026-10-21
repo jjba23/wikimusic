@@ -125,9 +125,15 @@ async function main() {
   const page = context.pages()[0] || await context.newPage();
   await page.setViewportSize({ width: WIDTH, height: HEIGHT });
 
-  page.on('requestfailed',
-    (request) => recordProblem('request failed',
-      `${request.failure()?.errorText} ${request.url()}`));
+  page.on('requestfailed', (request) => {
+    const failure = request.failure()?.errorText || '';
+    // A document the next click superseded is cancelled, not missing.  An
+    // aborted picture, script or stylesheet is still a problem.
+    if (failure.includes('ERR_ABORTED') && request.resourceType() === 'document') {
+      return;
+    }
+    recordProblem('request failed', `${failure} ${request.url()}`);
+  });
   page.on('response', (response) => {
     if (response.status() >= 400) {
       recordProblem('HTTP ' + response.status(), response.url());

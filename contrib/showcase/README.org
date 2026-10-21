@@ -34,6 +34,11 @@ that recorded it is what regenerates it for the next release.
   private display, records, encodes, and stops everything again.  Logs and
   the raw capture stay in ~contrib/showcase/out/~ (ignored by git).
 
+  The demo server and Chrome get free ports on every run, and Xvfb gets the
+  first free display from ~:99~ up, so nothing has to be stopped by hand.
+  ~SHOWCASE_PORT~, ~SHOWCASE_CDP_PORT~ and ~SHOWCASE_DISPLAY~ pin them; the
+  frame size and GIF quality are described below.
+
   It needs, beyond what the project's own [[file:../../manifest.scm][manifest]] provides:
 
   | What                     | Why                                                        |
@@ -69,8 +74,9 @@ that recorded it is what regenerates it for the next release.
 
 * Changing what it shows
 
-  The song, artist and genre are looked up by name, and the search term
-  defaults to the last word of the song's title:
+  The song is looked up by name; the artist and genre follow from it, and can
+  be pinned when a song has more than one.  The search term defaults to the
+  last word of the song's title:
 
   #+begin_src sh
   contrib/showcase/run.sh --song "Left to Die" --artist Death \
@@ -79,7 +85,8 @@ that recorded it is what regenerates it for the next release.
 
   ~build_demo.py~ checks that the three pages have the prose, tablature,
   artwork and links the choreography relies on, and says which one is missing
-  instead of recording a half-empty page.  ~record.js~ holds the beats
+  instead of recording a half-empty page.  A pinned artist or genre that the
+  song does not belong to is refused rather than silently recorded.  ~record.js~ holds the beats
   themselves; each one waits for a selector or a URL, so a changed page fails
   loudly at the beat that changed.
 
@@ -103,8 +110,9 @@ that recorded it is what regenerates it for the next release.
 
 * Troubleshooting
 
-  - *A port or display is busy.*  ~run.sh~ refuses to start rather than reuse
-    something it does not own.  Set ~PORT~, ~CDP_PORT~ or ~DISPLAY_NUM~.
+  - *A pinned port or display is busy.*  ~run.sh~ refuses to start rather
+    than reuse something it does not own.  Unset ~SHOWCASE_PORT~,
+    ~SHOWCASE_CDP_PORT~ and ~SHOWCASE_DISPLAY~ to let it pick free ones.
   - *The demo server exits.*  Read ~out/server.log~; the usual cause is a
     missing ~env.scm~ (the demo instance symlinks the project's own).
   - *The recording fails at a beat.*  Re-run with ~--dry-run~ and look at the

@@ -34,6 +34,7 @@ import re
 import shutil
 import sqlite3
 import sys
+import threading
 import time
 import urllib.parse
 from pathlib import Path
@@ -83,9 +84,11 @@ class ArtworkCache:
             self.index = json.loads(self.index_path.read_text())
         except (OSError, ValueError):
             self.index = {}
+        self.lock = threading.Lock()
 
     def get(self, url: str):
-        entry = self.index.get(url)
+        with self.lock:
+            entry = self.index.get(url)
         if not entry:
             return None
         path = self.directory / entry["file"]
@@ -94,12 +97,15 @@ class ArtworkCache:
         return path.read_bytes(), entry["ext"]
 
     def put(self, url: str, data: bytes, ext: str):
+        # Eight downloads run at once; the index is one file, so the writes
+        # into it (and the temporary file they share) are serialised.
         name = hashlib.sha256(url.encode()).hexdigest()[:16] + "." + ext
         (self.directory / name).write_bytes(data)
-        self.index[url] = {"file": name, "ext": ext}
-        tmp = self.index_path.with_suffix(".tmp")
-        tmp.write_text(json.dumps(self.index, indent=1, sort_keys=True))
-        os.replace(tmp, self.index_path)
+        with self.lock:
+            self.index[url] = {"file": name, "ext": ext}
+            tmp = self.index_path.with_suffix(".tmp")
+            tmp.write_text(json.dumps(self.index, indent=1, sort_keys=True))
+            os.replace(tmp, self.index_path)
 
 
 def fetch(url: str, cache: ArtworkCache, offline: bool):
@@ -161,8 +167,8 @@ def require_entity(kind: str, name: str, checks):
                 f"with --{kind} or seed it first ({hint})")
 
 
-def resolve_showcase(conn, song_name: str, artist_name: str, genre_name: str,
-                     search: str | None):
+def resolve_showcase(conn, song_name: str, artist_name: str | None,
+                     genre_name: str | None, search: str | None):
     """Find the pages the recording walks, and check they show their features."""
     song = single(conn,
                   "select identifier, display_name, description from songs "
@@ -173,21 +179,49 @@ def resolve_showcase(conn, song_name: str, artist_name: str, genre_name: str,
                          "pass --song or seed the database first")
     song_id, song_display, description = song
 
-    artist = single(conn,
-                    "select a.identifier, a.display_name, a.description "
-                    "from song_artists sa join artists a "
-                    "on a.identifier = sa.artist_identifier "
-                    "where sa.song_identifier = ? limit 1", (song_id,))
-    if not artist:
-        raise SystemExit(f"song {song_name!r} has no artist")
+    if artist_name:
+        artist = single(conn,
+                        "select identifier, display_name, description "
+                        "from artists where display_name = ? "
+                        "order by views desc limit 1", (artist_name,))
+        if not artist:
+            raise SystemExit(f"no artist named {artist_name!r}; "
+                             "pass --artist or seed the database first")
+        if not single(conn, "select 1 from song_artists where "
+                            "song_identifier = ? and artist_identifier = ?",
+                      (song_id, artist[0])):
+            raise SystemExit(f"{song_display!r} is not by {artist_name!r}; "
+                             "pass the song's own artist with --artist")
+    else:
+        artist = single(conn,
+                        "select a.identifier, a.display_name, a.description "
+                        "from song_artists sa join artists a "
+                        "on a.identifier = sa.artist_identifier "
+                        "where sa.song_identifier = ? limit 1", (song_id,))
+        if not artist:
+            raise SystemExit(f"song {song_name!r} has no artist")
 
-    genre = single(conn,
-                   "select g.identifier, g.display_name, g.description "
-                   "from song_genres sg join genres g "
-                   "on g.identifier = sg.genre_identifier "
-                   "where sg.song_identifier = ? limit 1", (song_id,))
-    if not genre:
-        raise SystemExit(f"song {song_name!r} has no genre")
+    if genre_name:
+        genre = single(conn,
+                       "select identifier, display_name, description "
+                       "from genres where display_name = ? "
+                       "order by views desc limit 1", (genre_name,))
+        if not genre:
+            raise SystemExit(f"no genre named {genre_name!r}; "
+                             "pass --genre or seed the database first")
+        if not single(conn, "select 1 from song_genres where "
+                            "song_identifier = ? and genre_identifier = ?",
+                      (song_id, genre[0])):
+            raise SystemExit(f"{song_display!r} is not in {genre_name!r}; "
+                             "pass the song's own genre with --genre")
+    else:
+        genre = single(conn,
+                       "select g.identifier, g.display_name, g.description "
+                       "from song_genres sg join genres g "
+                       "on g.identifier = sg.genre_identifier "
+                       "where sg.song_identifier = ? limit 1", (song_id,))
+        if not genre:
+            raise SystemExit(f"song {song_name!r} has no genre")
 
     artist_id, artist_display, artist_description = artist
     genre_id, genre_display, genre_description = genre
@@ -275,6 +309,11 @@ def copy_project(repo: Path, demo: Path, port: int):
     upload = repo / "pub" / "img" / "upload"
     if upload.exists():
         os.symlink(upload, demo / "pub" / "img" / "upload")
+    # The site's own pictures -- its logo, and whatever else lives beside the
+    # upload directory -- are not part of the demo's artwork copy.
+    for item in (repo / "pub" / "img").iterdir():
+        if item.is_file():
+            os.symlink(item, demo / "pub" / "img" / item.name)
 
     (demo / "conf").mkdir(parents=True, exist_ok=True)
     shutil.copy(repo / "conf" / "plugins.scm", demo / "conf" / "plugins.scm")
@@ -298,10 +337,12 @@ def main():
                         help="port the demo instance listens on")
     parser.add_argument("--song", default="Left to Die",
                         help="the song the recording opens")
-    parser.add_argument("--artist", default="Death",
-                        help="the artist the recording opens")
-    parser.add_argument("--genre", default="Death Metal",
-                        help="the genre the recording opens")
+    parser.add_argument("--artist", default=None,
+                        help="the artist the recording opens (default: the "
+                             "song's own artist)")
+    parser.add_argument("--genre", default=None,
+                        help="the genre the recording opens (default: the "
+                             "song's own genre)")
     parser.add_argument("--search", default=None,
                         help="the term typed into the search field "
                              "(default: the last word of the song's title)")

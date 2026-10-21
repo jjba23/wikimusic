@@ -15,11 +15,41 @@ set -euo pipefail
 here=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)
 repo=$(cd -- "$here/../.." >/dev/null && pwd)
 
+die() { echo "run.sh: $*" >&2; exit 1; }
+
 demo=${DEMO:-/tmp/wikimusic-showcase-demo}
 out=${OUT:-"$here/out"}
-port=${PORT:-50051}
-cdp_port=${CDP_PORT:-9222}
-display=${DISPLAY_NUM:-99}
+# SHOWCASE_* rather than the usual PORT/DISPLAY names: a shell that exports
+# PORT=0 or DISPLAY for another program should not silently move the demo.
+# Left alone, the ports are picked fresh, so a Chrome still shutting down
+# from the previous take cannot block the next one.
+free_port() {
+  python3 - <<'PY'
+import socket
+probe = socket.socket()
+probe.bind(("127.0.0.1", 0))
+print(probe.getsockname()[1])
+probe.close()
+PY
+}
+
+port=${SHOWCASE_PORT:-}
+case $port in ''|0) port=$(free_port) ;; esac
+cdp_port=${SHOWCASE_CDP_PORT:-}
+case $cdp_port in ''|0) cdp_port=$(free_port) ;; esac
+
+if [ -n "${SHOWCASE_DISPLAY:-}" ]; then
+  display=$SHOWCASE_DISPLAY
+else
+  for candidate in 99 100 101 102 103 104 105; do
+    if [ ! -e "/tmp/.X11-unix/X$candidate" ] \
+        && [ ! -e "/tmp/.X$candidate-lock" ]; then
+      display=$candidate
+      break
+    fi
+  done
+  [ -n "${display:-}" ] || die "no free X display between :99 and :105; set SHOWCASE_DISPLAY"
+fi
 view_width=${VIEW_WIDTH:-1440}
 view_height=${VIEW_HEIGHT:-900}
 gif_width=${WIDTH:-1000}
@@ -45,8 +75,6 @@ while [ "$#" -gt 0 ]; do
   esac
   shift
 done
-
-die() { echo "run.sh: $*" >&2; exit 1; }
 
 for tool in python3 node npm ffmpeg curl setsid; do
   command -v "$tool" >/dev/null 2>&1 || die "$tool is required"
@@ -86,22 +114,34 @@ else
 fi
 
 python3 - "$port" "$cdp_port" <<'PY'
-import socket, sys
+import socket, sys, time
+
+# A Chrome from a previous take can hold its debugging port for a moment
+# after being told to quit, so give the sockets a few seconds to clear.
+deadline = time.time() + 10
 for value in sys.argv[1:]:
     port = int(value)
-    probe = socket.socket()
-    try:
-        probe.bind(("127.0.0.1", port))
-    except OSError:
-        sys.exit(f"port {port} is already in use")
-    finally:
-        probe.close()
+    while True:
+        probe = socket.socket()
+        try:
+            probe.bind(("127.0.0.1", port))
+            break
+        except OSError:
+            if time.time() > deadline:
+                sys.exit(f"port {port} is already in use")
+            time.sleep(0.25)
+        finally:
+            probe.close()
 PY
 
 mkdir -p "$out"
 if [ ! -d "$here/node_modules/playwright-core" ]; then
   echo "run.sh: installing playwright-core"
-  (cd "$here" && npm install --no-audit --no-fund)
+  if [ -f "$here/package-lock.json" ]; then
+    (cd "$here" && npm ci --no-audit --no-fund)
+  else
+    (cd "$here" && npm install --no-audit --no-fund)
+  fi
 fi
 
 echo "run.sh: building the demo instance"
@@ -119,18 +159,20 @@ cleanup() {
   set +e
   if [ -n "$chrome_pid" ]; then kill -- -"$chrome_pid" 2>/dev/null; fi
   if [ -n "$server_pid" ]; then kill -- -"$server_pid" 2>/dev/null; fi
-  if [ -n "$xvfb_pid" ]; then kill "$xvfb_pid" 2>/dev/null; fi
+  if [ -n "$xvfb_pid" ]; then kill -- -"$xvfb_pid" 2>/dev/null; fi
   wait 2>/dev/null
   rm -rf "$profile"
   exit "$status"
 }
 trap cleanup EXIT INT TERM
 
-if [ -e "/tmp/.X11-unix/X$display" ]; then
-  die "display :$display is already in use; set DISPLAY_NUM to a free one"
+if [ -e "/tmp/.X11-unix/X$display" ] || [ -e "/tmp/.X$display-lock" ]; then
+  die "display :$display is already in use; set SHOWCASE_DISPLAY to a free one"
 fi
 echo "run.sh: starting Xvfb on :$display"
-"${xvfb[@]}" ":$display" -screen 0 "${view_width}x${view_height}x24" \
+# setsid, like the server and Chrome: the command may be a Guix wrapper, and
+# killing the wrapper alone would orphan the X server it started.
+setsid "${xvfb[@]}" ":$display" -screen 0 "${view_width}x${view_height}x24" \
   -nolisten tcp >"$out/xvfb.log" 2>&1 &
 xvfb_pid=$!
 
@@ -143,7 +185,7 @@ server_pid=$!
 
 base="http://localhost:$port"
 for _ in $(seq 1 240); do
-  if curl -fsS -o /dev/null --max-time 2 "$base/"; then
+  if curl -fsS -o /dev/null --max-time 2 "$base/" 2>/dev/null; then
     break
   fi
   if ! kill -0 "$server_pid" 2>/dev/null; then
@@ -157,7 +199,9 @@ curl -fsS -o /dev/null --max-time 2 "$base/" \
   || die "the demo server did not answer on $base; see $out/server.log"
 
 echo "run.sh: starting Chrome"
-setsid "$chrome" \
+# DISPLAY is what puts Chrome on the Xvfb screen the camera is pointed at;
+# without it Chrome renders wherever the caller's session is.
+setsid env DISPLAY=":$display" "$chrome" \
   --kiosk --window-size="${view_width},${view_height}" \
   --window-position=0,0 --force-device-scale-factor=1 \
   --no-first-run --no-default-browser-check --disable-infobars \
@@ -170,7 +214,7 @@ chrome_pid=$!
 
 for _ in $(seq 1 120); do
   if curl -fsS -o /dev/null --max-time 2 \
-      "http://127.0.0.1:$cdp_port/json/version"; then
+      "http://127.0.0.1:$cdp_port/json/version" 2>/dev/null; then
     break
   fi
   if ! kill -0 "$chrome_pid" 2>/dev/null; then
@@ -205,6 +249,23 @@ if [ "$dry" = 1 ]; then
   echo "run.sh: dry run finished; screenshots are in $out/check"
   exit 0
 fi
+
+# An X11 grab of the wrong (or a blank) display is a perfectly valid video,
+# and gifski happily encodes it into a black GIF.  Look at a frame first.
+echo "run.sh: checking the capture"
+frame="$out/check/capture-frame.png"
+ffmpeg -y -loglevel error -ss 10 -i "$out/capture.mkv" -frames:v 1 "$frame" \
+  || die "could not read $out/capture.mkv"
+[ -s "$frame" ] || die "the capture has no frame at ten seconds"
+python3 - "$frame" <<'PY'
+import sys
+from PIL import Image
+
+image = Image.open(sys.argv[1]).convert("L")
+low, high = image.getextrema()
+if high - low < 8:
+    sys.exit("the capture is blank: Chrome was not drawing on the Xvfb display")
+PY
 
 echo "run.sh: encoding"
 WIDTH="$gif_width" FPS="$gif_fps" QUALITY="$gif_quality" LOSSY="$gif_lossy" \
