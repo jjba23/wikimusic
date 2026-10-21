@@ -1,0 +1,11 @@
+{
+  "name": "wikimusic-showcase",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Records the WikiMusic showcase GIF from a throw-away demo instance.",
+  "license": "AGPL-3.0-or-later",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright-core": "1.64.1"
+  }
+}

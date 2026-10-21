@@ -1,0 +1,114 @@
+#+title: The showcase GIF
+
+#+name: showcase
+The picture at the top of the README -- the one a visitor sees before reading
+a word -- is recorded by this directory.  It is a real session against a
+throw-away copy of the project's database, not a mock-up, and the same script
+that recorded it is what regenerates it for the next release.
+
+* What one run produces
+
+  A ~59 second, 1000x625 GIF at about 9 frames per second, written to
+  ~pub/img/wikimusic-demo.gif~, walking the happy path:
+
+  - the front page, top and shelf;
+  - the songs list, sorted by views, with the tile-size switch and a search;
+  - a song page with prose, tablature, the chord guide, the chord highlight
+    and the click track's auto-scroll;
+  - an artist page with its pictures and its prose, and the pictures' carousel;
+  - the genres list and a genre page;
+  - the same genre and song pages with dark mode on, its chords and its tab.
+
+  Nothing is staged in the page: the recording only clicks what a reader
+  would click, and the cursor it draws is the only thing added.
+
+* Running it
+
+  #+begin_src sh
+  contrib/showcase/run.sh                # record, encode, install
+  contrib/showcase/run.sh --no-install   # leave the GIF under contrib/showcase/out
+  contrib/showcase/run.sh --dry-run      # screenshots at every beat, no capture
+  #+end_src
+
+  ~run.sh~ builds the demo instance, starts Xvfb and a kiosk Chrome on a
+  private display, records, encodes, and stops everything again.  Logs and
+  the raw capture stay in ~contrib/showcase/out/~ (ignored by git).
+
+  It needs, beyond what the project's own [[file:../../manifest.scm][manifest]] provides:
+
+  | What                     | Why                                                        |
+  |--------------------------+------------------------------------------------------------|
+  | Google Chrome or Chromium | the browser the recording drives (+--kiosk+, CDP)          |
+  | ~ffmpeg~                  | captures the X display as lossless FFV1                    |
+  | ~node~ and ~npm~          | runs ~record.js~ with [[https://playwright.dev/][Playwright]]'s CDP client            |
+  | ~python3~, ~requests~, ~Pillow~ | builds the demo instance and localises its artwork    |
+  | ~Xvfb~                    | the display Chrome draws on (borrowed from Guix if absent) |
+  | ~gifski~ and ~gifsicle~   | encode the GIF (borrowed from Guix or Nix if absent)       |
+
+  On Guix the tools that are not in the manifest can be borrowed in the same
+  way the script does it, for example
+  ~guix shell gifski gifsicle -- contrib/showcase/run.sh~.
+
+* Why a demo instance, and why it cannot show a broken picture
+
+  The project database points at pictures on other people's servers, and some
+  of those links die.  A release recording must not inherit that, so
+  ~build_demo.py~ copies the database, resolves every artwork URL, and stores
+  the pictures under the copy's own ~pub/img/demo/~.  Rows whose picture
+  cannot be fetched are dropped from the copy, so the page draws a tile
+  without a picture rather than an image icon that failed.
+
+  Downloads are cached in ~$XDG_CACHE_HOME/wikimusic-showcase/artwork~ and
+  keyed by URL, so later runs are fast.  After one online run,
+  ~--offline~ records without touching the network at all.
+
+  The recorder is just as strict at the other end: it refuses to finish if any
+  picture on a visited page has no intrinsic size, if a request fails with a
+  4xx/5xx, or if the page throws.  The take is checked before it is encoded,
+  not after somebody notices in the README.
+
+* Changing what it shows
+
+  The song, artist and genre are looked up by name, and the search term
+  defaults to the last word of the song's title:
+
+  #+begin_src sh
+  contrib/showcase/run.sh --song "Left to Die" --artist Death \
+                          --genre "Death Metal" --search die
+  #+end_src
+
+  ~build_demo.py~ checks that the three pages have the prose, tablature,
+  artwork and links the choreography relies on, and says which one is missing
+  instead of recording a half-empty page.  ~record.js~ holds the beats
+  themselves; each one waits for a selector or a URL, so a changed page fails
+  loudly at the beat that changed.
+
+  Size and quality are environment variables:
+
+  #+begin_src sh
+  WIDTH=1200 FPS=10 QUALITY=95 LOSSY=60 contrib/showcase/run.sh
+  #+end_src
+
+  ~WIDTH~ is the GIF's width; the recording itself is 1440x900 (set
+  ~VIEW_WIDTH~ and ~VIEW_HEIGHT~ to change that).  A larger or smoother GIF
+  costs file size quickly -- the README should stay readable on a slow
+  connection.
+
+* The caption
+
+  If a run changes which pages the GIF visits, update the ~#+caption~ above
+  the image in the top-level ~README.org~ as well.  ~maak build-manual~
+  renders that caption into the HTML manual, so it is the sentence readers
+  actually see under the picture.
+
+* Troubleshooting
+
+  - *A port or display is busy.*  ~run.sh~ refuses to start rather than reuse
+    something it does not own.  Set ~PORT~, ~CDP_PORT~ or ~DISPLAY_NUM~.
+  - *The demo server exits.*  Read ~out/server.log~; the usual cause is a
+    missing ~env.scm~ (the demo instance symlinks the project's own).
+  - *The recording fails at a beat.*  Re-run with ~--dry-run~ and look at the
+    screenshots in ~out/check/~; the error names the selector or URL that did
+    not appear.
+  - *Artwork is missing.*  Delete the cache entry (or run without
+    ~--offline~); the script prints every URL it had to drop.
