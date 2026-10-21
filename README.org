@@ -20,7 +20,7 @@ Guile Scheme, both hackable down to the last button, and both free software in
 the strict sense of the word.
 
 #+name: wikimusic-demo
-#+caption: A minute in WikiMusic: the front page, the songs list, a song page with its tablature, its chord guide and its click track, and the same page in dark mode.
+#+caption: A minute in WikiMusic: the front page, the songs list with its search, sort and tile-size controls, a song page with its tablature, its chord guide and its click track, an artist and a genre page, and the same pages in dark mode.
 [[https://codeberg.org/jjba23/wikimusic/raw/branch/trunk/pub/img/wikimusic-demo.gif]]
 
 - 🌍 *Read the biggest instance:* [[https://wikimusic.jointhefreeworld.org][wikimusic.jointhefreeworld.org]]
