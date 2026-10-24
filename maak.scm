@@ -17,6 +17,10 @@
 
 (define-module (maak)
   #:use-module (maak maak)
+  ;; The i18n helpers are imported under a prefix because two of the tasks
+  ;; below are named `i18n-compile' and `i18n-merge', and a task may not shadow
+  ;; the helper it calls.
+  #:use-module ((maak i18n) #:prefix i18n:)
   #:declarative? #t)
 
 ;; ====== Maak constants ======
@@ -82,9 +86,7 @@ Args: lang represents the language code (e.g., en_US, nl_NL, etc.)
 
 Use msgfmt to compile the .po file into a .mo file for the specified language
 The output .mo file will be placed in the LC_MESSAGES directory under the language's folder."
-  ($ (list (~ "msgfmt -v -o ~a/~a/LC_MESSAGES/~a.mo" i18n-dir lang
-              i18n-textdomain)
-           (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain))))
+  (i18n:i18n-compile lang #:dir i18n-dir #:textdomain i18n-textdomain))
 
 (define (i18n-init* lang)
   "Initialize a new translation file from a template (.pot) for a specific language.
@@ -94,11 +96,8 @@ Args: lang represents the language code (e.g., en_US, nl_NL, etc.)
 Use msginit to generate a .po file from the .pot template for the specified language
 The -l option sets the language, and --no-translator means no translator is pre-filled in the .po file
 The generated .po file is placed in the LC_MESSAGES directory for the given language"
-  (mkdir-p (~ "~a/~a/LC_MESSAGES" i18n-dir lang))
-  ($ (list (~ "msginit -l ~a.UTF8 -o" lang)
-           (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain)
-           (~ "-i ~a/~a.pot --no-translator" i18n-dir i18n-textdomain))
-     #:verbose? #t))
+  (i18n:i18n-init lang #:dir i18n-dir #:textdomain i18n-textdomain
+                  #:verbose? #t))
 
 (define (i18n-merge* lang)
   "Merge translation updates from the template (.pot) into an existing .po file.
@@ -108,9 +107,7 @@ Args: lang represents the language code (e.g., en_US, nl_NL, etc.)
 Use msgmerge to update the specified language's .po file with new translations from the template (.pot)
 The -U flag updates the .po file in place
 This ensures the .po file stays up-to-date with the latest changes in the template"
-  ($ (list "msgmerge -U"
-           (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain)
-           (~ "~a/~a.pot" i18n-dir i18n-textdomain))))
+  (i18n:i18n-merge lang #:dir i18n-dir #:textdomain i18n-textdomain))
 
 (define (i18n-source-globs)
   "Return the source file patterns xgettext should read, existing ones only.
@@ -132,9 +129,13 @@ translation refresh ever needs."
 (define* (i18n-extract* #:key (update? #t))
   "Extract translatable strings from Scheme source files using xgettext.
 Args: update? represents whether we should update a template or create a new one."
-  ($ (append (list (~ "xgettext --default-domain=~a" i18n-textdomain)
+  ;; The source globs are words the shell has to expand, so this stays a shell
+  ;; line -- with one part per word, so a path with a space in it still reads as
+  ;; one word and the quoting around the copyright holders stays as written.
+  ($ (append (list "xgettext"
+                   (~ "--default-domain=~a" i18n-textdomain)
                    (~ "--output=~a/~a.pot" i18n-dir i18n-textdomain)
-                   "--language=Scheme --keyword=G_" "--sort-by-file")
+                   "--language=Scheme" "--keyword=G_" "--sort-by-file")
              (if update?
                  (list "--join-existing")
                  '())
@@ -142,15 +143,16 @@ Args: update? represents whether we should update a template or create a new one
                       (string-join copyright-holders ","))
                    (~ "--package-name=~a" i18n-textdomain))
              (i18n-source-globs)
-             (list "--from-code UTF-8"))
+             (list "--from-code" "UTF-8"))
      #:verbose? #t))
 
 ;; ====== Maak tasks ======
 
 (define (repl)
   "Development REPL."
-  (time-machine-manifest-shell '("guile -L ./lib -L ."
-                                 "-c '((@ (ares server) run-nrepl-server))'")))
+  (time-machine-manifest-shell
+   (list "guile" "-L" "./lib" "-L" "."
+         "-c" "'((@ (ares server) run-nrepl-server))'")))
 
 (define (default)
   "Default task to be run, list available tasks."
@@ -162,13 +164,16 @@ Args: update? represents whether we should update a template or create a new one
 ;; this is the test run reading the project's keys the way the server does.
 (define (test)
   "Run the project's test suite, one spec at a time, from test/veritas."
-  (time-machine-manifest-shell '("guile  --fresh-auto-compile -L ./lib -L ./test -L ."
-                                 "-c '(load \"env.scm\")(begin (setlocale LC_ALL \"C.UTF-8\") (use-modules (veritas runner)) (run-tests))'")))
+  (time-machine-manifest-shell
+   (list "guile" "--fresh-auto-compile"
+         "-L" "./lib" "-L" "./test" "-L" "."
+         "-c"
+         "'(load \"env.scm\")(begin (setlocale LC_ALL \"C.UTF-8\") (use-modules (veritas runner)) (run-tests))'")))
 
 (define (build-manual)
   "Render the project's manual, which is the README."
-  (time-machine-manifest-shell (list (~ "emacs -Q --batch --eval '~s'"
-                                        emacs-lisp-manual-publish-cmd))
+  (time-machine-manifest-shell (list "emacs" "-Q" "--batch" "--eval"
+                                     (~ "'~s'" emacs-lisp-manual-publish-cmd))
                                #:verbose? #t))
 
 (define (deploy)
@@ -192,14 +197,14 @@ which is where a reader of the site is sent."
   "Hot-reloading developer's setup."
   (time-machine-manifest-shell (list "watchexec"
                                      "--clear"
-                                     (~ "--exts ~a"
-                                        (string-join (map symbol->string
-                                                      hot-reload-file-types)
-                                                     ","))
+                                     "--exts"
+                                     (string-join (map symbol->string
+                                                       hot-reload-file-types)
+                                                  ",")
                                      "--on-busy-update=restart"
-                                     "--shell bash"
-                                     "--watch . --"
-                                     "maak server")))
+                                     "--shell" "bash"
+                                     "--watch" "." "--"
+                                     "maak" "server")))
 
 (define (hr)
   "Alias to hot-reloading."
@@ -211,18 +216,22 @@ which is where a reader of the site is sent."
 
 (define (kill-server)
   "Kill any running HTTP server in the same port."
-  ($ (list (~ "fuser -k ~a/tcp || true" http-port)))
+  ;; Nothing listening is not a failure, so the command is allowed to say so
+  ;; instead of the task dying on `fuser''s non-zero exit.
+  (run (list "fuser" "-k" (~ "~a/tcp" http-port))
+       #:allow-failure? #t)
   (run (list "sleep" "2")))
 
 (define (server)
   "Target to start the wikimusic server with the default configuration."
   (kill-server)
-  (time-machine-manifest-shell '("art work")))
+  (time-machine-manifest-shell (list "art" "work")))
 
 (define (production-server)
   "Target to start the wikimusic server with the production configuration."
   (kill-server)
-  (time-machine-manifest-shell '("art work -c conf/production.conf")))
+  (time-machine-manifest-shell (list "art" "work"
+                                     "-c" "conf/production.conf")))
 
 (define (migrate)
   "Apply the SQL migrations to the database in this directory with mutastructura.
@@ -234,9 +243,10 @@ transaction.  That is what makes this safe to run at any time, and it is also
 the way to bring a database made by an earlier deployment up to what the source
 in front of it expects.  Mutastructura is the only thing that applies
 migrations; no task reads the SQL files and hands them to sqlite3 itself."
-  (time-machine-manifest-shell (list (format #f
-                                      "mutastructura --database sqlite3 --connection ~a --migrations ~a"
-                                      wikimusic-db migrations-dir))
+  (time-machine-manifest-shell (list "mutastructura"
+                                     "--database" "sqlite3"
+                                     "--connection" wikimusic-db
+                                     "--migrations" migrations-dir)
                                #:verbose? #t))
 
 (define (init-db)
@@ -250,12 +260,11 @@ why a deployment that has data runs `maak migrate' instead."
   (delete-file-recursively wikimusic-db)
   (delete-file-recursively (~ "~a-shm" wikimusic-db))
   (delete-file-recursively (~ "~a-wal" wikimusic-db))
-  ;; The command list, not the bare string: `time-machine-manifest-shell'
-  ;; appends what it is given to the `guix time-machine ... shell' it builds,
-  ;; so a string here would make the whole command an improper list.
-  (time-machine-manifest-shell (list (~
-                                      "sqlite3 ~a 'PRAGMA journal_mode=WAL;'"
-                                      wikimusic-db)))
+  ;; One word per part, and the pragma keeps the single quotes it needs to
+  ;; reach sqlite3 whole: `time-machine-manifest-shell' joins what it is given
+  ;; into a shell line, so the quoting is part of the argument.
+  (time-machine-manifest-shell (list "sqlite3" wikimusic-db
+                                     "'PRAGMA journal_mode=WAL;'"))
   (migrate))
 
 ;; ====== Maak i18n tasks ======
@@ -293,8 +302,9 @@ why a deployment that has data runs `maak migrate' instead."
   (i18n-extract* #:update? #t))
 
 (define (olive-css)
-  ($ '("curl --output \"./pub/css/wikimusic.olive.min.css\""
-       "\"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/wikimusic.olive.min.css\"")))
+  (curl-download
+   "https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/wikimusic.olive.min.css"
+   #:output "./pub/css/wikimusic.olive.min.css"))
 
 ;; The type and the glyphs are fetched rather than written: the three Lucida
 ;; families, the two web families and the Phosphor set are somebody else's work,
@@ -305,7 +315,8 @@ why a deployment that has data runs `maak migrate' instead."
 ;; the stylesheets themselves name.
 (define (vendor-assets)
   "Fetch the assets the interface is painted with into `pub/'."
-  (time-machine-manifest-shell '("guile -L ./lib -L . resources/assets/fetch.scm")))
+  (time-machine-manifest-shell (list "guile" "-L" "./lib" "-L" "."
+                                     "resources/assets/fetch.scm")))
 
 ;; ====== The vendored Guitar Pro renderer ======
 
@@ -321,12 +332,10 @@ why a deployment that has data runs `maak migrate' instead."
 (define* (alphatab-fetch #:key url destination)
   "Fetch URL into DESTINATION, creating the directory it belongs in first.
 
-The download fails loudly -- `--fail' turns an HTTP error into a non-zero
-status -- because a run that quietly left a page's asset missing would be found
-by a reader looking at a tab that will not render."
-  ($ (list "curl --fail --location --silent --show-error"
-           (~ "--output \"~a\"" destination)
-           (~ "\"~a\"" url))))
+The download fails loudly -- the request carries `--fail', which turns an HTTP
+error into a non-zero status -- because a run that quietly left a page's asset
+missing would be found by a reader looking at a tab that will not render."
+  (curl-download url #:output destination))
 
 (define (alphatab)
   "Vendor alphaTab, the Guitar Pro renderer, into `pub/vendor/alphatab'.
@@ -359,8 +368,15 @@ than being a blob of unknown age."
 
 (define (import-production-database)
   "Import production env's database to local workspace via SSH/SCP"
-  ($ '("scp wolk-jjba:/etc/byggsteg/job-clone/wikimusic/trunk/wikimusic.db* .")))
+  ;; The `*' is scp's, naming the database and the `-wal'/`-shm' files beside
+  ;; it, and it belongs to the remote side: handed over as one word, no local
+  ;; shell tries to expand it first.
+  (run (list "scp"
+             "wolk-jjba:/etc/byggsteg/job-clone/wikimusic/trunk/wikimusic.db*"
+             ".")))
 
 (define (import-production-env)
   "Import production env's database to local workspace via SSH/SCP"
-  ($ '("scp wolk-jjba:/etc/byggsteg/job-clone/wikimusic/trunk/env.scm .")))
+  (run (list "scp"
+             "wolk-jjba:/etc/byggsteg/job-clone/wikimusic/trunk/env.scm"
+             ".")))
