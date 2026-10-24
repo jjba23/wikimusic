@@ -154,7 +154,7 @@ Args: update? represents whether we should update a template or create a new one
 
 (define (default)
   "Default task to be run, list available tasks."
-  ($ '("maak --list")))
+  (list-tasks))
 
 ;; The key file has to be loaded before the runner forks a worker for each
 ;; spec: the modules under test import (wikimusic env), and a worker inherits
@@ -184,7 +184,9 @@ which is where a reader of the site is sent."
 
 (define (fmt)
   "Format Scheme source code files according to the Guix style guide."
-  ($ '("find . -maxdepth 8 -name '*.scm'" "-type f -exec guix style -f {} \\;")))
+  (run (list "find" "." "-maxdepth" "8" "-name" "*.scm" "-type" "f"
+             "-exec" "guix" "style" "-f" "{}" ";")
+       #:verbose? #t))
 
 (define (hot-reload)
   "Hot-reloading developer's setup."
@@ -210,7 +212,7 @@ which is where a reader of the site is sent."
 (define (kill-server)
   "Kill any running HTTP server in the same port."
   ($ (list (~ "fuser -k ~a/tcp || true" http-port)))
-  ($ '("sleep 2")))
+  (run (list "sleep" "2")))
 
 (define (server)
   "Target to start the wikimusic server with the default configuration."
