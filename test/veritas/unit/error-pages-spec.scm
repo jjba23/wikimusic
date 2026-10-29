@@ -29,11 +29,10 @@
                 #:select (get-syspage-handler))
   #:use-module ((artanis utils)
                 #:select (sxml->xml-string))
+  #:use-module ((wikimusic html)
+                #:select (page-stylesheets))
   #:use-module (app views error)
   #:export (spec))
-
-(define olive-bundle
-  "pub/css/wikimusic.olive.min.css")
 
 (define (all-matches pattern string)
   "Return every match of the regular expression PATTERN in STRING, as strings."
@@ -54,10 +53,19 @@
                                  (all-matches "class=\"([^\"]*)\"" html))))
 
 (define (sheets-for html)
-  "Return the two stylesheets that style HTML: the bundle it links, and the
-companion sheet inlined into its own style elements."
-  (string-append (call-with-input-file olive-bundle
-                   get-string-all)
+  "Return every sheet that styles HTML.
+
+They are the two kinds a page is painted with: the stylesheets it links -- a
+page does not carry them, so they are read from the tree they are served
+from, and the list is the page's own (see `page-stylesheets') rather than one
+written out again here -- and the companion sheets the framework inlines into
+style elements of its own."
+  (string-append (apply string-append
+                        (map (lambda (path)
+                               (call-with-input-file (string-append "pub/"
+                                                                    path)
+                                 get-string-all))
+                             page-stylesheets))
                  (string-join (all-matches "<style[^>]*>(.*?)</style>" html)
                               "")))
 

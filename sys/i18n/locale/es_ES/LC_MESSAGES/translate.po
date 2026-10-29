@@ -954,3 +954,12 @@ msgstr ""
 #: lib/wikimusic/html.scm:1288 lib/wikimusic/html.scm:1296
 msgid "Large tiles"
 msgstr ""
+
+msgid "skip to content"
+msgstr "ir al contenido"
+
+msgid "smaller text"
+msgstr "texto más pequeño"
+
+msgid "larger text"
+msgstr "texto más grande"

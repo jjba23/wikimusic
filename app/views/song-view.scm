@@ -547,14 +547,22 @@
 
                             (div song-attributes
                                  (div (@ (class ,(mk-class '(py-1 px-5))))
-                                      ,(sub-h4 (G_ "musical content pref:"))
-                                      ,(ascii-size-select G_
-                                                          #:route (format #f
-                                                                   "/~as/uuid/~a"
-                                                                   'song
-                                                                   (assq-ref
-                                                                    song
-                                                                    'identifier)))))
+                                      ;; The size the ascii contents are read
+                                      ;; at, said in the reader's own terms:
+                                      ;; the control steps up and down and
+                                      ;; shows the share it is drawn at, and
+                                      ;; the page remembers the choice for the
+                                      ;; next song they open (see
+                                      ;; `(wikimusic html)' and the route).
+                                      ,(sub-h4 (G_ "ascii size"))
+                                      ,(ascii-size-control G_
+                                                           #:route (format #f
+                                                                    "/~as/uuid/~a"
+                                                                    'song
+                                                                    (assq-ref
+                                                                     song
+                                                                     'identifier))
+                                                           #:size ascii-size)))
 
                             (div ,(render-song-content G_ song song-contents
                                                        ascii-size))))))

@@ -141,7 +141,8 @@
                                   #:type 'submit
                                   #:background '(bg-redwood-700)
                                   #:color '(text-stone-100)
-                                  #:hover-background '(hover:bg-redwood-900)))
+                                  #:hover-background '(hover:bg-redwood-900
+                                                       dark:hover:bg-redwood-500)))
                    (a (@ (href ,(format #f "/users/edit/~a"
                                         (assoc-ref u "identifier"))))
                       ,(icon-button #:icon 'pencil

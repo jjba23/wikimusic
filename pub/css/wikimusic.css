@@ -1,0 +1,183 @@
+/* wikimusic - the free music knowledge encyclopaedia
+ *
+ * SPDX-License-Identifier: MIT
+ * Copyright © Josep Bigorra <jjbigorra@gmail.com>
+*/
+
+/*
+  The interface's own sheet, read after the Olive bundle it is built on.
+
+  Everything the pages are painted with is a utility class, and the bundle in
+  `wikimusic.olive.min.css' defines them all.  What is here is the other kind
+  of rule: the handful of decisions a utility cannot state -- a property no
+  class names (the colour scheme of the browser's own controls, the tab stop
+  of a tablature, ligatures that would close it up) and a preference a reader
+  states in their browser rather than in the page.  Keeping them together
+  keeps the markup about the page rather than about the browser.
+
+  Olive ships first and this sheet second, so a utility in the markup still
+  wins over a base rule here: nothing below is !important, and nothing below
+  restates a decision the markup can already make.
+*/
+
+/* ===== The scheme the browser's own controls are drawn in =====
+
+   A page styles what it draws and the browser styles the rest: the scrollbar
+   of a long page, the list a `select' opens, the spinners of a number field,
+   the caret in an input, the highlight of a chosen line.  All of those are
+   painted by the browser, and by default they are painted light -- so a
+   reader on the dark theme opens a white menu from a dark page.
+
+   `color-scheme' is how a page says which of its two themes it is showing.
+   It is read per element and inherited, so the root states it once, and the
+   attribute the theme switch already writes (`data-theme', see
+   `hygguileToggleDarkTheme') is what selects which. */
+
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* ===== A tablature is read as a grid of columns =====
+
+   An ascii tab -- or a chord chart, or a lyric sheet -- is monospaced for a
+   reason: a column of characters is a string, and a string that shifts by
+   half a character is a different note.  Two things break those columns even
+   in a monospaced face:
+
+   - A tab character is not a monospaced character.  It is a jump to the next
+     tab stop, and the stop is a browser decision: eight characters by
+     default, which puts a stored tab in a different column than the author's
+     editor did.  Four is what the editors these tabs were written in used.
+   - A ligature is one glyph for two or more characters -- `=>', `|=', `||='.
+     Intel One Mono, the face the interface is set in, ships them, and a
+     ligature is one character wide where its characters were two, so a run
+     containing one closes up and every column after it moves.
+
+   So the block is given the stop it was written against and the ligatures
+   are turned off. `line-height' stays loose enough to read: leading moves
+   the rows, not the glyphs, so it costs the columns nothing. */
+
+.wm-ascii {
+  tab-size: 4;
+  line-height: 1.35;
+  font-variant-ligatures: none;
+}
+
+/* ===== Where a skip link lands =====
+
+   The content a reader who skipped the navigation lands on is the top of the
+   page's own body, which sits under a bar that stays put.  `scroll-margin'
+   is the space the browser leaves between the edge of the viewport and the
+   element it scrolls to, so the bar covers this much of the page instead of
+   the first line of what was jumped to.  Six rem is the bar at its tallest
+   plus the room a heading needs to be read as a heading. */
+
+.wm-skip-target {
+  scroll-margin-top: 6rem;
+}
+
+/* ===== A disclosure that says it opens =====
+
+   A song page folds its tab, its legend and any PDF into `<details>`, so a
+   reader who came for one of them is not made to scroll past the others.
+   `<details>` opens and closes with no script, but the browser's own marker
+   is a triangle the size and colour of the text, and it does not turn -- a
+   section that folds looks exactly like a section that does not.  So the
+   marker is dropped and the chevron the markup draws is turned instead, over
+   one transition, the way a control that moves should.
+
+   The rules are those two: the summary is the trigger, the mark inside it is
+   what turns when the block is open.  Nothing is drawn here that the page
+   does not already put in the markup, which is why the mark is the markup's
+   own `<span>` rather than a pseudo-element. */
+
+.wm-disclosure > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.wm-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.wm-disclosure-mark {
+  display: inline-flex;
+  transition: transform 200ms ease;
+}
+
+.wm-disclosure[open] > summary .wm-disclosure-mark {
+  transform: rotate(180deg);
+}
+
+/* ===== The first control on a page =====
+
+   A way past the navigation, for a reader on a keyboard or a screen reader
+   who has already read it on the page they came from.  It sits above the
+   viewport until it takes focus and then slides into the corner, which is
+   the one place on a page where motion is not decoration: it is how the
+   reader sees that the control they pressed is the one now on screen.
+
+   `top: 0' and `inset-inline-start: 0' are the corner in either direction of
+   writing, and the z-index puts it above the bar it skips over. */
+
+.wm-skip-link {
+  position: fixed;
+  top: 0;
+  inset-inline-start: 0;
+  z-index: 96;
+  padding: 0.75rem 1rem;
+  border-end-end-radius: 0.75rem;
+  background: #1c1917;
+  color: #f5f5f4;
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-130%);
+  transition: transform 160ms ease;
+}
+
+[data-theme="dark"] .wm-skip-link {
+  background: #f5f5f4;
+  color: #1c1917;
+}
+
+.wm-skip-link:focus,
+.wm-skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* ===== Reduced motion =====
+
+   The motions above are switched off here rather than in each rule, so a
+   rule added under one of these headings is covered by the preference
+   without having to remember it. */
+
+@media (prefers-reduced-motion: reduce) {
+  .wm-disclosure-mark,
+  .wm-skip-link {
+    transition: none;
+  }
+}
+
+/* ===== Anchors that travel rather than jump =====
+
+   A page that holds a long tablature and a legend under it is read by
+   jumping between them (see the ascii contents and the back-to-the-top
+   control), and a jump that arrives in one frame loses the reader's place.
+   Smooth scrolling is the difference between "I was scrolled somewhere" and
+   "I followed the link".  A reader who has asked their machine for less
+   motion gets the instant jump, which is what that preference is for -- the
+   media query below is the whole of it, so there is nothing for a
+   reduced-motion block to switch back off. */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+

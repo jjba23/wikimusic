@@ -923,3 +923,12 @@ msgstr ""
 #: lib/wikimusic/html.scm:1288 lib/wikimusic/html.scm:1296
 msgid "Large tiles"
 msgstr ""
+
+msgid "skip to content"
+msgstr ""
+
+msgid "smaller text"
+msgstr ""
+
+msgid "larger text"
+msgstr ""

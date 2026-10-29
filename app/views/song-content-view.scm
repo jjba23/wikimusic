@@ -118,6 +118,67 @@
                                    "highlightChords('ascii-content-container');"
                                    "highlightChords('ascii-legend-container');")))))
 
+;; The heading of a disclosure, and the mark that says whether it is open.
+;;
+;; The chevron is the affordance: it turns as the section opens, so a reader
+;; reads from the heading alone that what is under it can be folded away.  A
+;; song page holds several such sections -- the tab, its legend, a PDF beside
+;; them -- and they are all long enough that a reader who came for one of them
+;; wants the others out of the way.
+;;
+;; The two classes are the framework's own, and neither needs a script: one
+;; drops the browser's marker and turns the mark when the `details' is open,
+;; the other carries the transition that makes the turn read as a turn rather
+;; than as a jump.  `<details>' folds and unfolds without any JavaScript, so
+;; the animation is the only part of this that a browser without it misses.
+(define* (disclosure-summary G_ wording)
+  "Return the summary a disclosure is titled with, as a heading that turns."
+  `(summary (@ (class ,(mk-class '(flex flex-row items-center gap-2
+                                   text-xl font-bold
+                                   text-onyx-300 dark:text-stone-300
+                                   select-none
+                                   transition-colors duration-150
+                                   hover:text-persia-pink-500
+                                   dark:hover:text-persia-pink-300))))
+            (span (@ (aria-hidden "true")
+                     (class ,(mk-class '(wm-disclosure-mark text-base))))
+                  ,(icon #:type 'caret-down))
+            ,(G_ wording)))
+
+;; The block an ascii text is drawn in.
+;;
+;; One definition for the two places a song page shows one -- the contents and
+;; the legend -- so the two cannot disagree about the size the reader chose,
+;; the frost behind them, or how a line wider than the page is reached:
+;; `overflow-x-auto' shows a scrollbar when the text needs one, where `scroll'
+;; kept one over a tab that fitted.
+;;
+;; The size comes through `ascii-size-known', so a name the deployment was
+;; handed that is not a step of the ladder -- `text-11', say, which an earlier
+;; control offered and the stylesheet has no utility for -- is drawn at the
+;; step it stands in for rather than at no size at all.
+(define* (ascii-block content #:key id size)
+  "Return CONTENT as the ascii block a song page draws it in, at SIZE."
+  `(pre (@ (id ,id)
+           (class ,(mk-class (append (list (string->symbol
+                                            (ascii-size-known size)))
+                                     '(wm-ascii
+                                       p-4 md:p-6
+                                       shadow-md
+                                       font-mono
+                                       hg-frost
+                                       bg-stone-100/75
+                                       dark:bg-onyx-900/75
+                                       text-black
+                                       dark:text-white
+                                       rounded-xl
+                                       border-2
+                                       border-persia-pink-100/25
+                                       dark:border-persia-pink-900/10
+                                       whitespace-pre
+                                       overflow-x-auto)))))
+       ,content))
+
 (define (format-chord-legend-ascii chord-alist)
   (if (or (not chord-alist)
           (null? chord-alist)) ""
@@ -134,30 +195,12 @@
     `(,(ascii-button-section G_) ,(render-chord-guide
                                    guitar-chord-guide-contents)
       (details (@ (open true)
-                  (class ,(mk-class '(my-6))))
-               (summary (@ (class ,(mk-class '(text-xl font-bold text-onyx-300
-                                                       dark:text-stone-300
-                                                       cursor-pointer))))
-                        ,(G_ "ascii contents"))
+                  (class ,(mk-class '(wm-disclosure my-6))))
+               ,(disclosure-summary G_ "ascii contents")
 
-               (pre (@ (id ascii-content-container)
-                       (class ,(mk-class (append (list (string->symbol
-                                                        ascii-size))
-                                                 '(p-4 md:p-6
-                                                   shadow-md
-                                                   font-mono
-                                                   hg-frost
-                                                   bg-stone-100/75
-                                                   dark:bg-onyx-900/75
-                                                   text-black
-                                                   dark:text-white
-                                                   rounded-xl
-                                                   border-2
-                                                   border-persia-pink-100/25
-                                                   dark:border-persia-pink-900/10
-                                                   whitespace-pre
-                                                   overflow-x-scroll)))))
-                    ,ascii-contents)))))
+               ,(ascii-block ascii-contents
+                             #:id "ascii-content-container"
+                             #:size ascii-size)))))
 
 ;; The Guitar Pro 5 tab of a version: the file itself, which a browser cannot
 ;; open, offered back for download beside what its own header says about the
@@ -274,18 +317,15 @@ more than one tab has no ambiguity about which it is addressing."
                                                         text-onyx-900
                                                         border
                                                         border-stone-300
+                                                        dark:border-stone-700
                                                         rounded-lg
                                                         px-2
                                                         py-1
                                                         text-sm
                                                         w-20))))
           (list `(details (@ (open true)
-                             (class ,(mk-class '(my-6))))
-                          (summary (@ (class ,(mk-class '(text-xl font-bold
-                                                          text-onyx-300
-                                                          dark:text-stone-300
-                                                          cursor-pointer))))
-                                   ,(G_ "Guitar Pro 5 tab"))
+                             (class ,(mk-class '(wm-disclosure my-6))))
+                          ,(disclosure-summary G_ "Guitar Pro 5 tab")
                           (div (@ (id ,id)
                                   (class ,(mk-class '(flex flex-col gap-4 py-4))))
                                ,(if metadata
@@ -482,7 +522,8 @@ more than one tab has no ambiguity about which it is addressing."
                                                                 #:background '
                                                                 (bg-redwood-700)
                                                                 #:hover-background '
-                                                                (hover:bg-redwood-900)
+                                                                (hover:bg-redwood-900
+                                                                 dark:hover:bg-redwood-500)
                                                                 #:border-color '
                                                                 (border-stone-300
                                                                  dark:border-stone-700)
@@ -491,34 +532,13 @@ more than one tab has no ambiguity about which it is addressing."
                                                                            "delete version"))))))
          (render-ascii-legend (lambda (ascii-legend)
                                 `(details (@ (open true)
-                                             (class ,(mk-class '(my-6))))
-                                          (summary (@ (class ,(mk-class '(text-xl
-                                                                          font-bold
-                                                                          text-onyx-300
-                                                                          dark:text-stone-300
-
-                                                                          cursor-pointer))))
-                                                   ,(G_ "ascii legend"))
-                                          (pre (@ (id ascii-legend-container)
-                                                  (class ,(mk-class (append (list
-                                                                             (string->symbol
-                                                                              ascii-size))
-                                                                            '(p-4
-                                                                              font-mono
-                                                                              md:p-6
-                                                                              shadow-md
-                                                                              hg-frost
-                                                                              bg-stone-100/75
-                                                                              dark:bg-onyx-900/75
-                                                                              text-black
-                                                                              dark:text-white
-                                                                              rounded-xl
-                                                                              border-2
-                                                                              border-persia-pink-100/25
-                                                                              dark:border-persia-pink-900/10
-                                                                              whitespace-pre
-                                                                              overflow-x-auto)))))
-                                               ,ascii-legend))))
+                                             (class ,(mk-class '(wm-disclosure
+                                                                 my-6))))
+                                          ,(disclosure-summary G_ "ascii legend")
+                                          ,(ascii-block ascii-legend
+                                                        #:id
+                                                        "ascii-legend-container"
+                                                        #:size ascii-size))))
          (ascii-legend-section (render-if-nestring render-ascii-legend
                                                    (assq-ref version
                                                              'ascii-legend)))
@@ -535,13 +555,9 @@ more than one tab has no ambiguity about which it is addressing."
                                          'pdf-contents)))
          (render-pdf-content (lambda (pdf-contents)
                                `((details (@ (open true)
-                                             (class ,(mk-class '(my-6))))
-                                          (summary (@ (class ,(mk-class '(text-xl
-                                                                          font-bold
-                                                                          text-onyx-300
-                                                                          dark:text-stone-300
-                                                                          cursor-pointer))))
-                                                   ,(G_ "PDF contents"))
+                                             (class ,(mk-class '(wm-disclosure
+                                                                 my-6))))
+                                          ,(disclosure-summary G_ "PDF contents")
                                           (iframe (@ (src ,pdf-contents)
                                                      (width "100%")
                                                      (class ,(mk-class '(min-h-screen))))
@@ -549,11 +565,22 @@ more than one tab has no ambiguity about which it is addressing."
          (pdf-content-section (render-if-nestring render-pdf-content
                                                   cleaned-pdf-data))
          (guitarpro-section (render-guitarpro-section G_ song version)))
-    `(,(hr) (details (@ (open true))
-                     (summary (@ (class ,(mk-class '(text-xl font-bold
+    `(,(hr) (details (@ (open true)
+                          (class ,(mk-class '(wm-disclosure))))
+                     (summary (@ (class ,(mk-class '(flex flex-row items-center
+                                                     gap-2
+                                                     text-xl font-bold
                                                      text-onyx-300
                                                      dark:text-stone-300
-                                                     cursor-pointer))))
+                                                     select-none
+                                                     transition-colors
+                                                     duration-150
+                                                     hover:text-persia-pink-500
+                                                     dark:hover:text-persia-pink-300))))
+                              (span (@ (aria-hidden "true")
+                                       (class ,(mk-class '(wm-disclosure-mark
+                                                           text-base))))
+                                    ,(icon #:type 'caret-down))
                               ,v-name)
 
                      (div (@ (class ,(mk-class '(my-4))))

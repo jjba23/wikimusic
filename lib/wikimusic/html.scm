@@ -34,6 +34,7 @@
                           link-ink
                           link-hover-ink
                           nav
+                          page-stylesheets
                           wikimusic-locales
                           locale-choose-form
                           html-template
@@ -47,7 +48,10 @@
                           external-sources-form
                           sort-select
                           grid-size-select
-                          ascii-size-select
+                          ascii-size-steps
+                          ascii-size-default
+                          ascii-size-known
+                          ascii-size-control
                           search-box
                           render-external-sources
                           artwork-social-image
@@ -291,13 +295,20 @@ the menu with @code{for}, so it reaches assistive technology as well."
   '("vendor/fonts/lucida.css" "vendor/fonts/google.css"
     "vendor/phosphor/phosphor.css"))
 
-;; The stylesheet the rest of the page is laid out with, and the icon a tab or a
-;; bookmark is shown with.  They are this project's own files rather than
+;; The stylesheets the rest of the page is laid out with, and the icon a tab or
+;; a bookmark is shown with.  They are this project's own files rather than
 ;; somebody else's, but a page reads them the same way and from the same place
 ;; as the three above: an instance that serves its assets from another host says
 ;; so once, and everything the document itself reads moves with it.
-(define page-stylesheet
-  "css/wikimusic.olive.min.css")
+;;
+;; There are two, and the order is the decision: the utility bundle first, the
+;; handful of rules a utility cannot state second (`pub/css/wikimusic.css' --
+;; the colour scheme of the browser's own controls, the tab stop of a
+;; tablature, the underline of a link).  A utility in the markup therefore
+;; still wins over a base rule in the second sheet, which is what keeps the
+;; page's own classes the ones that decide how it looks.
+(define page-stylesheets
+  '("css/wikimusic.olive.min.css" "css/wikimusic.css"))
 (define page-icon
   "favicon.ico")
 
@@ -495,7 +506,12 @@ classes it carries, so the element name is about what the bar *is*."
                                  (if reading?
                                      '()
                                      '(sticky top-2 z-32))
-                                 '(hover:text-china-violet-700)))))
+                                 ;; The ink a link takes on hover is named for
+                                 ;; both themes: the deep violet is a light-theme
+                                 ;; decision, and on the dark page the same hover
+                                 ;; is answered with the light step instead.
+                                 '(hover:text-china-violet-700
+                                   dark:hover:text-china-violet-300)))))
 
            ;; Logo
            (div (@ (class ,(mk-class '(flex items-center
@@ -657,6 +673,7 @@ and six.
                                                   text-onyx-900
                                                   border
                                                   border-stone-300
+                                                  dark:border-stone-700
                                                   rounded-lg
                                                   px-2
                                                   py-1
@@ -720,7 +737,10 @@ and six.
                         `(span (@ (id ,(format #f "~a-beat-~a" id beat))
                                   (class ,(mk-class '(w-2 h-2 rounded-full
                                                           bg-persia-pink-900
-                                                          opacity-40)))) ""))
+                                                          dark:bg-persia-pink-300
+                                                          opacity-40
+                                                          transition-opacity
+                                                          duration-150)))) ""))
                       '(1 2 3 4 5 6))))))
 
 ;;; The picture a page's link preview is shown with, when the page has one.
@@ -777,6 +797,61 @@ and six.
   `(,doctype-html (html (@ (lang ,(language-of locale)))
                         (head (title ,title)
                               ,(hygguile-recommended-meta)
+
+                              ;; A page is painted in one of two themes and the
+                              ;; browser is told so before it paints: `color-scheme'
+                              ;; is what the pieces a page does not draw -- the
+                              ;; scrollbar, the list a `select' opens, a caret --
+                              ;; are coloured by, and `theme-color' is the bar a
+                              ;; phone draws above the page.  The two values are the
+                              ;; two surfaces the body is painted with (`bg-stone-100'
+                              ;; and `dark:bg-onyx-900' below), so the chrome and the
+                              ;; page are the same colour.
+                              (meta (@ (name "color-scheme")
+                                       (content "light dark")))
+                              (meta (@ (name "theme-color")
+                                       (media "(prefers-color-scheme: light)")
+                                       (content "#fbfbfc")))
+                              (meta (@ (name "theme-color")
+                                       (media "(prefers-color-scheme: dark)")
+                                       (content "#222426")))
+
+                              ;; The theme the reader is already reading in, applied
+                              ;; to the root before the first paint.
+                              ;;
+                              ;; The framework's own script remembers a choice and
+                              ;; applies it when the document has loaded, which is
+                              ;; one paint too late: a reader who chose the dark
+                              ;; theme was shown a white page, a frame of their
+                              ;; choice being undone, on every navigation.  A script
+                              ;; in the head runs before the body exists and before
+                              ;; the first paint, so nothing is ever drawn in the
+                              ;; wrong theme.  It reads the same key the framework's
+                              ;; script writes, and it is not deferred for that
+                              ;; reason.
+                              ;;
+                              ;; A reader who has not chosen yet is not given a
+                              ;; default: the page matches the machine they are
+                              ;; reading it on, which is the theme their system has
+                              ;; already decided they prefer.  The switch still works
+                              ;; from there -- it reads the attribute this writes,
+                              ;; so the first press takes them to the other theme
+                              ;; rather than to a third state.
+                              (script (@ (type "text/javascript"))
+                                      "
+(function () {
+  var preference = null
+  try { preference = localStorage.getItem('data-theme') } catch (error) {}
+  var theme = (preference === 'dark' || preference === 'light')
+    ? preference
+    : (window.matchMedia
+        && window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light')
+  document.documentElement.setAttribute('data-theme', theme)
+})()
+")
+
                               ,(seo-head #:title title
                                          #:description description
                                          #:path path
@@ -806,9 +881,11 @@ and six.
                                        (href ,(asset-address page-icon))
                                        (type "image/x-icon")) "")
 
-                              (link (@ (rel stylesheet)
-                                       (href ,(asset-address page-stylesheet)))
-                                    "")
+                              ,@(map (lambda (path)
+                                       `(link (@ (rel stylesheet)
+                                                 (href ,(asset-address path)))
+                                              ""))
+                                     page-stylesheets)
 
                               (script (@ (type speculationrules))
                                       "
@@ -848,6 +925,17 @@ and six.
                                                      dark:bg-onyx-900
                                                      font-sans min-h-screen))))
 
+                              ;; The first thing a keyboard reader meets, and
+                              ;; the only control that comes before the bar: a
+                              ;; reader who has read the navigation on one page
+                              ;; does not want to walk it again on every page
+                              ;; they open.  It sits above the viewport until it
+                              ;; takes focus, then slides into the corner (see
+                              ;; `pub/css/wikimusic.css').
+                              (a (@ (href "#content")
+                                    (class "wm-skip-link"))
+                                 ,(G_ "skip to content"))
+
                               ,notification-tray
 
                               ;; The page's colour, behind everything the frost
@@ -876,9 +964,17 @@ and six.
                                                                  #:reading?
                                                                  reading?)
 
-                                                           ;; Content gets its own responsive container.
-                                                           (div (@ (class ,(mk-class '
-                                                                            (w-full
+                                                           ;; Content gets its own responsive container,
+                                                           ;; and it is where a reader who skipped
+                                                           ;; the navigation lands: the identifier is
+                                                           ;; what the skip link points at, and the
+                                                           ;; class keeps the bar above it from
+                                                           ;; covering the top of what was jumped to.
+                                                           (div (@ (id "content")
+                                                                   (tabindex "-1")
+                                                                   (class ,(mk-class '
+                                                                            (wm-skip-target
+                                                                             w-full
                                                                              min-w-0
                                                                              px-2
                                                                              sm:px-3
@@ -908,7 +1004,7 @@ and six.
                                            sm:rounded-2xl
                                            shadow-md
                                            hover:shadow-lg
-                                           transition-shadow
+                                           transition-all
                                            duration-200
                                            h-full
                                            flex
@@ -916,7 +1012,9 @@ and six.
                                            overflow-hidden
                                            border
                                            border-persia-pink-100/25
-                                           dark:border-persia-pink-900/10))))
+                                           dark:border-persia-pink-900/10
+                                           hover:border-persia-pink-300/40
+                                           dark:hover:border-persia-pink-500/30))))
 
            ;; Cover
            ,(render-if-nempty (lambda (art)
@@ -1066,7 +1164,8 @@ and six.
                          #:type 'submit
                          #:color '(text-stone-100)
                          #:background '(bg-redwood-500)
-                         #:hover-background '(hover:bg-redwood-900))))))
+                         #:hover-background '(hover:bg-redwood-900
+                                              dark:hover:bg-redwood-300))))))
 
 (define* (render-comment G_
                          user-alist
@@ -1248,7 +1347,8 @@ and six.
                                        ,(icon-button #:icon 'thumbs-up
                                                      #:color '(text-stone-100)
                                                      #:background '(bg-asparagus-500)
-                                                     #:hover-background '(hover:bg-asparagus-900)
+                                                     #:hover-background '(hover:bg-asparagus-900
+                                                                          dark:hover:bg-asparagus-300)
                                                      #:type 'submit
                                                      #:icon-css '(text-lg
                                                                   text-stone-300
@@ -1272,7 +1372,8 @@ and six.
                                        ,(icon-button #:icon 'thumbs-down
                                                      #:color '(text-stone-100)
                                                      #:background '(bg-redwood-500)
-                                                     #:hover-background '(hover:bg-redwood-900)
+                                                     #:hover-background '(hover:bg-redwood-900
+                                                                          dark:hover:bg-redwood-300)
                                                      #:type 'submit
                                                      #:icon-css '(text-lg
                                                                   text-stone-300
@@ -1645,6 +1746,7 @@ throw the results away."
                                                            duration-150)
                                                          (if current?
                                                              '(bg-persia-pink-500/15
+                                                               dark:bg-persia-pink-500/20
                                                                text-persia-pink-700
                                                                dark:text-persia-pink-300)
                                                              '(text-onyx-300/50
@@ -1668,47 +1770,176 @@ throw the results away."
                               'square
                               (G_ "Large tiles"))))))))
 
-(define* (ascii-size-select G_
-                            #:key route)
-  `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-min))))
-         (select (@ (onchange "window.location.href=this.value;")
-                    (name ascii-size-select)
-                    (id ascii-size-select)
-                    (class ,(mk-class '(py-2 px-3
-                                             border-2
-                                             border-persia-pink-300/25
-                                             dark:border-persia-pink-300/25
-                                             hg-frost
-                                             bg-stone-100/75
-                                             dark:bg-onyx-900/75
-                                             text-onyx-300
-                                             dark:text-stone-300
-                                             rounded-xl
-                                             max-w-72
-                                             shadow-md))))
-                 (option ,(G_ "ascii size"))
-                 ,(map (lambda (s)
-                         `((option (@ (value ,(format #f "~a?ascii-size=~a"
-                                                      route
-                                                      (car s))))
-                                   ,(cdr s))))
-                       `(("text-xs" . "text-xs") ("text-sm" . "text-sm")
-                         ("text-md" . "text-md")
-                         ("text-lg" . "text-lg")
-                         ("text-xl" . "text-xl")
-                         ("text-1" . "text-1")
-                         ("text-2" . "text-2")
-                         ("text-3" . "text-3")
-                         ("text-4" . "text-4")
-                         ("text-5" . "text-5")
-                         ("text-6" . "text-6")
-                         ("text-7" . "text-7")
-                         ("text-8" . "text-8")
-                         ("text-9" . "text-9")
-                         ("text-10" . "text-10")
-                         ("text-11" . "text-11")
-                         ("text-12" . "text-12")
-                         ("text-16" . "text-16")))))))
+;;; ====== The sizes a song page's ascii contents are read in ======
+;;;
+;;; A tab, a chord chart or a lyric sheet is read at whatever size the reader's
+;;; eyes want, and the size is the page's to carry: it is a class on the block
+;;; that holds the text, chosen in the reader's URL and remembered for them in
+;;; a cookie (see the route that renders a song).  Two things are written down
+;;; once, here: the steps offered, and what a step is called on the control.
+;;;
+;;; A step is a font-size utility the bundle really defines, paired with the
+;;; share of the reading size it draws at -- 100% is Olive's `text-4', which is
+;;; one rem, and every other step is that same ladder at a quarter rem a step.
+;;; The pairing is written out rather than computed from the class name so the
+;;; control's label and the stylesheet cannot drift apart quietly: a step that
+;;; the bundle does not define would draw at the size of its parent, which is
+;;; how the control used to offer `text-11' -- a name with no utility behind
+;;; it, where choosing it changed nothing at all.
+(define ascii-size-steps
+  '(("text-2" . "50") ("text-3" . "75") ("text-4" . "100")
+    ("text-5" . "125") ("text-6" . "150") ("text-7" . "175")
+    ("text-8" . "200") ("text-9" . "225") ("text-10" . "250")
+    ("text-12" . "300") ("text-16" . "400")))
+
+;; What the control called the same steps before the ladder was written down:
+;; the five names it offered beside the numbers, and the step each one is.  A
+;; preference is stored as a name, so the names keep working -- a reader who
+;; chose `text-md' when that was on offer is shown the step it means rather
+;; than being sent back to the default.
+(define ascii-size-aliases
+  '(("text-xs" . "text-2") ("text-sm" . "text-3") ("text-md" . "text-4")
+    ("text-lg" . "text-5") ("text-xl" . "text-6")))
+
+;; The step a song page opens at when the reader has not chosen one: 75%, a
+;; quarter smaller than the page's own reading size, which is what an ascii
+;; tab has always been drawn at on this site.
+(define ascii-size-default
+  "text-3")
+
+(define (ascii-size-known size)
+  "Return the step SIZE names, or the default step when it names none.
+
+SIZE is whatever the deployment was handed -- a class from the query string
+or from the reader's cookie -- so it may be an old name (`text-sm'), a name
+this control no longer offers, or nothing at all.  Only a step of the ladder
+is returned, which is what keeps a size from being applied to the page that
+the stylesheet cannot draw."
+  (if (assoc size ascii-size-steps)
+      size
+      (let ((alias (assoc-ref ascii-size-aliases size)))
+        (if (and alias (assoc alias ascii-size-steps))
+            alias
+            ascii-size-default))))
+
+(define (ascii-size-neighbour size direction)
+  "Return the step one place from SIZE in DIRECTION, or #f at either end.
+
+DIRECTION is 1 for the next larger step and -1 for the next smaller one; the
+ends of the ladder have no neighbour, which is what the control draws as a
+disabled stepper rather than as a link to nowhere."
+  (let ((sizes (map car ascii-size-steps)))
+    (let loop ((rest sizes) (previous #f))
+      (cond
+        ((null? rest) #f)
+        ((equal? (car rest) size)
+         (if (> direction 0)
+             (and (pair? (cdr rest)) (cadr rest))
+             previous))
+        (else (loop (cdr rest) (car rest)))))))
+
+;; The control a reader resizes the ascii contents of a song page with.
+;;
+;; It is three things in one group: a step down, the step the page is drawn at,
+;; and a step up.  The two steppers are links, so the control works with no
+;; script at all and the address a reader lands on says what size it is drawn
+;; at -- and the middle is a menu, because a reader who knows they want the
+;; largest step should not have to press six times to reach it.  The menu shows
+;; the share rather than the class name (`text-4' says nothing to a reader),
+;; and the step in use is the one already chosen in it, so the control always
+;; answers "how big is this" without being opened.
+;;
+;; A stepper at either end of the ladder is a span rather than a link: there is
+;; nowhere for it to go, and a control that goes nowhere is not offered as one.
+(define* (ascii-size-control G_
+                             #:key route (size ascii-size-default))
+  "Return the control a reader resizes a page's ascii contents with.
+
+ROUTE is the page's own address, which every control here hangs a query
+string off.  SIZE is the step the page is being drawn at; it is read through
+`ascii-size-known', so an unknown or former name lands on the step it means."
+  (let* ((current (ascii-size-known size))
+         (stepper (lambda (step glyph wording)
+                    `(,(if step 'a 'span)
+                      (@ (aria-label ,(G_ wording))
+                         (title ,(G_ wording))
+                         ,@(if step
+                               `((href ,(format #f "~a?ascii-size=~a" route
+                                                step)))
+                               '((aria-disabled "true")))
+                         (class
+                          ,(mk-class
+                            (append '(inline-flex items-center
+                                                  justify-center
+                                                  p-1
+                                                  rounded-lg
+                                                  select-none
+                                                  transition-colors
+                                                  duration-150)
+                                    (if step
+                                        '(cursor-pointer
+                                          text-onyx-300/70
+                                          dark:text-stone-300/70
+                                          hover:bg-stone-300/40
+                                          dark:hover:bg-onyx-500/40
+                                          hover:text-persia-pink-500
+                                          dark:hover:text-persia-pink-300
+                                          active:scale-95)
+                                        '(cursor-not-allowed
+                                          text-onyx-300/25
+                                          dark:text-stone-300/25))))))
+                      ,(icon #:type glyph
+                             #:icon-css '(text-base))))))
+    `((div (@ (role "group")
+              (aria-label ,(G_ "ascii size"))
+              (class ,(mk-class '(inline-flex flex-row items-center
+                                              gap-1
+                                              p-1
+                                              rounded-xl
+                                              border
+                                              border-persia-pink-100/25
+                                              dark:border-persia-pink-900/10
+                                              bg-stone-100/50
+                                              dark:bg-onyx-900/50))))
+           ,(stepper (ascii-size-neighbour current -1)
+                     'minus
+                     "smaller text")
+           (select (@ (onchange "window.location.href=this.value;")
+                      (name ascii-size-select)
+                      (id ascii-size-select)
+                      (aria-label ,(G_ "ascii size"))
+                      (class ,(mk-class '(appearance-none
+                                          cursor-pointer
+                                          rounded-lg
+                                          px-2
+                                          py-1
+                                          text-center
+                                          tabular-nums
+                                          text-sm
+                                          font-medium
+                                          bg-transparent
+                                          text-persia-pink-700
+                                          dark:text-persia-pink-300
+                                          transition-colors
+                                          duration-150
+                                          hover:bg-stone-300/40
+                                          dark:hover:bg-onyx-500/40))))
+             ,@(map (lambda (step)
+                      (let ((name (car step))
+                            (share (cdr step)))
+                        `(option (@ (value ,(format #f
+                                                    "~a?ascii-size=~a"
+                                                    route
+                                                    name))
+                                    ,@(if (equal? name current)
+                                          '((selected ""))
+                                          '()))
+                                 ,(format #f "~a%" share))))
+                    ascii-size-steps))
+           ,(stepper (ascii-size-neighbour current 1)
+                     'plus
+                     "larger text")))))
+
 
 ;; The search control, and where it takes the words it is given.
 ;;

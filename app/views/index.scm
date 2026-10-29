@@ -442,6 +442,7 @@
                                               md:px-12
                                               xl:px-20
                                               border-persia-pink-500/25
+                                              dark:border-persia-pink-500/15
                                               border-3))))
               (figure (img (@ (class ,(mk-class '(rounded-2xl h-auto max-w-64
                                                               sm:max-w-96)))
