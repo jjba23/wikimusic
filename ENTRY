@@ -1,5 +1,10 @@
 ;; -*- mode: Scheme;-*-
 
+;; wikimusic - the free music knowledge encyclopaedia
+;;
+;; SPDX-License-Identifier: MIT
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
 ;; This an Artanis ENTRY file, don't remove it!
 
  (use-modules (artanis artanis)

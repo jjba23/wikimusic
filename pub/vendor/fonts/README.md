@@ -13,7 +13,7 @@ they are what an instance serves.
 
 | file | what it is | licence |
 | --- | --- | --- |
-| `lucida.css` | the `@font-face` rules for the three Lucida families, written in this tree, with every address relative | AGPL-3.0-or-later, as part of wikimusic |
+| `lucida.css` | the `@font-face` rules for the three Lucida families, written in this tree, with every address relative | MIT, as part of wikimusic |
 | `LSANS.woff`, `LSANSI.woff`, `LSANSD.woff`, `LSANSDI.woff` | Lucida Sans, regular and bold, upright and italic | proprietary — see below |
 | `LTYPE.woff`, `LTYPEO.woff`, `LTYPEB.woff`, `LTYPEBO.woff` | Lucida Sans Typewriter, regular and bold, upright and oblique | proprietary — see below |
 | `l_10646.woff` | Lucida Sans Unicode | proprietary — see below |

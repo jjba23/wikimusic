@@ -1,7 +1,8 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Josep Bigorra
-# This file is distributed under the same license as the translate package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# WikiMusic
+# wikimusic - the free music knowledge encyclopaedia
+# 
+# SPDX-License-Identifier: MIT
+# Copyright © Josep Bigorra <jjbigorra@gmail.com>
 #
 #, fuzzy
 msgid ""
@@ -659,7 +660,7 @@ msgstr ""
 
 #: lib/wikimusic/html.scm:274 lib/wikimusic/html.scm:308
 #: lib/wikimusic/html.scm:313
-msgid "wikimusic is free software, available under the GNU AGPL v3 or newer"
+msgid "wikimusic is free software, available under the MIT license"
 msgstr ""
 
 #: lib/wikimusic/html.scm:281 lib/wikimusic/html.scm:315

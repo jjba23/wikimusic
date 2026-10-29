@@ -1,6 +1,8 @@
 # 日本語 translations for wikimusic package.
-# Copyright (C) 2026 Josep Bigorra <jjbigorra@gmail.com>
-# This file is distributed under the same license as the wikimusic package.
+# wikimusic - the free music knowledge encyclopaedia
+# 
+# SPDX-License-Identifier: MIT
+# Copyright © Josep Bigorra <jjbigorra@gmail.com>
 #
 msgid ""
 msgstr ""
@@ -678,8 +680,8 @@ msgstr "マニュアル"
 
 #: lib/wikimusic/html.scm:274 lib/wikimusic/html.scm:308
 #: lib/wikimusic/html.scm:313
-msgid "wikimusic is free software, available under the GNU AGPL v3 or newer"
-msgstr "wikimusicは自由ソフトウェアであり、GNU AGPL v3以降の下で利用できます"
+msgid "wikimusic is free software, available under the MIT license"
+msgstr "wikimusicは自由ソフトウェアであり、MITライセンスの下で利用できます"
 
 #: lib/wikimusic/html.scm:281 lib/wikimusic/html.scm:315
 #: lib/wikimusic/html.scm:320

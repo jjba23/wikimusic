@@ -1,19 +1,7 @@
-;;; wikimusic - the free music knowledge encyclopaedia
-
+;; wikimusic - the free music knowledge encyclopaedia
+;;
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
-
-;; wikimusic is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU Affero General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; wikimusic is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Affero General Public License for more details.
-
-;; You should have received a copy of the GNU Affero General Public License
-;; along with wikimusic.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; What an instance says about itself.
 ;;;
@@ -173,7 +161,7 @@ else's README."
 (define (licence-url)
   "Return the address the licence text is read at."
   (config-value 'licence-url
-                #:default "https://www.gnu.org/licenses/agpl-3.0.html"))
+                #:default "https://opensource.org/license/mit"))
 
 (define (copyright-holder)
   "Return who the instance's copyright line names."

@@ -1,3 +1,8 @@
+;; wikimusic - the free music knowledge encyclopaedia
+;;
+;; SPDX-License-Identifier: MIT
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
 (import (artanis mvc model))
 
 (create-artanis-model password_reset

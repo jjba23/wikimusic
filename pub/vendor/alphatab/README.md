@@ -29,9 +29,9 @@ Release **1.8.4**, npm package `@coderline/alphatab`, from
   and the source of the covered code is the upstream project at the pinned tag:
   <https://github.com/CoderLine/alphaTab/tree/v1.8.4>.  Anyone who wants the
   source of what is served here is pointed there rather than being given a
-  minified file and nothing else.  MPL-2.0 is compatible with wikimusic's
-  AGPL-3.0-or-later through MPL section 3.3, which names the AGPL as a
-  secondary licence.
+  minified file and nothing else.  MPL-2.0 is compatible with wikimusic's MIT
+  licence through MPL section 3.3, which lets a larger work carry terms of its
+  own choice.
 - **The SoundFont is Apache-2.0**, which allows redistribution: its licence
   text and its Sonic Network Inc. notice travel beside the file.
 - **Bravura is SIL OFL 1.1**; its licence text travels beside it.
