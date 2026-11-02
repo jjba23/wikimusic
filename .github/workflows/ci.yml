@@ -18,6 +18,6 @@ jobs:
     uses: jjba23/byggsteg-github/.github/workflows/byggsteg.yml@trunk
     with:
       tasks: maak-test maak-migrate maak-deploy pull-and-restart
-      daemon-name: lucidplan-daemon
+      daemon-name: wikimusic-daemon
       timeout-minutes: 60
     secrets: inherit
