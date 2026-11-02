@@ -1,7 +1,7 @@
-;; wikimusic - the free music knowledge encyclopaedia
-;;
-;; SPDX-License-Identifier: MIT
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; wikimusic - the free music knowledge encyclopaedia
+;;;
+;;; SPDX-License-Identifier: MIT
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 (define-module (wikimusic html)
   #:use-module (web server)
@@ -58,47 +58,47 @@
                           metronome-widget
                           item-tile-grid-face))
 
-;; The tile grid's shape, chosen by the reader and remembered in a cookie.  A
-;; reader who wants a dense wall of covers asks for `small' and gets more,
-;; narrower columns at every breakpoint; a reader who wants a handful of large
-;; tiles asks for `large' and gets fewer, wider ones.  `medium' is the default
-;; and is what the grid has always been.
+;;; The tile grid's shape, chosen by the reader and remembered in a cookie.  A
+;;; reader who wants a dense wall of covers asks for `small' and gets more,
+;;; narrower columns at every breakpoint; a reader who wants a handful of large
+;;; tiles asks for `large' and gets fewer, wider ones.  `medium' is the default
+;;; and is what the grid has always been.
 (define* (item-tile-grid-face #:key (size "medium"))
   "Return the tile grid's class string, sized to SIZE.
 
 SIZE is one of the strings `small', `medium' or `large'; anything else is
 read as `medium'."
   (mk-class (cond
-              ((equal? size "small")
+              [(equal? size "small")
                '(grid grid-cols-3
                       gap-1
                       sm:gap-2
                       sm:grid-cols-4
                       md:grid-cols-6
                       lg:grid-cols-8
-                      xl:grid-cols-10))
-              ((equal? size "large")
+                      xl:grid-cols-10)]
+              [(equal? size "large")
                '(grid grid-cols-1
                       gap-3
                       sm:gap-4
                       sm:grid-cols-2
                       md:grid-cols-2
                       lg:grid-cols-3
-                      xl:grid-cols-3))
-              (else '(grid grid-cols-2
+                      xl:grid-cols-3)]
+              [else '(grid grid-cols-2
                            gap-2
                            sm:gap-3
                            sm:grid-cols-3
                            md:grid-cols-4
                            lg:grid-cols-5
-                           xl:grid-cols-6)))))
+                           xl:grid-cols-6)])))
 
-;; The page's own colour, laid down once for the whole document: three
-;; oversized, heavily blurred discs drifting very slowly behind everything.
-;; They are what the frosted panes have to frost -- a backdrop filter over a
-;; flat page hands back a flat pane -- and they are the framework's own wash
-;; mechanics (`hg-blob' for the drift, Olive's blur ladder for the rest),
-;; which a `glass-panel' would otherwise build for one pane at a time.
+;;; The page's own colour, laid down once for the whole document: three
+;;; oversized, heavily blurred discs drifting very slowly behind everything.
+;;; They are what the frosted panes have to frost -- a backdrop filter over a
+;;; flat page hands back a flat pane -- and they are the framework's own wash
+;;; mechanics (`hg-blob' for the drift, Olive's blur ladder for the rest),
+;;; which a `glass-panel' would otherwise build for one pane at a time.
 (define* (ambient-wash classes
                        #:key delay pace)
   "Render one decorative colour wash for the page's background.
@@ -116,23 +116,23 @@ are kept out of step with one another.
 How long one drift takes, as a number of seconds or any CSS time.
 @end table"
   (let ((style (append (if delay
-                           (list (cons 'animation-delay
-                                       (if (symbol? delay)
-                                           (symbol->string delay)
-                                           (format #f "~as" delay))))
-                           '())
+                         (list (cons 'animation-delay
+                                     (if (symbol? delay)
+                                       (symbol->string delay)
+                                       (format #f "~as" delay))))
+                         '())
                        (if pace
-                           (list (cons '--hg-blob-duration
-                                       (if (symbol? pace)
-                                           (symbol->string pace)
-                                           (format #f "~as" pace))))
-                           '()))))
+                         (list (cons '--hg-blob-duration
+                                     (if (symbol? pace)
+                                       (symbol->string pace)
+                                       (format #f "~as" pace))))
+                         '()))))
     `((div (@ (aria-hidden "true")
               (class ,(mk-class classes))
               ,@(if (null? style)
-                    '()
-                    (list (list 'style
-                                (mk-style style)))))
+                  '()
+                  (list (list 'style
+                              (mk-style style)))))
            ;; The empty string is load-bearing, as it is for the notification
            ;; tray.  A childless element is serialized as `<div ... />', and
            ;; HTML has no self-closing tag for a div: the parser reads it as an
@@ -150,12 +150,12 @@ How long one drift takes, as a number of seconds or any CSS time.
              opacity-75
              hg-blob))
 
-;; Olive's offsets are the positive ones (`top-196', `bottom-1/4'): it
-;; generates no negative inset utility at all, so a wash cannot be pushed
-;; off an edge by naming a negative offset.  It does not have to be.  The
-;; whitespace around the panes is where the colour reads, so the discs sit
-;; inside the page instead -- anchored from whichever edge keeps them off
-;; the centre -- and the blur decides how much of the page each one tints.
+;;; Olive's offsets are the positive ones (`top-196', `bottom-1/4'): it
+;;; generates no negative inset utility at all, so a wash cannot be pushed
+;;; off an edge by naming a negative offset.  It does not have to be.  The
+;;; whitespace around the panes is where the colour reads, so the discs sit
+;;; inside the page instead -- anchored from whichever edge keeps them off
+;;; the centre -- and the blur decides how much of the page each one tints.
 (define* (ambient-washes)
   "Return the page's background washes, out of phase with one another."
   (list (ambient-wash `(,@ambient-wash-classes w-196
@@ -184,11 +184,11 @@ How long one drift takes, as a number of seconds or any CSS time.
                       #:pace 74)))
 ;;; ===== The language a reader reads the interface in =====
 
-;; The languages this instance answers in: the name of the catalog under
-;; `sys/i18n/locale', and the language as it is written in that language.
-;; The list is the page's -- it is what a reader is offered -- so a catalog
-;; added under that directory is offered here, and one removed stops being
-;; offered.  See `sys/i18n/locale' and `maak i18n-compile'.
+;;; The languages this instance answers in: the name of the catalog under
+;;; `sys/i18n/locale', and the language as it is written in that language.
+;;; The list is the page's -- it is what a reader is offered -- so a catalog
+;;; added under that directory is offered here, and one removed stops being
+;;; offered.  See `sys/i18n/locale' and `maak i18n-compile'.
 (define-public wikimusic-locales
   '(("en_US" . "English (US)") ("nl_NL" . "Nederlands")
     ("es_ES" . "Español")
@@ -229,11 +229,11 @@ the menu with @code{for}, so it reaches assistive technology as well."
                                       dark:border-china-violet-300/25
                                       shadow-md))))
           ,@(if return-to
-                `((input (@ (type "hidden")
-                            (name "return-to")
-                            (value ,return-to)))
-                  "")
-                '())
+              `((input (@ (type "hidden")
+                          (name "return-to")
+                          (value ,return-to)) "")
+                "")
+              '())
           ,(icon #:type 'translate
                  #:icon-css '(text-lg text-china-violet-700
                                       dark:text-china-violet-300))
@@ -273,10 +273,10 @@ the menu with @code{for}, so it reaches assistive technology as well."
                                                dark:text-stone-300)
                         #:icon-css '(text-lg text-onyx-700 dark:text-stone-300)))))
 
-;; Every page carries these, so they are the site's smallest scripts: what a
-;; page uses only sometimes -- the renderer a Guitar Pro tab is drawn with, and
-;; the SoundFont that makes it audible -- is fetched by the script below when a
-;; reader asks for a tab, and the renderer itself is never inlined.
+;;; Every page carries these, so they are the site's smallest scripts: what a
+;;; page uses only sometimes -- the renderer a Guitar Pro tab is drawn with, and
+;;; the SoundFont that makes it audible -- is fetched by the script below when a
+;;; reader asks for a tab, and the renderer itself is never inlined.
 ;;; ====== The type and the glyphs ======
 ;;;
 ;;; The interface is set in Work Sans, Source Serif 4 and JuliaMono, and its
@@ -294,26 +294,26 @@ the menu with @code{for}, so it reaches assistive technology as well."
   '("vendor/fonts/juliamono.css" "vendor/fonts/google.css"
     "vendor/phosphor/phosphor.css"))
 
-;; The stylesheets the rest of the page is laid out with, and the icon a tab or
-;; a bookmark is shown with.  They are this project's own files rather than
-;; somebody else's, but a page reads them the same way and from the same place
-;; as the three above: an instance that serves its assets from another host says
-;; so once, and everything the document itself reads moves with it.
-;;
-;; There are two, and the order is the decision: the utility bundle first, the
-;; handful of rules a utility cannot state second (`pub/css/wikimusic.css' --
-;; the colour scheme of the browser's own controls, the tab stop of a
-;; tablature, the underline of a link).  A utility in the markup therefore
-;; still wins over a base rule in the second sheet, which is what keeps the
-;; page's own classes the ones that decide how it looks.
+;;; The stylesheets the rest of the page is laid out with, and the icon a tab or
+;;; a bookmark is shown with.  They are this project's own files rather than
+;;; somebody else's, but a page reads them the same way and from the same place
+;;; as the three above: an instance that serves its assets from another host says
+;;; so once, and everything the document itself reads moves with it.
+;;;
+;;; There are two, and the order is the decision: the utility bundle first, the
+;;; handful of rules a utility cannot state second (`pub/css/wikimusic.css' --
+;;; the colour scheme of the browser's own controls, the tab stop of a
+;;; tablature, the underline of a link).  A utility in the markup therefore
+;;; still wins over a base rule in the second sheet, which is what keeps the
+;;; page's own classes the ones that decide how it looks.
 (define page-stylesheets
   '("css/wikimusic.olive.min.css" "css/wikimusic.css"))
 (define page-icon
   "favicon.ico")
 
-;; Every address of the interface's own assets a document head states, built at
-;; the one place a document is built: a page reads what this instance serves,
-;; or what the deployment said it serves instead of it.
+;;; Every address of the interface's own assets a document head states, built at
+;;; the one place a document is built: a page reads what this instance serves,
+;;; or what the deployment said it serves instead of it.
 (define (theme-stylesheet-links)
   "Return the links a page reads the interface's type and glyphs with."
   (map (lambda (path)
@@ -337,33 +337,33 @@ the same string however it is nested."
                          "pub/js/password-strength.js"
                          "pub/js/guitarpro-player.js")))
 
-;; What a link on this instance is painted with, handed to hygguile's `a' as
-;; `#:color' and `#:hover'.
-;;
-;; A link could take that component's own default ink, and half of it is the
-;; palette this instance is painted with: the light half is a pair of Olive's
-;; blues.  The dark half names `moonstone', which the Olive bundle this instance
-;; ships has no utility for at all -- the bundle was cut before the component
-;; asked for it, so the class is a no-op and a link keeps its light ink, or the
-;; browser's own blue, on the dark theme.  What a link is painted with is the
-;; interface's decision in any case, so it is named here, once, in inks the
-;; sheet does define: the same pair the front page's one ask is painted with.
+;;; What a link on this instance is painted with, handed to hygguile's `a' as
+;;; `#:color' and `#:hover'.
+;;;
+;;; A link could take that component's own default ink, and half of it is the
+;;; palette this instance is painted with: the light half is a pair of Olive's
+;;; blues.  The dark half names `moonstone', which the Olive bundle this instance
+;;; ships has no utility for at all -- the bundle was cut before the component
+;;; asked for it, so the class is a no-op and a link keeps its light ink, or the
+;;; browser's own blue, on the dark theme.  What a link is painted with is the
+;;; interface's decision in any case, so it is named here, once, in inks the
+;;; sheet does define: the same pair the front page's one ask is painted with.
 (define link-ink
   '(text-jeans-blue-500 dark:text-persia-pink-300))
 (define link-hover-ink
   '(hover:text-jeans-blue-900 dark:hover:text-persia-pink-700))
 
-;; The two lines every page ends with: where the rest of the project is, and
-;; what this running copy is.
-;;
-;; It used to carry four: a tagline, a row that announced its own links, a
-;; sentence of licence and a copyright.  All of that is either said elsewhere
-;; -- the tagline is the page's own description -- or said shorter: an SPDX
-;; identifier names the licence exactly where a sentence about it only
-;; described it, and the reader who wants the whole text is one click from it.
+;;; The two lines every page ends with: where the rest of the project is, and
+;;; what this running copy is.
+;;;
+;;; It used to carry four: a tagline, a row that announced its own links, a
+;;; sentence of licence and a copyright.  All of that is either said elsewhere
+;;; -- the tagline is the page's own description -- or said shorter: an SPDX
+;;; identifier names the licence exactly where a sentence about it only
+;;; described it, and the reader who wants the whole text is one click from it.
 (define* (page-footer G_)
-  `(,(footer `( ;Where the rest of it is.  The archive is the one link that leaves the
-               
+  `(,(footer `(;Where the rest of it is.  The archive is the one link that leaves the
+
 
                ;; server behind, so it is offered here rather than only to a reader
                ;; who knows the address: a copy of everything, to save or read
@@ -430,8 +430,8 @@ the same string however it is nested."
                          #:size '(text-sm))
                     (a (@ (href "javascript:void(0)")
                           (class ,(mk-class '(no-underline text-onyx-500
-                                              dark:text-stone-300
-                                              cursor-pointer font-light)))
+                                                           dark:text-stone-300
+                                                           cursor-pointer font-light)))
                           (onclick
                            "window.scrollTo({ top: 0, behavior: 'smooth' })"))
                        ,(G_ "back to the top"))))
@@ -464,15 +464,15 @@ classes it carries, so the element name is about what the bar *is*."
                                       #:weight '(font-light)
                                       #:size '(text-sm sm:text-md)
                                       #:icon-css '(text-sm sm:text-md
-                                                   lg:text-lg text-onyx-300
-                                                   dark:text-stone-300)
+                                                           lg:text-lg text-onyx-300
+                                                           dark:text-stone-300)
                                       #:extra-classes '(py-1 px-2
-                                                        sm:py-1
-                                                        sm:px-2
-                                                        md:py-2
-                                                        md:px-3
-                                                        cursor-pointer
-                                                        whitespace-nowrap))))))
+                                                             sm:py-1
+                                                             sm:px-2
+                                                             md:py-2
+                                                             md:px-3
+                                                             cursor-pointer
+                                                             whitespace-nowrap))))))
     `((nav (@ (class ,(mk-class (append
                                  ;; The bar is a strip, not a panel: a reader
                                  ;; looks past it on every page, so it keeps
@@ -503,8 +503,8 @@ classes it carries, so the element name is about what the bar *is*."
                                  ;; not pinned: it scrolls away with the page and
                                  ;; gives the whole viewport back to the content.
                                  (if reading?
-                                     '()
-                                     '(sticky top-2 z-32))
+                                   '()
+                                   '(sticky top-2 z-32))
                                  ;; The ink a link takes on hover is named for
                                  ;; both themes: the deep violet is a light-theme
                                  ;; decision, and on the dark page the same hover
@@ -530,16 +530,16 @@ classes it carries, so the element name is about what the bar *is*."
                                                no-underline))))
                    ,(h1 (list (icon #:type 'music-note
                                     #:icon-css '(shrink-0 text-lg
-                                                 sm:text-xl
-                                                 text-onyx-300
-                                                 dark:text-stone-300
-                                                 hover:text-persia-pink-900
-                                                 dark:hover:text-persia-pink-300))
+                                                          sm:text-xl
+                                                          text-onyx-300
+                                                          dark:text-stone-300
+                                                          hover:text-persia-pink-900
+                                                          dark:hover:text-persia-pink-300))
                               (G_ "WikiMusic"))
                         #:weight '(font-medium italic)
                         #:color '(text-onyx-300 dark:text-stone-300
-                                  hover:text-persia-pink-900
-                                  dark:hover:text-persia-pink-300)
+                                                hover:text-persia-pink-900
+                                                dark:hover:text-persia-pink-300)
                         #:family '(font-sans)
                         #:size '(text-lg sm:text-xl md:text-2xl))))
 
@@ -563,45 +563,43 @@ classes it carries, so the element name is about what the bar *is*."
                            'guitar "artists")
 
                 ;; Login / profile
-                ,(if (not is-logged-in)
-                     `(a (@ (href "/login")
-                            (class ,(mk-class '(shrink-0 no-underline))))
-                         ,(icon-button #:icon 'sign-in
-                                       #:content (G_ "login")
-                                       #:family '(font-sans)
-                                       #:color '(text-onyx-900
-                                                 dark:text-stone-100)
-                                       #:weight '(font-light)
-                                       #:size '(text-sm sm:text-md)
-                                       #:icon-css '(text-sm sm:text-md
-                                                    lg:text-lg text-onyx-300
-                                                    dark:text-stone-300)
-                                       #:extra-classes '(py-1 px-2
-                                                         sm:py-1
-                                                         sm:px-2
-                                                         md:py-2
-                                                         md:px-3
-                                                         cursor-pointer
-                                                         whitespace-nowrap)))
-                     `(a (@ (href "/me")
-                            (class ,(mk-class '(shrink-0 no-underline))))
-                         ,(icon-button #:icon 'user-circle
-                                       #:content (G_ "me")
-                                       #:family '(font-sans)
-                                       #:color '(text-onyx-900
-                                                 dark:text-stone-100)
-                                       #:weight '(font-light)
-                                       #:size '(text-sm sm:text-md)
-                                       #:icon-css '(text-sm sm:text-md
-                                                    lg:text-lg text-onyx-300
-                                                    dark:text-stone-300)
-                                       #:extra-classes '(py-1 px-2
-                                                         sm:py-1
-                                                         sm:px-2
-                                                         md:py-2
-                                                         md:px-3
-                                                         cursor-pointer
-                                                         whitespace-nowrap))))
+                ,(unless is-logged-in `(a (@ (href "/login")
+                                             (class ,(mk-class '(shrink-0 no-underline))))
+                                          ,(icon-button #:icon 'sign-in
+                                                        #:content (G_ "login")
+                                                        #:family '(font-sans)
+                                                        #:color '(text-onyx-900
+                                                                  dark:text-stone-100)
+                                                        #:weight '(font-light)
+                                                        #:size '(text-sm sm:text-md)
+                                                        #:icon-css '(text-sm sm:text-md
+                                                                             lg:text-lg text-onyx-300
+                                                                             dark:text-stone-300)
+                                                        #:extra-classes '(py-1 px-2
+                                                                               sm:py-1
+                                                                               sm:px-2
+                                                                               md:py-2
+                                                                               md:px-3
+                                                                               cursor-pointer
+                                                                               whitespace-nowrap))) `(a (@ (href "/me")
+                                                                                                           (class ,(mk-class '(shrink-0 no-underline))))
+                                                                                                        ,(icon-button #:icon 'user-circle
+                                                                                                                      #:content (G_ "me")
+                                                                                                                      #:family '(font-sans)
+                                                                                                                      #:color '(text-onyx-900
+                                                                                                                                dark:text-stone-100)
+                                                                                                                      #:weight '(font-light)
+                                                                                                                      #:size '(text-sm sm:text-md)
+                                                                                                                      #:icon-css '(text-sm sm:text-md
+                                                                                                                                           lg:text-lg text-onyx-300
+                                                                                                                                           dark:text-stone-300)
+                                                                                                                      #:extra-classes '(py-1 px-2
+                                                                                                                                             sm:py-1
+                                                                                                                                             sm:px-2
+                                                                                                                                             md:py-2
+                                                                                                                                             md:px-3
+                                                                                                                                             cursor-pointer
+                                                                                                                                             whitespace-nowrap))))
 
                 ;; Theme switch
                 ,(ui-mode-button #:icon ""
@@ -663,27 +661,27 @@ tabulation when the page knows one, and 120 otherwise.
 The beats in a bar the control opens with; the menu offers two, three, four
 and six.
 @end table"
-  (let* ((tempo-id (format #f "~a-tempo" id))
-         (beats-id (format #f "~a-beats" id))
-         (label-class (mk-class '(dark:text-stone-300 text-stone-500 font-bold
-                                                      text-sm)))
-         (field-class (mk-class '(bg-stone-100/75 dark:bg-onyx-500
-                                                  dark:text-stone-300
-                                                  text-onyx-900
-                                                  border
-                                                  border-stone-300
-                                                  dark:border-stone-700
-                                                  rounded-lg
-                                                  px-2
-                                                  py-1
-                                                  text-sm
-                                                  w-20)))
-         (option (lambda (meter)
-                   `(option (@ (value ,(number->string meter))
-                               ,@(if (= meter beats)
-                                     '((selected ""))
-                                     '()))
-                            ,(number->string meter)))))
+  (let ((tempo-id (format #f "~a-tempo" id))
+        (beats-id (format #f "~a-beats" id))
+        (label-class (mk-class '(dark:text-stone-300 text-stone-500 font-bold
+                                                     text-sm)))
+        (field-class (mk-class '(bg-stone-100/75 dark:bg-onyx-500
+                                                 dark:text-stone-300
+                                                 text-onyx-900
+                                                 border
+                                                 border-stone-300
+                                                 dark:border-stone-700
+                                                 rounded-lg
+                                                 px-2
+                                                 py-1
+                                                 text-sm
+                                                 w-20)))
+        (option (lambda (meter)
+                  `(option (@ (value ,(number->string meter))
+                              ,@(if (= meter beats)
+                                  '((selected ""))
+                                  '()))
+                           ,(number->string meter)))))
     `(div (@ (id ,id)
              (data-metronome "")
              (hidden "")
@@ -701,15 +699,15 @@ and six.
                          (step "1")
                          (inputmode numeric)
                          (value ,(number->string tempo))
-                         (class ,field-class)))
+                         (class ,field-class)) "")
                (label (@ (for ,beats-id)
                          (class ,label-class))
                       ,(G_ "beats in a bar"))
                (select (@ (id ,beats-id)
                           (name ,beats-id)
                           (onchange ,(format #f
-                                      "wikimusicMetronomeMeterChanged('~a')"
-                                      id))
+                                             "wikimusicMetronomeMeterChanged('~a')"
+                                             id))
                           (class ,field-class))
                        ,(option 2)
                        ,(option 3)
@@ -718,7 +716,7 @@ and six.
                ,(icon-button #:icon 'timer
                              #:id (format #f "~a-toggle" id)
                              #:on-click (format #f
-                                         "wikimusicMetronomeToggle('~a')" id)
+                                                "wikimusicMetronomeToggle('~a')" id)
                              #:content `((span (@ (id ,(format #f "~a-start"
                                                                id)))
                                                ,(G_ "start"))
@@ -756,8 +754,8 @@ and six.
   "Return the address of ARTWORKS' first absolute picture, or FALLBACK."
   (let ((addresses (filter (lambda (address)
                              (and (string? address)
-                                  (or (string-prefix? "http://" address)
-                                      (string-prefix? "https://" address))))
+                               (or (string-prefix? "http://" address)
+                                 (string-prefix? "https://" address))))
                            (map (lambda (artwork)
                                   (catch #t
                                          (lambda ()
@@ -767,7 +765,7 @@ and six.
                                            (assq-ref artwork
                                                      'content-url)))) artworks))))
     (if (pair? addresses)
-        (car addresses) fallback)))
+      (car addresses) fallback)))
 
 ;;; The document every page is rendered into.  Its body is what a reader sees;
 ;;; the keywords after it are what a crawler and a link preview are told about
@@ -792,7 +790,7 @@ and six.
                         (json-ld '())
                         (is-logged-in #f)
                         (reading? #f))
-  
+
   `(,doctype-html (html (@ (lang ,(language-of locale)))
                         (head (title ,title)
                               ,(hygguile-recommended-meta)
@@ -807,13 +805,13 @@ and six.
                               ;; and `dark:bg-onyx-900' below), so the chrome and the
                               ;; page are the same colour.
                               (meta (@ (name "color-scheme")
-                                       (content "light dark")))
+                                       (content "light dark")) "")
                               (meta (@ (name "theme-color")
                                        (media "(prefers-color-scheme: light)")
-                                       (content "#fbfbfc")))
+                                       (content "#fbfbfc")) "")
                               (meta (@ (name "theme-color")
                                        (media "(prefers-color-scheme: dark)")
-                                       (content "#222426")))
+                                       (content "#222426")) "")
 
                               ;; The theme the reader is already reading in, applied
                               ;; to the root before the first paint.
@@ -867,10 +865,10 @@ and six.
                               ;; instead (`theme-stylesheet-links' below).
                               ,@(filter (lambda (fragment)
                                           (not (hosted-elsewhere? fragment
-                                                "cdn.jsdelivr.net")))
+                                                                  "cdn.jsdelivr.net")))
                                         (hygguile-recommended-resources
-                                                                        #:fonts
-                                                                        (theme-stylesheet-links)))
+                                         #:fonts
+                                         (theme-stylesheet-links)))
 
                               (link (@ (rel "shortcut icon")
                                        (href ,(asset-address page-icon))
@@ -900,10 +898,10 @@ and six.
 ")
 
                               (script ,(assoc-ref asset-library
-                                        "pub/js/song-chord-highlighter.js"))
+                                                  "pub/js/song-chord-highlighter.js"))
 
                               (script ,(assoc-ref asset-library
-                                        "pub/js/song-auto-scroll.js"))
+                                                  "pub/js/song-auto-scroll.js"))
 
                               (script ,(assoc-ref asset-library
                                                   "pub/js/symbanta.js"))
@@ -915,10 +913,10 @@ and six.
                                                   "pub/js/metronome.js"))
 
                               (script ,(assoc-ref asset-library
-                                        "pub/js/password-strength.js"))
+                                                  "pub/js/password-strength.js"))
 
                               (script ,(assoc-ref asset-library
-                                        "pub/js/guitarpro-player.js")))
+                                                  "pub/js/guitarpro-player.js")))
 
                         (body (@ (class ,(mk-class '(bg-stone-100
                                                      dark:bg-onyx-900
@@ -945,17 +943,16 @@ and six.
                               ;; decorative disc must not be what makes a phone
                               ;; scroll sideways to find the edge of the page.
                               (div (@ (class ,(mk-class '(absolute inset-0
-                                                          overflow-hidden
-                                                          pointer-events-none))))
+                                                                   overflow-hidden
+                                                                   pointer-events-none))))
                                    ,@(ambient-washes))
 
-                              ,(with-footer #:main `((main (@ (class ,(mk-class '
-                                                                       (flex
-                                                                        flex-col
-                                                                        justify-start
-                                                                        min-h-96
-                                                                        w-full
-                                                                        min-w-0))))
+                              ,(with-footer #:main `((main (@ (class ,(mk-class '(flex
+                                                                                  flex-col
+                                                                                  justify-start
+                                                                                  min-h-96
+                                                                                  w-full
+                                                                                  min-w-0))))
 
                                                            ,(nav G_
                                                                  #:is-logged-in
@@ -971,17 +968,16 @@ and six.
                                                            ;; covering the top of what was jumped to.
                                                            (div (@ (id "content")
                                                                    (tabindex "-1")
-                                                                   (class ,(mk-class '
-                                                                            (wm-skip-target
-                                                                             w-full
-                                                                             min-w-0
-                                                                             px-2
-                                                                             sm:px-3
-                                                                             md:px-4
-                                                                             lg:px-6
-                                                                             py-3
-                                                                             sm:py-4
-                                                                             md:py-6))))
+                                                                   (class ,(mk-class '(wm-skip-target
+                                                                                       w-full
+                                                                                       min-w-0
+                                                                                       px-2
+                                                                                       sm:px-3
+                                                                                       md:px-4
+                                                                                       lg:px-6
+                                                                                       py-3
+                                                                                       sm:py-4
+                                                                                       md:py-6))))
 
                                                                 ,body)))
 
@@ -1019,21 +1015,21 @@ and six.
            ,(render-if-nempty (lambda (art)
                                 `(a (@ (href ,item-link)
                                        (class ,(mk-class '(block w-full
-                                                           aspect-square
-                                                           shrink-0
-                                                           overflow-hidden))))
+                                                                 aspect-square
+                                                                 shrink-0
+                                                                 overflow-hidden))))
                                     (img (@ (loading "lazy")
                                             (class ,(mk-class '(w-full h-full
-                                                                object-cover
-                                                                transition-transform
-                                                                duration-200
-                                                                hover:scale-105)))
+                                                                       object-cover
+                                                                       transition-transform
+                                                                       duration-200
+                                                                       hover:scale-105)))
                                             (src ,(uri-decode (assq-ref art
-                                                                        'content-url)))))))
+                                                                        'content-url)))) "")))
                               (cond
-                                ((nil? artworks)
-                                 '())
-                                (else (car artworks))))
+                                [(nil? artworks)
+                                 '()]
+                                [else (car artworks)]))
 
            ;; Content
            (div (@ (class ,(mk-class '(flex flex-col
@@ -1058,43 +1054,33 @@ and six.
                 ;; Extra information
                 ,(render-if-nempty (lambda (info)
                                      `(div (@ (class ,(mk-class '(pt-1 sm:pt-2
-                                                                  text-center))))
+                                                                       text-center))))
                                            ,info)) extra-top-info)
 
                 ;; Statistics
                 (div (@ (class ,(mk-class '(mt-2 flex flex-wrap items-center
                                                  justify-center gap-1))))
-                     (div ,(em (format #f "~a ~a"
-                                       (assq-ref x
-                                                 'views)
-                                       (G_ "views"))
-                               #:size '(text-sm)
-                               #:color '(text-onyx-300 dark:text-stone-300)))
-
-                     (span ,(p "·"
-                               #:color '(text-onyx-500 dark:text-stone-700)
-                               #:size '(text-sm)))
-
-                     (div (@ (class ,(mk-class '(min-w-0))))
-                          ,(em (format #f "~a ~a"
-                                       (length comments)
-                                       (G_ "comments"))
-                               #:size '(text-sm)
-                               #:color '(text-onyx-300 dark:text-stone-300))))
+                     ,(if (> 1 (length comments)) '()
+                        `((div (@ (class ,(mk-class '(min-w-0))))
+                               ,(em (format #f "~a ~a"
+                                            (length comments)
+                                            (G_ "comments"))
+                                    #:size '(text-sm)
+                                    #:color '(text-onyx-300 dark:text-stone-300))))))
 
                 ,extra-bot-info)))))
 
 (define* (render-visibility-status G_ status)
   (cond
-    ((eq? status 0)
-     (G_ "published"))
-    (else (G_ "unkown status"))))
+    [(eq? status 0)
+     (G_ "published")]
+    [else (G_ "unkown status")]))
 
-;; A comment's toolbar.  Reply, edit and delete all need the entity the thread
-;; hangs off and the comment's own identifier, so both are handed down from the
-;; page rather than guessed.  Every control is rendered for every reader -- the
-;; way the entity's own edit link is -- and the route it posts to is what
-;; refuses a session that may not use it (see `guard-owner').
+;;; A comment's toolbar.  Reply, edit and delete all need the entity the thread
+;;; hangs off and the comment's own identifier, so both are handed down from the
+;;; page rather than guessed.  Every control is rendered for every reader -- the
+;;; way the entity's own edit link is -- and the route it posts to is what
+;;; refuses a session that may not use it (see `guard-owner').
 (define* (comment-actions G_
                           #:key entity entity-identifier comment)
   (let* ((comment-identifier (assq-ref comment
@@ -1104,15 +1090,15 @@ and six.
     `(div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-3 items-center
                                       my-2))))
           (details (summary (@ (class ,(mk-class '(cursor-pointer text-sm
-                                                   text-persia-pink-500
-                                                   dark:text-persia-pink-300))))
+                                                                  text-persia-pink-500
+                                                                  dark:text-persia-pink-300))))
                             ,(G_ "reply"))
                    (form (@ (method POST)
                             (action ,(format #f "/~as/uuid/~a/comments/new"
                                              entity entity-identifier)))
                          (input (@ (type hidden)
                                    (name parent-identifier)
-                                   (value ,comment-identifier)))
+                                   (value ,comment-identifier)) "")
                          ,(textarea #:label (G_ "your reply")
                                     #:name "contents"
                                     #:rows 3
@@ -1132,8 +1118,8 @@ and six.
                          ,(button (G_ "post reply")
                                   #:type 'submit)))
           (details (summary (@ (class ,(mk-class '(cursor-pointer text-sm
-                                                   text-persia-pink-500
-                                                   dark:text-persia-pink-300))))
+                                                                  text-persia-pink-500
+                                                                  dark:text-persia-pink-300))))
                             ,(G_ "edit"))
                    (form (@ (method POST)
                             (action ,(format #f "~a/edit" base)))
@@ -1194,8 +1180,8 @@ and six.
                       'created-at))
         ,(render-if-nempty (lambda (at)
                              `(p (@ (class ,(mk-class '(text-sm italic
-                                                        text-stone-500
-                                                        dark:text-stone-300))))
+                                                                text-stone-500
+                                                                dark:text-stone-300))))
                                  ,(G_ "edited")))
                            (assq-ref comment
                                      'last-edited-at))
@@ -1210,11 +1196,11 @@ and six.
                           comments
                           #:key entity
                           entity-identifier)
-  (let* ((top-nodes (filter (lambda (c)
-                              (equal? parent-identifier
-                                      (assoc-ref c
-                                                 'parent-identifier)))
-                            comments)))
+  (let ((top-nodes (filter (lambda (c)
+                             (equal? parent-identifier
+                                     (assoc-ref c
+                                                'parent-identifier)))
+                           comments)))
     (map (lambda (comment)
            `((div (@ (class "max-w-prose"))
                   ,(render-comment G_
@@ -1239,8 +1225,8 @@ and six.
                          opinions
                          comments
                          user-alist)
-  (let* ( ;One photograph is a photograph and is shown as one.  Two or more
-         
+  (let* (;One photograph is a photograph and is shown as one.  Two or more
+
 
          ;; are a carousel: the framework's track pans with a swipe and its
          ;; arrows page one picture at a time, and both of those are better
@@ -1250,7 +1236,7 @@ and six.
          ;; with no scripting is told to scroll the track instead of being
          ;; offered controls that do nothing.
          (artwork-count (length (if (list? artworks) artworks
-                                    '())))
+                                  '())))
          ;; A picture is sized by the room it is standing in and not by itself,
          ;; and the room is the same on every page: a figure of one height per
          ;; breakpoint, growing with the slide beside it and then stopping, with
@@ -1271,13 +1257,13 @@ and six.
          ;; own proportions kept.
          (rendered-artworks (map (lambda (art)
                                    `(figure (@ (class ,(mk-class '(w-full h-48
-                                                                   sm:h-72
-                                                                   md:h-96
-                                                                   flex
-                                                                   flex-col
-                                                                   items-center
-                                                                   justify-center
-                                                                   gap-2))))
+                                                                          sm:h-72
+                                                                          md:h-96
+                                                                          flex
+                                                                          flex-col
+                                                                          items-center
+                                                                          justify-center
+                                                                          gap-2))))
 
                                             (div (@ (class ,(mk-class '(flex-1
                                                                         min-h-0
@@ -1294,13 +1280,11 @@ and six.
                                                                              shadow-md)))
                                                          (src ,(uri-decode (assq-ref
                                                                             art
-                                                                            'content-url))))))
+                                                                            'content-url)))) ""))
                                             ,(render-if-nempty (lambda (fc)
                                                                  `(figcaption (@
-                                                                               (class ,
-                                                                                (mk-class '
-                                                                                 (text-onyx-300
-                                                                                  dark:text-stone-300))))
+                                                                               (class ,(mk-class '(text-onyx-300
+                                                                                                   dark:text-stone-300))))
                                                                               ,fc))
                                                                (assq-ref art
                                                                          'content-caption))))
@@ -1318,11 +1302,11 @@ and six.
                                                     (assoc-ref o
                                                                (string->symbol
                                                                 (format #f
-                                                                 "~a-identifier"
-                                                                 entity))))
-                                            (equal? 1
-                                                    (assq-ref o
-                                                              'is-like))))
+                                                                        "~a-identifier"
+                                                                        entity))))
+                                         (equal? 1
+                                                 (assq-ref o
+                                                           'is-like))))
                                      opinions)))
          (dislike-count (length (filter (lambda (o)
                                           (and (equal? (assq-ref x
@@ -1330,19 +1314,19 @@ and six.
                                                        (assq-ref o
                                                                  (string->symbol
                                                                   (format #f
-                                                                   "~a-identifier"
-                                                                   entity))))
-                                               (equal? 1
-                                                       (assoc-ref o
-                                                                  'is-dislike))))
+                                                                          "~a-identifier"
+                                                                          entity))))
+                                            (equal? 1
+                                                    (assoc-ref o
+                                                               'is-dislike))))
                                         opinions)))
          (opinion-buttons `((div (@ (class ,(mk-class '(flex flex-row
                                                              flex-wrap gap-3))))
                                  (form (@ (method POST)
                                           (action ,(format #f
-                                                    "/~as/uuid/~a/like" entity
-                                                    (assq-ref x
-                                                              'identifier))))
+                                                           "/~as/uuid/~a/like" entity
+                                                           (assq-ref x
+                                                                     'identifier))))
                                        ,(icon-button #:icon 'thumbs-up
                                                      #:color '(text-stone-100)
                                                      #:background '(bg-asparagus-500)
@@ -1354,20 +1338,18 @@ and six.
                                                                   dark:text-stone-300)
                                                      #:content `(div ,(G_
                                                                        "like")
-                                                                     (span (@ (class ,
-                                                                               (mk-class '
-                                                                                (font-light
-                                                                                 text-md))))
+                                                                     (span (@ (class ,(mk-class '(font-light
+                                                                                                  text-md))))
                                                                            ,(format
                                                                              #f
                                                                              " ( ~a ) "
                                                                              like-count)))))
                                  (form (@ (method POST)
                                           (action ,(format #f
-                                                    "/~as/uuid/~a/dislike"
-                                                    entity
-                                                    (assq-ref x
-                                                              'identifier))))
+                                                           "/~as/uuid/~a/dislike"
+                                                           entity
+                                                           (assq-ref x
+                                                                     'identifier))))
                                        ,(icon-button #:icon 'thumbs-down
                                                      #:color '(text-stone-100)
                                                      #:background '(bg-redwood-500)
@@ -1380,10 +1362,8 @@ and six.
                                                      #:content `(div ,(G_
                                                                        "dislike")
 
-                                                                     (span (@ (class ,
-                                                                               (mk-class '
-                                                                                (font-light
-                                                                                 text-sm))))
+                                                                     (span (@ (class ,(mk-class '(font-light
+                                                                                                  text-sm))))
                                                                            ,(format
                                                                              #f
                                                                              " ( ~a ) "
@@ -1391,9 +1371,8 @@ and six.
          (maybe-description (render-if-nestring (lambda (description)
                                                   (dl (list (dt (G_
                                                                  "description")
-                                                                #:dt-classes '
-                                                                (pt-3 sm:pt-4
-                                                                      pb-1))
+                                                                #:dt-classes '(pt-3 sm:pt-4
+                                                                                    pb-1))
                                                             (dd (org2html (html-unescape
                                                                            description))))))
                                                 (assq-ref x
@@ -1402,22 +1381,20 @@ and six.
                                                    `(,(dt (G_ "last edited")
                                                           #:dt-classes '(pt-3
                                                                          sm:pt-4
-                                                                         pb-1)) ,
-                                                     (dd (strftime "%c"
+                                                                         pb-1)) ,(dd (strftime "%c"
 
-                                                                   (localtime (string->number
-                                                                               last-edited-at))))))
+                                                                                               (localtime (string->number
+                                                                                                           last-edited-at))))))
                                                  (assq-ref x
                                                            'last-edited-at)))
          (maybe-approved-by (render-if-nempty (lambda (approved-by)
                                                 `(,(dt (G_ "approved by")
                                                        #:dt-classes '(pt-3
                                                                       sm:pt-4
-                                                                      pb-1)) ,
-                                                  (dd approved-by)))
+                                                                      pb-1)) ,(dd approved-by)))
                                               (assq-ref x
                                                         'approved-by))))
-    
+
     `((div (@ (class ,(mk-class '(hg-frost bg-stone-100/75
                                            dark:bg-onyx-900/75
                                            rounded-3xl
@@ -1432,45 +1409,45 @@ and six.
                                            flex-wrap
                                            gap-6))))
            ,@(if (> artwork-count 1)
-                 (carousel #:id (format #f "artworks-~a-~a" entity
-                                        (assq-ref x
-                                                  'identifier))
-                           #:fragments rendered-artworks
-                           ;; The track is as wide as the panel and no
-                           ;; wider: without this the list is sized by the
-                           ;; pictures in it, so a card holding four of them
-                           ;; stretches to their width and takes the whole
-                           ;; page sideways with it -- the arrows land off the
-                           ;; screen and the right-hand one cannot be pressed.
-                           #:carousel-list-wrapper-css '(relative min-w-0
-                                                                  w-full)
-                           #:carousel-list-css '(flex gap-3
-                                                      sm:gap-4
-                                                      lg:gap-6
-                                                      list-none
-                                                      w-full
-                                                      overflow-x-auto
-                                                      scroll-smooth
-                                                      snap-x
-                                                      rounded-xl
-                                                      my-2)
-                           ;; A slide on a phone is a share of the track
-                           ;; rather than a width in `rem': a fixed width that
-                           ;; fits one phone overflows the next one down, and
-                           ;; the point of the sliver of the next picture left
-                           ;; showing is that it is a share of whatever width
-                           ;; the track turned out to be.  From the small
-                           ;; breakpoint up the track is wide enough to size a
-                           ;; slide in `rem' again, and a reader sees one and a
-                           ;; half of them at every width from there to the
-                           ;; widest desk.
-                           #:item-width '(w-5/6 sm:w-72 md:w-96 lg:w-128)
-                           #:item-height '(h-auto)
-                           #:carousel-item-content-css '(flex items-center
-                                                              justify-center)
-                           #:no-js-hint (G_
-                                         "several pictures — scroll sideways to see them"))
-                 (list `(div ,rendered-artworks)))
+               (carousel #:id (format #f "artworks-~a-~a" entity
+                                      (assq-ref x
+                                                'identifier))
+                         #:fragments rendered-artworks
+                         ;; The track is as wide as the panel and no
+                         ;; wider: without this the list is sized by the
+                         ;; pictures in it, so a card holding four of them
+                         ;; stretches to their width and takes the whole
+                         ;; page sideways with it -- the arrows land off the
+                         ;; screen and the right-hand one cannot be pressed.
+                         #:carousel-list-wrapper-css '(relative min-w-0
+                                                                w-full)
+                         #:carousel-list-css '(flex gap-3
+                                                    sm:gap-4
+                                                    lg:gap-6
+                                                    list-none
+                                                    w-full
+                                                    overflow-x-auto
+                                                    scroll-smooth
+                                                    snap-x
+                                                    rounded-xl
+                                                    my-2)
+                         ;; A slide on a phone is a share of the track
+                         ;; rather than a width in `rem': a fixed width that
+                         ;; fits one phone overflows the next one down, and
+                         ;; the point of the sliver of the next picture left
+                         ;; showing is that it is a share of whatever width
+                         ;; the track turned out to be.  From the small
+                         ;; breakpoint up the track is wide enough to size a
+                         ;; slide in `rem' again, and a reader sees one and a
+                         ;; half of them at every width from there to the
+                         ;; widest desk.
+                         #:item-width '(w-5/6 sm:w-72 md:w-96 lg:w-128)
+                         #:item-height '(h-auto)
+                         #:carousel-item-content-css '(flex items-center
+                                                            justify-center)
+                         #:no-js-hint (G_
+                                       "several pictures — scroll sideways to see them"))
+               (list `(div ,rendered-artworks)))
            (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
                      ,opinion-buttons
                      (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity
@@ -1520,9 +1497,9 @@ and six.
                                               #:content "copy"
 
                                               #:on-click (format #f
-                                                          "navigator.clipboard.writeText('~a')"
-                                                          (assoc-ref x
-                                                                     'identifier)))))))))
+                                                                 "navigator.clipboard.writeText('~a')"
+                                                                 (assoc-ref x
+                                                                            'identifier)))))))))
       (details (summary (@ (class ,(mk-class '(text-onyx-300
                                                dark:text-stone-300
                                                cursor-pointer))))
@@ -1562,11 +1539,11 @@ and six.
                        (content-url "")
                        (content-caption "")
                        (order-value 0))
-  (let* ((form-action (if (equal? #f artwork-identifier)
-                          (format #f "/~as/uuid/~a/artworks/new" entity
-                                  entity-identifier)
-                          (format #f "/~as/uuid/~a/artworks/edit/~a" entity
-                                  entity-identifier artwork-identifier))))
+  (let ((form-action (if (equal? #f artwork-identifier)
+                       (format #f "/~as/uuid/~a/artworks/new" entity
+                               entity-identifier)
+                       (format #f "/~as/uuid/~a/artworks/edit/~a" entity
+                               entity-identifier artwork-identifier))))
     `((div (@ (class ,(mk-class '(flex flex-col gap-2))))
            (form (@ (method POST)
                     (content-type application/x-www-form-urlencoded)
@@ -1583,16 +1560,16 @@ and six.
                               #:name "order-value"
                               #:value order-value)
                       (div ,(submit-button (if artwork-identifier
-                                               (G_ "edit")
-                                               (G_ "create"))))))
+                                             (G_ "edit")
+                                             (G_ "create"))))))
            ,(render-if-nempty (lambda (artwork-id)
                                 `(form (@ (method POST)
                                           (content-type
                                            application/x-www-form-urlencoded)
                                           (action ,(format #f
-                                                    "/~as/uuid/~a/artworks/~a/delete"
-                                                    entity entity-identifier
-                                                    artwork-identifier)))
+                                                           "/~as/uuid/~a/artworks/~a/delete"
+                                                           entity entity-identifier
+                                                           artwork-identifier)))
                                        ,(danger-submit-button (G_ "delete"))))
                               artwork-identifier)))))
 
@@ -1604,12 +1581,12 @@ and six.
                                 (youtube-url "")
                                 (spotify-url "")
                                 (soundcloud-url ""))
-  (let* ((form-action (if (equal? #f external-sources-identifier)
-                          (format #f "/~as/uuid/~a/external-sources/new"
-                                  entity entity-identifier)
-                          (format #f "/~as/uuid/~a/external-sources/~a/edit"
-                                  entity entity-identifier
-                                  external-sources-identifier))))
+  (let ((form-action (if (equal? #f external-sources-identifier)
+                       (format #f "/~as/uuid/~a/external-sources/new"
+                               entity entity-identifier)
+                       (format #f "/~as/uuid/~a/external-sources/~a/edit"
+                               entity entity-identifier
+                               external-sources-identifier))))
     `((div (@ (class ,(mk-class '(flex flex-col gap-2))))
            (form (@ (method POST)
                     (content-type application/x-www-form-urlencoded)
@@ -1631,8 +1608,8 @@ and six.
                               #:value soundcloud-url
                               #:required #f)
                       (div ,(submit-button (if external-sources-identifier
-                                               (G_ "save")
-                                               (G_ "save"))))))))))
+                                             (G_ "save")
+                                             (G_ "save"))))))))))
 
 (define* (sort-select G_
                       #:key entity user-sort)
@@ -1658,10 +1635,10 @@ and six.
                          `((option (@ (value ,(format #f "/~as?sort=~a" entity
                                                       (car s)))
                                       ,(cond
-                                         ((equal? user-sort
+                                         [(equal? user-sort
                                                   (car s))
-                                          '(selected ""))
-                                         (else '(not-selected ""))))
+                                          '(selected "")]
+                                         [else '(not-selected "")]))
                                    ,(cdr s))))
 
                        `(("display-name-asc" unquote
@@ -1682,9 +1659,7 @@ and six.
                          ("views-asc" unquote
                           (G_ "Views - Ascending"))
                          ("views-desc" unquote
-                          (G_ "Views - Descending"))
-
-                         ))))))
+                          (G_ "Views - Descending"))))))))
 
 (define* (grid-size-select G_
                            #:key entity size
@@ -1708,8 +1683,8 @@ chooses its own size against its own address, and SEARCH-QUERY is carried along
 when the reader is looking at search results, so that choosing a size does not
 throw the results away."
   (let ((tail (if (and search-query
-                       (not (equal? search-query "")))
-                  (format #f "&search=~a" search-query) "")))
+                    (not (equal? search-query "")))
+                (format #f "&search=~a" search-query) "")))
     `((div (@ (role "group")
               (aria-label ,(G_ "tile size"))
               (class ,(mk-class '(inline-flex flex-row
@@ -1732,8 +1707,8 @@ throw the results away."
                                (title ,wording)
                                (aria-label ,wording)
                                ,@(if current?
-                                     '((aria-current "true"))
-                                     '())
+                                   '((aria-current "true"))
+                                   '())
                                (class ,(mk-class (append '(inline-flex
                                                            items-center
                                                            justify-center
@@ -1744,20 +1719,20 @@ throw the results away."
                                                            transition-colors
                                                            duration-150)
                                                          (if current?
-                                                             '(bg-persia-pink-500/15
-                                                               dark:bg-persia-pink-500/20
-                                                               text-persia-pink-700
-                                                               dark:text-persia-pink-300)
-                                                             '(text-onyx-300/50
-                                                               dark:text-stone-300/50
-                                                               hover:bg-stone-300/40
-                                                               dark:hover:bg-onyx-500/40
-                                                               hover:text-persia-pink-500
-                                                               dark:hover:text-persia-pink-300))))))
+                                                           '(bg-persia-pink-500/15
+                                                             dark:bg-persia-pink-500/20
+                                                             text-persia-pink-700
+                                                             dark:text-persia-pink-300)
+                                                           '(text-onyx-300/50
+                                                             dark:text-stone-300/50
+                                                             hover:bg-stone-300/40
+                                                             dark:hover:bg-onyx-500/40
+                                                             hover:text-persia-pink-500
+                                                             dark:hover:text-persia-pink-300))))))
                             ,(icon #:type glyph
                                    #:weight (if current?
-                                                'bold
-                                                'regular)
+                                              'bold
+                                              'regular)
                                    #:icon-css '(text-base))))))
                   (list (list "small"
                               'dots-nine
@@ -1791,23 +1766,23 @@ throw the results away."
     ("text-8" . "200") ("text-9" . "225") ("text-10" . "250")
     ("text-12" . "300") ("text-16" . "400")))
 
-;; What the control called the same steps before the ladder was written down:
-;; the five names it offered beside the numbers, and the step each one is.  A
-;; preference is stored as a name, so the names keep working -- a reader who
-;; chose `text-md' when that was on offer is shown the step it means rather
-;; than being sent back to the default.
+;;; What the control called the same steps before the ladder was written down:
+;;; the five names it offered beside the numbers, and the step each one is.  A
+;;; preference is stored as a name, so the names keep working -- a reader who
+;;; chose `text-md' when that was on offer is shown the step it means rather
+;;; than being sent back to the default.
 (define ascii-size-aliases
   '(("text-xs" . "text-2") ("text-sm" . "text-3") ("text-md" . "text-4")
     ("text-lg" . "text-5") ("text-xl" . "text-6")))
 
-;; The step a song page opens at when the reader has not chosen one: 75%, a
-;; quarter smaller than the page's own reading size, which is what an ascii
-;; tab has always been drawn at on this site.
+;;; The step a song page opens at when the reader has not chosen one: 75%, a
+;;; quarter smaller than the page's own reading size, which is what an ascii
+;;; tab has always been drawn at on this site.
 (define ascii-size-default
   "text-3")
 
 (define (ascii-size-known size)
-  "Return the step SIZE names, or the default step when it names none.
+  "Return the step @var{size} names, or the default step when it names none.
 
 SIZE is whatever the deployment was handed -- a class from the query string
 or from the reader's cookie -- so it may be an old name (`text-sm'), a name
@@ -1815,14 +1790,14 @@ this control no longer offers, or nothing at all.  Only a step of the ladder
 is returned, which is what keeps a size from being applied to the page that
 the stylesheet cannot draw."
   (if (assoc size ascii-size-steps)
-      size
-      (let ((alias (assoc-ref ascii-size-aliases size)))
-        (if (and alias (assoc alias ascii-size-steps))
-            alias
-            ascii-size-default))))
+    size
+    (let ((alias (assoc-ref ascii-size-aliases size)))
+      (if (and alias (assoc alias ascii-size-steps))
+        alias
+        ascii-size-default))))
 
 (define (ascii-size-neighbour size direction)
-  "Return the step one place from SIZE in DIRECTION, or #f at either end.
+  "Return the step one place from @var{size} in DIRECTION, or #f at either end.
 
 DIRECTION is 1 for the next larger step and -1 for the next smaller one; the
 ends of the ladder have no neighbour, which is what the control draws as a
@@ -1830,26 +1805,26 @@ disabled stepper rather than as a link to nowhere."
   (let ((sizes (map car ascii-size-steps)))
     (let loop ((rest sizes) (previous #f))
       (cond
-        ((null? rest) #f)
-        ((equal? (car rest) size)
+        [(null? rest) #f]
+        [(equal? (car rest) size)
          (if (> direction 0)
-             (and (pair? (cdr rest)) (cadr rest))
-             previous))
-        (else (loop (cdr rest) (car rest)))))))
+           (and (pair? (cdr rest)) (cadr rest))
+           previous)]
+        [else (loop (cdr rest) (car rest))]))))
 
-;; The control a reader resizes the ascii contents of a song page with.
-;;
-;; It is three things in one group: a step down, the step the page is drawn at,
-;; and a step up.  The two steppers are links, so the control works with no
-;; script at all and the address a reader lands on says what size it is drawn
-;; at -- and the middle is a menu, because a reader who knows they want the
-;; largest step should not have to press six times to reach it.  The menu shows
-;; the share rather than the class name (`text-4' says nothing to a reader),
-;; and the step in use is the one already chosen in it, so the control always
-;; answers "how big is this" without being opened.
-;;
-;; A stepper at either end of the ladder is a span rather than a link: there is
-;; nowhere for it to go, and a control that goes nowhere is not offered as one.
+;;; The control a reader resizes the ascii contents of a song page with.
+;;;
+;;; It is three things in one group: a step down, the step the page is drawn at,
+;;; and a step up.  The two steppers are links, so the control works with no
+;;; script at all and the address a reader lands on says what size it is drawn
+;;; at -- and the middle is a menu, because a reader who knows they want the
+;;; largest step should not have to press six times to reach it.  The menu shows
+;;; the share rather than the class name (`text-4' says nothing to a reader),
+;;; and the step in use is the one already chosen in it, so the control always
+;;; answers "how big is this" without being opened.
+;;;
+;;; A stepper at either end of the ladder is a span rather than a link: there is
+;;; nowhere for it to go, and a control that goes nowhere is not offered as one.
 (define* (ascii-size-control G_
                              #:key route (size ascii-size-default))
   "Return the control a reader resizes a page's ascii contents with.
@@ -1857,38 +1832,38 @@ disabled stepper rather than as a link to nowhere."
 ROUTE is the page's own address, which every control here hangs a query
 string off.  SIZE is the step the page is being drawn at; it is read through
 `ascii-size-known', so an unknown or former name lands on the step it means."
-  (let* ((current (ascii-size-known size))
-         (stepper (lambda (step glyph wording)
-                    `(,(if step 'a 'span)
-                      (@ (aria-label ,(G_ wording))
-                         (title ,(G_ wording))
-                         ,@(if step
-                               `((href ,(format #f "~a?ascii-size=~a" route
-                                                step)))
-                               '((aria-disabled "true")))
-                         (class
-                          ,(mk-class
-                            (append '(inline-flex items-center
-                                                  justify-center
-                                                  p-1
-                                                  rounded-lg
-                                                  select-none
-                                                  transition-colors
-                                                  duration-150)
-                                    (if step
-                                        '(cursor-pointer
-                                          text-onyx-300/70
-                                          dark:text-stone-300/70
-                                          hover:bg-stone-300/40
-                                          dark:hover:bg-onyx-500/40
-                                          hover:text-persia-pink-500
-                                          dark:hover:text-persia-pink-300
-                                          active:scale-95)
-                                        '(cursor-not-allowed
-                                          text-onyx-300/25
-                                          dark:text-stone-300/25))))))
-                      ,(icon #:type glyph
-                             #:icon-css '(text-base))))))
+  (let ((current (ascii-size-known size))
+        (stepper (lambda (step glyph wording)
+                   `(,(if step 'a 'span)
+                     (@ (aria-label ,(G_ wording))
+                        (title ,(G_ wording))
+                        ,@(if step
+                            `((href ,(format #f "~a?ascii-size=~a" route
+                                             step)))
+                            '((aria-disabled "true")))
+                        (class
+                         ,(mk-class
+                           (append '(inline-flex items-center
+                                                 justify-center
+                                                 p-1
+                                                 rounded-lg
+                                                 select-none
+                                                 transition-colors
+                                                 duration-150)
+                                   (if step
+                                     '(cursor-pointer
+                                       text-onyx-300/70
+                                       dark:text-stone-300/70
+                                       hover:bg-stone-300/40
+                                       dark:hover:bg-onyx-500/40
+                                       hover:text-persia-pink-500
+                                       dark:hover:text-persia-pink-300
+                                       active:scale-95)
+                                     '(cursor-not-allowed
+                                       text-onyx-300/25
+                                       dark:text-stone-300/25))))))
+                     ,(icon #:type glyph
+                            #:icon-css '(text-base))))))
     `((div (@ (role "group")
               (aria-label ,(G_ "ascii size"))
               (class ,(mk-class '(inline-flex flex-row items-center
@@ -1923,32 +1898,31 @@ string off.  SIZE is the step the page is being drawn at; it is read through
                                           duration-150
                                           hover:bg-stone-300/40
                                           dark:hover:bg-onyx-500/40))))
-             ,@(map (lambda (step)
-                      (let ((name (car step))
-                            (share (cdr step)))
-                        `(option (@ (value ,(format #f
-                                                    "~a?ascii-size=~a"
-                                                    route
-                                                    name))
-                                    ,@(if (equal? name current)
-                                          '((selected ""))
-                                          '()))
-                                 ,(format #f "~a%" share))))
-                    ascii-size-steps))
+                   ,@(map (lambda (step)
+                            (let ((name (car step))
+                                  (share (cdr step)))
+                              `(option (@ (value ,(format #f
+                                                          "~a?ascii-size=~a"
+                                                          route
+                                                          name))
+                                          ,@(if (equal? name current)
+                                              '((selected ""))
+                                              '()))
+                                       ,(format #f "~a%" share))))
+                          ascii-size-steps))
            ,(stepper (ascii-size-neighbour current 1)
                      'plus
                      "larger text")))))
 
-
-;; The search control, and where it takes the words it is given.
-;;
-;; A list page searches itself: the words are added to the query string the page
-;; is already read with, so the sort order, the tile size and the page number a
-;; reader chose survive their search.  A page *about* something else -- the
-;; front page -- names the collection instead, and the form is then an ordinary
-;; GET: a browser without scripting submits it to `/songs?search=…' and the
-;; script below navigates to the same address, so the control behaves the same
-;; with and without it.
+;;; The search control, and where it takes the words it is given.
+;;;
+;;; A list page searches itself: the words are added to the query string the page
+;;; is already read with, so the sort order, the tile size and the page number a
+;;; reader chose survive their search.  A page *about* something else -- the
+;;; front page -- names the collection instead, and the form is then an ordinary
+;;; GET: a browser without scripting submits it to `/songs?search=…' and the
+;;; script below navigates to the same address, so the control behaves the same
+;;; with and without it.
 (define* (search-box G_
                      #:key search-query
                      (action "")
@@ -1994,15 +1968,15 @@ function addSearchQueryParam(form) {
                (div (@ (class ,(mk-class (append '(flex flex-row items-center
                                                         flex-wrap gap-2)
                                                  (if centered?
-                                                     '(justify-center)
-                                                     '(justify-center
-                                                       md:justify-start)))))))
+                                                   '(justify-center)
+                                                   '(justify-center
+                                                     md:justify-start)))))) "")
                ,(input #:label ""
                        #:name "search"
                        #:value (cond
-                                 ((equal? #f search-query)
-                                  "")
-                                 (else search-query))
+                                 [(equal? #f search-query)
+                                  ""]
+                                 [else search-query])
                        #:placeholder (G_ "Search...")
                        #:input-css '(py-2 px-3
                                           max-w-prose
@@ -2026,8 +2000,8 @@ function addSearchQueryParam(form) {
                                                            flex-wrap
                                                            items-center))))
                                ,(a `((div (@ (class ,(mk-class '(flex flex-row
-                                                                 items-center
-                                                                 gap-1))))
+                                                                      items-center
+                                                                      gap-1))))
                                           (span ,label)
                                           ,(icon #:type 'link
                                                  #:icon-css '(text-china-violet-700
@@ -2041,9 +2015,7 @@ function addSearchQueryParam(form) {
                                    #:color '(text-china-violet-700
                                              dark:text-china-violet-300)
                                    #:hover '(hover:text-persia-pink-500
-                                             dark:hover:text-persia-pink-300))
-
-                               ))) link))
+                                             dark:hover:text-persia-pink-300))))) link))
 
 (define* (render-external-sources G_ external-sources)
   `((div (@ (class ,(mk-class '(flex flex-row
@@ -2091,18 +2063,18 @@ function addSearchQueryParam(form) {
                                                           text-md leading-7))
                  (heading-classes (lambda (level)
                                     (case level
-                                      ((1)
+                                      [(1)
                                        '(my-2 text-4xl font-bold text-onyx-300
-                                              dark:text-stone-300))
-                                      ((2)
+                                              dark:text-stone-300)]
+                                      [(2)
                                        '(my-2 text-3xl font-bold text-onyx-300
-                                              dark:text-stone-300))
-                                      ((3)
+                                              dark:text-stone-300)]
+                                      [(3)
                                        '(my-2 text-2xl font-bold text-onyx-300
-                                              dark:text-stone-300))
-                                      (else '(my-2 text-xl font-bold
+                                              dark:text-stone-300)]
+                                      [else '(my-2 text-xl font-bold
                                                    text-onyx-300
-                                                   dark:text-stone-300)))))
+                                                   dark:text-stone-300)])))
                  (separator-classes '(my-8 mx-4 border-2 border-stone-500/50
                                            dark:border-onyx-100/50))
                  (paragraph-classes '(font-sans text-onyx-500

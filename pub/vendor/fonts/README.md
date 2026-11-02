@@ -45,6 +45,8 @@ every address is written down:
 
 ## What is not here
 
-No Lucida face and no Intel One Mono: both were in this tree once, Lucida as
-proprietary files copied from the author's static assets and Intel One Mono as
-Google's copy, and neither is served, fetched or named any more.
+Nothing proprietary: every file above is under the SIL Open Font License 1.1,
+and no family is served from a host this instance does not run. The tree used to
+carry two faces that were neither -- one proprietary, copied from the author's
+static assets, and one fetched from Google -- and neither is fetched, served or
+named anywhere now.
