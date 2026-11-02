@@ -294,9 +294,9 @@ why a deployment that has data runs `maak migrate' instead."
    "https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/wikimusic.olive.min.css"
    #:output "./pub/css/wikimusic.olive.min.css"))
 
-;; The type and the glyphs are fetched rather than written: the three Lucida
-;; families, the two web families and the Phosphor set are somebody else's work,
-;; and the files a page reads are copies of it kept in `pub/' and served by this
+;; The type and the glyphs are fetched rather than written: the three families
+;; the interface is set in and the Phosphor set are somebody else's work, and
+;; the files a page reads are copies of it kept in `pub/' and served by this
 ;; instance itself (see `resources/assets/fetch.scm').  Running this is only
 ;; needed to refresh those copies -- they are checked in, because they are what
 ;; an instance serves -- and it fetches every one of them, from the addresses

@@ -6,13 +6,13 @@
 ;;; Fetching the assets the interface is painted with.
 ;;;
 ;;; The type the pages are set in and the glyphs their controls wear are not
-;;; wikimusic's own: the three Lucida families are the author's, the two web
-;;; families are Google's, and the Phosphor set is Phosphor's.  What this script
-;;; does is bring a copy of each into `pub/', so that a browser reading a page
-;;; of this instance asks this instance for them and nobody else -- no
-;;; third-party request for every reader to be told about, nothing to break when
-;;; somebody else's host is down or renamed, and pages that render the same on a
-;;; machine with no way out to the network at all.
+;;; wikimusic's own: Work Sans and Source Serif 4 are Google's, JuliaMono is
+;;; Cormullion's, and the Phosphor set is Phosphor's.  What this script does is
+;;; bring a copy of each into `pub/', so that a browser reading a page of this
+;;; instance asks this instance for them and nobody else -- no third-party
+;;; request for every reader to be told about, nothing to break when somebody
+;;; else's host is down or renamed, and pages that render the same on a machine
+;;; with no way out to the network at all.
 ;;;
 ;;; The files it writes are checked in, because they are what the instance
 ;;; serves; running it is only needed to refresh them, and it is written so that
@@ -60,9 +60,26 @@
 
 (define google-fonts-stylesheet
   (string-append "https://fonts.googleapis.com/css2?family="
-                 "Intel+One+Mono:ital,wght@0,300..700;1,300..700" "&family="
-                 "Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800"
+                 "Work+Sans:ital,wght@0,100..900;1,100..900" "&family="
+                 "Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900"
                  "&display=swap"))
+
+;; JuliaMono is not in the Google Fonts catalogue, so it is taken from its own
+;; project, at a tag rather than a branch: a refresh fetches the release this
+;; tree was built against, and moving to a newer one is an edit here.  The two
+;; files are the latin subsets of the regular and bold weights, which is the
+;; pair a page of code needs; the upstream archive's other weights are Unicode
+;; supersets of the same design.
+(define juliamono-version
+  "v0.63.2")
+
+(define juliamono-font-base
+  (string-append "https://raw.githubusercontent.com/cormullion/juliamono/"
+                 juliamono-version "/webfonts"))
+
+(define juliamono-fonts
+  '(("JuliaMono-RegularLatin.woff2" . "juliamono-normal-latin.woff2")
+    ("JuliaMono-BoldLatin.woff2" . "juliamono-bold-latin.woff2")))
 
 (define phosphor-stylesheet
   "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css")
@@ -70,36 +87,24 @@
 (define phosphor-font
   "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/Phosphor.woff2")
 
-;; The three Lucida families the interface is set in and the picture the project
-;; shows of itself.  Unlike the two above, these are wikimusic's own host's
-;; files, which is exactly why a copy belongs here: the site worked only as long
-;; as one machine stayed up and kept serving it.
-(define lucida-font-files
-  '("LSANS" "LSANSI"
-    "LSANSD"
-    "LSANSDI"
-    "LTYPE"
-    "LTYPEO"
-    "LTYPEB"
-    "LTYPEBO"
-    "l_10646"))
-
-(define lucida-font-host
-  "https://jointhefreeworld.org/static-assets/fonts")
-
+;; The picture the project shows of itself.  It is wikimusic's own host's file,
+;; which is exactly why a copy belongs here: the site worked only as long as one
+;; machine stayed up and kept serving it.
 (define project-picture
   "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg")
 
 ;; The licences of the files above, kept beside them.  They are somebody else's
-;; work and they say so: the two web families travel under the SIL Open Font
+;; work and they say so: the three families travel under the SIL Open Font
 ;; Licence, which asks that a copy of it go with them, and the icon set under
 ;; the MIT licence, which asks for the notice.  A licence is fetched from the
 ;; place its own author keeps it rather than written out here, because the text
 ;; is theirs -- and it is fetched every time, so a set that is refreshed is
 ;; refreshed with the licence it was published under.
 (define licence-files
-  `(("https://raw.githubusercontent.com/google/fonts/main/ofl/intelonemono/OFL.txt" . "vendor/fonts/IntelOneMono-OFL.txt")
-    ("https://raw.githubusercontent.com/google/fonts/main/ofl/plusjakartasans/OFL.txt" . "vendor/fonts/PlusJakartaSans-OFL.txt")
+  `(("https://raw.githubusercontent.com/google/fonts/main/ofl/worksans/OFL.txt" . "vendor/fonts/WorkSans-OFL.txt")
+    ("https://raw.githubusercontent.com/google/fonts/main/ofl/sourceserif4/OFL.txt" . "vendor/fonts/SourceSerif4-OFL.txt")
+    (,(string-append "https://raw.githubusercontent.com/cormullion/juliamono/"
+                     juliamono-version "/LICENSE") . "vendor/fonts/JuliaMono-OFL.txt")
     ("https://raw.githubusercontent.com/phosphor-icons/web/master/LICENSE" . "vendor/phosphor/LICENSE")))
 
 ;;; ====== Fetching one file ======
@@ -261,13 +266,14 @@ left of the face names one file, so the list it ends is ended by a semicolon."
                                                           file)) file)
     (format #t "  wrote ~a~%" file)))
 
-(define (fetch-lucida-fonts!)
-  "Bring the three Lucida families into `pub/vendor/fonts'."
+(define (fetch-juliamono!)
+  "Bring JuliaMono's two latin faces into `pub/vendor/fonts'."
   (for-each (lambda (face)
-              (fetch! (string-append lucida-font-host "/" face ".woff")
+              (fetch! (string-append juliamono-font-base
+                                     "/"
+                                     (car face))
                       (path-under-root "pub/vendor/fonts"
-                                       (string-append face ".woff"))))
-            lucida-font-files))
+                                       (cdr face)))) juliamono-fonts))
 
 (define (fetch-project-picture!)
   "Bring the picture the project shows of itself into `pub/img'."
@@ -288,8 +294,8 @@ left of the face names one file, so the list it ends is ended by a semicolon."
             (map (lambda (directory)
                    (path-under-root "pub" directory))
                  '("vendor" "vendor/fonts" "vendor/phosphor" "img")))
-  (format #t "the three Lucida families:~%")
-  (fetch-lucida-fonts!)
+  (format #t "the monospace family:~%")
+  (fetch-juliamono!)
   (format #t "the two web families:~%")
   (fetch-google-fonts!)
   (format #t "the icon set:~%")

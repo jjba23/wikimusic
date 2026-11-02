@@ -279,12 +279,11 @@ the menu with @code{for}, so it reaches assistive technology as well."
 ;; reader asks for a tab, and the renderer itself is never inlined.
 ;;; ====== The type and the glyphs ======
 ;;;
-;;; The interface is set in three Lucida families and a pair of web families,
-;;; and its controls wear Phosphor glyphs.  All of it used to be somebody else's
-;;; address: a font host for the web families, an icon CDN for the glyphs, and
-;;; the author's own domain for the Lucida files -- so every page of every
-;;; instance made three third-party requests before it could be read, and the
-;;; type was only there while those hosts were.
+;;; The interface is set in Work Sans, Source Serif 4 and JuliaMono, and its
+;;; controls wear Phosphor glyphs.  All of it used to be somebody else's
+;;; address: a font host for the web families and an icon CDN for the glyphs,
+;;; so every page of every instance made a third-party request before it could
+;;; be read, and the type was only there while those hosts were.
 ;;;
 ;;; They are now files this project ships, fetched into `pub/' (see `maak
 ;;; vendor-assets'), and a page points at them where the deployment said they
@@ -292,7 +291,7 @@ the menu with @code{for}, so it reaches assistive technology as well."
 ;;; this instance's own copy.  Every address in each stylesheet is relative, so
 ;;; the three files carry their own fonts to whatever host serves them.
 (define theme-stylesheets
-  '("vendor/fonts/lucida.css" "vendor/fonts/google.css"
+  '("vendor/fonts/juliamono.css" "vendor/fonts/google.css"
     "vendor/phosphor/phosphor.css"))
 
 ;; The stylesheets the rest of the page is laid out with, and the icon a tab or

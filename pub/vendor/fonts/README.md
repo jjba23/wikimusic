@@ -13,15 +13,18 @@ they are what an instance serves.
 
 | file | what it is | licence |
 | --- | --- | --- |
-| `lucida.css` | the `@font-face` rules for the three Lucida families, written in this tree, with every address relative | MIT, as part of wikimusic |
-| `LSANS.woff`, `LSANSI.woff`, `LSANSD.woff`, `LSANSDI.woff` | Lucida Sans, regular and bold, upright and italic | proprietary — see below |
-| `LTYPE.woff`, `LTYPEO.woff`, `LTYPEB.woff`, `LTYPEBO.woff` | Lucida Sans Typewriter, regular and bold, upright and oblique | proprietary — see below |
-| `l_10646.woff` | Lucida Sans Unicode | proprietary — see below |
+| `juliamono.css` | the `@font-face` rules for JuliaMono, written in this tree, with every address relative | MIT, as part of wikimusic |
+| `juliamono-normal-latin.woff2`, `juliamono-bold-latin.woff2` | JuliaMono, regular and bold, in the latin subset | SIL OFL 1.1 |
 | `google.css` | the stylesheet the two web families are declared by, fetched from Google and rewritten so that every address is the file beside it | SIL OFL 1.1, as the fonts are |
-| `intelonemono-*.woff2` | Intel One Mono, in the subsets and slopes the stylesheet names | SIL OFL 1.1 |
-| `plusjakartasans-*.woff2` | Plus Jakarta Sans, in the subsets and slopes the stylesheet names | SIL OFL 1.1 |
-| `IntelOneMono-OFL.txt` | Intel One Mono's own licence text | SIL OFL 1.1 |
-| `PlusJakartaSans-OFL.txt` | Plus Jakarta Sans's own licence text | SIL OFL 1.1 |
+| `worksans-*.woff2` | Work Sans, in the subsets and slopes the stylesheet names | SIL OFL 1.1 |
+| `sourceserif4-*.woff2` | Source Serif 4, in the subsets and slopes the stylesheet names | SIL OFL 1.1 |
+| `JuliaMono-OFL.txt` | JuliaMono's own licence text | SIL OFL 1.1 |
+| `WorkSans-OFL.txt` | Work Sans's own licence text | SIL OFL 1.1 |
+| `SourceSerif4-OFL.txt` | Source Serif 4's own licence text | SIL OFL 1.1 |
+
+The three families cover the three roles the interface needs: Work Sans for
+prose, Source Serif 4 for long-form reading in an article's body, and JuliaMono
+for a tablature, a chord chart or a snippet of code.
 
 ## Where they came from
 
@@ -34,18 +37,14 @@ every address is written down:
   Unicode it carries and its slope.  `google.css` is Google's own stylesheet
   with each of those addresses replaced by the file beside it, so nothing in
   this tree points at a host that is not this instance;
-- the three Lucida families are fetched, one file each, from the author's own
-  static assets, which is where they were published;
-- the two licence texts above are fetched from where their authors keep them.
+- JuliaMono is not in the Google Fonts catalogue, so it is taken from its own
+  project instead, at a release tag rather than a branch: the script names the
+  tag it was built against, and the two latin faces the interface sets code in
+  are the files it keeps;
+- the three licence texts above are fetched from where their authors keep them.
 
-## What the licences ask of us
+## What is not here
 
-- **Intel One Mono and Plus Jakarta Sans are SIL OFL 1.1, and they are
-  unmodified.**  Their copyright notices and licence texts travel beside them,
-  which is what the OFL asks for; the reserved font names are not used by
-  anything here, and wikimusic's own stylesheet does not rename them.
-- **The Lucida families are proprietary typefaces** originally developed by
-  Bigelow & Holmes.  They are bundled pre-installed on many systems, and the
-  position the project takes on serving the files — fair use, local
-  development and non-commercial use, with users responsible for their own
-  compliance — is written out in the manual, under *On Lucida fonts*.
+No Lucida face and no Intel One Mono: both were in this tree once, Lucida as
+proprietary files copied from the author's static assets and Intel One Mono as
+Google's copy, and neither is served, fetched or named any more.

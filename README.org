@@ -1079,14 +1079,13 @@ at run time and works with no network of its own:
 - the *SONiVOX SoundFont* (Apache-2.0, © Sonic Network Inc.) is what makes a
   played-back tab audible, and fits beside it;
 - *Bravura* (SIL OFL 1.1) is the music font a tablature is drawn with;
-- *Intel One Mono* and *Plus Jakarta Sans* (both SIL OFL 1.1) are the two web
-  families the interface is set in beside [[https://en.wikipedia.org/wiki/Lucida][Lucida]], and their licence texts
-  travel with them;
+- *Work Sans*, *Source Serif 4* (both SIL OFL 1.1, from
+  [[https://fonts.google.com/][Google Fonts]]) and *JuliaMono* (SIL OFL 1.1, from
+  [[https://juliamono.netlify.app/][its own project]]) are the three families the
+  interface is set in, and their licence texts travel with them;
 - [[https://phosphoricons.com/][*Phosphor*]] ([[https://opensource.org/license/mit][MIT]]) is the icon set every control on the site wears;
-- the three *Lucida* families the interface is set in, and the *picture the
-  project shows of itself*, which are the author's own files rather than a third
-  party's -- what the project takes the position on the Lucida files to be is
-  set out below, under [[#on-lucida-fonts][On Lucida fonts]].
+- the *picture the project shows of itself*, which is the author's own file
+  rather than a third party's.
 
 Two tasks fetch them, and each is the only way its own files should change:
 =maak vendor-assets= brings the typefaces, the glyphs and the project's picture
@@ -1103,14 +1102,28 @@ show -- a copy that went on naming the host it came from would be a tree full of
 files nobody reads -- so it is pinned by the test suite against a written
 stylesheet rather than a live one, with no network: ~test/veritas/unit/assets-spec.scm~.
 
-** On Lucida fonts
+** On fonts
 :PROPERTIES:
-:CUSTOM_ID: on-lucida-fonts
+:CUSTOM_ID: on-fonts
 :END:
 
-Lucida fonts are proprietary typefaces originally developed by Bigelow & Holmes. They remain a long-time favorite for many people and are very legible in many situations and hardware/software. While they are bundled pre-installed on many operating systems and platforms, they remain proprietary fonts.
+The interface is set in three libre families, all under the SIL Open Font
+License and all served by the instance itself:
 
-You may use these font files under principles of fair use or for local development and non-commercial purposes, provided it is not for profit and used without securing a proper commercial license where required by law. Users and contributors are solely responsible for ensuring their usage complies with applicable software licensing terms and intellectual property rights.
+- *Work Sans* for prose, the face the body of a page and every control is set
+  in;
+- *Source Serif 4* for long-form reading, the face an article's body is set in;
+- *JuliaMono* for code, the face a tablature, a chord chart or a snippet is set
+  in, chosen because it keeps its columns and its box-drawing glyphs.
+
+Work Sans and Source Serif 4 come from [[https://fonts.google.com/][Google Fonts]];
+JuliaMono is published at [[https://juliamono.netlify.app/][juliamono.netlify.app]]
+and is not in the Google Fonts catalogue, so it is fetched from its own project
+at a release tag. Both Google families are variable fonts, so one file per style
+carries the whole weight axis; JuliaMono ships static weights, hence two files
+split at 600.
+
+No proprietary font is vendored, served or named anywhere in this tree.
 
 -------
 

@@ -53,7 +53,7 @@
      default, which puts a stored tab in a different column than the author's
      editor did.  Four is what the editors these tabs were written in used.
    - A ligature is one glyph for two or more characters -- `=>', `|=', `||='.
-     Intel One Mono, the face the interface is set in, ships them, and a
+     JuliaMono, the face the interface is set in, ships them, and a
      ligature is one character wide where its characters were two, so a run
      containing one closes up and every column after it moves.
 

@@ -232,7 +232,7 @@ mirror -- names the address they hang off, without a trailing slash:
 (define (asset-address path)
   "Return PATH as the address a page reads one of the interface's assets at.
 
-PATH is the file's place inside `pub/' (`vendor/fonts/lucida.css',
+PATH is the file's place inside `pub/' (`vendor/fonts/juliamono.css',
 `css/wikimusic.olive.min.css', say).  It is returned as a path of this instance
 when the deployment named no other host, so that a page renders the same on
 every instance -- local, mirrored or behind a CDN -- and a deployment that moved

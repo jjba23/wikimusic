@@ -313,7 +313,7 @@
                                               shell-html)
                                              (string-append
                                               "href=\"https://assets.example.org/theme"
-                                              "/vendor/fonts/lucida.css\""))
+                                              "/vendor/fonts/juliamono.css\""))
                             #t)
                        #:name "the type the page is set in")
           (assert-true (and (string-contains (with-deployment 'assets-url
@@ -334,10 +334,9 @@
          (test "no file of the interface is somebody else's to serve"
                ;; Every one of these was a request a reader's browser made to
                ;; a host this project does not run: a font host for the two web
-               ;; families, an icon CDN for the glyphs, and the author's own
-               ;; domain for the Lucida files.  They are files in `pub/' now,
-               ;; and a page that named one of them again would be a page that
-               ;; stops being readable when that host is.
+               ;; families and an icon CDN for the glyphs.  They are files in
+               ;; `pub/' now, and a page that named one of them again would be
+               ;; a page that stops being readable when that host is.
                (assert-false (string-contains (shell-html)
                                               "fonts.googleapis.com")
                              #:name "no font host")
@@ -346,11 +345,11 @@
                              "and none of the hosts a face was fetched from")
                (assert-false (string-contains (shell-html) "cdn.jsdelivr.net")
                              #:name "no icon CDN")
-               ;; The Lucida families used to be read from the author's own
-               ;; static assets, and that path is the one thing here that has to
-               ;; be named rather than counted: the page carries the address of
-               ;; an events endpoint on that domain as well, and a service is
-               ;; not an asset -- what must not be there is a *file* of the
+               ;; A typeface used to be read from the author's own static
+               ;; assets, and that path is the one thing here that has to be
+               ;; named rather than counted: the page carries the address of an
+               ;; events endpoint on that domain as well, and a service is not
+               ;; an asset -- what must not be there is a *file* of the
                ;; interface waiting on somebody else's machine to be up.
                (assert-false (string-contains (shell-html)
                                               "static-assets/fonts")

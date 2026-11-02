@@ -1,0 +1,34 @@
+/* wikimusic - the free music knowledge encyclopaedia
+ *
+ * SPDX-License-Identifier: MIT
+ * Copyright © Josep Bigorra <jjbigorra@gmail.com>
+ */
+
+/* The monospace family, written in this tree rather than fetched as a
+   stylesheet: JuliaMono is not in the Google Fonts catalogue, so there is no
+   stylesheet of its own to keep a copy of, and the two faces below are the
+   latin subsets `maak vendor-assets' puts beside this file.
+
+   JuliaMono: Copyright © 2019-2024 Cormullion, SIL Open Font Licence 1.1.
+   Source: https://github.com/cormullion/juliamono/
+
+   The files are addressed relative to this sheet, so the sheet and the fonts
+   travel together to whatever host serves the instance.  JuliaMono ships
+   static weights, so the pair is split at 600: a weight below that reads the
+   regular face, a weight above it the bold one. */
+
+@font-face {
+  font-family: 'JuliaMono';
+  font-style: normal;
+  font-weight: 300 500;
+  font-display: swap;
+  src: url('./juliamono-normal-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JuliaMono';
+  font-style: normal;
+  font-weight: 600 900;
+  font-display: swap;
+  src: url('./juliamono-bold-latin.woff2') format('woff2');
+}
