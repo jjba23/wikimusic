@@ -1060,7 +1060,7 @@ and six.
                 ;; Statistics
                 (div (@ (class ,(mk-class '(mt-2 flex flex-wrap items-center
                                                  justify-center gap-1))))
-                     ,(if (eq? 0 (length comments)) '()
+                     ,(if (eqv? 0 (length comments)) '()
                         `((div (@ (class ,(mk-class '(min-w-0))))
                                ,(em (format #f "~a ~a"
                                             (length comments)
@@ -1072,7 +1072,7 @@ and six.
 
 (define* (render-visibility-status G_ status)
   (cond
-    [(eq? status 0)
+    [(eqv? status 0)
      (G_ "published")]
     [else (G_ "unkown status")]))
 
