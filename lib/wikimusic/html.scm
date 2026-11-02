@@ -1060,7 +1060,7 @@ and six.
                 ;; Statistics
                 (div (@ (class ,(mk-class '(mt-2 flex flex-wrap items-center
                                                  justify-center gap-1))))
-                     ,(if (> 1 (length comments)) '()
+                     ,(if (eq? 0 (length comments)) '()
                         `((div (@ (class ,(mk-class '(min-w-0))))
                                ,(em (format #f "~a ~a"
                                             (length comments)
