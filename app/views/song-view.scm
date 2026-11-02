@@ -31,22 +31,7 @@
                            artists
                            song-artists
                            x)
-  (let* ((extra-bot-info (render-if-nempty (lambda (vc)
-                                             `((div (@ (class ,(mk-class '(flex
-                                                                           flex-row
-                                                                           gap-2
-                                                                           justify-center
-                                                                           items-center))))
-                                                    ,(em (format #f "~a ~a"
-                                                                 (car vc)
-                                                                 (G_
-                                                                  "versions"))
-                                                         #:size '(text-sm)
-                                                         #:color '(text-onyx-300
-                                                                   dark:text-stone-300)))))
-                                           (assoc-ref song-version-count-alist
-                                            (assq-ref x
-                                                      'identifier))))
+  (let* ((extra-bot-info '())
          (respective (filter (lambda (a)
                                (equal? (assq-ref x
                                                  'identifier)
@@ -80,9 +65,7 @@
                                                      dark:text-stone-100)
                                            #:hover '(hover:text-persia-pink-900
                                                      dark:hover:text-persia-pink-300)))
-                                      art))))
-
-         )
+                                      art)))))
     `((div ,(item-tile G_
                        'song
                        x
@@ -104,14 +87,14 @@
   (let loop
     ((rest versions))
     (if (null? rest) #f
-        (let* ((url (assq-ref (car rest)
-                              'guitarpro-contents))
-               (metadata (and (string? url)
-                              (gp5-metadata-of-data-url url))))
-          (or (and metadata
-                   (assq-ref metadata
-                             'tempo))
-              (loop (cdr rest)))))))
+      (let* ((url (assq-ref (car rest)
+                            'guitarpro-contents))
+             (metadata (and (string? url)
+                         (gp5-metadata-of-data-url url))))
+        (or (and metadata
+              (assq-ref metadata
+                        'tempo))
+          (loop (cdr rest)))))))
 
 (define* (song-list-page G_
                          #:key (only-tiles #f)
@@ -129,44 +112,44 @@
                          pages
                          is-logged-in)
   (let* ((page (if (and limit
-                        (> limit 0))
-                   (+ 1
-                      (quotient offset limit)) 1))
+                     (> limit 0))
+                 (+ 1
+                    (quotient offset limit)) 1))
          ;; A list page is described by the list itself: what is on it, and --
          ;; when one was searched for -- the words that found it.  Everything
          ;; past the first page, and every page of results, is kept out of the
          ;; index: a crawler that follows `?page=' forever would index the same
          ;; songs over and over under addresses no reader ever types.
          (searching? (and (string? search-query)
-                          (not (string-null? search-query))))
+                       (not (string-null? search-query))))
          (list-title (if searching?
-                      (format #f
-                       "Songs matching “~a” — guitar tabs & chords | WikiMusic"
-                       search-query)
-                      "Songs: guitar tabs, bass tabs, chords and keys | WikiMusic"))
+                       (format #f
+                               "Songs matching “~a” — guitar tabs & chords | WikiMusic"
+                               search-query)
+                       "Songs: guitar tabs, bass tabs, chords and keys | WikiMusic"))
          (list-description (if searching?
-                            (format #f
-                             "Songs on WikiMusic matching “~a”, with their artists, keys, tunings and stored tabs."
-                             search-query)
-                            "Every song on WikiMusic with its artists, key, tuning and stored guitar and bass tabs, chords and notation."))
+                             (format #f
+                                     "Songs on WikiMusic matching “~a”, with their artists, keys, tunings and stored tabs."
+                                     search-query)
+                             "Every song on WikiMusic with its artists, key, tuning and stored guitar and bass tabs, chords and notation."))
          (page-buttons (if (and pages
-                                (> pages 1))
-                           (pagination #:current page
-                                       #:total pages
-                                       #:base-url (format #f
-                                                   "/songs?limit=~a&sort=~a~a&page="
-                                                   limit
-                                                   (or user-sort "")
-                                                   (if (and search-query
-                                                            (not (equal?
-                                                                  search-query
-                                                                  "")))
-                                                       (format #f "&search=~a"
-                                                               search-query)
-                                                       ""))
-                                       #:prev-label (G_ "previous")
-                                       #:next-label (G_ "next"))
-                           '()))
+                             (> pages 1))
+                         (pagination #:current page
+                                     #:total pages
+                                     #:base-url (format #f
+                                                        "/songs?limit=~a&sort=~a~a&page="
+                                                        limit
+                                                        (or user-sort "")
+                                                        (if (and search-query
+                                                              (not (equal?
+                                                                    search-query
+                                                                    "")))
+                                                          (format #f "&search=~a"
+                                                                  search-query)
+                                                          ""))
+                                     #:prev-label (G_ "previous")
+                                     #:next-label (G_ "next"))
+                         '()))
          (body `(div (@ (class ,(mk-class '(px-4 md:px-8
                                                  py-2
                                                  flex
@@ -189,19 +172,16 @@
                              #:size '(text-2xl)
 
                              #:family '(font-sans))) ,(unless only-tiles
-                                                        `(div (@ (class ,(mk-class '
-                                                                          (flex
-                                                                           flex-wrap
-                                                                           flex-row
-                                                                           justify-center
-                                                                           gap-2))))
-                                                              (div (@ (class ,
-                                                                             (mk-class '
-                                                                              (flex
-                                                                               flex-wrap
-                                                                               flex-row
-                                                                               justify-start
-                                                                               items-center))))
+                                                        `(div (@ (class ,(mk-class '(flex
+                                                                                     flex-wrap
+                                                                                     flex-row
+                                                                                     justify-center
+                                                                                     gap-2))))
+                                                              (div (@ (class ,(mk-class '(flex
+                                                                                          flex-wrap
+                                                                                          flex-row
+                                                                                          justify-start
+                                                                                          items-center))))
                                                                    ,(sort-select
                                                                      G_
                                                                      #:entity 'song
@@ -214,14 +194,12 @@
                                                                      grid-size
                                                                      #:search-query
                                                                      search-query))
-                                                              (div (@ (class ,
-                                                                             (mk-class '
-                                                                              (flex
-                                                                               flex-wrap
-                                                                               flex-row
-                                                                               gap-3
-                                                                               justify-end
-                                                                               items-center))))
+                                                              (div (@ (class ,(mk-class '(flex
+                                                                                          flex-wrap
+                                                                                          flex-row
+                                                                                          gap-3
+                                                                                          justify-end
+                                                                                          items-center))))
 
                                                                    ,(search-box
                                                                      G_
@@ -231,13 +209,13 @@
                                                                 grid-size)))
                                 ,(map (lambda (x)
                                         (render-song-tile G_
-                                         #:artworks artworks
-                                         #:song-version-count-alist
-                                         song-version-count-alist
-                                         #:comments comments
-                                         #:artists artists
-                                         #:song-artists song-artists
-                                         #:x x)) songs))
+                                                          #:artworks artworks
+                                                          #:song-version-count-alist
+                                                          song-version-count-alist
+                                                          #:comments comments
+                                                          #:artists artists
+                                                          #:song-artists song-artists
+                                                          #:x x)) songs))
                            ,page-buttons
 
                            ,(unless only-tiles
@@ -249,22 +227,22 @@
                                            (a (@ (href "/songs/new"))
                                               ,(button (G_ "new song")))))))))))
     (if only-tiles body
-        (html-template G_
-                       #:is-logged-in is-logged-in
-                       #:title list-title
-                       #:description list-description
-                       #:path (if (and (= page 1)
-                                       (not searching?)) "/songs" #f)
-                       #:robots (if (or searching?
-                                        (> page 1)) "noindex, follow" #f)
-                       #:json-ld (list (page-json-ld #:type "CollectionPage"
-                                                     #:url (if searching? #f
-                                                               (absolute-url
-                                                                "/songs"))
-                                                     #:name list-title
-                                                     #:description
-                                                     list-description))
-                       #:body body))))
+      (html-template G_
+                     #:is-logged-in is-logged-in
+                     #:title list-title
+                     #:description list-description
+                     #:path (if (and (= page 1)
+                                  (not searching?)) "/songs" #f)
+                     #:robots (if (or searching?
+                                    (> page 1)) "noindex, follow" #f)
+                     #:json-ld (list (page-json-ld #:type "CollectionPage"
+                                                   #:url (if searching? #f
+                                                           (absolute-url
+                                                            "/songs"))
+                                                   #:name list-title
+                                                   #:description
+                                                   list-description))
+                     #:body body))))
 
 (define* (song-detail-page G_
                            #:key song
@@ -280,7 +258,7 @@
                            (ascii-size 'text-md)
                            external-sources
                            is-logged-in)
-  
+
   (let* ((artist-name-titles (map (lambda (ar)
                                     `((div ,(a (assq-ref ar
                                                          'display-name)
@@ -292,10 +270,10 @@
                                                          dark:hover:text-persia-pink-300
                                                          hover:underline)
                                                #:href (format #f
-                                                       "/artists/uuid/~a"
+                                                              "/artists/uuid/~a"
 
-                                                       (assq-ref ar
-                                                                 'identifier))))))
+                                                              (assq-ref ar
+                                                                        'identifier))))))
                                   artists))
          (genre-name-titles (map (lambda (ar)
                                    `((div ,(a (assoc-ref ar
@@ -308,10 +286,10 @@
                                                         dark:hover:text-persia-pink-300
                                                         hover:underline)
                                               #:href (format #f
-                                                      "/genres/uuid/~a"
+                                                             "/genres/uuid/~a"
 
-                                                      (assq-ref ar
-                                                                'identifier))))))
+                                                             (assq-ref ar
+                                                                       'identifier))))))
                                  genres))
          ;; ---- What a crawler and a link preview are told about this page
          ;;
@@ -331,11 +309,11 @@
                               (assq-ref ar
                                         'display-name)) artists))
          (artist-line (and (pair? artist-names)
-                           (string-join artist-names " and ")))
+                        (string-join artist-names " and ")))
          (instruments (delete-duplicates (filter (lambda (word)
                                                    (and (string? word)
-                                                        (not (string-null?
-                                                              word))))
+                                                     (not (string-null?
+                                                           word))))
                                                  (map (lambda (sc)
                                                         (assq-ref sc
                                                                   'instrument-type))
@@ -350,46 +328,46 @@
          (album (assq-ref song
                           'album-name))
          (stored-words (cond
-                         ((pair? instruments)
+                         [(pair? instruments)
                           (format #f "~a tabs, chords"
-                                  (string-join instruments " & ")))
-                         ((pair? song-contents)
-                          "tabs, chords")
-                         (else "chords")))
+                                  (string-join instruments " & "))]
+                         [(pair? song-contents)
+                          "tabs, chords"]
+                         [else "chords"]))
          (page-title (format #f
                              "~a~a — ~a~a | WikiMusic"
                              song-name
                              (if artist-line
-                                 (format #f " – ~a" artist-line) "")
+                               (format #f " – ~a" artist-line) "")
                              stored-words
                              (if (and (string? key)
-                                      (not (string-null? key)))
-                                 (format #f " & the key of ~a" key) "")))
+                                   (not (string-null? key)))
+                               (format #f " & the key of ~a" key) "")))
          (page-description (summarize (string-append song-name
-                                       (if artist-line
-                                           (format #f " by ~a" artist-line) "")
-                                       (if (and (string? album)
-                                                (not (string-null? album)))
-                                           (format #f " from ~a" album) "")
-                                       " — "
-                                       stored-words
-                                       (if (and (string? tuning)
-                                                (not (string-null? tuning)))
-                                           (format #f " in ~a tuning" tuning)
-                                           "")
-                                       ", stored on WikiMusic as "
-                                       (if (pair? song-contents)
-                                           (format #f "~a~a"
-                                                   (length song-contents)
-                                                   (if (= 1
-                                                          (length
-                                                           song-contents))
-                                                       " version" " versions"))
-                                           "a song page")
-                                       ". "
-                                       (let ((written (assq-ref song
-                                                                'description)))
-                                         (if (string? written) written "")))
+                                                     (if artist-line
+                                                       (format #f " by ~a" artist-line) "")
+                                                     (if (and (string? album)
+                                                           (not (string-null? album)))
+                                                       (format #f " from ~a" album) "")
+                                                     " — "
+                                                     stored-words
+                                                     (if (and (string? tuning)
+                                                           (not (string-null? tuning)))
+                                                       (format #f " in ~a tuning" tuning)
+                                                       "")
+                                                     ", stored on WikiMusic as "
+                                                     (if (pair? song-contents)
+                                                       (format #f "~a~a"
+                                                               (length song-contents)
+                                                               (if (= 1
+                                                                      (length
+                                                                       song-contents))
+                                                                 " version" " versions"))
+                                                       "a song page")
+                                                     ". "
+                                                     (let ((written (assq-ref song
+                                                                              'description)))
+                                                       (if (string? written) written "")))
                                       #:limit 300))
          (page-image (artwork-social-image artworks
                                            #:fallback (announced-image)))
@@ -408,12 +386,12 @@
                                                                        song-name))
                                                                 (if (and (string?
                                                                           key)
-                                                                         (not (string-null?
-                                                                               key)))
-                                                                    (list (cons
-                                                                           "musicalKey"
-                                                                           key))
-                                                                    '())
+                                                                      (not (string-null?
+                                                                            key)))
+                                                                  (list (cons
+                                                                         "musicalKey"
+                                                                         key))
+                                                                  '())
                                                                 (let ((creators
                                                                        (named-nodes
                                                                         #:type
@@ -421,10 +399,10 @@
                                                                         #:names
                                                                         artist-names)))
                                                                   (if creators
-                                                                   (list (cons
-                                                                          "creator"
-                                                                          creators))
-                                                                   '()))
+                                                                    (list (cons
+                                                                           "creator"
+                                                                           creators))
+                                                                    '()))
                                                                 (let ((genres-node
                                                                        (named-nodes
                                                                         #:type
@@ -432,51 +410,51 @@
                                                                         #:names
                                                                         genre-names)))
                                                                   (if
-                                                                   genres-node
-                                                                   (list (cons
-                                                                          "genre"
-                                                                          genres-node))
-                                                                   '())))))
+                                                                    genres-node
+                                                                    (list (cons
+                                                                           "genre"
+                                                                           genres-node))
+                                                                    '())))))
          (song-attributes `((div (@ (class ,(mk-class '(px-4 py-6 mx-auto))))
                                  (dl ;The row's own keys are the hyphenated
-                                     ;; ones the repository asked SQL for; a
-                                     ;; column named with an underscore is
-                                     ;; not there, so each of these is `#f'
-                                     ;; and the whole list below rendered as
-                                     ;; nothing at all.
-                                     ,(render-if-nestring (lambda (tuning)
-                                                            (list (dt (G_
-                                                                       "tuning"))
-                                                                  (dd tuning)))
-                                                          (assq-ref song
-                                                                    'music-tuning))
-                                     ,(render-if-nestring (lambda (keyy)
-                                                            (list (dt (G_
-                                                                       "music key"))
-                                                                  (dd keyy)))
-                                                          (assq-ref song
-                                                                    'music-key))
-                                     ,(render-if-nestring (lambda (music-creation-date)
-                                                            (list (dt (G_
-                                                                       "music creation date"))
-                                                                  (dd
-                                                                   music-creation-date)))
-                                                          (assq-ref song
-                                                                    'music-creation-date))
-                                     ,(render-if-nestring (lambda (album-name)
-                                                            (list (dt (G_
-                                                                       "album name"))
-                                                                  (dd
-                                                                   album-name)))
-                                                          (assq-ref song
-                                                                    'album-name))
-                                     ,(render-if-nestring (lambda (album-link)
-                                                            (list (dt (G_
-                                                                       "album info link"))
-                                                                  (dd (a (uri-decode
-                                                                          album-link)))))
-                                                          (assq-ref song
-                                                                    'album-info-link)))))))
+                                  ;; ones the repository asked SQL for; a
+                                  ;; column named with an underscore is
+                                  ;; not there, so each of these is `#f'
+                                  ;; and the whole list below rendered as
+                                  ;; nothing at all.
+                                  ,(render-if-nestring (lambda (tuning)
+                                                         (list (dt (G_
+                                                                    "tuning"))
+                                                               (dd tuning)))
+                                                       (assq-ref song
+                                                                 'music-tuning))
+                                  ,(render-if-nestring (lambda (keyy)
+                                                         (list (dt (G_
+                                                                    "music key"))
+                                                               (dd keyy)))
+                                                       (assq-ref song
+                                                                 'music-key))
+                                  ,(render-if-nestring (lambda (music-creation-date)
+                                                         (list (dt (G_
+                                                                    "music creation date"))
+                                                               (dd
+                                                                music-creation-date)))
+                                                       (assq-ref song
+                                                                 'music-creation-date))
+                                  ,(render-if-nestring (lambda (album-name)
+                                                         (list (dt (G_
+                                                                    "album name"))
+                                                               (dd
+                                                                album-name)))
+                                                       (assq-ref song
+                                                                 'album-name))
+                                  ,(render-if-nestring (lambda (album-link)
+                                                         (list (dt (G_
+                                                                    "album info link"))
+                                                               (dd (a (uri-decode
+                                                                       album-link)))))
+                                                       (assq-ref song
+                                                                 'album-info-link)))))))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:title page-title
@@ -523,7 +501,7 @@
                                                                         justify-start))))
                                                  ,(em "genres:")
                                                  ,genre-name-titles))))
-                                  
+
                                   (div (div ,(entity-details G_
                                                              #:entity 'song
                                                              #:x song
@@ -540,9 +518,9 @@
                                  ,(sub-h4 (G_ "metronome"))
                                  ,(metronome-widget G_
                                                     #:id (format #f
-                                                          "metronome-~a"
-                                                          (assq-ref song
-                                                                    'identifier))
+                                                                 "metronome-~a"
+                                                                 (assq-ref song
+                                                                           'identifier))
                                                     #:tempo (or tab-tempo 120)))
 
                             (div song-attributes
@@ -557,11 +535,11 @@
                                       ,(sub-h4 (G_ "ascii size"))
                                       ,(ascii-size-control G_
                                                            #:route (format #f
-                                                                    "/~as/uuid/~a"
-                                                                    'song
-                                                                    (assq-ref
-                                                                     song
-                                                                     'identifier))
+                                                                           "/~as/uuid/~a"
+                                                                           'song
+                                                                           (assq-ref
+                                                                            song
+                                                                            'identifier))
                                                            #:size ascii-size)))
 
                             (div ,(render-song-content G_ song song-contents

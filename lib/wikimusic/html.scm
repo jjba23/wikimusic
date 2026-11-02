@@ -1050,23 +1050,11 @@ and six.
                          #:color '(text-onyx-300 dark:text-stone-100)
                          #:hover '(hover:text-persia-pink-500
                                    dark:hover:text-persia-pink-300)))
-
                 ;; Extra information
                 ,(render-if-nempty (lambda (info)
                                      `(div (@ (class ,(mk-class '(pt-1 sm:pt-2
                                                                        text-center))))
                                            ,info)) extra-top-info)
-
-                ;; Statistics
-                (div (@ (class ,(mk-class '(mt-2 flex flex-wrap items-center
-                                                 justify-center gap-1))))
-                     ,(if (eqv? 0 (length comments)) '()
-                        `((div (@ (class ,(mk-class '(min-w-0))))
-                               ,(em (format #f "~a ~a"
-                                            (length comments)
-                                            (G_ "comments"))
-                                    #:size '(text-sm)
-                                    #:color '(text-onyx-300 dark:text-stone-300))))))
 
                 ,extra-bot-info)))))
 
