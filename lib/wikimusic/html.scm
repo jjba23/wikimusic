@@ -528,19 +528,21 @@ classes it carries, so the element name is about what the bar *is*."
                                                sm:gap-2
                                                min-w-0
                                                no-underline))))
-                   ,(h1 (list `(img (@ (src ,(asset-address
-                                                 "/img/wikimusic-logo.svg"))
-                                     (alt "")
-                                     (loading lazy)
-                                     (class ,(mk-class '(shrink-0 h-8 w-auto
-                                                                 sm:h-9)))))
-                              (G_ "WikiMusic"))
-                        #:weight '(font-medium italic)
-                        #:color '(text-onyx-300 dark:text-stone-300
-                                                hover:text-persia-pink-900
-                                                dark:hover:text-persia-pink-300)
-                        #:family '(font-sans)
-                        #:size '(text-lg sm:text-xl md:text-2xl))))
+                   (div (@ (class ,(mk-class '(flex flex-row align-center items-center gap-2))))
+                        (img (@ (src ,(asset-address
+                                       "/img/wikimusic-logo.png"))
+                                (alt "")
+                                (loading lazy)
+                                (class ,(mk-class '(shrink-0 h-7 w-auto
+                                                             sm:h-8)))) "")
+                        ,(h1 `(
+                               (span ,(G_ "WikiMusic")))
+                             #:weight '(font-medium italic)
+                             #:color '(text-onyx-300 dark:text-stone-300
+                                                     hover:text-persia-pink-900
+                                                     dark:hover:text-persia-pink-300)
+                             #:family '(font-sans)
+                             #:size '(text-lg sm:text-xl md:text-2xl)))))
 
            ;; Navigation / account / theme
            (div (@ (class ,(mk-class '(flex flex-wrap
