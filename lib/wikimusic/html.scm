@@ -528,12 +528,12 @@ classes it carries, so the element name is about what the bar *is*."
                                                sm:gap-2
                                                min-w-0
                                                no-underline))))
-                   ,(h1 (list (img (@ (src ,(asset-address
-                                                "/img/wikimusic-logo.svg"))
-                                    (alt "")
-                                    (loading lazy)
-                                    (class ,(mk-class '(shrink-0 h-8 w-auto
-                                                                sm:h-9)))))
+                   ,(h1 (list `(img (@ (src ,(asset-address
+                                                 "/img/wikimusic-logo.svg"))
+                                     (alt "")
+                                     (loading lazy)
+                                     (class ,(mk-class '(shrink-0 h-8 w-auto
+                                                                 sm:h-9)))))
                               (G_ "WikiMusic"))
                         #:weight '(font-medium italic)
                         #:color '(text-onyx-300 dark:text-stone-300

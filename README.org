@@ -298,7 +298,7 @@ The same module is where an instance says what it says about itself.  Every one 
 ;; The picture a pasted link is previewed with, and the one near the front
 ;; page's closing: an address of its own, or a path on this instance, which is
 ;; what the project's own picture is.
-(define-public social-image-url "/img/wikimusic.jpg")
+(define-public social-image-url "/img/wikimusic-logo.png")
 
 ;; Where the interface's own stylesheets, type and glyphs are read from.  Empty
 ;; -- which is what an instance serving them itself says -- reads them off this
