@@ -87,12 +87,6 @@
 (define phosphor-font
   "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/Phosphor.woff2")
 
-;; The picture the project shows of itself.  It is wikimusic's own host's file,
-;; which is exactly why a copy belongs here: the site worked only as long as one
-;; machine stayed up and kept serving it.
-(define project-picture
-  "https://jointhefreeworld.org/static-assets/wikimusic/img/wikimusic.jpg")
-
 ;; The licences of the files above, kept beside them.  They are somebody else's
 ;; work and they say so: the three families travel under the SIL Open Font
 ;; Licence, which asks that a copy of it go with them, and the icon set under
@@ -275,11 +269,6 @@ left of the face names one file, so the list it ends is ended by a semicolon."
                       (path-under-root "pub/vendor/fonts"
                                        (cdr face)))) juliamono-fonts))
 
-(define (fetch-project-picture!)
-  "Bring the picture the project shows of itself into `pub/img'."
-  (fetch! project-picture
-          (path-under-root "pub/img/wikimusic.jpg")))
-
 (define (fetch-licences!)
   "Bring the licences of the files above in beside them."
   (for-each (lambda (licence)
@@ -300,8 +289,6 @@ left of the face names one file, so the list it ends is ended by a semicolon."
   (fetch-google-fonts!)
   (format #t "the icon set:~%")
   (fetch-phosphor-icons!)
-  (format #t "the project's picture:~%")
-  (fetch-project-picture!)
   (format #t "the licences the files above travel under:~%")
   (fetch-licences!)
   (format #t "done~%"))

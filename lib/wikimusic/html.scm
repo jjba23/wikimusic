@@ -528,13 +528,12 @@ classes it carries, so the element name is about what the bar *is*."
                                                sm:gap-2
                                                min-w-0
                                                no-underline))))
-                   ,(h1 (list (icon #:type 'music-note
-                                    #:icon-css '(shrink-0 text-lg
-                                                          sm:text-xl
-                                                          text-onyx-300
-                                                          dark:text-stone-300
-                                                          hover:text-persia-pink-900
-                                                          dark:hover:text-persia-pink-300))
+                   ,(h1 (list (img (@ (src ,(asset-address
+                                                "/img/wikimusic-logo.svg"))
+                                    (alt "")
+                                    (loading lazy)
+                                    (class ,(mk-class '(shrink-0 h-8 w-auto
+                                                                sm:h-9)))))
                               (G_ "WikiMusic"))
                         #:weight '(font-medium italic)
                         #:color '(text-onyx-300 dark:text-stone-300
@@ -877,6 +876,11 @@ and six.
                               (link (@ (rel "icon")
                                        (href ,(asset-address page-icon))
                                        (type "image/x-icon")) "")
+
+                              (link (@ (rel "icon")
+                                       (type "image/svg+xml")
+                                       (href ,(asset-address
+                                               "/img/wikimusic-logo.svg"))) "")
 
                               ,@(map (lambda (path)
                                        `(link (@ (rel stylesheet)

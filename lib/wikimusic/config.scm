@@ -205,7 +205,7 @@ money pays for.  Shown unless it says otherwise."
 
 An absolute address, or a path on this instance, which a page turns into one."
   (config-value 'social-image-url
-                #:default "/img/wikimusic.jpg"))
+                #:default "/img/wikimusic-logo.png"))
 
 ;;; ====== Where the interface's own assets are read from ======
 
