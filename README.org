@@ -10,6 +10,9 @@
 [[https://jointhefreeworld.org/ggg/dist/license-mit.svg]]
 [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
 
+#+attr_html: :width 160 :alt WikiMusic logo
+[[file:logo.svg]]
+
 *the free music knowledge encyclopaedia*: a community-run catalogue of songs,
 artists and genres with guitar and bass tabs, chords, lyrics, keys, tunings and
 sheet music, written by musicians for anyone learning to play.
@@ -452,7 +455,6 @@ Here follows an example of a Guix (Shepherd service):
                                    shepherd-root-service-type
                                    wolk-jjba-wikimusic-service)))
                 (default-value '())))
-
 
 #+end_src
 
