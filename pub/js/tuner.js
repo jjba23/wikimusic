@@ -26,9 +26,11 @@
 ///   <id>-cents            how far it is from that note, in cents
 ///   <id>-needle           the marker on the meter (-50 .. +50 cents)
 ///   <id>-status-idle      before a note is heard
+///   <id>-status-asking    the browser has been asked for the microphone
 ///   <id>-status-listening a note is being waited for
 ///   <id>-status-in-tune   close enough to be in tune
 ///   <id>-status-denied    the microphone was refused, or there is none
+///   <id>-status-blocked   the browser is blocking the microphone for this site
 ///   <id>-status-unsupported  a browser that cannot read a microphone
 ///   <id>-toggle           the control that starts and stops it
 ///   <id>-start            that control's label while it is stopped
@@ -67,9 +69,11 @@ const wikimusicTuner = (() => {
   const showStatus = (id, suffix) => {
     [
       "-status-idle",
+      "-status-asking",
       "-status-listening",
       "-status-in-tune",
       "-status-denied",
+      "-status-blocked",
       "-status-unsupported",
     ].forEach((name) => {
       const span = part(id, name);
@@ -333,6 +337,13 @@ const wikimusicTuner = (() => {
       return;
     }
 
+    // The page says the browser has been asked before it is: a prompt can open
+    // behind the toolbar, or be answered by a remembered setting with no prompt
+    // at all, and a control that looks like it did nothing is a control a reader
+    // presses again and again instead of looking at the address bar.
+    showStatus(id, "-status-asking");
+    showLabels(id, true);
+
     let stream;
     try {
       // A tuner wants the string, not the room: the processing a browser does
@@ -346,7 +357,13 @@ const wikimusicTuner = (() => {
         video: false,
       });
     } catch (error) {
-      showStatus(id, "-status-denied");
+      // A refusal the reader can act on is told apart from a microphone that is
+      // not there: `NotAllowedError' is this site being blocked (or a prompt
+      // being dismissed) and it is fixed in the address bar, while a missing
+      // device is not something a reader can fix here at all.
+      const refused = error && (error.name === "NotAllowedError" ||
+        error.name === "SecurityError");
+      showStatus(id, refused ? "-status-blocked" : "-status-denied");
       showLabels(id, false);
       return;
     }
@@ -461,6 +478,23 @@ const wikimusicTuner = (() => {
         widget.hidden = false;
         showStatus(widget.id, "-status-idle");
         showLabels(widget.id, false);
+        // A permission that was refused once is remembered, and a remembered
+        // refusal opens no prompt: the page says so before the reader presses
+        // anything, so "nothing happens" is never the whole answer.
+        if (navigator.permissions && navigator.permissions.query) {
+          navigator.permissions
+            .query({ name: "microphone" })
+            .then((state) => {
+              const tell = () => {
+                if (state.state === "denied" && !running.has(widget.id)) {
+                  showStatus(widget.id, "-status-blocked");
+                }
+              };
+              tell();
+              state.onchange = tell;
+            })
+            .catch(() => {});
+        }
       },
     );
   };

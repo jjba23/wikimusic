@@ -46,52 +46,99 @@
 ;; player's -- the string, the note it should be, how far off it is -- because
 ;; that is the page a reader is looking for.
 (define tuner-description
-  "Tune a guitar, bass or ukulele in the browser: play a string into the microphone and WikiMusic names the note and how far off it is, with the standard, drop D and half-step-down tunings and a reference tone for every string.")
+  "Tune a guitar, bass, ukulele, mandolin, banjo, violin, viola, cello or double bass in the browser: play a string into the microphone and WikiMusic names the note and how far off it is, with every tuning a player reaches for and a reference tone for every string.")
 
 (define (preset-name G_ preset)
-  "Return the words PRESET is offered under."
-  (cond
-    [(eq? preset 'guitar-drop-d) (G_ "guitar, drop d")]
-    [(eq? preset 'guitar-half-step) (G_ "guitar, half a step down")]
-    [(eq? preset 'bass-4) (G_ "bass, four strings")]
-    [(eq? preset 'bass-5) (G_ "bass, five strings")]
-    [(eq? preset 'ukulele) (G_ "ukulele")]
+  "Return the words PRESET is offered under.
+
+The words are written out one by one rather than built from the preset's name:
+`G_' translates a literal, and a tuning a reader chooses is worth naming in
+their own language rather than spelling as an address."
+  (case preset
+    [(guitar-drop-d) (G_ "guitar, drop d")]
+    [(guitar-half-step) (G_ "guitar, half a step down")]
+    [(guitar-full-step-down) (G_ "guitar, a full step down")]
+    [(guitar-open-d) (G_ "guitar, open d")]
+    [(guitar-open-g) (G_ "guitar, open g")]
+    [(guitar-open-e) (G_ "guitar, open e")]
+    [(guitar-dadgad) (G_ "guitar, dadgad")]
+    [(guitar-seven-string) (G_ "seven-string guitar")]
+    [(bass-4) (G_ "bass, four strings")]
+    [(bass-drop-d) (G_ "bass, drop d")]
+    [(bass-5) (G_ "bass, five strings")]
+    [(bass-6) (G_ "bass, six strings")]
+    [(ukulele) (G_ "ukulele")]
+    [(ukulele-baritone) (G_ "baritone ukulele")]
+    [(mandolin) (G_ "mandolin")]
+    [(banjo) (G_ "five-string banjo")]
+    [(banjo-tenor) (G_ "tenor banjo")]
+    [(violin) (G_ "violin")]
+    [(viola) (G_ "viola")]
+    [(cello) (G_ "cello")]
+    [(double-bass) (G_ "double bass")]
     [else (G_ "guitar, standard tuning")]))
+
+(define (family-name G_ family)
+  "Return the words the family FAMILY is offered under."
+  (case family
+    [(bass) (G_ "bass")]
+    [(ukulele) (G_ "ukulele")]
+    [(folk) (G_ "folk strings")]
+    [(orchestral) (G_ "orchestral strings")]
+    [else (G_ "guitar")]))
 
 ;; The presets as a row of addresses rather than as a menu the script has to
 ;; understand: choosing one is loading the page a reader wants, and a reader who
 ;; copies the address has copied the tuning.
 (define* (preset-picker G_ #:key current)
+  ;; The pills are grouped by the instrument they are an instrument of: a
+  ;; reader with a cello should not have to read twenty-two tunings to find
+  ;; the four that are theirs.
+  (define (pill preset)
+    (let ((named (car preset))
+          (here? (eq? (car preset) current)))
+      `(a (@ (href ,(format #f "?preset=~a" named))
+             ,@(if here? '((aria-current "page")) '())
+             (class
+              ,(mk-class
+                (append '(no-underline
+                          rounded-xl
+                          px-3
+                          py-1
+                          text-sm
+                          font-medium
+                          border-2
+                          transition-colors
+                          duration-150)
+                        (if here?
+                          '(bg-persia-pink-500/25
+                            border-persia-pink-500/25
+                            text-persia-pink-700
+                            dark:text-persia-pink-300)
+                          '(border-transparent
+                            text-onyx-500
+                            dark:text-stone-300
+                            hover:text-persia-pink-500
+                            dark:hover:text-persia-pink-300))))))
+           ,(preset-name G_ named))))
   `(nav (@ (aria-label ,(G_ "tuning presets"))
-           (class ,(mk-class '(flex flex-row flex-wrap gap-2 items-center))))
-        ,@(map (lambda (preset)
-                 (let ((named (car preset))
-                       (here? (eq? (car preset) current)))
-                   `(a (@ (href ,(format #f "?preset=~a" named))
-                          ,@(if here? '((aria-current "page")) '())
-                          (class
-                           ,(mk-class
-                             (append '(no-underline
-                                       rounded-xl
-                                       px-3
-                                       py-1
-                                       text-sm
-                                       font-medium
-                                       border-2
-                                       transition-colors
-                                       duration-150)
-                                     (if here?
-                                       '(bg-persia-pink-500/25
-                                         border-persia-pink-500/25
-                                         text-persia-pink-700
-                                         dark:text-persia-pink-300)
-                                       '(border-transparent
-                                         text-onyx-500
-                                         dark:text-stone-300
-                                         hover:text-persia-pink-500
-                                         dark:hover:text-persia-pink-300))))))
-                      ,(preset-name G_ named))))
-               tuning-presets)))
+           (class ,(mk-class '(flex flex-col gap-3))))
+        ,@(map (lambda (family)
+                 `(div (@ (class ,(mk-class '(flex flex-col gap-1))))
+                       (span (@ (class ,(mk-class '(text-xs
+                                                   uppercase
+                                                   tracking-wide
+                                                   font-semibold
+                                                   text-onyx-500
+                                                   dark:text-stone-300))))
+                             ,(family-name G_ family))
+                       (div (@ (class ,(mk-class '(flex
+                                                   flex-row
+                                                   flex-wrap
+                                                   gap-2
+                                                   items-center))))
+                            ,@(map pill (tuning-presets-in family)))))
+               tuning-families)))
 
 ;; One string of the preset: the note it should sound, the frequency that note
 ;; is, and the control that plays it.  The note and the frequency are the page's
@@ -207,6 +254,9 @@
              (span (@ (id ,(part "-status-idle"))
                       (hidden ""))
                    ,(G_ "waiting for a note"))
+             (span (@ (id ,(part "-status-asking"))
+                      (hidden ""))
+                   ,(G_ "ask your browser for the microphone, and allow it when it asks"))
              (span (@ (id ,(part "-status-listening"))
                       (hidden ""))
                    ,(G_ "listening …"))
@@ -216,6 +266,12 @@
              (span (@ (id ,(part "-status-denied"))
                       (hidden ""))
                    ,(G_ "permission was refused or there is no microphone"))
+             ;; A refusal the browser remembers opens no prompt at all, so this
+             ;; is the one sentence that turns "nothing happens" into something
+             ;; a reader can do about it.
+             (span (@ (id ,(part "-status-blocked"))
+                      (hidden ""))
+                   ,(G_ "this browser is blocking the microphone for this site: allow it in the address bar, then press listen"))
              (span (@ (id ,(part "-status-unsupported"))
                       (hidden ""))
                    ,(G_ "this browser cannot read a pitch from a microphone")))
