@@ -14,8 +14,8 @@
 (define-artanis-controller about)
 
 (import (app views about)
-        (kracht prelude)
-        (wikimusic html))
+  (kracht prelude)
+  (wikimusic html))
 
 (get "/about"
      #:mime 'xml
@@ -25,4 +25,4 @@
        (response-emit (:mime rc
                              (about-page (:i18n rc)
                                          #:is-logged-in (:cookies-value rc
-                                                         "x-bewaking-wikimusic"))))))
+                                                                        "x-bewaking-wikimusic"))))))

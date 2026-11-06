@@ -1,7 +1,7 @@
-;; wikimusic - the free music knowledge encyclopaedia
-;;
-;; SPDX-License-Identifier: MIT
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; wikimusic - the free music knowledge encyclopaedia
+;;;
+;;; SPDX-License-Identifier: MIT
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 (define-module (maak)
   #:use-module (maak maak)
@@ -12,34 +12,34 @@
   #:use-module ((maak i18n) #:prefix i18n:)
   #:declarative? #t)
 
-;; ====== Maak constants ======
+;;; ====== Maak constants ======
 
-;; The TCP port on which the web server will listen.
+;;; The TCP port on which the web server will listen.
 (define http-port
   50050)
 
 (define deploy-dir
   "/srv/http/jointhefreeworld.org")
 
-;; The file where the Wikimusic DB is located.
+;;; The file where the Wikimusic DB is located.
 (define wikimusic-db
   "wikimusic.db")
 
-;; The SQL migrations.  Mutastructura reads this directory itself and applies
-;; the files in it oldest first, as the file names sort, so this is the directory
-;; rather than a shell glob.
+;;; The SQL migrations.  Mutastructura reads this directory itself and applies
+;;; the files in it oldest first, as the file names sort, so this is the directory
+;;; rather than a shell glob.
 (define migrations-dir
   "resources/migrations/sqlite")
 
-;; The main copyright holders of the project.
+;;; The main copyright holders of the project.
 (define copyright-holders
   '("Josep Bigorra"))
 
-;; The path to the directory where the i18n resources are located.
+;;; The path to the directory where the i18n resources are located.
 (define i18n-dir
   "./sys/i18n/locale")
 
-;; The text domain for the i18n translations.
+;;; The text domain for the i18n translations.
 (define i18n-textdomain
   "translate")
 
@@ -49,16 +49,16 @@
 (define hot-reload-file-types
   '(scm css js))
 
-;; The Emacs Lisp script to run for publishing the manual.
-;;
-;; The manual is the README: one document, read on the forge and published as
-;; HTML, rather than two that say the same thing and drift apart.  The export
-;; lands beside it, as `README.html', and the deploy task below is what moves it
-;; in front of the instance that serves it.
-;; The manual's figures and example blocks carry a `#+name:', and this makes the
-;; exporter use those names as the HTML ids instead of inventing a fresh
-;; `orgXXXXXX' one on every build -- an id that changes on every build is an
-;; anchor no reader can keep.
+;;; The Emacs Lisp script to run for publishing the manual.
+;;;
+;;; The manual is the README: one document, read on the forge and published as
+;;; HTML, rather than two that say the same thing and drift apart.  The export
+;;; lands beside it, as `README.html', and the deploy task below is what moves it
+;;; in front of the instance that serves it.
+;;; The manual's figures and example blocks carry a `#+name:', and this makes the
+;;; exporter use those names as the HTML ids instead of inventing a fresh
+;;; `orgXXXXXX' one on every build -- an id that changes on every build is an
+;;; anchor no reader can keep.
 (define emacs-lisp-manual-publish-cmd
   '(progn (require 'ox-html)
           (setq org-html-prefer-user-labels t)
@@ -66,7 +66,7 @@
           (org-html-export-to-html)
           (message "finished publishing Wikimusic manual")))
 
-;; ====== Maak i18n abstractions ======
+;;; ====== Maak i18n abstractions ======
 
 (define (i18n-compile* lang)
   "Compile the translation file (.po) into a machine-readable (.mo) format
@@ -135,7 +135,7 @@ Args: update? represents whether we should update a template or create a new one
              (list "--from-code" "UTF-8"))
      #:verbose? #t))
 
-;; ====== Maak tasks ======
+;;; ====== Maak tasks ======
 
 (define (repl)
   "Development REPL."
@@ -147,10 +147,10 @@ Args: update? represents whether we should update a template or create a new one
   "Default task to be run, list available tasks."
   (list-tasks))
 
-;; The key file has to be loaded before the runner forks a worker for each
-;; spec: the modules under test import (wikimusic env), and a worker inherits
-;; what the parent had loaded.  The server does the same thing from ENTRY, so
-;; this is the test run reading the project's keys the way the server does.
+;;; The key file has to be loaded before the runner forks a worker for each
+;;; spec: the modules under test import (wikimusic env), and a worker inherits
+;;; what the parent had loaded.  The server does the same thing from ENTRY, so
+;;; this is the test run reading the project's keys the way the server does.
 (define (test)
   "Run the project's test suite, one spec at a time, from test/veritas."
   (time-machine-manifest-shell
@@ -165,10 +165,10 @@ Args: update? represents whether we should update a template or create a new one
                                      (~ "'~s'" emacs-lisp-manual-publish-cmd))
                                #:verbose? #t))
 
-;; The API tree under `lib/wikimusic-api' is generated from
-;; `openapi/wikimusic.yaml'.  The specification is the source and the Scheme is
-;; the build product, checked in so a checkout runs without the generator; the
-;; `api' task rewrites it, and `api-check' refuses a tree that has drifted.
+;;; The API tree under `lib/wikimusic-api' is generated from
+;;; `openapi/wikimusic.yaml'.  The specification is the source and the Scheme is
+;;; the build product, checked in so a checkout runs without the generator; the
+;;; `api' task rewrites it, and `api-check' refuses a tree that has drifted.
 (define (api)
   "Generate the REST API code from openapi/wikimusic.yaml."
   (time-machine-manifest-shell
@@ -183,7 +183,8 @@ Args: update? represents whether we should update a template or create a new one
    (list "guile" "-L" "./lib" "-L" "."
          "-c"
          "'((@ (openapi-generator cli) main!) (list \"generate\" \"--config\" \"openapi/openapi-generator.yaml\" \"--check\"))'")
-   #:verbose? #t))
+   #:verbose? #t)
+  (fmt))
 
 (define (deploy)
   "Deploy the project's documentation.
@@ -280,7 +281,7 @@ why a deployment that has data runs `maak migrate' instead."
                                      "'PRAGMA journal_mode=WAL;'"))
   (migrate))
 
-;; ====== Maak i18n tasks ======
+;;; ====== Maak i18n tasks ======
 
 (define (i18n-compile)
   "Compile the translation files for all locales."
@@ -319,26 +320,26 @@ why a deployment that has data runs `maak migrate' instead."
    "https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/wikimusic.olive.min.css"
    #:output "./pub/css/wikimusic.olive.min.css"))
 
-;; The type and the glyphs are fetched rather than written: the three families
-;; the interface is set in and the Phosphor set are somebody else's work, and
-;; the files a page reads are copies of it kept in `pub/' and served by this
-;; instance itself (see `resources/assets/fetch.scm').  Running this is only
-;; needed to refresh those copies -- they are checked in, because they are what
-;; an instance serves -- and it fetches every one of them, from the addresses
-;; the stylesheets themselves name.
+;;; The type and the glyphs are fetched rather than written: the three families
+;;; the interface is set in and the Phosphor set are somebody else's work, and
+;;; the files a page reads are copies of it kept in `pub/' and served by this
+;;; instance itself (see `resources/assets/fetch.scm').  Running this is only
+;;; needed to refresh those copies -- they are checked in, because they are what
+;;; an instance serves -- and it fetches every one of them, from the addresses
+;;; the stylesheets themselves name.
 (define (vendor-assets)
   "Fetch the assets the interface is painted with into `pub/'."
   (time-machine-manifest-shell (list "guile" "-L" "./lib" "-L" "."
                                      "resources/assets/fetch.scm")))
 
-;; ====== The vendored Guitar Pro renderer ======
+;;; ====== The vendored Guitar Pro renderer ======
 
-;; The release of alphaTab whose files are kept under `pub/vendor/alphatab'.
-;; The files are fetched rather than installed, the way the stylesheet above
-;; is, so that the site carries them itself and reaches no CDN at run time.
-;; Pinning the release is what keeps the vendored files and the code that
-;; drives them in step: alphaTab loads the worker it renders with and the
-;; music font it draws with from paths its own release decides.
+;;; The release of alphaTab whose files are kept under `pub/vendor/alphatab'.
+;;; The files are fetched rather than installed, the way the stylesheet above
+;;; is, so that the site carries them itself and reaches no CDN at run time.
+;;; Pinning the release is what keeps the vendored files and the code that
+;;; drives them in step: alphaTab loads the worker it renders with and the
+;;; music font it draws with from paths its own release decides.
 (define alphatab-version
   "1.8.4")
 
@@ -394,16 +395,16 @@ than being a blob of unknown age."
              "wolk-jjba:/etc/byggsteg/job-clone/wikimusic/trunk/env.scm"
              ".")))
 
-;; ====== Agent skills ======
+;;; ====== Agent skills ======
 
-;; AGENTS.md is generated, never edited by hand.  The section has two halves:
-;; the data below, which is this project's, and the task itself, which is not.
-;; Another repository copies the whole section and replaces the data - the
-;; header, the pinned skills (repository, commit, path, licence) and the
-;; practices - and `maak agents' writes its own AGENTS.md.  Regeneration is
-;; deterministic: the same pins and the same text produce the same file, byte
-;; for byte, and it needs nothing but curl.  The skill URLs assume GitHub, so a
-;; skill hosted elsewhere needs a URL of its own.
+;;; AGENTS.md is generated, never edited by hand.  The section has two halves:
+;;; the data below, which is this project's, and the task itself, which is not.
+;;; Another repository copies the whole section and replaces the data - the
+;;; header, the pinned skills (repository, commit, path, licence) and the
+;;; practices - and `maak agents' writes its own AGENTS.md.  Regeneration is
+;;; deterministic: the same pins and the same text produce the same file, byte
+;;; for byte, and it needs nothing but curl.  The skill URLs assume GitHub, so a
+;;; skill hosted elsewhere needs a URL of its own.
 
 (define ponytail-commit
   "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846")
@@ -411,9 +412,9 @@ than being a blob of unknown age."
 (define tdd-commit
   "22f0b463e7a5e579904dd6211a520321035526f7")
 
-;; Name, repository, commit, the path the repository keeps the skill at and the
-;; licence.  A skill arrives whole: trimming it means scanning for headings, and
-;; such a scan cannot tell a heading from a `##' line inside a code fence.
+;;; Name, repository, commit, the path the repository keeps the skill at and the
+;;; licence.  A skill arrives whole: trimming it means scanning for headings, and
+;;; such a scan cannot tell a heading from a `##' line inside a code fence.
 (define agent-skills
   (list (list "ponytail"
               "DietrichGebert/ponytail"
@@ -438,9 +439,9 @@ input, so regenerating gives the same document.  The repository's own rules win
 over general advice, and the narrowest rule here wins over the broadest.
 ")
 
-;; Practices this project keeps.  They are short on purpose: a rule a reader
-;; checks in a second is a rule that gets followed.  The pinned skills are the
-;; long form of the same habits.
+;;; Practices this project keeps.  They are short on purpose: a rule a reader
+;;; checks in a second is a rule that gets followed.  The pinned skills are the
+;;; long form of the same habits.
 (define agent-practices
   (list
    "## Documentation
