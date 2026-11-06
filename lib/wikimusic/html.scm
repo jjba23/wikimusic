@@ -336,7 +336,8 @@ the same string however it is nested."
                          "pub/js/metronome.js"
                          "pub/js/password-strength.js"
                          "pub/js/guitarpro-player.js"
-                         "pub/js/chord-player.js" "pub/js/tuner.js")))
+                         "pub/js/chord-player.js" "pub/js/tuner.js"
+                         "pub/js/carousel.js")))
 
 ;;; What a link on this instance is painted with, handed to hygguile's `a' as
 ;;; `#:color' and `#:hover'.
@@ -959,7 +960,13 @@ and six.
                                                   "pub/js/chord-player.js"))
 
                               (script ,(assoc-ref asset-library
-                                                  "pub/js/tuner.js")))
+                                                  "pub/js/tuner.js"))
+
+                              ;; The dots and the count under a carousel: the track
+                              ;; scrolls without it, so this only says where in the set
+                              ;; a reader is.
+                              (script ,(assoc-ref asset-library
+                                                  "pub/js/carousel.js")))
 
                         (body (@ (class ,(mk-class '(bg-stone-100
                                                      dark:bg-onyx-900

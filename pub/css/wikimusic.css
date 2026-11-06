@@ -160,6 +160,60 @@ a:focus-visible .wm-wordmark-accent {
   outline-offset: -4px;
 }
 
+/* ===== A carousel's own controls =====
+
+   The track scrolls with snap points and needs none of this; what is here is
+   the part a scrolled list cannot say -- where in the set a reader is.  The
+   dot of the slide being looked at is drawn long, so the set has a shape and
+   not only a number. */
+
+.wm-carousel-dots {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-block: 0.35rem;
+}
+
+.wm-carousel-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.25;
+  cursor: pointer;
+  transition: opacity 200ms ease-in-out, width 200ms ease-in-out;
+}
+
+.wm-carousel-dot[aria-current="true"] {
+  width: 1.5rem;
+  opacity: 0.85;
+}
+
+.wm-carousel-dot:focus-visible {
+  outline: 2px solid var(--wm-brand);
+  outline-offset: 2px;
+}
+
+.wm-carousel-count {
+  margin: 0;
+  text-align: center;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.65;
+}
+
+.carousel-list {
+  scrollbar-width: thin;
+}
+
+.carousel-list-item {
+  scroll-snap-align: center;
+}
+
 /* ===== The scheme the browser's own controls are drawn in =====
 
    A page styles what it draws and the browser styles the rest: the scrollbar
