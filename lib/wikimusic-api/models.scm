@@ -146,7 +146,6 @@
             genre-summary-identifier
             genre-summary-display-name
             genre-summary-description
-            genre-summary-parent
             genre-summary-views
             genre-summary-created-at
             <genre>
@@ -160,7 +159,6 @@
             genre-identifier
             genre-display-name
             genre-description
-            genre-parent
             genre-views
             genre-artworks
             genre-created-at
@@ -317,24 +315,20 @@
   (created-at artist-created-at))
 
 (define-record-type <genre-summary>
-  (%make-genre-summary identifier display-name description parent views
-                       created-at)
+  (%make-genre-summary identifier display-name description views created-at)
   genre-summary?
   (identifier genre-summary-identifier)
   (display-name genre-summary-display-name)
   (description genre-summary-description)
-  (parent genre-summary-parent)
   (views genre-summary-views)
   (created-at genre-summary-created-at))
 
 (define-record-type <genre>
-  (%make-genre identifier display-name description parent views artworks
-               created-at)
+  (%make-genre identifier display-name description views artworks created-at)
   genre?
   (identifier genre-identifier)
   (display-name genre-display-name)
   (description genre-description)
-  (parent genre-parent)
   (views genre-views)
   (artworks genre-artworks)
   (created-at genre-created-at))
@@ -1398,21 +1392,20 @@ like any other Artist, so a patch that would leave the record invalid raises."
                              (identifier #f)
                              (display-name #f)
                              (description #f)
-                             (parent #f)
                              (views #f)
                              (created-at #f))
   "Create a GenreSummary.
 
 A genre as a list shows it.
 
-Fields: identifier (string, required), displayName (string, required), description (string), parent (GenreRef), views (integer, required), createdAt (string).
+Fields: identifier (string, required), displayName (string, required), description (string), views (integer, required), createdAt (string).
 
 @example
-(make-genre-summary #:identifier <string> #:display-name <string> #:description <string> #:parent <GenreRef> #:views <integer> #:created-at <string>)
+(make-genre-summary #:identifier <string> #:display-name <string> #:description <string> #:views <integer> #:created-at <string>)
 @end example"
   (let ((value
-          (%make-genre-summary identifier display-name description parent
-                               views created-at)))
+          (%make-genre-summary identifier display-name description views
+                               created-at)))
     (validate-genre-summary value)
     value))
 
@@ -1434,9 +1427,6 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
   (when (genre-summary-description value)
     (check-type '("genre-summary" "description")
                 (genre-summary-description value) 'string))
-  (when (genre-summary-parent value)
-    (check-predicate '("genre-summary" "parent") (genre-summary-parent value)
-                     genre-ref? "GenreRef"))
   (check-required '("genre-summary" "views") (genre-summary-views value))
   (check-type '("genre-summary" "views") (genre-summary-views value) 'integer)
   (check-minimum '("genre-summary" "views") (genre-summary-views value) 0)
@@ -1457,11 +1447,6 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
           (if (eq? (genre-summary-description value) #f)
               '()
               (list (cons "description" (genre-summary-description value))))
-          (if (eq? (genre-summary-parent value) #f)
-              '()
-              (list
-                    (cons "parent"
-                          (genre-ref->jso (genre-summary-parent value)))))
           (list (cons "views" (genre-summary-views value)))
           (if (eq? (genre-summary-created-at value) #f)
               '()
@@ -1487,7 +1472,6 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
                             (if (json-null? value)
                                 #f
                                 value))
-                          #:parent (jso->genre-ref (jso-ref node "parent"))
                           #:views
                           (let ((value (jso-ref node "views")))
                             (if (json-null? value)
@@ -1509,7 +1493,6 @@ like any other GenreSummary, so a patch that would leave the record invalid rais
                      (identifier #f)
                      (display-name #f)
                      (description #f)
-                     (parent #f)
                      (views #f)
                      (artworks #f)
                      (created-at #f))
@@ -1517,14 +1500,14 @@ like any other GenreSummary, so a patch that would leave the record invalid rais
 
 One genre, with everything the API says about it.
 
-Fields: identifier (string, required), displayName (string, required), description (string), parent (GenreRef), views (integer, required), artworks (list of Artwork, required), createdAt (string).
+Fields: identifier (string, required), displayName (string, required), description (string), views (integer, required), artworks (list of Artwork, required), createdAt (string).
 
 @example
-(make-genre #:identifier <string> #:display-name <string> #:description <string> #:parent <GenreRef> #:views <integer> #:artworks <list of Artwork> #:created-at <string>)
+(make-genre #:identifier <string> #:display-name <string> #:description <string> #:views <integer> #:artworks <list of Artwork> #:created-at <string>)
 @end example"
   (let ((value
-          (%make-genre identifier display-name description parent views
-                       artworks created-at)))
+          (%make-genre identifier display-name description views artworks
+                       created-at)))
     (validate-genre value)
     value))
 
@@ -1540,9 +1523,6 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
   (check-type '("genre" "displayName") (genre-display-name value) 'string)
   (when (genre-description value)
     (check-type '("genre" "description") (genre-description value) 'string))
-  (when (genre-parent value)
-    (check-predicate '("genre" "parent") (genre-parent value) genre-ref?
-                     "GenreRef"))
   (check-required '("genre" "views") (genre-views value))
   (check-type '("genre" "views") (genre-views value) 'integer)
   (check-minimum '("genre" "views") (genre-views value) 0)
@@ -1565,9 +1545,6 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
           (if (eq? (genre-description value) #f)
               '()
               (list (cons "description" (genre-description value))))
-          (if (eq? (genre-parent value) #f)
-              '()
-              (list (cons "parent" (genre-ref->jso (genre-parent value)))))
           (list (cons "views" (genre-views value)))
           (list
                 (cons "artworks"
@@ -1600,7 +1577,6 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
                     (if (json-null? value)
                         #f
                         value))
-                  #:parent (jso->genre-ref (jso-ref node "parent"))
                   #:views
                   (let ((value (jso-ref node "views")))
                     (if (json-null? value)

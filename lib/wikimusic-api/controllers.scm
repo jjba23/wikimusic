@@ -214,12 +214,11 @@ result to run-server:
   "GET /api/v1/songs
 
 Songs of this instance, with the artists and genres each one credits.
-A search matches the name and the description.
+A search matches the name and the description.  The songs credited to
+one artist, or that belong to one genre, are the subresources below.
 
 Parameters:
   - search (string, query)
-  - artist (string, query)
-  - genre (string, query)
   - limit (integer, query)
   - offset (integer, query)
 
@@ -228,8 +227,6 @@ installed in api-handlers for this operation."
   (invoke-handler 'list-songs request
     (list
       (cons 'search (let ((raw (http-request-query-ref request "search"))) (if raw raw #f)))
-      (cons 'artist (let ((raw (http-request-query-ref request "artist"))) (if raw raw #f)))
-      (cons 'genre (let ((raw (http-request-query-ref request "genre"))) (if raw raw #f)))
       (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
       (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
@@ -318,12 +315,10 @@ installed in api-handlers for this operation."
 (define (list-genres request path-arguments)
   "GET /api/v1/genres
 
-Genres of this instance.  A genre may name a parent genre, which is how
-the encyclopaedia records that a style belongs to a tradition.
+Genres of this instance.
 
 Parameters:
   - search (string, query)
-  - parent (string, query)
   - limit (integer, query)
   - offset (integer, query)
 
@@ -332,7 +327,6 @@ installed in api-handlers for this operation."
   (invoke-handler 'list-genres request
     (list
       (cons 'search (let ((raw (http-request-query-ref request "search"))) (if raw raw #f)))
-      (cons 'parent (let ((raw (http-request-query-ref request "parent"))) (if raw raw #f)))
       (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
       (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 

@@ -276,9 +276,10 @@ A client is ~(wikimusic-api client)~:
           (song-list-total songs)))
 #+end_src
 
-Only the HTML routes are mounted on the Artanis server; the generated
-dispatcher is not registered there yet, so an instance does not answer
-=/api/v1= today.
+The routes are mounted by ~app/controllers/api.scm=, and
+~lib/wikimusic/api.scm= answers each operation from the same SQLite
+repositories the pages read, so a running instance serves =/api/v1= beside its
+HTML pages.
 
 * Running WikiMusic
 :PROPERTIES:

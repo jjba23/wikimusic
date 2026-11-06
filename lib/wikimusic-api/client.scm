@@ -223,20 +223,17 @@ string value, which is written through unchanged."
                      client
                      #:key
                      (search #f)
-                     (artist #f)
-                     (genre #f)
                      (limit #f)
                      (offset #f)
                      (auth (api-client-auth client)))
   "GET /api/v1/songs
 
 Songs of this instance, with the artists and genres each one credits.
-A search matches the name and the description.
+A search matches the name and the description.  The songs credited to
+one artist, or that belong to one genre, are the subresources below.
 
 Parameters:
   - search (string, query)
-  - artist (string, query)
-  - genre (string, query)
   - limit (integer, query)
   - offset (integer, query)
 
@@ -250,8 +247,6 @@ Credentials come from AUTH, which defaults to the client's."
               (client-send client 'GET path
                            #:query
                            (append (list (cons "search" search))
-                                   (list (cons "artist" artist))
-                                   (list (cons "genre" genre))
                                    (list (cons "limit" limit))
                                    (list (cons "offset" offset)) auth-query)
                            #:headers auth-headers
@@ -421,18 +416,15 @@ Credentials come from AUTH, which defaults to the client's."
                       client
                       #:key
                       (search #f)
-                      (parent #f)
                       (limit #f)
                       (offset #f)
                       (auth (api-client-auth client)))
   "GET /api/v1/genres
 
-Genres of this instance.  A genre may name a parent genre, which is how
-the encyclopaedia records that a style belongs to a tradition.
+Genres of this instance.
 
 Parameters:
   - search (string, query)
-  - parent (string, query)
   - limit (integer, query)
   - offset (integer, query)
 
@@ -446,7 +438,6 @@ Credentials come from AUTH, which defaults to the client's."
               (client-send client 'GET path
                            #:query
                            (append (list (cons "search" search))
-                                   (list (cons "parent" parent))
                                    (list (cons "limit" limit))
                                    (list (cons "offset" offset)) auth-query)
                            #:headers auth-headers

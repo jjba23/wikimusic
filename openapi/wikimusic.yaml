@@ -40,7 +40,8 @@ paths:
       summary: List songs
       description: |
         Songs of this instance, with the artists and genres each one credits.
-        A search matches the name and the description.
+        A search matches the name and the description.  The songs credited to
+        one artist, or that belong to one genre, are the subresources below.
       parameters:
         - name: search
           in: query
@@ -48,18 +49,6 @@ paths:
           schema:
             type: string
             minLength: 1
-        - name: artist
-          in: query
-          description: Only songs credited to this artist.
-          schema:
-            type: string
-            format: uuid
-        - name: genre
-          in: query
-          description: Only songs that belong to this genre.
-          schema:
-            type: string
-            format: uuid
         - name: limit
           in: query
           description: The page size.
@@ -268,9 +257,7 @@ paths:
       tags:
         - Genres
       summary: List genres
-      description: |
-        Genres of this instance.  A genre may name a parent genre, which is how
-        the encyclopaedia records that a style belongs to a tradition.
+      description: Genres of this instance.
       parameters:
         - name: search
           in: query
@@ -278,12 +265,6 @@ paths:
           schema:
             type: string
             minLength: 1
-        - name: parent
-          in: query
-          description: Only genres directly below this parent genre.
-          schema:
-            type: string
-            format: uuid
         - name: limit
           in: query
           description: The page size.
@@ -649,8 +630,6 @@ components:
           type: string
         description:
           type: string
-        parent:
-          $ref: '#/components/schemas/GenreRef'
         views:
           type: integer
           minimum: 0
@@ -672,8 +651,6 @@ components:
           type: string
         description:
           type: string
-        parent:
-          $ref: '#/components/schemas/GenreRef'
         views:
           type: integer
           minimum: 0

@@ -29,7 +29,11 @@
              (gnu packages texinfo)
              (gnu packages autotools)
              ((guix licenses)
-              #:prefix license:))
+              #:prefix license:)
+             ((jointhefreeworld packages guile)
+              #:prefix jtf:)
+             ((jointhefreeworld packages applications)
+              #:prefix jtf:))
 
 (define-public guile-hygguile
   (package
@@ -297,7 +301,7 @@ Features include executing migrations transactionally and computing SHA256
 checksums to track schema evolution in a @code{migrations_history} table.")
     (license license:agpl3+)))
 
-(packages->manifest (list (specification->package "make")
+(packages->manifest (list jtf:maak
                           (specification->package "gettext")
                           guile-3.0-latest
                           guile-uuid
@@ -321,5 +325,5 @@ checksums to track schema evolution in a @code{migrations_history} table.")
                           guile-dbd-sqlite3
                           mutastructura
                           watchexec
-                          sift
+                          jtf:sift
                           emacs-no-x))
