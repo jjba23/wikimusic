@@ -71,6 +71,14 @@ a:focus-visible .wm-wordmark-accent {
    the second rule the ink would stop at the anchor and the glyphs and labels
    inside would keep their own. */
 
+/* An anchor with no colour of its own is painted in the browser's link blue.
+   Every control in the bar names its colour on the span inside it, so the
+   anchor itself only ever showed that blue in the gaps -- a visited link, a
+   selection, a reader's own stylesheet.  The bar's ink is the page's ink. */
+.wm-nav a {
+  color: inherit;
+}
+
 .wm-nav a:hover,
 .wm-nav a:focus-visible {
   color: var(--wm-brand);
@@ -130,7 +138,7 @@ a:focus-visible .wm-wordmark-accent {
   --wm-tile-surface: color-mix(in oklch, var(--wm-ink) 84%, white);
   --wm-tile-line: color-mix(in oklch, white 11%, transparent);
   --wm-tile-ink: color-mix(in oklch, white 94%, var(--wm-ink));
-  --wm-tile-quiet: color-mix(in oklch, white 64%, var(--wm-ink));
+  --wm-tile-quiet: color-mix(in oklch, white 72%, var(--wm-ink));
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.4),
               0 14px 28px -20px rgb(0 0 0 / 0.75);
 }
@@ -252,6 +260,45 @@ a:focus-visible .wm-wordmark-accent {
   flex-direction: column;
   gap: 1.5rem;
   padding: 0.5rem 1.25rem;
+}
+
+/* ===== A bar a thumb can hit =====
+
+   Seven controls on a 360px phone, each of them a word and a glyph: at the
+   bar's desktop padding they were 24px tall and their labels 12px, which is
+   below the 44px a thumb is usually promised and below the 16px a phone is
+   asked not to zoom past.  The size goes up on the small screen and the
+   padding follows it; the bar wraps onto a second row rather than squeezing
+   the labels, because a wrapped bar is still a bar and a shrunk one is not
+   readable. */
+
+@media (max-width: 639px) {
+  .wm-nav a {
+    min-height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .wm-nav a > span {
+    font-size: 0.9375rem;
+  }
+
+  /* Seven controls at a readable size make two rows on a phone, and a bar that
+     is pinned to the top of a 640px-tall screen cannot spend 140px of it.  The
+     row stays one row and scrolls sideways instead: the next control is always
+     half visible, which is what tells a thumb there is more of it.  The scroll
+     bar itself is hidden because it would be a second bar under the first. */
+  .wm-nav > div:last-child {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .wm-nav > div:last-child::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* ===== The size of a tablature =====

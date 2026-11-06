@@ -1054,6 +1054,16 @@ We believe creating accessible websites for everyone, including people with disa
 
 Wikimusic chooses lots of its UI to appeal to the widest public possible by default, but is very configurable to allow extensibility.
 
+What that means here, concretely.  Every cover on a list carries its name as its
+`alt` text, so the link around it is announced as the song rather than as
+"link".  The two auto-scroll menus say what they choose, because a bare
+`<select>` beside a heading has no name of its own.  The bar's controls are
+thumb-sized on a phone and scroll sideways in one row there, so a bar pinned to
+the top of the screen does not spend a fifth of it.  And each theme is measured
+rather than assumed: the footer's ink and a tile's credit line are stated per
+theme, because carrying the light theme's dark ink onto a dark surface is how
+text disappears.
+
 -------
 
 * On GNU Artanis

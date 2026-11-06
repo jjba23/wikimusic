@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wikimusic\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 21:39+0100\n"
+"POT-Creation-Date: 2026-11-06 22:48+0100\n"
 "PO-Revision-Date: 2026-10-13 12:00+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -44,38 +44,42 @@ msgstr "Genre geliket!"
 msgid "Disliked genre!"
 msgstr "Genre gedisliket!"
 
-#: app/controllers/interchange.scm:145
+#: app/controllers/interchange.scm:145 app/controllers/interchange.scm:146
 #, fuzzy
 msgid "contents"
 msgstr "PDF-inhoud"
 
-#: app/controllers/interchange.scm:162 app/controllers/interchange.scm:183
-#: app/controllers/interchange.scm:192 app/views/error.scm:153
-#: app/views/index.scm:278
+#: app/controllers/interchange.scm:162 app/controllers/interchange.scm:168
+#: app/controllers/interchange.scm:183 app/controllers/interchange.scm:189
+#: app/controllers/interchange.scm:192 app/controllers/interchange.scm:198
+#: app/views/error.scm:153 app/views/index.scm:278
 msgid "artists"
 msgstr "artiesten"
 
-#: app/controllers/interchange.scm:163 app/controllers/interchange.scm:185
-#: app/controllers/interchange.scm:197 app/views/error.scm:158
-#: app/views/index.scm:281
+#: app/controllers/interchange.scm:163 app/controllers/interchange.scm:169
+#: app/controllers/interchange.scm:185 app/controllers/interchange.scm:191
+#: app/controllers/interchange.scm:197 app/controllers/interchange.scm:203
+#: app/views/error.scm:158 app/views/index.scm:281
 msgid "genres"
 msgstr "genres"
 
-#: app/controllers/interchange.scm:164 app/controllers/interchange.scm:187
-#: app/controllers/interchange.scm:202 app/views/error.scm:148
-#: app/views/index.scm:275
+#: app/controllers/interchange.scm:164 app/controllers/interchange.scm:170
+#: app/controllers/interchange.scm:187 app/controllers/interchange.scm:193
+#: app/controllers/interchange.scm:202 app/controllers/interchange.scm:208
+#: app/views/error.scm:148 app/views/index.scm:275
 msgid "songs"
 msgstr "liedjes"
 
-#: app/controllers/interchange.scm:177 lib/wikimusic/prose.scm:46
+#: app/controllers/interchange.scm:177 app/controllers/interchange.scm:183
+#: lib/wikimusic/prose.scm:46
 msgid "the free music knowledge encyclopaedia"
 msgstr "de vrije muziekkennis-encyclopedie"
 
-#: app/controllers/interchange.scm:179
+#: app/controllers/interchange.scm:179 app/controllers/interchange.scm:185
 msgid "exported at"
 msgstr ""
 
-#: app/controllers/interchange.scm:189
+#: app/controllers/interchange.scm:189 app/controllers/interchange.scm:195
 msgid "Download the JSON export"
 msgstr ""
 
@@ -179,7 +183,8 @@ msgstr ""
 msgid "your name"
 msgstr "gebruikersnaam"
 
-#: app/views/articles.scm:106 lib/wikimusic/html.scm:1177
+#: app/views/articles.scm:106 lib/wikimusic/html.scm:1152
+#: lib/wikimusic/html.scm:1177
 #, fuzzy
 msgid "your comment"
 msgstr "opmerkingen"
@@ -194,12 +199,14 @@ msgid "a reader"
 msgstr ""
 
 #: app/views/articles.scm:166 app/views/artist-view.scm:64
-#: app/views/genre-view.scm:64 app/views/song-view.scm:156
+#: app/views/genre-view.scm:64 app/views/song-view.scm:152
+#: app/views/song-view.scm:156
 msgid "previous"
 msgstr "vorige"
 
 #: app/views/articles.scm:167 app/views/artist-view.scm:65
-#: app/views/genre-view.scm:65 app/views/song-view.scm:157
+#: app/views/genre-view.scm:65 app/views/song-view.scm:153
+#: app/views/song-view.scm:157
 msgid "next"
 msgstr "volgende"
 
@@ -233,11 +240,13 @@ msgstr ""
 msgid "no comments yet"
 msgstr "opmerkingen"
 
-#: app/views/articles.scm:325 lib/wikimusic/html.scm:1559
+#: app/views/articles.scm:325 lib/wikimusic/html.scm:1538
+#: lib/wikimusic/html.scm:1559
 msgid "comments"
 msgstr "opmerkingen"
 
 #: app/views/articles.scm:341 app/views/song-content-view.scm:373
+#: app/views/song-content-view.scm:406
 msgid "title"
 msgstr ""
 
@@ -291,7 +300,8 @@ msgid "display name"
 msgstr "weergavenaam"
 
 #: app/views/artist-edit.scm:155 app/views/genre-edit.scm:151
-#: app/views/song-edit.scm:322 lib/wikimusic/html.scm:1424
+#: app/views/song-edit.scm:322 lib/wikimusic/html.scm:1403
+#: lib/wikimusic/html.scm:1424
 msgid "description"
 msgstr "beschrijving"
 
@@ -303,14 +313,16 @@ msgstr ""
 #: app/views/artist-edit.scm:164 app/views/genre-edit.scm:160
 #: app/views/me.scm:149 app/views/me.scm:320
 #: app/views/song-content-edit.scm:188 app/views/song-edit.scm:332
-#: lib/wikimusic/html.scm:1174 lib/wikimusic/html.scm:1508
-#: lib/wikimusic/html.scm:1614
+#: lib/wikimusic/html.scm:1149 lib/wikimusic/html.scm:1174
+#: lib/wikimusic/html.scm:1487 lib/wikimusic/html.scm:1508
+#: lib/wikimusic/html.scm:1593 lib/wikimusic/html.scm:1614
 msgid "edit"
 msgstr "bewerken"
 
 #: app/views/artist-edit.scm:165 app/views/genre-edit.scm:161
 #: app/views/me.scm:223 app/views/song-content-edit.scm:189
-#: app/views/song-edit.scm:333 lib/wikimusic/html.scm:1615
+#: app/views/song-edit.scm:333 lib/wikimusic/html.scm:1594
+#: lib/wikimusic/html.scm:1615
 msgid "create"
 msgstr "aanmaken"
 
@@ -374,6 +386,7 @@ msgid "password"
 msgstr "wachtwoord"
 
 #: app/views/login.scm:44 app/views/me.scm:101 lib/wikimusic/html.scm:602
+#: lib/wikimusic/html.scm:604
 msgid "login"
 msgstr "inloggen"
 
@@ -437,7 +450,8 @@ msgstr "id"
 msgid "permissions"
 msgstr "rechten"
 
-#: app/views/me.scm:135 lib/wikimusic/html.scm:1199 lib/wikimusic/html.scm:1624
+#: app/views/me.scm:135 lib/wikimusic/html.scm:1174 lib/wikimusic/html.scm:1199
+#: lib/wikimusic/html.scm:1603 lib/wikimusic/html.scm:1624
 msgid "delete"
 msgstr "verwijderen"
 
@@ -554,168 +568,171 @@ msgstr ""
 msgid "hear this chord"
 msgstr ""
 
-#: app/views/song-content-view.scm:216
+#: app/views/song-content-view.scm:216 app/views/song-content-view.scm:258
 msgid "1 line"
 msgstr "1 regel"
 
-#: app/views/song-content-view.scm:218
+#: app/views/song-content-view.scm:218 app/views/song-content-view.scm:259
 msgid "2 line"
 msgstr "2 regels"
 
-#: app/views/song-content-view.scm:220
+#: app/views/song-content-view.scm:220 app/views/song-content-view.scm:260
 msgid "4 line"
 msgstr "4 regels"
 
-#: app/views/song-content-view.scm:223
+#: app/views/song-content-view.scm:223 app/views/song-content-view.scm:261
 msgid "8 line"
 msgstr "8 regels"
 
-#: app/views/song-content-view.scm:225
+#: app/views/song-content-view.scm:225 app/views/song-content-view.scm:262
 msgid "16 line"
 msgstr "16 regels"
 
-#: app/views/song-content-view.scm:227
+#: app/views/song-content-view.scm:227 app/views/song-content-view.scm:263
 msgid "32 line"
 msgstr "32 regels"
 
-#: app/views/song-content-view.scm:232
+#: app/views/song-content-view.scm:232 app/views/song-content-view.scm:270
 msgid "1 second"
 msgstr "1 seconde"
 
-#: app/views/song-content-view.scm:234
+#: app/views/song-content-view.scm:234 app/views/song-content-view.scm:271
 msgid "2 second"
 msgstr "2 seconden"
 
-#: app/views/song-content-view.scm:236
+#: app/views/song-content-view.scm:236 app/views/song-content-view.scm:272
 msgid "4 second"
 msgstr "4 seconden"
 
-#: app/views/song-content-view.scm:238
+#: app/views/song-content-view.scm:238 app/views/song-content-view.scm:273
 msgid "8 second"
 msgstr "8 seconden"
 
-#: app/views/song-content-view.scm:240
+#: app/views/song-content-view.scm:240 app/views/song-content-view.scm:274
 msgid "16 second"
 msgstr "16 seconden"
 
-#: app/views/song-content-view.scm:242
+#: app/views/song-content-view.scm:242 app/views/song-content-view.scm:275
 msgid "32 second"
 msgstr "32 seconden"
 
-#: app/views/song-content-view.scm:247
+#: app/views/song-content-view.scm:247 app/views/song-content-view.scm:280
 msgid "auto-scrolling:"
 msgstr "automatisch scrollen:"
 
-#: app/views/song-content-view.scm:250
+#: app/views/song-content-view.scm:250 app/views/song-content-view.scm:283
 msgid "scroll"
 msgstr "scrollen"
 
-#: app/views/song-content-view.scm:255
+#: app/views/song-content-view.scm:255 app/views/song-content-view.scm:288
 msgid "highlight chords"
 msgstr "akkoorden markeren"
 
-#: app/views/song-content-view.scm:375
+#: app/views/song-content-view.scm:375 app/views/song-content-view.scm:408
 #, fuzzy
 msgid "artist"
 msgstr "artiesten"
 
-#: app/views/song-content-view.scm:377
+#: app/views/song-content-view.scm:377 app/views/song-content-view.scm:410
 #, fuzzy
 msgid "album"
 msgstr "albumnaam"
 
-#: app/views/song-content-view.scm:379
+#: app/views/song-content-view.scm:379 app/views/song-content-view.scm:412
 #, fuzzy
 msgid "tabbed by"
 msgstr "goedgekeurd door"
 
-#: app/views/song-content-view.scm:381 app/views/song-content-view.scm:547
-#: lib/wikimusic/html.scm:726
+#: app/views/song-content-view.scm:381 app/views/song-content-view.scm:414
+#: app/views/song-content-view.scm:547 app/views/song-content-view.scm:580
+#: lib/wikimusic/html.scm:726 lib/wikimusic/html.scm:728
 msgid "tempo"
 msgstr ""
 
-#: app/views/song-content-view.scm:386 app/views/song-edit.scm:301
+#: app/views/song-content-view.scm:386 app/views/song-content-view.scm:419
+#: app/views/song-edit.scm:301 app/views/song-view.scm:435
 #: app/views/song-view.scm:439
 msgid "music key"
 msgstr "muzieksleutel"
 
-#: app/views/song-content-view.scm:388
+#: app/views/song-content-view.scm:388 app/views/song-content-view.scm:421
 msgid "measures"
 msgstr ""
 
-#: app/views/song-content-view.scm:390
+#: app/views/song-content-view.scm:390 app/views/song-content-view.scm:423
 msgid "tracks"
 msgstr ""
 
-#: app/views/song-content-view.scm:498
+#: app/views/song-content-view.scm:498 app/views/song-content-view.scm:531
 msgid ""
 "the header of this tab could not be read, but the file itself can be "
 "downloaded"
 msgstr ""
 
-#: app/views/song-content-view.scm:512
+#: app/views/song-content-view.scm:512 app/views/song-content-view.scm:545
 msgid "download the tab"
 msgstr ""
 
-#: app/views/song-content-view.scm:516
+#: app/views/song-content-view.scm:516 app/views/song-content-view.scm:549
 msgid "show the tablature"
 msgstr ""
 
-#: app/views/song-content-view.scm:532
+#: app/views/song-content-view.scm:532 app/views/song-content-view.scm:565
 msgid "play"
 msgstr ""
 
-#: app/views/song-content-view.scm:537 lib/wikimusic/html.scm:758
+#: app/views/song-content-view.scm:537 app/views/song-content-view.scm:570
+#: lib/wikimusic/html.scm:758 lib/wikimusic/html.scm:760
 msgid "stop"
 msgstr ""
 
-#: app/views/song-content-view.scm:558
+#: app/views/song-content-view.scm:558 app/views/song-content-view.scm:591
 msgid "the tab's own tempo"
 msgstr ""
 
-#: app/views/song-content-view.scm:571
+#: app/views/song-content-view.scm:571 app/views/song-content-view.scm:604
 msgid "loop bars"
 msgstr ""
 
-#: app/views/song-content-view.scm:579
+#: app/views/song-content-view.scm:579 app/views/song-content-view.scm:612
 msgid "to"
 msgstr ""
 
-#: app/views/song-content-view.scm:596
+#: app/views/song-content-view.scm:596 app/views/song-content-view.scm:629
 msgid "loop these bars"
 msgstr ""
 
-#: app/views/song-content-view.scm:603
+#: app/views/song-content-view.scm:603 app/views/song-content-view.scm:636
 msgid "stop looping"
 msgstr ""
 
-#: app/views/song-content-view.scm:612
+#: app/views/song-content-view.scm:612 app/views/song-content-view.scm:645
 msgid ""
 "a passage plays over and over between the two bars, after a bar of count-in"
 msgstr ""
 
-#: app/views/song-content-view.scm:627
+#: app/views/song-content-view.scm:627 app/views/song-content-view.scm:660
 msgid "loading the tablature …"
 msgstr ""
 
-#: app/views/song-content-view.scm:631
+#: app/views/song-content-view.scm:631 app/views/song-content-view.scm:664
 msgid "the tablature is drawn below: press play to hear it"
 msgstr ""
 
-#: app/views/song-content-view.scm:635
+#: app/views/song-content-view.scm:635 app/views/song-content-view.scm:668
 msgid ""
 "this tablature could not be drawn here, but the file can still be downloaded"
 msgstr ""
 
-#: app/views/song-content-view.scm:657
+#: app/views/song-content-view.scm:657 app/views/song-content-view.scm:690
 msgid "edit version"
 msgstr "versie bewerken"
 
-#: app/views/song-content-view.scm:677
+#: app/views/song-content-view.scm:677 app/views/song-content-view.scm:710
 msgid "delete version"
 msgstr "versie verwijderen"
 
-#: app/views/song-content-view.scm:736
+#: app/views/song-content-view.scm:736 app/views/song-content-view.scm:769
 msgid "manage version"
 msgstr "versie beheren"
 
@@ -723,7 +740,8 @@ msgstr "versie beheren"
 msgid "editing song"
 msgstr "lied bewerken"
 
-#: app/views/song-edit.scm:40 app/views/song-view.scm:234
+#: app/views/song-edit.scm:40 app/views/song-view.scm:230
+#: app/views/song-view.scm:234
 msgid "new song"
 msgstr "nieuw lied"
 
@@ -756,7 +774,8 @@ msgstr "nieuw lied"
 msgid "music tuning"
 msgstr "muziekstemming"
 
-#: app/views/song-edit.scm:307 app/views/song-view.scm:445
+#: app/views/song-edit.scm:307 app/views/song-view.scm:441
+#: app/views/song-view.scm:445
 msgid "music creation date"
 msgstr "aanmaakdatum muziek"
 
@@ -765,7 +784,8 @@ msgstr "aanmaakdatum muziek"
 msgid "the album"
 msgstr "albumnaam"
 
-#: app/views/song-edit.scm:313 app/views/song-view.scm:452
+#: app/views/song-edit.scm:313 app/views/song-view.scm:448
+#: app/views/song-view.scm:452
 msgid "album name"
 msgstr "albumnaam"
 
@@ -778,28 +798,29 @@ msgstr "album-info-url"
 msgid "the description"
 msgstr "beschrijving"
 
-#: app/views/song-view.scm:69
+#: app/views/song-view.scm:65 app/views/song-view.scm:69
 msgid "by "
 msgstr ""
 
-#: app/views/song-view.scm:176
+#: app/views/song-view.scm:172 app/views/song-view.scm:176
 msgid "viewing songs:"
 msgstr "liedjes bekijken:"
 
-#: app/views/song-view.scm:433
+#: app/views/song-view.scm:429 app/views/song-view.scm:433
 msgid "tuning"
 msgstr "stemming"
 
-#: app/views/song-view.scm:459
+#: app/views/song-view.scm:455 app/views/song-view.scm:459
 msgid "album info link"
 msgstr "album-infolink"
 
-#: app/views/song-view.scm:524
+#: app/views/song-view.scm:520 app/views/song-view.scm:524
 msgid "metronome"
 msgstr ""
 
-#: app/views/song-view.scm:541 lib/wikimusic/html.scm:1919
-#: lib/wikimusic/html.scm:1935
+#: app/views/song-view.scm:537 app/views/song-view.scm:541
+#: lib/wikimusic/html.scm:1899 lib/wikimusic/html.scm:1907
+#: lib/wikimusic/html.scm:1919 lib/wikimusic/html.scm:1935
 msgid "ascii size"
 msgstr "ascii-grootte"
 
@@ -1007,212 +1028,213 @@ msgstr ""
 msgid "back to the top"
 msgstr "terug naar boven"
 
-#: lib/wikimusic/html.scm:559
+#: lib/wikimusic/html.scm:559 lib/wikimusic/html.scm:561
 msgid "Wiki"
 msgstr "Wiki"
 
-#: lib/wikimusic/html.scm:561
+#: lib/wikimusic/html.scm:561 lib/wikimusic/html.scm:563
 msgid "Music"
 msgstr "Music"
 
-#: lib/wikimusic/html.scm:620
+#: lib/wikimusic/html.scm:620 lib/wikimusic/html.scm:622
 msgid "me"
 msgstr "ik"
 
-#: lib/wikimusic/html.scm:738
+#: lib/wikimusic/html.scm:738 lib/wikimusic/html.scm:740
 msgid "beats in a bar"
 msgstr ""
 
-#: lib/wikimusic/html.scm:755
+#: lib/wikimusic/html.scm:755 lib/wikimusic/html.scm:757
 msgid "start"
 msgstr ""
 
-#: lib/wikimusic/html.scm:978
+#: lib/wikimusic/html.scm:978 lib/wikimusic/html.scm:986
 msgid "skip to content"
 msgstr "naar de inhoud"
 
-#: lib/wikimusic/html.scm:1127
+#: lib/wikimusic/html.scm:1102 lib/wikimusic/html.scm:1127
 msgid "published"
 msgstr "gepubliceerd"
 
-#: lib/wikimusic/html.scm:1128
+#: lib/wikimusic/html.scm:1103 lib/wikimusic/html.scm:1128
 msgid "unkown status"
 msgstr "onbekende status"
 
-#: lib/wikimusic/html.scm:1146
+#: lib/wikimusic/html.scm:1121 lib/wikimusic/html.scm:1146
 msgid "reply"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1153
+#: lib/wikimusic/html.scm:1128 lib/wikimusic/html.scm:1153
 msgid "your reply"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1169
+#: lib/wikimusic/html.scm:1144 lib/wikimusic/html.scm:1169
 msgid "post reply"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1195 lib/wikimusic/html.scm:1662
-#: lib/wikimusic/html.scm:1663
+#: lib/wikimusic/html.scm:1170 lib/wikimusic/html.scm:1195
+#: lib/wikimusic/html.scm:1641 lib/wikimusic/html.scm:1642
+#: lib/wikimusic/html.scm:1662 lib/wikimusic/html.scm:1663
 msgid "save"
 msgstr "opslaan"
 
-#: lib/wikimusic/html.scm:1236
+#: lib/wikimusic/html.scm:1211 lib/wikimusic/html.scm:1236
 #, fuzzy
 msgid "edited"
 msgstr "bewerken"
 
-#: lib/wikimusic/html.scm:1391
+#: lib/wikimusic/html.scm:1370 lib/wikimusic/html.scm:1391
 msgid "like"
 msgstr "leuk"
 
-#: lib/wikimusic/html.scm:1414
+#: lib/wikimusic/html.scm:1393 lib/wikimusic/html.scm:1414
 msgid "dislike"
 msgstr "niet leuk"
 
-#: lib/wikimusic/html.scm:1432
+#: lib/wikimusic/html.scm:1411 lib/wikimusic/html.scm:1432
 msgid "last edited"
 msgstr "laatst bewerkt"
 
-#: lib/wikimusic/html.scm:1442
+#: lib/wikimusic/html.scm:1421 lib/wikimusic/html.scm:1442
 msgid "approved by"
 msgstr "goedgekeurd door"
 
-#: lib/wikimusic/html.scm:1500
+#: lib/wikimusic/html.scm:1479 lib/wikimusic/html.scm:1500
 msgid "several pictures — scroll sideways to see them"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1510
+#: lib/wikimusic/html.scm:1489 lib/wikimusic/html.scm:1510
 msgid "views"
 msgstr "weergaven"
 
-#: lib/wikimusic/html.scm:1515
+#: lib/wikimusic/html.scm:1494 lib/wikimusic/html.scm:1515
 msgid "created"
 msgstr "aangemaakt"
 
-#: lib/wikimusic/html.scm:1521
+#: lib/wikimusic/html.scm:1500 lib/wikimusic/html.scm:1521
 msgid "contributor"
 msgstr "bijdrager"
 
-#: lib/wikimusic/html.scm:1532
+#: lib/wikimusic/html.scm:1511 lib/wikimusic/html.scm:1532
 msgid "visibility"
 msgstr "zichtbaarheid"
 
-#: lib/wikimusic/html.scm:1538
+#: lib/wikimusic/html.scm:1517 lib/wikimusic/html.scm:1538
 msgid "uuid"
 msgstr "uuid"
 
-#: lib/wikimusic/html.scm:1566
+#: lib/wikimusic/html.scm:1545 lib/wikimusic/html.scm:1566
 #, fuzzy
 msgid "new comment"
 msgstr "opmerkingen"
 
-#: lib/wikimusic/html.scm:1582
+#: lib/wikimusic/html.scm:1561 lib/wikimusic/html.scm:1582
 #, fuzzy
 msgid "post comment"
 msgstr "opmerkingen"
 
-#: lib/wikimusic/html.scm:1602
+#: lib/wikimusic/html.scm:1581 lib/wikimusic/html.scm:1602
 msgid "content url"
 msgstr "inhoud-url"
 
-#: lib/wikimusic/html.scm:1606
+#: lib/wikimusic/html.scm:1585 lib/wikimusic/html.scm:1606
 msgid "content caption"
 msgstr "inhoud-bijschrift"
 
-#: lib/wikimusic/html.scm:1609
+#: lib/wikimusic/html.scm:1588 lib/wikimusic/html.scm:1609
 msgid "order value"
 msgstr "ordewaarde"
 
-#: lib/wikimusic/html.scm:1645
+#: lib/wikimusic/html.scm:1624 lib/wikimusic/html.scm:1645
 msgid "wikipedia url"
 msgstr "wikipedia-url"
 
-#: lib/wikimusic/html.scm:1649
+#: lib/wikimusic/html.scm:1628 lib/wikimusic/html.scm:1649
 msgid "youtube url"
 msgstr "youtube-url"
 
-#: lib/wikimusic/html.scm:1653
+#: lib/wikimusic/html.scm:1632 lib/wikimusic/html.scm:1653
 msgid "spotify url"
 msgstr "spotify-url"
 
-#: lib/wikimusic/html.scm:1657
+#: lib/wikimusic/html.scm:1636 lib/wikimusic/html.scm:1657
 msgid "soundcloud url"
 msgstr "soundcloud-url"
 
-#: lib/wikimusic/html.scm:1684
+#: lib/wikimusic/html.scm:1663 lib/wikimusic/html.scm:1684
 msgid "sort order"
 msgstr "sorteerorde"
 
-#: lib/wikimusic/html.scm:1696
+#: lib/wikimusic/html.scm:1675 lib/wikimusic/html.scm:1696
 msgid "Name - Ascending"
 msgstr "Naam - Oplopend"
 
-#: lib/wikimusic/html.scm:1698
+#: lib/wikimusic/html.scm:1677 lib/wikimusic/html.scm:1698
 msgid "Name - Descending"
 msgstr "Naam - Aflopend"
 
-#: lib/wikimusic/html.scm:1701
+#: lib/wikimusic/html.scm:1680 lib/wikimusic/html.scm:1701
 msgid "Created - Ascending"
 msgstr "Aangemaakt - Oplopend"
 
-#: lib/wikimusic/html.scm:1703
+#: lib/wikimusic/html.scm:1682 lib/wikimusic/html.scm:1703
 msgid "Created - Descending"
 msgstr "Aangemaakt - Aflopend"
 
-#: lib/wikimusic/html.scm:1706
+#: lib/wikimusic/html.scm:1685 lib/wikimusic/html.scm:1706
 msgid "Last edited - Ascending"
 msgstr "Laatst bewerkt - Oplopend"
 
-#: lib/wikimusic/html.scm:1708
+#: lib/wikimusic/html.scm:1687 lib/wikimusic/html.scm:1708
 msgid "Last edited - Descending"
 msgstr "Laatst bewerkt - Aflopend"
 
-#: lib/wikimusic/html.scm:1711
+#: lib/wikimusic/html.scm:1690 lib/wikimusic/html.scm:1711
 msgid "Views - Ascending"
 msgstr "Weergaven - Oplopend"
 
-#: lib/wikimusic/html.scm:1713
+#: lib/wikimusic/html.scm:1692 lib/wikimusic/html.scm:1713
 msgid "Views - Descending"
 msgstr "Weergaven - Aflopend"
 
-#: lib/wikimusic/html.scm:1740
+#: lib/wikimusic/html.scm:1719 lib/wikimusic/html.scm:1740
 #, fuzzy
 msgid "tile size"
 msgstr "ascii-grootte"
 
-#: lib/wikimusic/html.scm:1790
+#: lib/wikimusic/html.scm:1769 lib/wikimusic/html.scm:1790
 msgid "Small tiles"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1793
+#: lib/wikimusic/html.scm:1772 lib/wikimusic/html.scm:1793
 msgid "Medium tiles"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1796
+#: lib/wikimusic/html.scm:1775 lib/wikimusic/html.scm:1796
 msgid "Large tiles"
 msgstr ""
 
-#: lib/wikimusic/html.scm:2035
+#: lib/wikimusic/html.scm:1992 lib/wikimusic/html.scm:2035
 msgid "Search..."
 msgstr "Zoeken..."
 
-#: lib/wikimusic/html.scm:2042
+#: lib/wikimusic/html.scm:1999 lib/wikimusic/html.scm:2042
 msgid "search"
 msgstr "zoeken"
 
-#: lib/wikimusic/html.scm:2083
+#: lib/wikimusic/html.scm:2040 lib/wikimusic/html.scm:2083
 msgid "Wikipedia"
 msgstr "Wikipedia"
 
-#: lib/wikimusic/html.scm:2087
+#: lib/wikimusic/html.scm:2044 lib/wikimusic/html.scm:2087
 msgid "Spotify"
 msgstr "Spotify"
 
-#: lib/wikimusic/html.scm:2091
+#: lib/wikimusic/html.scm:2048 lib/wikimusic/html.scm:2091
 msgid "Youtube"
 msgstr "Youtube"
 
-#: lib/wikimusic/html.scm:2095
+#: lib/wikimusic/html.scm:2052 lib/wikimusic/html.scm:2095
 msgid "Soundcloud"
 msgstr "Soundcloud"
 

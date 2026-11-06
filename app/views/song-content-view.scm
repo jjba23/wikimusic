@@ -209,37 +209,70 @@ the fingering, and what they are offered is the chord, played."
                 ,(icon-button #:icon 'plus
                               #:content (G_ "new version"))))))
 
+(define* (scroll-step-select G_ #:key id label selected steps)
+  "Return a menu of auto-scroll steps, named for what it chooses.
+
+The library's `select' builder carries no aria attribute, and a menu beside a
+heading with no name of its own is announced as an unnamed combobox.  The
+classes are the ones that builder gave it, so the menu looks the same as the
+others on the page; what is new is the name and the options written out, which
+is the only way to attach one."
+  `(select (@ (id ,id)
+              (name ,id)
+              (aria-label ,(G_ label))
+              (class ,(mk-class '(bg-stone-300/75
+                                  border-2
+                                  border-stone-700
+                                  cursor-pointer
+                                  dark:bg-onyx-700
+                                  dark:border-onyx-100
+                                  dark:text-stone-300
+                                  duration-150
+                                  focus-visible:outline-2
+                                  focus-visible:outline-offset-2
+                                  font-sans
+                                  max-w-full
+                                  outline-onyx-500
+                                  px-3
+                                  py-2
+                                  rounded-xl
+                                  shadow-md
+                                  text-md
+                                  text-onyx-500
+                                  transition-colors
+                                  w-full))))
+           ,@(map (lambda (step)
+                    `(option (@ (value ,(car step))
+                                (class "font-sans")
+                                ,@(if (equal? (car step) selected)
+                                    '((selected ""))
+                                    '()))
+                             ,(cdr step)))
+                  steps)))
+
 (define (line-scroll-select G_)
-  (select #:id 'line-scroll
-          #:name 'line-scroll
-          #:options (list (option #:value 1
-                                  #:content (G_ "1 line"))
-                          (option #:value 2
-                                  #:content (G_ "2 line"))
-                          (option #:value 4
-                                  #:content (G_ "4 line")
-                                  #:selected-value 4)
-                          (option #:value 8
-                                  #:content (G_ "8 line"))
-                          (option #:value 16
-                                  #:content (G_ "16 line"))
-                          (option #:value 32
-                                  #:content (G_ "32 line")))))
+  (scroll-step-select G_
+                      #:id "line-scroll"
+                      #:label "lines per scroll step"
+                      #:selected "4"
+                      #:steps (list (cons "1" (G_ "1 line"))
+                                    (cons "2" (G_ "2 line"))
+                                    (cons "4" (G_ "4 line"))
+                                    (cons "8" (G_ "8 line"))
+                                    (cons "16" (G_ "16 line"))
+                                    (cons "32" (G_ "32 line")))))
+
 (define (second-scroll-select G_)
-  (select #:id 'second-scroll
-          #:name 'second-scroll
-          #:options (list (option #:value 1
-                                  #:content (G_ "1 second"))
-                          (option #:value 2
-                                  #:content (G_ "2 second"))
-                          (option #:value 4
-                                  #:content (G_ "4 second"))
-                          (option #:value 8
-                                  #:content (G_ "8 second"))
-                          (option #:value 16
-                                  #:content (G_ "16 second"))
-                          (option #:value 32
-                                  #:content (G_ "32 second")))))
+  (scroll-step-select G_
+                      #:id "second-scroll"
+                      #:label "seconds per scroll step"
+                      #:selected "1"
+                      #:steps (list (cons "1" (G_ "1 second"))
+                                    (cons "2" (G_ "2 second"))
+                                    (cons "4" (G_ "4 second"))
+                                    (cons "8" (G_ "8 second"))
+                                    (cons "16" (G_ "16 second"))
+                                    (cons "32" (G_ "32 second")))))
 
 (define (ascii-button-section G_)
   `((div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4 items-center

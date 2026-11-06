@@ -6,3 +6,6 @@ env.scm
 .nrepl-port
 # the manual rendered from the README by `maak build-manual'
 README.html
+
+# msgmerge keeps the previous catalog beside the new one
+sys/i18n/locale/*/LC_MESSAGES/*.po~

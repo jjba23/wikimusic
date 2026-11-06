@@ -438,6 +438,8 @@ the same string however it is nested."
                            "window.scrollTo({ top: 0, behavior: 'smooth' })"))
                        ,(G_ "back to the top"))))
              #:footer-classes '(flex flex-col
+                                     text-onyx-900
+                                     dark:text-stone-300
                                      gap-2
                                      items-start
                                      px-6
@@ -464,8 +466,8 @@ classes it carries, so the element name is about what the bar *is*."
                                       #:color '(text-onyx-900
                                                 dark:text-stone-100)
                                       #:weight '(font-light)
-                                      #:size '(text-sm sm:text-md)
-                                      #:icon-css '(text-sm sm:text-md
+                                      #:size '(text-md)
+                                      #:icon-css '(text-md sm:text-md
                                                            lg:text-lg text-onyx-300
                                                            dark:text-stone-300)
                                       #:extra-classes '(py-1 px-2
@@ -1052,6 +1054,13 @@ and six.
                                        (class "wm-tile-cover block w-full aspect-square shrink-0 overflow-hidden"))
                                     (img (@ (loading "lazy")
                                             (class "w-full h-full object-cover transition-transform duration-300 hover:scale-105")
+                                            ;; The cover is the whole of the link
+                                            ;; around it, so its name is the only
+                                            ;; name that link has: an empty `alt'
+                                            ;; would leave a link a screen reader
+                                            ;; can only announce as "link".
+                                            (alt ,(assq-ref x
+                                                            'display-name))
                                             (src ,(uri-decode (assq-ref art
                                                                         'content-url)))) "")))
                               (cond
@@ -1289,6 +1298,10 @@ and six.
                                                                         items-center
                                                                         justify-center))))
                                                  (img (@ (loading lazy)
+                                                         ;; Decorative: the figure
+                                                         ;; carries the caption and
+                                                         ;; nothing here is a control.
+                                                         (alt "")
                                                          (class ,(mk-class '(max-w-full
                                                                              max-h-full
                                                                              w-auto

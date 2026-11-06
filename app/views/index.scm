@@ -444,7 +444,8 @@
                                               border-persia-pink-500/25
                                               dark:border-persia-pink-500/15
                                               border-3))))
-              (figure (img (@ (class ,(mk-class '(rounded-2xl h-auto max-w-64
+              (figure (img (@ (alt "")
+                                           (class ,(mk-class '(rounded-2xl h-auto max-w-64
                                                               sm:max-w-96)))
                               (loading lazy)
                               ;; The picture is the deployment's own asset,
