@@ -737,9 +737,9 @@ needs anything of the browser.
 :CUSTOM_ID: what-a-reader-is-offered
 :END:
 
-- *The presets* are addresses, not a menu a script has to understand: a guitar
-  in standard tuning, in drop D or half a step down, a four- and a five-string
-  bass, and a ukulele in its re-entrant tuning.  Choosing one is a link to the
+- *The presets* are addresses, not a menu a script has to understand: twenty-two of them, grouped the way a player thinks of them: guitar, bass,
+  ukulele, the folk strings and the orchestral ones, each under its own
+  heading in the picker.  Choosing one is a link to the
   same page with =?preset= in it, so the tuning a reader plays in can be
   bookmarked, sent to somebody else, and read back by the script without the
   script knowing which presets exist.  A name nothing offers is the default
@@ -767,9 +767,14 @@ note it is tuned to, and a peak-picking detector would report the harmonic
 instead of the string.
 
 The control is hidden until the script that drives it is there, the same way the
-metronome is, and every sentence it can show -- waiting for a note, listening, in
-tune, permission refused, a browser that cannot read a pitch -- is written by the
-page.  The script un-hides one of them, so a translated page stays translated
+metronome is, and every sentence it can show -- waiting for a note, asking for the
+microphone, listening, in tune, permission refused, a browser that cannot read a
+pitch -- is written by the page.  The page asks for the microphone only when a
+reader presses the control, and it says that it is asking while the browser's own
+prompt is open, because a prompt a reader dismissed once is never shown again: a
+page that went on saying "waiting for a note" would wait forever.  When the
+browser remembers a refusal, the page says which of the two happened and sends the
+reader to the address bar, where the permission is given back.  The script un-hides one of them, so a translated page stays translated
 while the microphone does or does not answer.
 
 The arithmetic is in =lib/wikimusic/domain/tuning.scm= and is a pure function of
