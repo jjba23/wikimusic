@@ -495,22 +495,22 @@ classes it carries, so the element name is about what the bar *is*."
                                  ;; hover class on each of the seven of them.
                                  '(wm-nav
                                    flex flex-col
-                                        lg:flex-row
-                                        lg:items-center
-                                        lg:justify-between
-                                        gap-1
-                                        sm:gap-2
-                                        w-full
-                                        px-2
-                                        py-1
-                                        sm:px-3
-                                        sm:py-2
-                                        bg-stone-100
-                                        dark:bg-onyx-900
-                                        rounded-2xl
-                                        border
-                                        border-stone-500/25
-                                        dark:border-onyx-100/10)
+                                   lg:flex-row
+                                   lg:items-center
+                                   lg:justify-between
+                                   gap-1
+                                   sm:gap-2
+                                   w-full
+                                   px-2
+                                   py-1
+                                   sm:px-3
+                                   sm:py-2
+                                   bg-stone-100
+                                   dark:bg-onyx-900
+                                   rounded-2xl
+                                   border
+                                   border-stone-500/25
+                                   dark:border-onyx-100/10)
                                  ;; While a reader is reading -- a song's ascii
                                  ;; contents, or a PDF beside them -- the bar is
                                  ;; not pinned: it scrolls away with the page and
@@ -547,8 +547,8 @@ classes it carries, so the element name is about what the bar *is*."
                    ;; around it.  It is smaller than the name beside it, which is
                    ;; what keeps the bar a strip rather than a header.
                    (div (@ (class ,(mk-class '(wm-wordmark flex flex-row
-                                                            items-center
-                                                            gap-2))))
+                                                           items-center
+                                                           gap-2))))
                         (img (@ (src ,(asset-address
                                        "/img/wikimusic-logo.png"))
                                 (alt "")
@@ -558,7 +558,7 @@ classes it carries, so the element name is about what the bar *is*."
                         ,(h1 `((span ,(G_ "Wiki"))
                                (span (@ (class "wm-wordmark-accent"))
                                      ,(G_ "Music")))
-                             #:weight '(font-semibold)
+                             #:weight '(font-light)
                              #:color '(text-onyx-900 dark:text-stone-100)
                              #:family '(font-sans)
                              #:size '(text-lg sm:text-xl md:text-2xl)))))
