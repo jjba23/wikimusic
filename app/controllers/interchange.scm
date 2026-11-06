@@ -37,6 +37,7 @@
         (wikimusic controller)
         (wikimusic sqlite util)
         (kracht prelude)
+        (srfi srfi-19)
         (json)
         (ice-9 iconv)
         (rnrs bytevectors)
@@ -111,77 +112,103 @@ in the statement is naming a constant."
 
 ;;; ====== The reader's view ======
 
-(define* (export-section G_
-                         #:key heading rows)
-  "Return one entity's section of the rendered export: a heading and, under
-it, one paragraph per row, its name linked to its page and its description
-rendered from Org."
-  `(section (@ (class "py-4"))
+(define* (export-entry G_ #:key entity row)
+  "Return one entry of the book: its name, linked to the page it came from,
+and the description rendered under it when the row carries one."
+  `(li (@ (class "wm-book-entry"))
+       (a (@ (href ,(format #f "/~as/uuid/~a" entity
+                            (assq-ref row 'identifier))))
+          ,(assq-ref row 'display-name))
+       ,(let ((description (assq-ref row 'description)))
+          (if (and (string? description)
+                   (not (string=? description "")))
+              `(div (@ (class "wm-book-description"))
+                    ,(org2html (html-unescape description)))
+              '()))))
+
+(define* (export-section G_ #:key heading anchor entity rows)
+  "Return one section of the book, anchored so the contents can jump to it.
+
+The heading carries the count as well as the name: a book of an instance's
+knowledge is read to find out how much of it there is, and a reader who wants
+the songs wants to know whether there are twelve or twelve hundred."
+  `(section (@ (id ,anchor) (class "wm-book-section"))
             (h2 ,heading)
-            (ul ,@(map (lambda (row)
-                         `(li (@ (class "py-2"))
-                              (a (@ (href ,(format #f "/~as/uuid/~a"
-                                                   (assq-ref row
-                                                             'entity-name)
-                                                   (assq-ref row
-                                                             'identifier))))
-                                 ,(assq-ref row
-                                            'display-name))
-                              ,(let ((description (assq-ref row
-                                                            'description)))
-                                 (if (and (string? description)
-                                          (not (string=? description "")))
-                                     `(div ,(org2html (html-unescape
-                                                       description)))
-                                     '())))) rows))))
+            (p (@ (class "wm-book-count"))
+               ,(format #f "~a ~a" (length rows) heading))
+            (ul (@ (class "wm-book-list"))
+                ,@(map (lambda (row)
+                         (export-entry G_ #:entity entity #:row row))
+                       rows))))
+
+(define* (export-toc G_ #:key entries)
+  "Return the book's own table of contents, one link per section."
+  `(nav (@ (class "wm-book-toc") (aria-label ,(G_ "contents")))
+        (ul ,@(map (lambda (entry)
+                     `(li (a (@ (href ,(cdr entry))) ,(car entry))))
+                   entries))))
 
 (get "/export/html"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
        (let* ((G_ (:i18n rc))
+              ;; `current-time' is a time record and `strftime' wants seconds
+              ;; since the epoch: take them out and let the C library name the
+              ;; day, so the cover says a date and not a number nobody reads.
+              (taken-at (strftime "%c"
+                                  (localtime (time-second (current-time)))))
               (with-name (lambda (entity table)
                            (map (lambda (row)
                                   (cons (cons 'entity-name entity) row))
-                                (read-table rc table)))))
-         (response-emit (:mime rc
-                               (html-template G_
-                                              #:title "wikimusic export"
-                                              ;; The archive is a copy of every page this instance serves,
-                                              ;; so it is a copy of their content under one address: it is
-                                              ;; linked from the footer and followed, but the pages
-                                              ;; themselves are what should answer a search.
-                                              #:robots "noindex, follow"
-                                              #:body `(div (@ (class
-                                                               "px-4 md:px-8 py-4 max-w-prose"))
-                                                           (h1
-                                                            "wikimusic export")
-                                                           (p ,(format #f
-                                                                "~a ~a"
-                                                                (G_
-                                                                 "exported at")
-                                                                (current-time)))
-                                                           (p ,(G_
-                                                                "This page is a self-contained copy of the knowledge this instance holds. It can be saved, archived and read without a server; the JSON export carries the same rows for a machine to read."))
-                                                           (a (@ (href
-                                                                  "/export/json"))
-                                                              ,(G_
-                                                                "Download the JSON export"))
-                                                           ,(export-section G_
-                                                             #:heading (G_
-                                                                        "artists")
-                                                             #:rows (with-name 'artist
-                                                                     "artists"))
-                                                           ,(export-section G_
-                                                             #:heading (G_
-                                                                        "genres")
-                                                             #:rows (with-name 'genre
-                                                                     "genres"))
-                                                           ,(export-section G_
-                                                             #:heading (G_
-                                                                        "songs")
-                                                             #:rows (with-name 'song
-                                                                     "songs")))))))))
+                                (read-table rc table))))
+              (artists (with-name 'artist "artists"))
+              (genres (with-name 'genre "genres"))
+              (songs (with-name 'song "songs"))
+              (contents (list (cons (G_ "artists") "#artists")
+                              (cons (G_ "genres") "#genres")
+                              (cons (G_ "songs") "#songs"))))
+         (response-emit
+          (:mime rc
+                 (html-template G_
+                                #:title "wikimusic — the book"
+                                ;; The archive is a copy of every page this
+                                ;; instance serves, so a search result is the
+                                ;; pages themselves and not this copy of them.
+                                #:robots "noindex, follow"
+                                #:description "Every artist, genre and song this instance knows, in one page that opens without a server."
+                                #:body `(article (@ (class "wm-book"))
+                                                 (header (@ (class "wm-book-cover"))
+                                                         (h1 "wikimusic")
+                                                         (p ,(G_ "the free music knowledge encyclopaedia"))
+                                                         (p ,(format #f "~a ~a"
+                                                                     (G_ "exported at")
+                                                                     taken-at))
+                                                         (p ,(format #f "~a ~a, ~a ~a, ~a ~a"
+                                                                     (length artists)
+                                                                     (G_ "artists")
+                                                                     (length genres)
+                                                                     (G_ "genres")
+                                                                     (length songs)
+                                                                     (G_ "songs")))
+                                                         (p (a (@ (href "/export/json"))
+                                                               ,(G_ "Download the JSON export"))))
+                                                 ,(export-toc G_ #:entries contents)
+                                                 ,(export-section G_
+                                                                 #:heading (G_ "artists")
+                                                                 #:anchor "artists"
+                                                                 #:entity 'artist
+                                                                 #:rows artists)
+                                                 ,(export-section G_
+                                                                 #:heading (G_ "genres")
+                                                                 #:anchor "genres"
+                                                                 #:entity 'genre
+                                                                 #:rows genres)
+                                                 ,(export-section G_
+                                                                 #:heading (G_ "songs")
+                                                                 #:anchor "songs"
+                                                                 #:entity 'song
+                                                                 #:rows songs))))))))
 
 ;;; ====== The door back in ======
 
