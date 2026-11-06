@@ -20,7 +20,7 @@
                   #:key is-logged-in token user)
   
   (let* ((user-details `((div (@ (class ,(mk-class '(py-8 px-4 max-w-prose))))
-                              ,(h3 (format #f "~a &lt;~a&gt;"
+                              ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a &lt;~a&gt;"
                                            (assoc-ref user "username")
                                            (assoc-ref user "email")))
                               (div (@ (class ,(mk-class '(flex flex-row

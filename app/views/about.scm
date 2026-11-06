@@ -120,8 +120,7 @@ and the foundation last."
         ;; What the place is called, in the words the front page signs itself
         ;; with, so a reader arriving here from the collection recognises where
         ;; they are.
-        ,(sub-h3 (project-tagline G_)
-                 #:family '(font-sans))
+        ,(wm-page-heading "dark:text-stone-500 font-light font-sans hg-leading-subtitle italic text-onyx-300 text-xl" (project-tagline G_))
 
         (p ,(project-account G_))
 

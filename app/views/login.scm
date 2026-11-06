@@ -78,9 +78,7 @@
                                       (div (@ (class ,(mk-class '(flex
                                                                   flex-col
                                                                   gap-8))))
-                                           ,(h2 (G_ "login to wikimusic")
-                                                #:weight '(font-light)
-                                                #:family '(font-sans))
+                                           ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "login to wikimusic"))
                                            (div ,login-form))
                                       (div (@ (class ,(mk-class '(flex
                                                                   flex-col

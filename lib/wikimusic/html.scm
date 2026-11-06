@@ -37,6 +37,7 @@
                           page-stylesheets
                           wikimusic-locales
                           locale-choose-form
+                          wm-page-heading
                           html-template
                           item-tile
                           render-visibility-status
@@ -450,6 +451,31 @@ the same string however it is nested."
                                      justify-start
                                      py-6))))
 
+;;; ====== The heading a page is named by ======
+;;;
+;;; A document has one `h1': its subject.  It is not the site's name, which is on
+;;; every page and is therefore furniture rather than a title, and it is not the
+;;; first section under the subject.  The bar writes the name as a paragraph and
+;;; every page names itself through `wm-page-heading', so the level is decided once
+;;; here instead of being repeated -- or forgotten -- in each view.  The classes
+;;; are the caller's, because a list's title and a song's title are the same
+;;; level in the outline and are not the same size on the screen.  (It is not
+;;; called `page-title': several views keep their SEO title in a local of that
+;;; name, and a helper sharing it shadows or is shadowed by them.)
+(define (wm-page-heading classes content)
+  "Return a page's subject as the document's one `h1'.
+
+CLASSES is how it is drawn -- a level in the outline and a size on the page are
+two different claims -- and CONTENT is what the page is called."
+  `(h1 (@ (class ,classes)) ,content))
+
+(define (brand-name G_)
+  "Return the site's name as the bar draws it: a name, not a heading."
+  `(p (@ (class "dark:text-stone-100 font-light font-sans hg-leading-display md:text-2xl sm:text-xl text-lg text-onyx-900"))
+      (span ,(G_ "Wiki"))
+      (span (@ (class "wm-wordmark-accent"))
+            ,(G_ "Music"))))
+
 (define* (nav G_
               #:key is-logged-in
               (reading? #f))
@@ -560,13 +586,7 @@ classes it carries, so the element name is about what the bar *is*."
                                 (loading lazy)
                                 (class ,(mk-class '(shrink-0 h-5 w-auto
                                                              sm:h-6)))) "")
-                        ,(h1 `((span ,(G_ "Wiki"))
-                               (span (@ (class "wm-wordmark-accent"))
-                                     ,(G_ "Music")))
-                             #:weight '(font-light)
-                             #:color '(text-onyx-900 dark:text-stone-100)
-                             #:family '(font-sans)
-                             #:size '(text-lg sm:text-xl md:text-2xl)))))
+                        ,(brand-name G_))))
 
            ;; Navigation / account / theme
            (div (@ (class ,(mk-class '(flex flex-wrap
@@ -1719,7 +1739,8 @@ throw the results away."
                 (format #f "&search=~a" search-query) "")))
     `((div (@ (role "group")
               (aria-label ,(G_ "tile size"))
-              (class ,(mk-class '(inline-flex flex-row
+              (class ,(mk-class '(wm-tile-size
+                                              inline-flex flex-row
                                               items-center
                                               gap-1
                                               p-1

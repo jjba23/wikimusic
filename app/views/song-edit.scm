@@ -33,11 +33,11 @@
                      (div (@ (class ,(mk-class '(py-3))))
                           ,(if (assq-ref song
                                          'identifier)
-                               (h2 (format #f "~a: ~a"
+                               (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a: ~a"
                                            (G_ "editing song")
                                            (assq-ref song
                                                      'display-name)))
-                               (h2 (G_ "new song"))))
+                               (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "new song"))))
                      (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
                                                               dark:text-stone-300

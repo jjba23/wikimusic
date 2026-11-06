@@ -249,8 +249,7 @@ invited to sign in again."
                                                                         sm:text-5xl)
                                                                        tone))))
                                                  ,(format #f "~a" status)))
-                                      ,(sub-h3 (G_ (error-headline status))
-                                               #:family '(font-sans))
+                                      ,(wm-page-heading "dark:text-stone-500 font-light font-sans hg-leading-subtitle italic text-onyx-300 text-xl" (G_ (error-headline status)))
                                       (p (@ (class ,(mk-class '(text-onyx-300
                                                                 dark:text-stone-300
                                                                 leading-6

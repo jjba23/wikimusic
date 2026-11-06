@@ -82,9 +82,9 @@
                             (pdf-contents ""))
   `((div (@ (class ,(mk-class '(py-3))))
          ,(if (and song-identifier song-content-identifier)
-              (h2 (format #f "~a: ~a ~a"
+              (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a: ~a ~a"
                           (G_ "editing version") version-name instrument-type))
-              (h2 (G_ "new version"))))
+              (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "new version"))))
     (form (@ (method POST)
              (action ,(if (and song-identifier song-content-identifier)
                           (format #f "/songs/uuid/~a/contents/~a/edit"

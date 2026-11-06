@@ -250,7 +250,7 @@ a:focus-visible .wm-wordmark-accent {
   padding: 0.25rem 1.25rem;
 }
 
-.wm-song-setting h4 {
+.wm-song-setting h3 {
   margin: 0;
   font-size: 0.95rem;
 }
@@ -260,6 +260,21 @@ a:focus-visible .wm-wordmark-accent {
   flex-direction: column;
   gap: 1.5rem;
   padding: 0.5rem 1.25rem;
+}
+
+/* ===== Three sizes, three targets =====
+
+   The tile-size chooser is three glyphs on a hairline of border, and at its
+   written padding each was a 24px square: legal, and the smallest thing left to
+   hit on a phone.  The square grows on a narrow screen while the card waits for
+   a pointer that is precise. */
+
+@media (max-width: 639px) {
+  .wm-tile-size a {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    justify-content: center;
+  }
 }
 
 /* ===== The language control =====

@@ -165,15 +165,11 @@
                                                  justify-center
                                                  md:justify-between))))
                      (,(unless only-tiles
-                         (h4 `(div (@ (class ,(mk-class '(flex flex-row
+                         (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-title text-2xl text-onyx-300" `(div (@ (class ,(mk-class '(flex flex-row
                                                                items-center
                                                                items-center
                                                                gap-1))))
-                                   ,(G_ "viewing songs:"))
-                             #:weight '(font-light)
-                             #:size '(text-2xl)
-
-                             #:family '(font-sans))) ,(unless only-tiles
+                                   ,(G_ "viewing songs:")))) ,(unless only-tiles
                                                         `(div (@ (class ,(mk-class '(flex
                                                                                      flex-wrap
                                                                                      flex-row
@@ -477,12 +473,8 @@
                                  ((div (@ (class ,(mk-class '(flex flex-col
                                                                    gap-4))))
                                        (div (@ (class ,(mk-class '(py-4))))
-                                            ,(h2 (assq-ref song
-                                                           'display-name)
-                                                 #:size '(text-3xl md:text-10)
-                                                 #:family '(font-sans)
-                                                 #:weight '(font-light
-                                                            leading-10)))
+                                            ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display leading-10 md:text-10 text-3xl text-onyx-300" (assq-ref song
+                                                           'display-name)))
                                        ,(when (not (nil? artists))
                                           `((div (@ (class ,(mk-class '(flex
                                                                         flex-row
@@ -517,7 +509,7 @@
                                                              user-alist)))))
                             ,(render-external-sources G_ external-sources)
                             (div (@ (class ,(mk-class '(py-1 px-5))))
-                                 ,(sub-h4 (G_ "metronome"))
+                                 ,(sub-h3 (G_ "metronome"))
                                  ,(metronome-widget G_
                                                     #:id (format #f
                                                                  "metronome-~a"
@@ -534,7 +526,7 @@
                                       ;; the page remembers the choice for the
                                       ;; next song they open (see
                                       ;; `(wikimusic html)' and the route).
-                                      ,(sub-h4 (G_ "ascii size"))
+                                      ,(sub-h3 (G_ "ascii size"))
                                       ,(ascii-size-control G_
                                                            #:route (format #f
                                                                            "/~as/uuid/~a"

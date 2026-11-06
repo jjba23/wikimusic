@@ -76,14 +76,11 @@
                                                  items-center
                                                  justify-center
                                                  md:justify-between))))
-                     (,(h4 `(div (@ (class ,(mk-class '(flex flex-row
+                     (,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-title text-2xl text-onyx-300" `(div (@ (class ,(mk-class '(flex flex-row
                                                              items-center
                                                              items-center
                                                              gap-1))))
-                                 ,(G_ "viewing artists:"))
-                           #:weight '(font-light)
-                           #:size '(text-2xl)
-                           #:family '(font-sans)) (div (@ (class ,(mk-class '(flex
+                                 ,(G_ "viewing artists:"))) (div (@ (class ,(mk-class '(flex
                                                                               flex-wrap
                                                                               flex-row
                                                                               justify-center
@@ -207,11 +204,8 @@
                    #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
                                                              md:py-4))))
                                  ((div (@ (class ,(mk-class '(py-4))))
-                                       ,(h2 (assq-ref artist
-                                                      'display-name)
-                                            #:size '(text-3xl md:text-10)
-                                            #:family '(font-sans)
-                                            #:weight '(font-light leading-10)))
+                                       ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display leading-10 md:text-10 text-3xl text-onyx-300" (assq-ref artist
+                                                      'display-name)))
                                   (div (div ,(entity-details G_
                                                              #:entity 'artist
                                                              #:x artist

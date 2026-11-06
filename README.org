@@ -1059,8 +1059,12 @@ What that means here, concretely.  Every cover on a list carries its name as its
 "link".  The two auto-scroll menus say what they choose, because a bare
 `<select>` beside a heading has no name of its own.  The bar's controls are
 thumb-sized on a phone and scroll sideways in one row there, so a bar pinned to
-the top of the screen does not spend a fifth of it.  And each theme is measured
-rather than assumed: the footer's ink and a tile's credit line are stated per
+the top of the screen does not spend a fifth of it.  Every page has exactly one
+`<h1>` and it is the page's own subject - the song, the list, the tuner - never
+the wordmark, which names the site in the bar and is a paragraph there; the
+sections under it are `<h3>`, so the outline does not skip a level.  A tile size
+is a 40px square on a phone, not the 24px the rule allows.  And each theme is
+measured rather than assumed: the footer's ink and a tile's credit line are stated per
 theme, because carrying the light theme's dark ink onto a dark surface is how
 text disappears.
 

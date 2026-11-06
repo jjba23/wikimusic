@@ -225,10 +225,7 @@ That is what its reader typed, the name of the account it was written from, or
                                                  #:name title
                                                  #:description description))
                    #:body `((div (@ (class ,(mk-class articles-column-classes)))
-                                 ,(h2 (G_ "articles")
-                                      #:family '(font-sans)
-                                      #:weight '(font-light)
-                                      #:size '(text-3xl))
+                                 ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "articles"))
                                  (p (@ (class ,(mk-class '(max-w-prose
                                                            text-md
                                                            text-onyx-500
@@ -308,10 +305,7 @@ That is what its reader typed, the name of the account it was written from, or
                                                                    dark:text-stone-300))))
                                             ,(or (assq-ref article 'created-at)
                                                  "")))
-                                 ,(h2 display-name
-                                      #:family '(font-sans)
-                                      #:weight '(font-light)
-                                      #:size '(text-3xl md:text-10))
+                                 ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" display-name)
                                  ,@video-fragment
                                  (div (@ (class ,(mk-class '(max-w-prose))))
                                       ,(org2html (or (assq-ref article
@@ -362,10 +356,7 @@ That is what its reader typed, the name of the account it was written from, or
                       ,(button (G_ "post it")
                                #:type 'submit))))
          (body `((div (@ (class ,(mk-class articles-column-classes)))
-                      ,(h2 (G_ "write an article")
-                           #:family '(font-sans)
-                           #:weight '(font-light)
-                           #:size '(text-3xl))
+                      ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "write an article"))
                       ,@(if is-logged-in
                             (list write-form)
                             (list (list 'p

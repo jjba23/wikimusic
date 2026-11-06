@@ -338,10 +338,7 @@ their own language rather than spelling as an address."
                                                  tuner-description))
                    #:body `((div (@ (class ,(mk-class
                                              tuner-column-classes)))
-                                 ,(h2 (G_ "tuner")
-                                      #:family '(font-sans)
-                                      #:weight '(font-light)
-                                      #:size '(text-3xl))
+                                 ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "tuner"))
                                  (p (@ (class ,(mk-class '(max-w-prose
                                                            text-md
                                                            text-onyx-500
