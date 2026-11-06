@@ -553,8 +553,8 @@ classes it carries, so the element name is about what the bar *is*."
                                        "/img/wikimusic-logo.png"))
                                 (alt "")
                                 (loading lazy)
-                                (class ,(mk-class '(shrink-0 h-6 w-auto
-                                                             sm:h-7)))) "")
+                                (class ,(mk-class '(shrink-0 h-5 w-auto
+                                                             sm:h-6)))) "")
                         ,(h1 `((span ,(G_ "Wiki"))
                                (span (@ (class "wm-wordmark-accent"))
                                      ,(G_ "Music")))
