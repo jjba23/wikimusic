@@ -588,6 +588,12 @@ classes it carries, so the element name is about what the bar *is*."
                 ,(nav-link "/tuner"
                            'equalizer "tuner")
 
+                ;; What a reader writes for another one.  It sits beside the
+                ;; tuner because both are the site used away from a song: one
+                ;; with an instrument in hand, one with something to say.
+                ,(nav-link "/articles"
+                           'article "articles")
+
                 ;; Login / profile
                 ,(unless is-logged-in `(a (@ (href "/login")
                                              (class ,(mk-class '(shrink-0 no-underline))))

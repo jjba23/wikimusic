@@ -81,6 +81,24 @@ a:focus-visible .wm-wordmark-accent {
   color: inherit;
 }
 
+/* The trap an article's comment form carries.
+
+   A spam script that fills every field it finds is caught by a field a reader
+   never meets, so the field has to exist in the markup and be out of the
+   reader's way at the same time.  It is laid out off the page rather than
+   `display: none', because the cheaper kind of bot reads the markup and skips
+   what is hidden -- and never `visibility: hidden' either, for the same
+   reason.  A screen reader does not reach it: the wrapper is `aria-hidden' and
+   the field itself is out of the tab order. */
+
+.wm-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 /* ===== The scheme the browser's own controls are drawn in =====
 
    A page styles what it draws and the browser styles the rest: the scrollbar
