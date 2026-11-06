@@ -49,29 +49,35 @@
                                                   'identifier)))
                               this-song-artists-relations)) artists))
 
-         (extra-top-info `((div (@ (class ,(mk-class '(py-2 text-center flex
-                                                            flex-col gap-2
-                                                            items-center))))
-                                ,(map (lambda (ar)
-                                        (a (assq-ref ar
-                                                     'display-name)
-                                           #:weight '(font-light)
-                                           #:size '(text-md)
-                                           #:href (format #f
-                                                          "/artists/uuid/~a"
-                                                          (assq-ref ar
-                                                                    'identifier))
-                                           #:color '(text-onyx-300
-                                                     dark:text-stone-100)
-                                           #:hover '(hover:text-persia-pink-900
-                                                     dark:hover:text-persia-pink-300)))
-                                      art)))))
+         (artist-links (map (lambda (ar)
+                              (a (assq-ref ar
+                                           'display-name)
+                                 #:weight '(font-light)
+                                 #:size '(text-xs sm:text-sm)
+                                 #:href (format #f "/artists/uuid/~a"
+                                                (assq-ref ar
+                                                          'identifier))
+                                 #:color '(text-onyx-500 dark:text-stone-400)
+                                 #:hover '(hover:text-persia-pink-500
+                                           dark:hover:text-persia-pink-300)))
+                            art))
+         ;; "by" and then the players, on the card's second line, separated by
+         ;; commas: a reader reads a name and then who made it, and the last
+         ;; comma is dropped because a list of two does not end in one.
+         (subtitle (if (null? artist-links)
+                       '()
+                       (cons (G_ "by ")
+                             (drop-right (append-map
+                                          (lambda (line)
+                                            (list line ", "))
+                                          artist-links)
+                                         1)))))
     `((div ,(item-tile G_
                        'song
                        x
                        (relevant-entities 'song artworks x)
                        (relevant-entities 'song comments x)
-                       #:extra-top-info extra-top-info
+                       #:subtitle subtitle
                        #:extra-bot-info extra-bot-info)))))
 
 ;; The tempo a page's metronome is offered at: the tempo the first readable tab

@@ -1039,7 +1039,8 @@ and six.
                     artworks
                     comments
                     #:key (extra-bot-info '())
-                    (extra-top-info '()))
+                    (extra-top-info '())
+                    (subtitle '()))
   (let ((item-link (format #f "/~as/uuid/~a" entity
                            (assq-ref x
                                      'identifier))))
@@ -1090,16 +1091,34 @@ and six.
                                             md:p-4))))
 
                 ;; Name
-                (div (@ (class ,(mk-class '(min-w-0 text-center))))
+                ;;
+                ;; The name is set heavier than the line under it, and that
+                ;; line is dimmer and smaller, because the two answer different
+                ;; questions: a reader choosing between two tiles is choosing a
+                ;; *song*, and who made it is how two songs with one name are
+                ;; told apart.
+                (div (@ (class ,(mk-class '(min-w-0 text-center
+                                                  flex flex-col gap-1))))
                      ,(a (assq-ref x
                                    'display-name)
-                         #:size '(text-md sm:text-md md:text-lg)
-                         #:weight '(font-light)
+                         #:size '(text-md sm:text-base md:text-lg)
+                         #:weight '(font-semibold)
                          #:family '(font-sans)
                          #:href item-link
                          #:color '(text-onyx-300 dark:text-stone-100)
                          #:hover '(hover:text-persia-pink-500
-                                   dark:hover:text-persia-pink-300)))
+                                   dark:hover:text-persia-pink-300))
+                     ,(render-if-nempty
+                       (lambda (line)
+                         `(p (@ (class ,(mk-class '(m-0
+                                                     text-xs
+                                                     sm:text-sm
+                                                     font-light
+                                                     leading-snug
+                                                     text-onyx-500
+                                                     dark:text-stone-400))))
+                             ,line))
+                       subtitle))
                 ;; Extra information
                 ,(render-if-nempty (lambda (info)
                                      `(div (@ (class ,(mk-class '(pt-1 sm:pt-2
