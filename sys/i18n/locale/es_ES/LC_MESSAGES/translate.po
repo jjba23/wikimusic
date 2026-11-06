@@ -44,44 +44,21 @@ msgstr "¡Género marcado como me gusta!"
 msgid "Disliked genre!"
 msgstr "¡Género marcado como no me gusta!"
 
-#: app/controllers/interchange.scm:145 app/controllers/interchange.scm:146
-#, fuzzy
-msgid "contents"
-msgstr "contenido PDF"
-
-#: app/controllers/interchange.scm:162 app/controllers/interchange.scm:168
-#: app/controllers/interchange.scm:183 app/controllers/interchange.scm:189
-#: app/controllers/interchange.scm:192 app/controllers/interchange.scm:198
 #: app/views/error.scm:153 app/views/index.scm:278
 msgid "artists"
 msgstr "artistas"
 
-#: app/controllers/interchange.scm:163 app/controllers/interchange.scm:169
-#: app/controllers/interchange.scm:185 app/controllers/interchange.scm:191
-#: app/controllers/interchange.scm:197 app/controllers/interchange.scm:203
 #: app/views/error.scm:158 app/views/index.scm:281
 msgid "genres"
 msgstr "géneros"
 
-#: app/controllers/interchange.scm:164 app/controllers/interchange.scm:170
-#: app/controllers/interchange.scm:187 app/controllers/interchange.scm:193
-#: app/controllers/interchange.scm:202 app/controllers/interchange.scm:208
 #: app/views/error.scm:148 app/views/index.scm:275
 msgid "songs"
 msgstr "canciones"
 
-#: app/controllers/interchange.scm:177 app/controllers/interchange.scm:183
 #: lib/wikimusic/prose.scm:46
 msgid "the free music knowledge encyclopaedia"
 msgstr "la enciclopedia libre del conocimiento musical"
-
-#: app/controllers/interchange.scm:179 app/controllers/interchange.scm:185
-msgid "exported at"
-msgstr ""
-
-#: app/controllers/interchange.scm:189 app/controllers/interchange.scm:195
-msgid "Download the JSON export"
-msgstr ""
 
 #: app/controllers/login.scm:55 app/controllers/login.scm:72
 msgid "could not sign you in"
@@ -1021,10 +998,6 @@ msgstr "código fuente"
 #: lib/wikimusic/html.scm:399 lib/wikimusic/html.scm:401
 msgid "manual"
 msgstr "manual"
-
-#: lib/wikimusic/html.scm:404 lib/wikimusic/html.scm:406
-msgid "export"
-msgstr ""
 
 #: lib/wikimusic/html.scm:419 lib/wikimusic/html.scm:421
 msgid "version:"

@@ -162,8 +162,7 @@ prefix in is one more thing that can be got wrong."
 ;;; is.  Everything a reader can reach is allowed -- the whole point of the site
 ;;; is to be found -- and the three kinds of address that are not for a crawler
 ;;; are refused: signing in and out, anything under a reader's own account, and
-;;; every form and every export, which are a contributor's writing or a copy of
-;;; pages that are already indexed under their own addresses.
+;;; every form, which is a contributor's writing rather than a page of the wiki.
 ;;;
 ;;; The refusals are written as path prefixes and one wildcard, which is what
 ;;; the major crawlers support: `Disallow: /*/edit' covers the edit route of
@@ -176,7 +175,6 @@ prefix in is one more thing that can be got wrong."
     "Disallow: /login"
     "Disallow: /logout"
     "Disallow: /me"
-    "Disallow: /export"
     "Disallow: /songs/new"
     "Disallow: /artists/new"
     "Disallow: /genres/new"

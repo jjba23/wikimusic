@@ -99,9 +99,6 @@ wikimusic is powered by: [[https://www.gnu.org/software/guile/][Guile Scheme]], 
   and the rest), rendered by the application itself in the site's own shell.
 - *Accounts and permissions*: sign-in, per-row ownership, and a super grant that
   overrides ownership for an instance's maintainers.
-- *Everything out and back in*: a [[https://www.json.org/][JSON]] dump of every content table and a
-  rendered [[https://html.spec.whatwg.org/multipage/][HTML]] archive of the whole instance, with an import route to load a
-  dump into another instance.
 - *A front page that is a way in*: what the place is called and what it holds,
   a line under it, a field that searches the collection, the two things a
   visitor came to do, the promises the community makes, the instance's own
@@ -398,7 +395,7 @@ To apply migrations to a database that already exists -- which is safe to run at
 maak migrate
 #+end_src
 
-Neither the server nor any other task applies migrations, and nothing reads the [[https://en.wikipedia.org/wiki/SQL][SQL]] files and hands them to ~sqlite3~ itself: ~maak init-db~ and ~maak migrate~ are the two ways in.  A copy of the SQLite file, or a JSON dump loaded into a fresh database (see [[#export-archival-and-exchanging-between-instances][Export, archival, and exchanging between instances]]), are the other ways to arrive at the tables.
+Neither the server nor any other task applies migrations, and nothing reads the [[https://en.wikipedia.org/wiki/SQL][SQL]] files and hands them to ~sqlite3~ itself: ~maak init-db~ and ~maak migrate~ are the two ways in.  A copy of the SQLite file is the other way to arrive at the tables.
 
 Upon starting a blank new wikimusic deployment you will have no users in the database, and there is no sign-up route: the first account is made from the shell, and it should hold two permissions -- =wikimusic:modify-permissions=, the super grant, and =wikimusic:user-create=, which is what the routes that make an account ask for.  The second is not covered by the first: a route asks for the permissions it names, and what the super grant overrides is ownership, not that (see [[#accounts-permissions-and-ownership][Accounts, permissions and ownership]]).
 
@@ -445,8 +442,8 @@ The unit tests live in ~test/veritas/unit~, one file per area, and each is run b
 :END:
 
 - ~app/controllers/~ -- the routes: one file per area of the site, plus
-  =interchange.scm= (export and import), =seo.scm= (the sitemap and the robots
-  file), =prefs.scm= and =me.scm= (a reader's own settings and page);
+  =seo.scm= (the sitemap and the robots file), =prefs.scm= and =me.scm= (a
+  reader's own settings and page);
 - ~app/models/~ -- one file per table, the definitions Artanis reads when it
   starts and creates when a table is missing;
 - ~app/views/~ -- the pages, as SXML: the front page, the three entities and

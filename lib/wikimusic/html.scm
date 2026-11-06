@@ -377,13 +377,7 @@ the same string however it is nested."
 ;;; identifier names the licence exactly where a sentence about it only
 ;;; described it, and the reader who wants the whole text is one click from it.
 (define* (page-footer G_)
-  `(,(footer `(;Where the rest of it is.  The archive is the one link that leaves the
-
-
-               ;; server behind, so it is offered here rather than only to a reader
-               ;; who knows the address: a copy of everything, to save or read
-               ;; offline.
-               (div (@ (class ,(mk-class '(flex flex-row
+  `(,(footer `((div (@ (class ,(mk-class '(flex flex-row
                                                 flex-wrap
                                                 gap-2
                                                 sm:gap-4
@@ -411,11 +405,6 @@ the same string however it is nested."
                     ;; than two that drift -- so the link leads to that document.
                     ,(a (G_ "manual")
                         #:href (manual-url)
-                        #:size '(text-md)
-                        #:color link-ink
-                        #:hover link-hover-ink)
-                    ,(a (G_ "export")
-                        #:href "/export/html"
                         #:size '(text-md)
                         #:color link-ink
                         #:hover link-hover-ink))
