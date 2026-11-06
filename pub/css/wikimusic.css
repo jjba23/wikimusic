@@ -259,7 +259,52 @@ a:focus-visible .wm-wordmark-accent {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  padding: 0.5rem 1.25rem;
+  /* The page's own gutter is the reading column's: the tab, its legend and a
+     PDF are the widest things here, and a second gutter on top of the page's
+     pushed the first line of a 34-column tab off a 360px screen. */
+  padding: 0.5rem 0;
+}
+
+/* The sections in the reading column sit closer than they do elsewhere on the
+   page: a tab is read line by line, so the space above it is the reader's. */
+.wm-song-content .wm-disclosure {
+  margin-block: 0.5rem;
+}
+
+/* ===== A tablature reads to the edge of the page =====
+
+   A tab is columns, so every pixel of padding is a column.  The page's 12px
+   gutter plus this paper's own 8px is what a phone loses now, against the 48px
+   that the page, the reading column and the paper each added before.  The
+   paper keeps its border and its radius, so the music still sits on something
+   rather than floating on the background, and it keeps enough room that a line
+   of characters does not touch the border it is drawn against. */
+
+@media (max-width: 639px) {
+  pre.wm-ascii {
+    padding: 0.35rem 0.5rem;
+  }
+}
+
+/* A PDF is a page inside a page: inset margins only make the document it shows
+   smaller, so on a narrow screen it opens to the width of the screen and keeps
+   on a desktop the width of the column it belongs to. */
+
+.wm-reading-frame {
+  display: block;
+  width: 100%;
+  min-height: 85vh;
+  border: 0;
+  border-radius: 0.75rem;
+}
+
+@media (max-width: 767px) {
+  .wm-reading-frame {
+    width: calc(100% + 1.5rem);
+    margin-inline: -0.75rem;
+    min-height: 90vh;
+    border-radius: 0;
+  }
 }
 
 /* ===== Three sizes, three targets =====

@@ -596,6 +596,16 @@ brighter, and the counter is announced politely to a screen reader, so =3 / 5=
 is read when it changes without interrupting what is being read.  Each dot takes
 the focus ring of the rest of the page and moves the track when pressed.
 
+** A tablature takes the width it is given
+
+A tab is columns, so every pixel of margin costs a column.  The page's own
+gutter is the reading column's: the tab, its legend and an embedded PDF sit on
+that edge rather than inside a second and a third inset, and the paper around
+them keeps only the padding that stops a line of characters touching its
+border.  On a 360px phone that is 56 columns of a 16px tab, where the two extra
+insets left room for 44.  A PDF opens to the width of the screen below 768px,
+where an inset only made the document it shows smaller.
+
 ** The form, in three parts
 
 Adding or editing a song asks for the same fields it always did, in the three

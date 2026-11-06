@@ -738,7 +738,7 @@ more than one tab has no ambiguity about which it is addressing."
                                           ,(disclosure-summary G_ "PDF contents")
                                           (iframe (@ (src ,pdf-contents)
                                                      (width "100%")
-                                                     (class ,(mk-class '(min-h-screen))))
+                                                     (class ,(mk-class '(wm-reading-frame))))
                                                   "")))))
          (pdf-content-section (render-if-nestring render-pdf-content
                                                   cleaned-pdf-data))
