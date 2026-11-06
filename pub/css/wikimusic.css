@@ -552,7 +552,13 @@ a.wm-size-step:hover {
 }
 
 .carousel-list {
-  scrollbar-width: thin;
+  /* The dots and the counter already say where in the set the reader is, and a
+     native bar under a picture reads as a broken track.  It still scrolls. */
+  scrollbar-width: none;
+}
+
+.carousel-list::-webkit-scrollbar {
+  display: none;
 }
 
 .carousel-list-item {

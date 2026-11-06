@@ -165,7 +165,7 @@
                                                  justify-center
                                                  md:justify-between))))
                      (,(unless only-tiles
-                         (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-title text-2xl text-onyx-300" `(div (@ (class ,(mk-class '(flex flex-row
+                         (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-title text-2xl text-onyx-300" `(span (@ (class ,(mk-class '(flex flex-row
                                                                items-center
                                                                items-center
                                                                gap-1))))
