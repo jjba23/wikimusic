@@ -213,7 +213,8 @@ the menu with @code{for}, so it reaches assistive technology as well."
   `((form (@ (action "/preferences/locale")
              (method "POST")
              (enctype "application/x-www-form-urlencoded")
-             (class ,(mk-class '(flex flex-row
+             (class ,(mk-class '(wm-locale
+                                      flex flex-row
                                       flex-wrap
                                       items-center
                                       gap-1
@@ -266,9 +267,10 @@ the menu with @code{for}, so it reaches assistive technology as well."
                                             #:selected-value selected-locale))
                                   wikimusic-locales))
           ,(icon-button #:icon 'check
-                        #:content ""
+                        #:content (G_ "use")
                         #:type 'submit
-                        #:extra-classes '(py-1 px-2 max-w-prose cursor-pointer
+                        #:extra-classes '(shrink-0 py-1 px-2 max-w-prose
+                                               cursor-pointer
                                                text-onyx-700
                                                dark:text-stone-300)
                         #:icon-css '(text-lg text-onyx-700 dark:text-stone-300)))))

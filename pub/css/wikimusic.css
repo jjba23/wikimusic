@@ -262,6 +262,60 @@ a:focus-visible .wm-wordmark-accent {
   padding: 0.5rem 1.25rem;
 }
 
+/* ===== The language control =====
+
+   A reader who cannot read the page is the one reader this control exists for,
+   so its name stays written out beside the menu rather than folded into a
+   glyph.  That name, the menu and the button that applies the choice do not fit
+   one 360px row: the button was the piece that gave way and landed alone under
+   the card, which reads as a stray control rather than as part of the same
+   question.  On a phone the menu therefore takes a row of its own and the
+   button sits beside it, where a thumb can reach both and neither is orphaned.
+   The card itself stops at the width of the column it sits in. */
+
+.wm-locale {
+  max-width: 100%;
+}
+
+@media (max-width: 479px) {
+  /* Two rows, stated rather than left to wrap: wrapping happened to put the
+     menu on the first row and the button alone on the second, which is the one
+     arrangement that separates the choice from the control that applies it. */
+  .wm-locale {
+    display: grid;
+    width: 100%;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "icon label label"
+      "menu menu use";
+    row-gap: 0.25rem;
+  }
+
+  .wm-locale > i {
+    grid-area: icon;
+  }
+
+  .wm-locale > label {
+    grid-area: label;
+    text-align: start;
+  }
+
+  .wm-locale > div {
+    grid-area: menu;
+    min-width: 0;
+  }
+
+  .wm-locale div > select {
+    width: 100%;
+  }
+
+  .wm-locale > button {
+    grid-area: use;
+    min-height: 2.75rem;
+    justify-content: center;
+  }
+}
+
 /* ===== A bar a thumb can hit =====
 
    Seven controls on a 360px phone, each of them a word and a glyph: at the

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wikimusic\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 22:48+0100\n"
+"POT-Creation-Date: 2026-11-06 22:53+0100\n"
 "PO-Revision-Date: 2026-10-13 12:00+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -184,7 +184,7 @@ msgid "your name"
 msgstr "nombre de usuario"
 
 #: app/views/articles.scm:106 lib/wikimusic/html.scm:1152
-#: lib/wikimusic/html.scm:1177
+#: lib/wikimusic/html.scm:1154 lib/wikimusic/html.scm:1177
 #, fuzzy
 msgid "your comment"
 msgstr "comentarios"
@@ -241,7 +241,7 @@ msgid "no comments yet"
 msgstr "comentarios"
 
 #: app/views/articles.scm:325 lib/wikimusic/html.scm:1538
-#: lib/wikimusic/html.scm:1559
+#: lib/wikimusic/html.scm:1540 lib/wikimusic/html.scm:1559
 msgid "comments"
 msgstr "comentarios"
 
@@ -301,7 +301,7 @@ msgstr "nombre visible"
 
 #: app/views/artist-edit.scm:155 app/views/genre-edit.scm:151
 #: app/views/song-edit.scm:322 lib/wikimusic/html.scm:1403
-#: lib/wikimusic/html.scm:1424
+#: lib/wikimusic/html.scm:1405 lib/wikimusic/html.scm:1424
 msgid "description"
 msgstr "descripción"
 
@@ -313,16 +313,18 @@ msgstr ""
 #: app/views/artist-edit.scm:164 app/views/genre-edit.scm:160
 #: app/views/me.scm:149 app/views/me.scm:320
 #: app/views/song-content-edit.scm:188 app/views/song-edit.scm:332
-#: lib/wikimusic/html.scm:1149 lib/wikimusic/html.scm:1174
-#: lib/wikimusic/html.scm:1487 lib/wikimusic/html.scm:1508
-#: lib/wikimusic/html.scm:1593 lib/wikimusic/html.scm:1614
+#: lib/wikimusic/html.scm:1149 lib/wikimusic/html.scm:1151
+#: lib/wikimusic/html.scm:1174 lib/wikimusic/html.scm:1487
+#: lib/wikimusic/html.scm:1489 lib/wikimusic/html.scm:1508
+#: lib/wikimusic/html.scm:1593 lib/wikimusic/html.scm:1595
+#: lib/wikimusic/html.scm:1614
 msgid "edit"
 msgstr "editar"
 
 #: app/views/artist-edit.scm:165 app/views/genre-edit.scm:161
 #: app/views/me.scm:223 app/views/song-content-edit.scm:189
 #: app/views/song-edit.scm:333 lib/wikimusic/html.scm:1594
-#: lib/wikimusic/html.scm:1615
+#: lib/wikimusic/html.scm:1596 lib/wikimusic/html.scm:1615
 msgid "create"
 msgstr "crear"
 
@@ -386,7 +388,7 @@ msgid "password"
 msgstr "contraseña"
 
 #: app/views/login.scm:44 app/views/me.scm:101 lib/wikimusic/html.scm:602
-#: lib/wikimusic/html.scm:604
+#: lib/wikimusic/html.scm:604 lib/wikimusic/html.scm:606
 msgid "login"
 msgstr "iniciar sesión"
 
@@ -450,8 +452,9 @@ msgstr "id"
 msgid "permissions"
 msgstr "permisos"
 
-#: app/views/me.scm:135 lib/wikimusic/html.scm:1174 lib/wikimusic/html.scm:1199
-#: lib/wikimusic/html.scm:1603 lib/wikimusic/html.scm:1624
+#: app/views/me.scm:135 lib/wikimusic/html.scm:1174 lib/wikimusic/html.scm:1176
+#: lib/wikimusic/html.scm:1199 lib/wikimusic/html.scm:1603
+#: lib/wikimusic/html.scm:1605 lib/wikimusic/html.scm:1624
 msgid "delete"
 msgstr "eliminar"
 
@@ -646,6 +649,7 @@ msgstr "aprobado por"
 #: app/views/song-content-view.scm:381 app/views/song-content-view.scm:414
 #: app/views/song-content-view.scm:547 app/views/song-content-view.scm:580
 #: lib/wikimusic/html.scm:726 lib/wikimusic/html.scm:728
+#: lib/wikimusic/html.scm:730
 msgid "tempo"
 msgstr ""
 
@@ -683,6 +687,7 @@ msgstr ""
 
 #: app/views/song-content-view.scm:537 app/views/song-content-view.scm:570
 #: lib/wikimusic/html.scm:758 lib/wikimusic/html.scm:760
+#: lib/wikimusic/html.scm:762
 msgid "stop"
 msgstr ""
 
@@ -819,7 +824,8 @@ msgid "metronome"
 msgstr ""
 
 #: app/views/song-view.scm:537 app/views/song-view.scm:541
-#: lib/wikimusic/html.scm:1899 lib/wikimusic/html.scm:1907
+#: lib/wikimusic/html.scm:1899 lib/wikimusic/html.scm:1901
+#: lib/wikimusic/html.scm:1907 lib/wikimusic/html.scm:1909
 #: lib/wikimusic/html.scm:1919 lib/wikimusic/html.scm:1935
 msgid "ascii size"
 msgstr "tamaño ascii"
@@ -996,245 +1002,301 @@ msgid ""
 "of the preset you are nearest"
 msgstr ""
 
-#: lib/wikimusic/html.scm:244
+#: lib/wikimusic/html.scm:244 lib/wikimusic/html.scm:245
 msgid "language"
 msgstr "idioma"
 
-#: lib/wikimusic/html.scm:382
+#: lib/wikimusic/html.scm:270
+msgid "use"
+msgstr ""
+
+#: lib/wikimusic/html.scm:382 lib/wikimusic/html.scm:384
 msgid "about"
 msgstr "acerca de"
 
-#: lib/wikimusic/html.scm:392
+#: lib/wikimusic/html.scm:392 lib/wikimusic/html.scm:394
 msgid "source code"
 msgstr "código fuente"
 
-#: lib/wikimusic/html.scm:399
+#: lib/wikimusic/html.scm:399 lib/wikimusic/html.scm:401
 msgid "manual"
 msgstr "manual"
 
-#: lib/wikimusic/html.scm:404
+#: lib/wikimusic/html.scm:404 lib/wikimusic/html.scm:406
 msgid "export"
 msgstr ""
 
-#: lib/wikimusic/html.scm:419
+#: lib/wikimusic/html.scm:419 lib/wikimusic/html.scm:421
 msgid "version:"
 msgstr "versión:"
 
-#: lib/wikimusic/html.scm:425
+#: lib/wikimusic/html.scm:425 lib/wikimusic/html.scm:427
 msgid "MIT"
 msgstr ""
 
-#: lib/wikimusic/html.scm:439
+#: lib/wikimusic/html.scm:439 lib/wikimusic/html.scm:441
 msgid "back to the top"
 msgstr "volver arriba"
 
 #: lib/wikimusic/html.scm:559 lib/wikimusic/html.scm:561
+#: lib/wikimusic/html.scm:563
 msgid "Wiki"
 msgstr "Wiki"
 
 #: lib/wikimusic/html.scm:561 lib/wikimusic/html.scm:563
+#: lib/wikimusic/html.scm:565
 msgid "Music"
 msgstr "Music"
 
 #: lib/wikimusic/html.scm:620 lib/wikimusic/html.scm:622
+#: lib/wikimusic/html.scm:624
 msgid "me"
 msgstr "yo"
 
 #: lib/wikimusic/html.scm:738 lib/wikimusic/html.scm:740
+#: lib/wikimusic/html.scm:742
 msgid "beats in a bar"
 msgstr ""
 
 #: lib/wikimusic/html.scm:755 lib/wikimusic/html.scm:757
+#: lib/wikimusic/html.scm:759
 msgid "start"
 msgstr ""
 
 #: lib/wikimusic/html.scm:978 lib/wikimusic/html.scm:986
+#: lib/wikimusic/html.scm:988
 msgid "skip to content"
 msgstr "ir al contenido"
 
-#: lib/wikimusic/html.scm:1102 lib/wikimusic/html.scm:1127
+#: lib/wikimusic/html.scm:1102 lib/wikimusic/html.scm:1104
+#: lib/wikimusic/html.scm:1127
 msgid "published"
 msgstr "publicado"
 
-#: lib/wikimusic/html.scm:1103 lib/wikimusic/html.scm:1128
+#: lib/wikimusic/html.scm:1103 lib/wikimusic/html.scm:1105
+#: lib/wikimusic/html.scm:1128
 msgid "unkown status"
 msgstr "estado desconocido"
 
-#: lib/wikimusic/html.scm:1121 lib/wikimusic/html.scm:1146
+#: lib/wikimusic/html.scm:1121 lib/wikimusic/html.scm:1123
+#: lib/wikimusic/html.scm:1146
 msgid "reply"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1128 lib/wikimusic/html.scm:1153
+#: lib/wikimusic/html.scm:1128 lib/wikimusic/html.scm:1130
+#: lib/wikimusic/html.scm:1153
 msgid "your reply"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1144 lib/wikimusic/html.scm:1169
+#: lib/wikimusic/html.scm:1144 lib/wikimusic/html.scm:1146
+#: lib/wikimusic/html.scm:1169
 msgid "post reply"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1170 lib/wikimusic/html.scm:1195
-#: lib/wikimusic/html.scm:1641 lib/wikimusic/html.scm:1642
-#: lib/wikimusic/html.scm:1662 lib/wikimusic/html.scm:1663
+#: lib/wikimusic/html.scm:1170 lib/wikimusic/html.scm:1172
+#: lib/wikimusic/html.scm:1195 lib/wikimusic/html.scm:1641
+#: lib/wikimusic/html.scm:1642 lib/wikimusic/html.scm:1643
+#: lib/wikimusic/html.scm:1644 lib/wikimusic/html.scm:1662
+#: lib/wikimusic/html.scm:1663
 msgid "save"
 msgstr "guardar"
 
-#: lib/wikimusic/html.scm:1211 lib/wikimusic/html.scm:1236
+#: lib/wikimusic/html.scm:1211 lib/wikimusic/html.scm:1213
+#: lib/wikimusic/html.scm:1236
 #, fuzzy
 msgid "edited"
 msgstr "editar"
 
-#: lib/wikimusic/html.scm:1370 lib/wikimusic/html.scm:1391
+#: lib/wikimusic/html.scm:1370 lib/wikimusic/html.scm:1372
+#: lib/wikimusic/html.scm:1391
 msgid "like"
 msgstr "me gusta"
 
-#: lib/wikimusic/html.scm:1393 lib/wikimusic/html.scm:1414
+#: lib/wikimusic/html.scm:1393 lib/wikimusic/html.scm:1395
+#: lib/wikimusic/html.scm:1414
 msgid "dislike"
 msgstr "no me gusta"
 
-#: lib/wikimusic/html.scm:1411 lib/wikimusic/html.scm:1432
+#: lib/wikimusic/html.scm:1411 lib/wikimusic/html.scm:1413
+#: lib/wikimusic/html.scm:1432
 msgid "last edited"
 msgstr "última edición"
 
-#: lib/wikimusic/html.scm:1421 lib/wikimusic/html.scm:1442
+#: lib/wikimusic/html.scm:1421 lib/wikimusic/html.scm:1423
+#: lib/wikimusic/html.scm:1442
 msgid "approved by"
 msgstr "aprobado por"
 
-#: lib/wikimusic/html.scm:1479 lib/wikimusic/html.scm:1500
+#: lib/wikimusic/html.scm:1479 lib/wikimusic/html.scm:1481
+#: lib/wikimusic/html.scm:1500
 msgid "several pictures — scroll sideways to see them"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1489 lib/wikimusic/html.scm:1510
+#: lib/wikimusic/html.scm:1489 lib/wikimusic/html.scm:1491
+#: lib/wikimusic/html.scm:1510
 msgid "views"
 msgstr "visitas"
 
-#: lib/wikimusic/html.scm:1494 lib/wikimusic/html.scm:1515
+#: lib/wikimusic/html.scm:1494 lib/wikimusic/html.scm:1496
+#: lib/wikimusic/html.scm:1515
 msgid "created"
 msgstr "creado"
 
-#: lib/wikimusic/html.scm:1500 lib/wikimusic/html.scm:1521
+#: lib/wikimusic/html.scm:1500 lib/wikimusic/html.scm:1502
+#: lib/wikimusic/html.scm:1521
 msgid "contributor"
 msgstr "colaborador"
 
-#: lib/wikimusic/html.scm:1511 lib/wikimusic/html.scm:1532
+#: lib/wikimusic/html.scm:1511 lib/wikimusic/html.scm:1513
+#: lib/wikimusic/html.scm:1532
 msgid "visibility"
 msgstr "visibilidad"
 
-#: lib/wikimusic/html.scm:1517 lib/wikimusic/html.scm:1538
+#: lib/wikimusic/html.scm:1517 lib/wikimusic/html.scm:1519
+#: lib/wikimusic/html.scm:1538
 msgid "uuid"
 msgstr "uuid"
 
-#: lib/wikimusic/html.scm:1545 lib/wikimusic/html.scm:1566
+#: lib/wikimusic/html.scm:1545 lib/wikimusic/html.scm:1547
+#: lib/wikimusic/html.scm:1566
 #, fuzzy
 msgid "new comment"
 msgstr "comentarios"
 
-#: lib/wikimusic/html.scm:1561 lib/wikimusic/html.scm:1582
+#: lib/wikimusic/html.scm:1561 lib/wikimusic/html.scm:1563
+#: lib/wikimusic/html.scm:1582
 #, fuzzy
 msgid "post comment"
 msgstr "comentarios"
 
-#: lib/wikimusic/html.scm:1581 lib/wikimusic/html.scm:1602
+#: lib/wikimusic/html.scm:1581 lib/wikimusic/html.scm:1583
+#: lib/wikimusic/html.scm:1602
 msgid "content url"
 msgstr "url del contenido"
 
-#: lib/wikimusic/html.scm:1585 lib/wikimusic/html.scm:1606
+#: lib/wikimusic/html.scm:1585 lib/wikimusic/html.scm:1587
+#: lib/wikimusic/html.scm:1606
 msgid "content caption"
 msgstr "pie de foto del contenido"
 
-#: lib/wikimusic/html.scm:1588 lib/wikimusic/html.scm:1609
+#: lib/wikimusic/html.scm:1588 lib/wikimusic/html.scm:1590
+#: lib/wikimusic/html.scm:1609
 msgid "order value"
 msgstr "valor de orden"
 
-#: lib/wikimusic/html.scm:1624 lib/wikimusic/html.scm:1645
+#: lib/wikimusic/html.scm:1624 lib/wikimusic/html.scm:1626
+#: lib/wikimusic/html.scm:1645
 msgid "wikipedia url"
 msgstr "url de wikipedia"
 
-#: lib/wikimusic/html.scm:1628 lib/wikimusic/html.scm:1649
+#: lib/wikimusic/html.scm:1628 lib/wikimusic/html.scm:1630
+#: lib/wikimusic/html.scm:1649
 msgid "youtube url"
 msgstr "url de youtube"
 
-#: lib/wikimusic/html.scm:1632 lib/wikimusic/html.scm:1653
+#: lib/wikimusic/html.scm:1632 lib/wikimusic/html.scm:1634
+#: lib/wikimusic/html.scm:1653
 msgid "spotify url"
 msgstr "url de spotify"
 
-#: lib/wikimusic/html.scm:1636 lib/wikimusic/html.scm:1657
+#: lib/wikimusic/html.scm:1636 lib/wikimusic/html.scm:1638
+#: lib/wikimusic/html.scm:1657
 msgid "soundcloud url"
 msgstr "url de soundcloud"
 
-#: lib/wikimusic/html.scm:1663 lib/wikimusic/html.scm:1684
+#: lib/wikimusic/html.scm:1663 lib/wikimusic/html.scm:1665
+#: lib/wikimusic/html.scm:1684
 msgid "sort order"
 msgstr "orden de clasificación"
 
-#: lib/wikimusic/html.scm:1675 lib/wikimusic/html.scm:1696
+#: lib/wikimusic/html.scm:1675 lib/wikimusic/html.scm:1677
+#: lib/wikimusic/html.scm:1696
 msgid "Name - Ascending"
 msgstr "Nombre - Ascendente"
 
-#: lib/wikimusic/html.scm:1677 lib/wikimusic/html.scm:1698
+#: lib/wikimusic/html.scm:1677 lib/wikimusic/html.scm:1679
+#: lib/wikimusic/html.scm:1698
 msgid "Name - Descending"
 msgstr "Nombre - Descendente"
 
-#: lib/wikimusic/html.scm:1680 lib/wikimusic/html.scm:1701
+#: lib/wikimusic/html.scm:1680 lib/wikimusic/html.scm:1682
+#: lib/wikimusic/html.scm:1701
 msgid "Created - Ascending"
 msgstr "Creado - Ascendente"
 
-#: lib/wikimusic/html.scm:1682 lib/wikimusic/html.scm:1703
+#: lib/wikimusic/html.scm:1682 lib/wikimusic/html.scm:1684
+#: lib/wikimusic/html.scm:1703
 msgid "Created - Descending"
 msgstr "Creado - Descendente"
 
-#: lib/wikimusic/html.scm:1685 lib/wikimusic/html.scm:1706
+#: lib/wikimusic/html.scm:1685 lib/wikimusic/html.scm:1687
+#: lib/wikimusic/html.scm:1706
 msgid "Last edited - Ascending"
 msgstr "Última edición - Ascendente"
 
-#: lib/wikimusic/html.scm:1687 lib/wikimusic/html.scm:1708
+#: lib/wikimusic/html.scm:1687 lib/wikimusic/html.scm:1689
+#: lib/wikimusic/html.scm:1708
 msgid "Last edited - Descending"
 msgstr "Última edición - Descendente"
 
-#: lib/wikimusic/html.scm:1690 lib/wikimusic/html.scm:1711
+#: lib/wikimusic/html.scm:1690 lib/wikimusic/html.scm:1692
+#: lib/wikimusic/html.scm:1711
 msgid "Views - Ascending"
 msgstr "Visitas - Ascendente"
 
-#: lib/wikimusic/html.scm:1692 lib/wikimusic/html.scm:1713
+#: lib/wikimusic/html.scm:1692 lib/wikimusic/html.scm:1694
+#: lib/wikimusic/html.scm:1713
 msgid "Views - Descending"
 msgstr "Visitas - Descendente"
 
-#: lib/wikimusic/html.scm:1719 lib/wikimusic/html.scm:1740
+#: lib/wikimusic/html.scm:1719 lib/wikimusic/html.scm:1721
+#: lib/wikimusic/html.scm:1740
 #, fuzzy
 msgid "tile size"
 msgstr "tamaño ascii"
 
-#: lib/wikimusic/html.scm:1769 lib/wikimusic/html.scm:1790
+#: lib/wikimusic/html.scm:1769 lib/wikimusic/html.scm:1771
+#: lib/wikimusic/html.scm:1790
 msgid "Small tiles"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1772 lib/wikimusic/html.scm:1793
+#: lib/wikimusic/html.scm:1772 lib/wikimusic/html.scm:1774
+#: lib/wikimusic/html.scm:1793
 msgid "Medium tiles"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1775 lib/wikimusic/html.scm:1796
+#: lib/wikimusic/html.scm:1775 lib/wikimusic/html.scm:1777
+#: lib/wikimusic/html.scm:1796
 msgid "Large tiles"
 msgstr ""
 
-#: lib/wikimusic/html.scm:1992 lib/wikimusic/html.scm:2035
+#: lib/wikimusic/html.scm:1992 lib/wikimusic/html.scm:1994
+#: lib/wikimusic/html.scm:2035
 msgid "Search..."
 msgstr "Buscar..."
 
-#: lib/wikimusic/html.scm:1999 lib/wikimusic/html.scm:2042
+#: lib/wikimusic/html.scm:1999 lib/wikimusic/html.scm:2001
+#: lib/wikimusic/html.scm:2042
 msgid "search"
 msgstr "buscar"
 
-#: lib/wikimusic/html.scm:2040 lib/wikimusic/html.scm:2083
+#: lib/wikimusic/html.scm:2040 lib/wikimusic/html.scm:2042
+#: lib/wikimusic/html.scm:2083
 msgid "Wikipedia"
 msgstr "Wikipedia"
 
-#: lib/wikimusic/html.scm:2044 lib/wikimusic/html.scm:2087
+#: lib/wikimusic/html.scm:2044 lib/wikimusic/html.scm:2046
+#: lib/wikimusic/html.scm:2087
 msgid "Spotify"
 msgstr "Spotify"
 
-#: lib/wikimusic/html.scm:2048 lib/wikimusic/html.scm:2091
+#: lib/wikimusic/html.scm:2048 lib/wikimusic/html.scm:2050
+#: lib/wikimusic/html.scm:2091
 msgid "Youtube"
 msgstr "Youtube"
 
-#: lib/wikimusic/html.scm:2052 lib/wikimusic/html.scm:2095
+#: lib/wikimusic/html.scm:2052 lib/wikimusic/html.scm:2054
+#: lib/wikimusic/html.scm:2095
 msgid "Soundcloud"
 msgstr "Soundcloud"
 
