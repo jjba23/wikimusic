@@ -22,27 +22,166 @@
   #:export (render-song-content render-version render-guitarpro-section
                                 guitarpro-facts guitarpro-filename))
 
-(define (render-chord-pill pair)
-  "Helper to render a single chord pill badge."
-  (let ((chord (car pair))
-        (fingering (cdr pair)))
-    `(div (@ (class ,(mk-class '(inline-flex items-center
-                                             gap-2
-                                             px-4
-                                             py-3
-                                             rounded-xl
-                                             border
-                                             border-stone-300
-                                             dark:border-onyx-500
-                                             hg-frost
-                                             bg-stone-100/75
-                                             dark:bg-onyx-500
-                                             shadow-md
-                                             transition-all))))
-          (span (@ (class ,(mk-class '(font-bold text-md text-onyx-900
+;;; A chord guide a player can hear.
+;;;
+;;; The guide has always listed the chords a tab names, with the fingering the
+;;; transposition implies (`Am  x02210').  A fingering is a picture to a player,
+;;; so it is drawn as one -- six strings, the frets under them, a dot where a
+;;; finger goes -- and the pill is a control rather than a label: pressing it
+;;; plays the chord, so a reader hears the shape they are being shown without
+;;; leaving the page or reaching for an instrument.
+
+(define (fingering-frets fingering)
+  "Return FINGERING as a list of frets, -1 for a silent string, or #f.
+
+FINGERING is what the guide stores: one character per string from the lowest,
+ a digit for the fret it is held at and `x' for a string left silent."
+  (let ((frets (map (lambda (character)
+                      (cond
+                        [(char=? character #\x) -1]
+                        [(char-numeric? character) (- (char->integer character)
+                                                     (char->integer #\0))]
+                        [else #f]))
+                    (string->list fingering))))
+    (and (every (lambda (fret) fret) frets)
+         frets)))
+
+(define (svg-number value)
+  "Return VALUE as the text an SVG attribute is written with."
+  (format #f "~a" value))
+
+(define (fretboard-diagram fingering)
+  "Return FINGERING drawn as a fretboard, or '() when it is not one.
+
+The diagram is a picture of a fact the pill already states in characters, so it
+is decoration to a screen reader and is named as such: what a reader is told is
+the fingering, and what they are offered is the chord, played."
+  (let ((frets (fingering-frets fingering)))
+    (if (not (and frets
+                  (= 6 (length frets))))
+      '()
+      (let* ((held (filter (lambda (fret)
+                             (> fret 0)) frets))
+             (base (if (and (pair? held)
+                            (> (apply min held) 1))
+                     (apply min held)
+                     1))
+             (x0 10)
+             (dx 9)
+             (y0 18)
+             (dy 13)
+             (string-x (lambda (string)
+                         (+ x0 (* string dx))))
+             (fret-y (lambda (row)
+                       (+ y0 (* row dy)))))
+        (list `(svg (@ (viewBox "0 0 66 92")
+                       (class ,(mk-class '(h-16 w-auto)))
+                       (aria-hidden "true")
+                       (fill "none")
+                       (stroke "currentColor")
+                       (stroke-width "1")
+                       (stroke-linecap "round"))
+                    ;; The frets, with the nut drawn as the thick line it is.
+                    ,@(map (lambda (row)
+                             `(line (@ (x1 ,(svg-number x0))
+                                       (y1 ,(svg-number (fret-y row)))
+                                       (x2 ,(svg-number (+ x0 (* 5 dx))))
+                                       (y2 ,(svg-number (fret-y row)))
+                                       ,@(if (and (= row 0) (= base 1))
+                                           '((stroke-width "3"))
+                                           '()))))
+                           '(0 1 2 3 4 5))
+                    ;; The strings.
+                    ,@(map (lambda (string)
+                             `(line (@ (x1 ,(svg-number (string-x string)))
+                                       (y1 ,(svg-number (fret-y 0)))
+                                       (x2 ,(svg-number (string-x string)))
+                                       (y2 ,(svg-number (fret-y 5))))))
+                           '(0 1 2 3 4 5))
+                    ;; Where the fingers go: an open string above the nut, a
+                    ;; silent one crossed out, a held one a dot in its fret.
+                    ,@(map (lambda (fret string)
+                             (let ((x (string-x string)))
+                               (cond
+                                 [(= fret -1)
+                                  `(text (@ (x ,(svg-number x))
+                                            (y ,(svg-number (- (fret-y 0) 5)))
+                                            (text-anchor "middle")
+                                            (stroke "none")
+                                            (fill "currentColor")
+                                            (font-size "10"))
+                                         "×")]
+                                 [(= fret 0)
+                                  `(circle (@ (cx ,(svg-number x))
+                                              (cy ,(svg-number (- (fret-y 0) 7)))
+                                              (r "2.6")))]
+                                 [else
+                                  `(circle (@ (cx ,(svg-number x))
+                                              (cy ,(svg-number (+ (fret-y (- fret
+                                                                          base))
+                                                                  6.5)))
+                                              (r "3.4")
+                                              (fill "currentColor")
+                                              (stroke "none")))])))
+                           frets '(0 1 2 3 4 5))
+                    ;; A shape played high up the neck says which fret it
+                    ;; starts at, the way a printed chord chart does.
+                    ,@(if (> base 1)
+                        (list `(text (@ (x ,(svg-number (- x0 3)))
+                                        (y ,(svg-number (+ (fret-y 0) 9)))
+                                        (text-anchor "end")
+                                        (stroke "none")
+                                        (fill "currentColor")
+                                        (font-size "8"))
+                                     ,(format #f "~afr" base)))
+                        '())))))))
+
+(define* (render-chord-pill G_ pair)
+  "Return one chord of the guide, drawn and playable, as SXML."
+  (let* ((chord (car pair))
+         (fingering (cdr pair))
+         (diagram (fretboard-diagram fingering))
+         (pill-classes '(flex flex-row items-center gap-2
+                              px-3 py-2
+                              rounded-xl
+                              border
+                              border-stone-300
+                              dark:border-onyx-500
+                              bg-stone-100/75
+                              dark:bg-onyx-500
+                              shadow-md
+                              transition-all
+                              text-onyx-900
+                              dark:text-stone-100)))
+    (if (pair? diagram)
+      `(button (@ (type "button")
+                  (class
+                   ,(mk-class (append '(cursor-pointer
+                                        active:scale-95)
+                                      pill-classes)))
+                  (title ,(G_ "hear this chord"))
+                  (aria-label ,(format #f "~a, ~a" chord fingering))
+                  (onclick ,(format #f "wikimusicChordPlay('~a')" fingering)))
+               (div (@ (class ,(mk-class '(flex
+                                           flex-col
+                                           items-start
+                                           gap-1))))
+                    (span (@ (class ,(mk-class '(font-bold
+                                                 text-md
+                                                 text-onyx-900
                                                  dark:text-stone-100))))
-                ,chord)
-          (span (@ (class ,(mk-class '(font-mono text-md
+                          ,chord)
+                    (span (@ (class ,(mk-class '(font-mono
+                                                 text-sm
+                                                 text-onyx-700
+                                                 dark:text-stone-300))))
+                          ,fingering))
+               ,(car diagram))
+      `(div (@ (class ,(mk-class pill-classes)))
+            (span (@ (class ,(mk-class '(font-bold text-md text-onyx-900
+                                                   dark:text-stone-100))))
+                  ,chord)
+            (span (@ (class ,(mk-class '(font-mono text-md
                                                  px-3
                                                  py-2
                                                  bg-stone-100
@@ -50,14 +189,14 @@
                                                  rounded-xl
                                                  text-onyx-700
                                                  dark:text-stone-300))))
-                ,fingering))))
+                  ,fingering)))))
 
-(define (render-chord-guide chord-pairs)
-  "Helper to render the flex row container for all chord pills"
+(define (render-chord-guide G_ chord-pairs)
+  "Return the guide's chords as one row of playable pills."
   (if (null? chord-pairs) ""
-      `(div (@ (class ,(mk-class '(flex flex-wrap gap-3 py-6 items-center
-                                        items-center))))
-            ,@(map render-chord-pill chord-pairs))))
+      `(div (@ (class ,(mk-class '(flex flex-wrap gap-3 py-6 items-center))))
+            ,@(map (lambda (pair)
+                     (render-chord-pill G_ pair)) chord-pairs))))
 
 (define* (render-song-content G_ song song-contents ascii-size)
   `(div (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))
@@ -149,7 +288,7 @@
 ;;
 ;; One definition for the two places a song page shows one -- the contents and
 ;; the legend -- so the two cannot disagree about the size the reader chose,
-;; the frost behind them, or how a line wider than the page is reached:
+;; the surface under them, or how a line wider than the page is reached:
 ;; `overflow-x-auto' shows a scrollbar when the text needs one, where `scroll'
 ;; kept one over a tab that fitted.
 ;;
@@ -162,13 +301,19 @@
   `(pre (@ (id ,id)
            (class ,(mk-class (append (list (string->symbol
                                             (ascii-size-known size)))
+                                     ;; A tablature is the music itself, so it
+                                     ;; is drawn on a surface of its own rather
+                                     ;; than on a pane of the page: the paper
+                                     ;; under it is opaque, so no colour wash
+                                     ;; and no content scrolling behind it
+                                     ;; tints a note, and it casts no shadow for
+                                     ;; the same reason -- a shadow is an edge
+                                     ;; of paper, not of the music.
                                      '(wm-ascii
                                        p-4 md:p-6
-                                       shadow-md
                                        font-mono
-                                       hg-frost
-                                       bg-stone-100/75
-                                       dark:bg-onyx-900/75
+                                       bg-white
+                                       dark:bg-onyx-900
                                        text-black
                                        dark:text-white
                                        rounded-xl
@@ -192,8 +337,8 @@
 (define (render-ascii-content G_ ascii-size ascii-contents)
   (let* ((guitar-chord-guide-contents (generate-guitar-chord-guide
                                        ascii-contents)))
-    `(,(ascii-button-section G_) ,(render-chord-guide
-                                   guitar-chord-guide-contents)
+    `(,(ascii-button-section G_) ,(render-chord-guide G_
+                                                       guitar-chord-guide-contents)
       (details (@ (open true)
                   (class ,(mk-class '(wm-disclosure my-6))))
                ,(disclosure-summary G_ "ascii contents")

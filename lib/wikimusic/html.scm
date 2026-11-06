@@ -335,7 +335,8 @@ the same string however it is nested."
                          "pub/js/file-base64.js"
                          "pub/js/metronome.js"
                          "pub/js/password-strength.js"
-                         "pub/js/guitarpro-player.js")))
+                         "pub/js/guitarpro-player.js"
+                         "pub/js/chord-player.js" "pub/js/tuner.js")))
 
 ;;; What a link on this instance is painted with, handed to hygguile's `a' as
 ;;; `#:color' and `#:hover'.
@@ -479,7 +480,21 @@ classes it carries, so the element name is about what the bar *is*."
                                  ;; just enough height for its controls and
                                  ;; no more, and grows no taller than the
                                  ;; row it holds.
-                                 '(flex flex-col
+                                 ;; The bar is *opaque* and it casts no shadow.
+                                 ;; Both are the same decision: this is the one
+                                 ;; element pinned over a page that is moving,
+                                 ;; and a translucent pane over moving content
+                                 ;; shows that content through itself -- the
+                                 ;; smear a reader reads as a shadow under the
+                                 ;; bar.  A surface that scrolls over a page
+                                 ;; is a surface of its own, and its edge is
+                                 ;; drawn with a border rather than thrown.
+                                 ;; `wm-nav' is the bar as a brand decision: every
+                                 ;; control inside it answers the pointer in the
+                                 ;; brand's pink, which is one rule rather than a
+                                 ;; hover class on each of the seven of them.
+                                 '(wm-nav
+                                   flex flex-col
                                         lg:flex-row
                                         lg:items-center
                                         lg:justify-between
@@ -490,27 +505,19 @@ classes it carries, so the element name is about what the bar *is*."
                                         py-1
                                         sm:px-3
                                         sm:py-2
-                                        hg-frost
-                                        bg-stone-100/75
-                                        dark:bg-onyx-900/75
+                                        bg-stone-100
+                                        dark:bg-onyx-900
                                         rounded-2xl
                                         border
                                         border-stone-500/25
-                                        dark:border-onyx-100/10
-                                        shadow-md)
+                                        dark:border-onyx-100/10)
                                  ;; While a reader is reading -- a song's ascii
                                  ;; contents, or a PDF beside them -- the bar is
                                  ;; not pinned: it scrolls away with the page and
                                  ;; gives the whole viewport back to the content.
                                  (if reading?
                                    '()
-                                   '(sticky top-2 z-32))
-                                 ;; The ink a link takes on hover is named for
-                                 ;; both themes: the deep violet is a light-theme
-                                 ;; decision, and on the dark page the same hover
-                                 ;; is answered with the light step instead.
-                                 '(hover:text-china-violet-700
-                                   dark:hover:text-china-violet-300)))))
+                                   '(sticky top-2 z-32))))))
 
            ;; Logo
            (div (@ (class ,(mk-class '(flex items-center
@@ -528,19 +535,31 @@ classes it carries, so the element name is about what the bar *is*."
                                                sm:gap-2
                                                min-w-0
                                                no-underline))))
-                   (div (@ (class ,(mk-class '(flex flex-row align-center items-center gap-2))))
+                   ;; The wordmark: the mark, then the name in two inks -- the
+                   ;; project's ink for the place, the brand's pink for the
+                   ;; music.  It is the one piece of type on every page, so it
+                   ;; is the one place the brand is written down as type rather
+                   ;; than implied by a border colour.
+                   ;;
+                   ;; The mark is the PNG because artanis only serves the file
+                   ;; extensions named in ENTRY's `#:statics'.  Its corners are
+                   ;; already transparent, so a dark page shows no white tile
+                   ;; around it.  It is smaller than the name beside it, which is
+                   ;; what keeps the bar a strip rather than a header.
+                   (div (@ (class ,(mk-class '(wm-wordmark flex flex-row
+                                                            items-center
+                                                            gap-2))))
                         (img (@ (src ,(asset-address
                                        "/img/wikimusic-logo.png"))
                                 (alt "")
                                 (loading lazy)
-                                (class ,(mk-class '(shrink-0 h-7 w-auto
-                                                             sm:h-8)))) "")
-                        ,(h1 `(
-                               (span ,(G_ "WikiMusic")))
-                             #:weight '(font-medium italic)
-                             #:color '(text-onyx-300 dark:text-stone-300
-                                                     hover:text-persia-pink-900
-                                                     dark:hover:text-persia-pink-300)
+                                (class ,(mk-class '(shrink-0 h-6 w-auto
+                                                             sm:h-7)))) "")
+                        ,(h1 `((span ,(G_ "Wiki"))
+                               (span (@ (class "wm-wordmark-accent"))
+                                     ,(G_ "Music")))
+                             #:weight '(font-semibold)
+                             #:color '(text-onyx-900 dark:text-stone-100)
                              #:family '(font-sans)
                              #:size '(text-lg sm:text-xl md:text-2xl)))))
 
@@ -562,6 +581,12 @@ classes it carries, so the element name is about what the bar *is*."
 
                 ,(nav-link "/artists"
                            'guitar "artists")
+
+                ;; The one control here that is used with an instrument in
+                ;; hand rather than with a page: a musician opens a tuner
+                ;; before they open a song.
+                ,(nav-link "/tuner"
+                           'equalizer "tuner")
 
                 ;; Login / profile
                 ,(unless is-logged-in `(a (@ (href "/login")
@@ -922,7 +947,13 @@ and six.
                                                   "pub/js/password-strength.js"))
 
                               (script ,(assoc-ref asset-library
-                                                  "pub/js/guitarpro-player.js")))
+                                                  "pub/js/guitarpro-player.js"))
+
+                              (script ,(assoc-ref asset-library
+                                                  "pub/js/chord-player.js"))
+
+                              (script ,(assoc-ref asset-library
+                                                  "pub/js/tuner.js")))
 
                         (body (@ (class ,(mk-class '(bg-stone-100
                                                      dark:bg-onyx-900

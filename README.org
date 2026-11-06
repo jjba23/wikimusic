@@ -82,9 +82,15 @@ wikimusic is powered by: [[https://www.gnu.org/software/guile/][Guile Scheme]], 
   tablature, and which it plays back -- so a reader can see, hear and download
   the same file without leaving the page.
 - *A page to practise from*: an ASCII tablature a reader can scroll by itself,
-  the *chords the tab names* turned into a fingering guide under it, and a
-  *metronome* whose click is made in the browser rather than fetched -- so a
-  song page is something to play along with, not only to read.
+  the *chords the tab names* turned into a fingering guide under it -- each
+  chord drawn as a fretboard and *played* when a reader presses it -- and a
+  *metronome* whose click is made in the browser rather than fetched, so a song
+  page is something to play along with, not only to read.
+- *A tuner*, at =/tuner=: the page a musician opens with an instrument in their
+  hands.  A guitar in standard, drop D or half a step down, a four- or
+  five-string bass, or a ukulele -- with every string named, its frequency
+  given, and a reference tone to hear -- and a microphone that names the note it
+  hears and shows how far off it is, in this browser, with nothing recorded.
 - *A responsive interface* -- the same shell on a phone and on a desktop -- with
   sorting, search and a subtle, icon-first tile-size control on every list.
 - *Light and dark*, with the reader's choice remembered, and four interface
@@ -396,10 +402,11 @@ The unit tests live in ~test/veritas/unit~, one file per area, and each is run b
   =domain/~ (what a song, an artist, a genre *is*), =sqlite/~ (how each is
   stored and read), =html.scm= (the shell and every component a page is built
   from), =controller.scm= (=guard-owner=, =may-mutate?=), =auth.scm=,
-  =config.scm=, =seo.scm=, =guitarpro.scm=, =prose.scm= and
-  =domain/guitar-chord-guide.scm=;
+  =config.scm=, =seo.scm=, =guitarpro.scm=, =prose.scm=,
+  =domain/guitar-chord-guide.scm= and =domain/tuning.scm= (what a string is
+  tuned to);
 - ~pub/~ -- everything the browser is served, and nothing else:
-  =css/=, =js/=, =img/= and =vendor/= (the typefaces, the glyphs and the
+  =css/=, =js/=. =img/= and =vendor/= (the typefaces, the glyphs and the
   tablature renderer, which an instance serves itself);
 - ~resources/~ -- =migrations/sqlite/= (the schema, oldest first) and
   =assets/=.  ~sys/~ -- =i18n/= (the translation catalogs) and =pages/=;
@@ -712,6 +719,62 @@ only to read.
 None of the three is needed to read the song, and none of them is a video or a
 third-party widget: they are three small scripts in =pub/js/=, offered by the
 page, hidden until the script that drives them is there.
+
+------
+
+* Tuning an instrument from the page
+:PROPERTIES:
+:CUSTOM_ID: tuning-an-instrument-from-the-page
+:END:
+
+=GET /tuner= is the one page of wikimusic that is used with an instrument in
+hand rather than with a page: it says what a set of strings *should* be, and
+what one of them *is*.  Both halves are the page's own, and only the second
+needs anything of the browser.
+
+** What a reader is offered
+:PROPERTIES:
+:CUSTOM_ID: what-a-reader-is-offered
+:END:
+
+- *The presets* are addresses, not a menu a script has to understand: a guitar
+  in standard tuning, in drop D or half a step down, a four- and a five-string
+  bass, and a ukulele in its re-entrant tuning.  Choosing one is a link to the
+  same page with =?preset= in it, so the tuning a reader plays in can be
+  bookmarked, sent to somebody else, and read back by the script without the
+  script knowing which presets exist.  A name nothing offers is the default
+  guitar tuning rather than an error: a reader who mistypes an address wanted a
+  tuner.
+- *Every string* is drawn with the note it should sound (=E2=), the frequency
+  that note is in hertz, and a control that plays it.  That half works with no
+  script at all: a player tuning by ear against a piano, or against a tuner
+  whose battery has gone, can read the notes off the page.
+- *The tuner* reads the microphone, names the note it hears, says how many cents
+  off it is, and moves a needle across a meter whose middle is in tune.  The
+  string of the preset a reader is nearest is ringed, so the page answers "which
+  one am I tuning" as well as "is it right".
+
+** What the microphone does, and does not
+:PROPERTIES:
+:CUSTOM_ID: what-the-microphone-does-and-does-not
+:END:
+
+The audio is read in the browser and nothing leaves it: no recording, no upload,
+and no sound from the room sent to the speakers -- a page that played its own
+microphone back would howl.  The pitch is found by *autocorrelation*, which is
+what makes a guitar string readable: its loudest partials are higher than the
+note it is tuned to, and a peak-picking detector would report the harmonic
+instead of the string.
+
+The control is hidden until the script that drives it is there, the same way the
+metronome is, and every sentence it can show -- waiting for a note, listening, in
+tune, permission refused, a browser that cannot read a pitch -- is written by the
+page.  The script un-hides one of them, so a translated page stays translated
+while the microphone does or does not answer.
+
+The arithmetic is in =lib/wikimusic/domain/tuning.scm= and is a pure function of
+a note number: A4 is 440 hertz by definition and every string is its own distance
+from it.  What the browser adds is the pitch, not the tuning.
 
 ------
 

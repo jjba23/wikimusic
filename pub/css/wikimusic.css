@@ -20,6 +20,67 @@
   restates a decision the markup can already make.
 */
 
+/* ===== The brand =====
+
+   Two inks, and the type the wordmark is set in.  Everything else the site is
+   painted with is a utility class from the bundle; this is the handful of
+   decisions that are the *project's* rather than a framework's, so they live
+   here, once, and the pages read them by name.
+
+   The pink is Olive's `persia-pink` -- the accent every border, link and
+   highlight on the site is already drawn from -- so the wordmark, the mark and
+   the favicon are the same colour as the page around them instead of a third
+   shade of their own.  The dark theme is not a tint of the light one: it steps
+   to the lighter pinks, because a deep pink on a dark page is a smudge. */
+
+:root {
+  --wm-brand: oklch(0.6904 0.1399 348.9);
+  --wm-brand-hover: oklch(0.6404 0.1399 348.9);
+  --wm-ink: oklch(0.2588 0.0044 247.95);
+  --wm-paper: oklch(0.987 0.0013 286.37);
+}
+
+[data-theme="dark"] {
+  --wm-brand: oklch(0.7904 0.1399 348.9);
+  --wm-brand-hover: oklch(0.8404 0.1399 348.9);
+}
+
+/* The wordmark: the name set tight and slightly heavier than the page's own
+   type, with the second half in the brand's ink.  It is the one element that
+   says whose site a reader is on, so it is the one element that is not a
+   utility class. */
+
+.wm-wordmark {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.wm-wordmark-accent {
+  color: var(--wm-brand);
+  transition: color 150ms ease;
+}
+
+a:hover .wm-wordmark-accent,
+a:focus-visible .wm-wordmark-accent {
+  color: var(--wm-brand-hover);
+}
+
+/* The bar's controls answer the pointer in the brand's ink too.  The rule is on
+   the bar rather than on each control because a control is a button-shaped
+   span inside an anchor, and every one of them names its own colour: without
+   the second rule the ink would stop at the anchor and the glyphs and labels
+   inside would keep their own. */
+
+.wm-nav a:hover,
+.wm-nav a:focus-visible {
+  color: var(--wm-brand);
+}
+
+.wm-nav a:hover *,
+.wm-nav a:focus-visible * {
+  color: inherit;
+}
+
 /* ===== The scheme the browser's own controls are drawn in =====
 
    A page styles what it draws and the browser styles the rest: the scrollbar
@@ -61,10 +122,115 @@
    are turned off. `line-height' stays loose enough to read: leading moves
    the rows, not the glyphs, so it costs the columns nothing. */
 
+/* The columns are held still by four things, and all four have to be here:
+   the stop a tab jumps to, the ligatures turned off, the kerning turned off
+   (a pair of characters set closer than a monospaced cell is a note moved by
+   half a character), and a letter spacing of zero.  `font-variant-numeric' is
+   the fifth: the digits of a fret are the widest thing in a tab, and a tab
+   that set them at a proportional width would shift every column on the line.
+   The leading is loose because a reader scans a tab by its rows, and it costs
+   the columns nothing: leading moves the lines, not the glyphs inside one. */
+
 .wm-ascii {
   tab-size: 4;
-  line-height: 1.35;
+  line-height: 1.5;
   font-variant-ligatures: none;
+  font-variant-numeric: tabular-nums;
+  font-kerning: none;
+  letter-spacing: 0;
+  word-spacing: 0;
+  text-rendering: optimizeSpeed;
+}
+
+/* ===== The `hidden` attribute means hidden =====
+
+   Every script-driven control on a song page -- the metronome, the tablature's
+   own controls, the tuner -- is written into the page with `hidden' and is
+   un-hidden by the script that can drive it.  A page's utilities are classes,
+   and a class that sets a display wins over the browser's own rule for the
+   attribute, which is how a control that had never been turned on was drawn
+   anyway.  The attribute is what the page means, so it keeps the last word. */
+
+[hidden] {
+  display: none !important;
+}
+
+/* ===== A tuner's meter =====
+
+   A line with ticks and a marker that travels along it: the needle is where a
+   string is, the middle is where it should be.  The marker's place is the
+   `--wm-cents' the script writes, which is the reading in cents, so the shape
+   of the meter is this stylesheet's business and the number is the script's.
+
+   The colour is `currentColor' and the ink is the markup's, so the meter is
+   painted with the page's palette in either theme; the one colour named here is
+   the one that means "in tune", which is not a colour the palette has a name
+   for. */
+
+.wm-tuner-meter {
+  position: relative;
+  height: 3rem;
+  margin-block: 0.25rem;
+}
+
+.wm-tuner-track {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.2;
+}
+
+.wm-tuner-tick {
+  position: absolute;
+  top: calc(50% - 0.35rem);
+  width: 1px;
+  height: 0.7rem;
+  background: currentColor;
+  opacity: 0.3;
+}
+
+.wm-tuner-tick-centre {
+  top: calc(50% - 0.7rem);
+  height: 1.4rem;
+  opacity: 0.55;
+}
+
+.wm-tuner-needle {
+  position: absolute;
+  top: calc(50% - 1.15rem);
+  left: calc(50% + var(--wm-cents, 0) * 1%);
+  width: 0.3rem;
+  height: 2.3rem;
+  border-radius: 9999px;
+  background: currentColor;
+  transform: translateX(-50%);
+  transition: left 90ms linear;
+}
+
+[data-in-tune="true"] .wm-tuner-needle {
+  background: #3f6212;
+}
+
+[data-theme="dark"] [data-in-tune="true"] .wm-tuner-needle {
+  background: #a3e635;
+}
+
+/* The string a reader is nearest, and the one being sounded: a ring around the
+   string rather than a colour of its own, so the note and its frequency keep
+   the ink the rest of the page is read in. */
+
+.wm-tuner-string[data-active="true"] {
+  border-color: currentColor;
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.wm-tuner-string[data-sounding="true"] {
+  border-color: currentColor;
+  outline: 2px dashed currentColor;
+  outline-offset: 2px;
 }
 
 /* ===== Where a skip link lands =====
@@ -131,8 +297,8 @@
   z-index: 96;
   padding: 0.75rem 1rem;
   border-end-end-radius: 0.75rem;
-  background: #1c1917;
-  color: #f5f5f4;
+  background: var(--wm-ink);
+  color: var(--wm-paper);
   font-weight: 600;
   text-decoration: none;
   transform: translateY(-130%);
@@ -140,8 +306,8 @@
 }
 
 [data-theme="dark"] .wm-skip-link {
-  background: #f5f5f4;
-  color: #1c1917;
+  background: var(--wm-paper);
+  color: var(--wm-ink);
 }
 
 .wm-skip-link:focus,
@@ -159,7 +325,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .wm-disclosure-mark,
-  .wm-skip-link {
+  .wm-skip-link,
+  .wm-tuner-needle,
+  .wm-wordmark-accent {
     transition: none;
   }
 }
