@@ -99,6 +99,67 @@ a:focus-visible .wm-wordmark-accent {
   overflow: hidden;
 }
 
+/* ===== The search =====
+
+   One pill holding the field and the control that sends it: the two share a
+   rounded edge instead of sitting beside each other as two boxes, and the
+   group says which one has the caret by taking the brand's own border.  The
+   field loses its edge inside it, so the only line a reader sees is the
+   group's. */
+
+.wm-search {
+  border: 2px solid color-mix(in oklch, var(--wm-brand) 40%, transparent);
+  border-radius: 9999px;
+  overflow: hidden;
+  transition: border-color 200ms ease-in-out;
+}
+
+.wm-search:focus-within {
+  border-color: var(--wm-brand);
+}
+
+.wm-search label {
+  display: none;
+}
+
+.wm-search-field {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  min-width: 0;
+}
+
+.wm-search-field::placeholder {
+  color: inherit;
+  opacity: 0.55;
+}
+
+.wm-search-button {
+  border: 0;
+  border-left: 2px solid color-mix(in oklch, var(--wm-brand) 35%, transparent);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  transition: background-color 200ms ease-in-out;
+}
+
+.wm-search-button:hover {
+  background: color-mix(in oklch, var(--wm-brand) 16%, transparent);
+}
+
+.wm-search-button:active {
+  background: color-mix(in oklch, var(--wm-brand) 24%, transparent);
+}
+
+.wm-search-button:focus-visible {
+  outline: 2px solid var(--wm-brand);
+  outline-offset: -4px;
+}
+
 /* ===== The scheme the browser's own controls are drawn in =====
 
    A page styles what it draws and the browser styles the rest: the scrollbar

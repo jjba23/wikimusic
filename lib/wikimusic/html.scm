@@ -1990,18 +1990,22 @@ function addSearchQueryParam(form) {
 }
 ")
     (div (@ (class ,(mk-class '(my-3))))
+         ;; The field and the control that sends it are one pill, at every
+         ;; width: a reader who has typed a word is looking at the button beside
+         ;; it, not below it.  The input takes whatever room the button leaves,
+         ;; so the pair travels as one control and the row is as wide as the
+         ;; page's reading measure rather than as wide as the page.
          (form (@ (action ,action)
-                  (onsubmit "addSearchQueryParam(this)"))
-               ;; A list page reads its words at the end of its own toolbar, so
-               ;; they line up with the left of it; a page that offers the
-               ;; control on its own -- the front page -- asks for it centred
-               ;; at every width.
-               (div (@ (class ,(mk-class (append '(flex flex-row items-center
-                                                        flex-wrap gap-2)
-                                                 (if centered?
-                                                   '(justify-center)
-                                                   '(justify-center
-                                                     md:justify-start)))))) "")
+                  (role "search")
+                  (onsubmit "addSearchQueryParam(this)")
+                  (class ,(mk-class (append '(wm-search flex flex-row
+                                                         flex-nowrap
+                                                         items-stretch
+                                                         w-full max-w-prose
+                                                         shadow-md)
+                                            (if centered?
+                                              '(mx-auto)
+                                              '())))))
                ,(input #:label ""
                        #:name "search"
                        #:value (cond
@@ -2009,20 +2013,13 @@ function addSearchQueryParam(form) {
                                   ""]
                                  [else search-query])
                        #:placeholder (G_ "Search...")
-                       #:input-css '(py-2 px-3
-                                          max-w-prose
-                                          rounded-xl
-                                          border-2
-                                          border-persia-pink-300/25
-                                          dark:border-persia-pink-300/25
-                                          hg-frost
-                                          bg-stone-100/75
-                                          dark:bg-onyx-900/75
-                                          dark:text-stone-300
-                                          text-onyx-300
-                                          shadow-md)
-                       #:input-flex-css #f)
-               ,(submit-button (G_ "search"))))))
+                       #:input-css '(wm-search-field w-full px-5 py-2
+                                                     text-onyx-300
+                                                     dark:text-stone-300)
+                       #:input-flex-css '(flex-1))
+               (button (@ (type "submit")
+                          (class "wm-search-button shrink-0 px-5 py-2 font-sans"))
+                       ,(G_ "search"))))))
 
 (define* (render-external-link #:key link label)
   (render-if-nestring (lambda (l)
