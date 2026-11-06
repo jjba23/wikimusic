@@ -152,7 +152,7 @@ not two per song."
 (define (artwork-record row)
   (make-artwork
    #:identifier (column row 'identifier)
-   #:content-url (column row 'content-url)
+   #:content-url (uri-decode (column row 'content-url))
    #:content-caption (text (column row 'content-caption))
    #:order-value (integer (column row 'order-value))))
 
@@ -247,8 +247,11 @@ not two per song."
   (let ((id (assq-ref args 'song-id)))
     (if (not (get-song-by-id song-repo id))
         (json-error 404 "not-found" "No such song")
-        (ok (map version-record
-                 (get-song-contents-by-song-ids content-repo (list id)))))))
+        (ok (list->vector
+             (map song-version->jso
+                  (map version-record
+                       (get-song-contents-by-song-ids content-repo
+                                                      (list id)))))))))
 
 (define (list-artists-handler artist-repo args)
   (receive (limit offset) (pagination args)
@@ -445,4 +448,6 @@ not two per song."
   (let ((body (http-response-body response)))
     (response-emit (if (string? body) body (jso->json-string body))
                    #:status (http-response-status response)
-                   #:headers '((Content-Type . "application/json; charset=utf-8")))))
+                   #:headers (list (cons 'content-type
+                                        (list 'application/json
+                                              (cons 'charset "utf-8")))))))
