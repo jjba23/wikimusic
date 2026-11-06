@@ -271,7 +271,7 @@ their own language rather than spelling as an address."
              ;; a reader can do about it.
              (span (@ (id ,(part "-status-blocked"))
                       (hidden ""))
-                   ,(G_ "this browser is blocking the microphone for this site: allow it in the address bar, then press listen"))
+                   ,(G_ "this browser is blocking the microphone for this site: open the permissions in the address bar, allow the microphone, then reload this page"))
              (span (@ (id ,(part "-status-unsupported"))
                       (hidden ""))
                    ,(G_ "this browser cannot read a pitch from a microphone")))
