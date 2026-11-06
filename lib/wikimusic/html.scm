@@ -1044,37 +1044,14 @@ and six.
   (let ((item-link (format #f "/~as/uuid/~a" entity
                            (assq-ref x
                                      'identifier))))
-    `((div (@ (class ,(mk-class '(hg-frost bg-stone-100/75
-                                           dark:bg-onyx-900/75
-                                           rounded-xl
-                                           sm:rounded-2xl
-                                           shadow-md
-                                           hover:shadow-lg
-                                           transition-all
-                                           duration-200
-                                           h-full
-                                           flex
-                                           flex-col
-                                           overflow-hidden
-                                           border
-                                           border-persia-pink-100/25
-                                           dark:border-persia-pink-900/10
-                                           hover:border-persia-pink-300/40
-                                           dark:hover:border-persia-pink-500/30))))
+    `((div (@ (class "wm-tile h-full flex flex-col overflow-hidden"))
 
            ;; Cover
            ,(render-if-nempty (lambda (art)
                                 `(a (@ (href ,item-link)
-                                       (class ,(mk-class '(block w-full
-                                                                 aspect-square
-                                                                 shrink-0
-                                                                 overflow-hidden))))
+                                       (class "wm-tile-cover block w-full aspect-square shrink-0 overflow-hidden"))
                                     (img (@ (loading "lazy")
-                                            (class ,(mk-class '(w-full h-full
-                                                                       object-cover
-                                                                       transition-transform
-                                                                       duration-200
-                                                                       hover:scale-105)))
+                                            (class "w-full h-full object-cover transition-transform duration-300 hover:scale-105")
                                             (src ,(uri-decode (assq-ref art
                                                                         'content-url)))) "")))
                               (cond
@@ -1083,46 +1060,29 @@ and six.
                                 [else (car artworks)]))
 
            ;; Content
-           (div (@ (class ,(mk-class '(flex flex-col
-                                            grow
-                                            min-w-0
-                                            p-2
-                                            sm:p-3
-                                            md:p-4))))
+           (div (@ (class "wm-tile-body flex flex-col gap-1 grow min-w-0 text-center"))
 
                 ;; Name
                 ;;
-                ;; The name is set heavier than the line under it, and that
-                ;; line is dimmer and smaller, because the two answer different
-                ;; questions: a reader choosing between two tiles is choosing a
-                ;; *song*, and who made it is how two songs with one name are
-                ;; told apart.
-                (div (@ (class ,(mk-class '(min-w-0 text-center
-                                                  flex flex-col gap-1))))
-                     ,(a (assq-ref x
-                                   'display-name)
-                         #:size '(text-md sm:text-base md:text-lg)
-                         #:weight '(font-semibold)
-                         #:family '(font-sans)
-                         #:href item-link
-                         #:color '(text-onyx-300 dark:text-stone-100)
-                         #:hover '(hover:text-persia-pink-500
-                                   dark:hover:text-persia-pink-300))
-                     ,(render-if-nempty
-                       (lambda (line)
-                         `(p (@ (class ,(mk-class '(m-0
-                                                     text-xs
-                                                     sm:text-sm
-                                                     font-light
-                                                     leading-snug
-                                                     text-onyx-500
-                                                     dark:text-stone-400))))
-                             ,line))
-                       subtitle))
+                ;; The name is the tile's title and the line under it is its
+                ;; credit: a reader choosing between two covers is choosing a
+                ;; *song*, and who made it is how two songs sharing a name are
+                ;; told apart.  Both are painted from the tile's own tokens --
+                ;; `.wm-tile-name' and `.wm-tile-by' in the interface's sheet --
+                ;; rather than from utilities, because a utility the bundle
+                ;; does not carry fails silently and the pair falls out of step
+                ;; with the theme.
+                (a (@ (href ,item-link)
+                      (class "wm-tile-name"))
+                   ,(assq-ref x
+                              'display-name))
+                ,(render-if-nempty
+                  (lambda (line)
+                    `(p (@ (class "wm-tile-by")) ,line))
+                  subtitle)
                 ;; Extra information
                 ,(render-if-nempty (lambda (info)
-                                     `(div (@ (class ,(mk-class '(pt-1 sm:pt-2
-                                                                       text-center))))
+                                     `(div (@ (class "pt-1 sm:pt-2 text-center"))
                                            ,info)) extra-top-info)
 
                 ,extra-bot-info)))))
@@ -1832,11 +1792,11 @@ throw the results away."
   '(("text-xs" . "text-2") ("text-sm" . "text-3") ("text-md" . "text-4")
     ("text-lg" . "text-5") ("text-xl" . "text-6")))
 
-;;; The step a song page opens at when the reader has not chosen one: 75%, a
-;;; quarter smaller than the page's own reading size, which is what an ascii
-;;; tab has always been drawn at on this site.
+;;; The step a song page opens at when the reader has not chosen one: 100%, the
+;;; page's own reading size.  A tab is meant to be read, and a reader who wants
+;;; it smaller or larger has the control right above it.
 (define ascii-size-default
-  "text-3")
+  "text-4")
 
 (define (ascii-size-known size)
   "Return the step @var{size} names, or the default step when it names none.
@@ -1900,7 +1860,8 @@ string off.  SIZE is the step the page is being drawn at; it is read through
                             '((aria-disabled "true")))
                         (class
                          ,(mk-class
-                           (append '(inline-flex items-center
+                           (append '(wm-size-step
+                                                     inline-flex items-center
                                                  justify-center
                                                  p-1
                                                  rounded-lg
@@ -1923,15 +1884,7 @@ string off.  SIZE is the step the page is being drawn at; it is read through
                             #:icon-css '(text-base))))))
     `((div (@ (role "group")
               (aria-label ,(G_ "ascii size"))
-              (class ,(mk-class '(inline-flex flex-row items-center
-                                              gap-1
-                                              p-1
-                                              rounded-xl
-                                              border
-                                              border-persia-pink-100/25
-                                              dark:border-persia-pink-900/10
-                                              bg-stone-100/50
-                                              dark:bg-onyx-900/50))))
+              (class "wm-size-control"))
            ,(stepper (ascii-size-neighbour current -1)
                      'minus
                      "smaller text")
@@ -1939,22 +1892,7 @@ string off.  SIZE is the step the page is being drawn at; it is read through
                       (name ascii-size-select)
                       (id ascii-size-select)
                       (aria-label ,(G_ "ascii size"))
-                      (class ,(mk-class '(appearance-none
-                                          cursor-pointer
-                                          rounded-lg
-                                          px-2
-                                          py-1
-                                          text-center
-                                          tabular-nums
-                                          text-sm
-                                          font-medium
-                                          bg-transparent
-                                          text-persia-pink-700
-                                          dark:text-persia-pink-300
-                                          transition-colors
-                                          duration-150
-                                          hover:bg-stone-300/40
-                                          dark:hover:bg-onyx-500/40))))
+                      (class "wm-size-select"))
                    ,@(map (lambda (step)
                             (let ((name (car step))
                                   (share (cdr step)))

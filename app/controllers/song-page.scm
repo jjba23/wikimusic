@@ -248,7 +248,7 @@
                                           (:cookies-value rc
                                            "wikimusic-ascii-size")))
                              (:cookies-value rc "wikimusic-ascii-size"))
-                            (else "text-sm")))
+                            (else ascii-size-default)))
               (inc-v (+ 1
                         (assq-ref song
                                   'views)))

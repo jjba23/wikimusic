@@ -758,6 +758,10 @@ only to read.
   browser -- twenty milliseconds of a shaped tone per beat -- rather than
   fetched, so a reader who never opens it pays nothing for it, and its tempo,
   its meter and its beat lamps are all the page's own Scheme.
+- The *size* the tab is drawn at is the page's own reading size until the reader
+  says otherwise: a control above the tab steps from 50% to 400%, shows the
+  share in use, and keeps the choice in a cookie, so the next song a reader
+  opens is drawn at the size they chose for the last one.
 
 None of the three is needed to read the song, and none of them is a video or a
 third-party widget: they are three small scripts in =pub/js/=, offered by the
@@ -819,6 +823,12 @@ page that went on saying "waiting for a note" would wait forever.  When the
 browser remembers a refusal, the page says which of the two happened and sends the
 reader to the address bar, where the permission is given back.  The script un-hides one of them, so a translated page stays translated
 while the microphone does or does not answer.
+
+Before it asks for a stream, the page reads the document's own permissions
+policy.  When the browser has been told that this document may not use the
+microphone, the page says the microphone is blocked for the site straight away,
+rather than asking for a stream it knows will be refused and leaving the reader
+with a console line about the policy and nothing on the page to explain it.
 
 The arithmetic is in =lib/wikimusic/domain/tuning.scm= and is a pure function of
 a note number: A4 is 440 hertz by definition and every string is its own distance

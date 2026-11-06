@@ -50,16 +50,12 @@
                               this-song-artists-relations)) artists))
 
          (artist-links (map (lambda (ar)
-                              (a (assq-ref ar
-                                           'display-name)
-                                 #:weight '(font-light)
-                                 #:size '(text-xs sm:text-sm)
-                                 #:href (format #f "/artists/uuid/~a"
-                                                (assq-ref ar
-                                                          'identifier))
-                                 #:color '(text-onyx-500 dark:text-stone-400)
-                                 #:hover '(hover:text-persia-pink-500
-                                           dark:hover:text-persia-pink-300)))
+                              `(a (@ (href ,(format #f "/artists/uuid/~a"
+                                                 (assq-ref ar
+                                                           'identifier)))
+                           (class "wm-tile-by-link"))
+                        ,(assq-ref ar
+                                   'display-name)))
                             art))
          ;; "by" and then the players, on the card's second line, separated by
          ;; commas: a reader reads a name and then who made it, and the last
@@ -530,7 +526,7 @@
                                                     #:tempo (or tab-tempo 120)))
 
                             (div song-attributes
-                                 (div (@ (class ,(mk-class '(py-1 px-5))))
+                                 (div (@ (class "wm-song-setting"))
                                       ;; The size the ascii contents are read
                                       ;; at, said in the reader's own terms:
                                       ;; the control steps up and down and

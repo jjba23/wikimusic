@@ -99,6 +99,235 @@ a:focus-visible .wm-wordmark-accent {
   overflow: hidden;
 }
 
+/* ===== An entity's tile =====
+
+   A list is a shelf of covers, and a cover is a picture with a name under it.
+   The tile is therefore one object -- picture, name, credit -- and its surface,
+   its edge, its shadow and its two inks are stated once, here, per theme,
+   instead of being reassembled from utilities.  A utility that the bundle
+   happens not to carry fails silently, which is how the credit line ended up
+   in the page's ink on the dark theme and vanished; a token cannot.
+
+   The dark theme is not the light one inverted.  The card lifts off the page
+   by being lighter than it, not darker, and its shadow is black rather than a
+   tint of the ink, because a shadow of the ink on a dark page is no shadow at
+   all. */
+
+.wm-tile {
+  --wm-tile-surface: color-mix(in oklch, white 98%, var(--wm-brand));
+  --wm-tile-line: color-mix(in oklch, var(--wm-ink) 12%, transparent);
+  --wm-tile-ink: color-mix(in oklch, var(--wm-ink) 94%, transparent);
+  --wm-tile-quiet: color-mix(in oklch, var(--wm-ink) 58%, transparent);
+  border: 1px solid var(--wm-tile-line);
+  border-radius: 0.9rem;
+  background: var(--wm-tile-surface);
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--wm-ink) 7%, transparent),
+              0 10px 22px -18px color-mix(in oklch, var(--wm-ink) 65%, transparent);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+[data-theme="dark"] .wm-tile {
+  --wm-tile-surface: color-mix(in oklch, var(--wm-ink) 84%, white);
+  --wm-tile-line: color-mix(in oklch, white 11%, transparent);
+  --wm-tile-ink: color-mix(in oklch, white 94%, var(--wm-ink));
+  --wm-tile-quiet: color-mix(in oklch, white 64%, var(--wm-ink));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.4),
+              0 14px 28px -20px rgb(0 0 0 / 0.75);
+}
+
+@media (min-width: 640px) {
+  .wm-tile {
+    border-radius: 1.1rem;
+  }
+}
+
+/* The lift is for a pointer that can hover; a touch screen would keep the
+   raised state stuck after a tap, so there it only gets the border. */
+.wm-tile:focus-within {
+  border-color: color-mix(in oklch, var(--wm-brand) 45%, transparent);
+}
+
+@media (hover: hover) {
+  .wm-tile:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklch, var(--wm-brand) 45%, transparent);
+    box-shadow: 0 2px 4px color-mix(in oklch, var(--wm-ink) 9%, transparent),
+                0 20px 36px -22px color-mix(in oklch, var(--wm-brand) 50%, transparent);
+  }
+}
+
+.wm-tile-body {
+  padding: 0.6rem 0.75rem 0.7rem;
+}
+
+@media (min-width: 640px) {
+  .wm-tile-body {
+    padding: 0.7rem 0.85rem 0.85rem;
+  }
+}
+
+.wm-tile-cover {
+  position: relative;
+}
+
+/* A bright cover and a dark one end on the same edge: the picture is faded
+   into the panel it stands on rather than butted against it. */
+.wm-tile-cover::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 16%;
+  pointer-events: none;
+  background: linear-gradient(to top,
+                              color-mix(in oklch, var(--wm-tile-surface) 40%, transparent),
+                              transparent);
+}
+
+.wm-tile-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  color: var(--wm-tile-ink);
+  font-family: inherit;
+  font-size: clamp(0.9rem, 0.82rem + 0.3vw, 1.02rem);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.wm-tile-name:hover {
+  color: var(--wm-brand);
+}
+
+.wm-tile-by {
+  overflow: hidden;
+  margin: 0;
+  color: var(--wm-tile-quiet);
+  font-size: 0.76rem;
+  font-weight: 400;
+  line-height: 1.35;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.wm-tile-by-link {
+  color: inherit;
+  border-bottom: 1px solid color-mix(in oklch, currentColor 22%, transparent);
+  text-decoration: none;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.wm-tile-by-link:hover {
+  color: var(--wm-brand);
+  border-bottom-color: currentColor;
+}
+
+/* ===== A song page's sections =====
+
+   Every section of a song page -- the cover, the metronome, the size of the
+   tablature, the tablature itself -- starts on the same left edge, so the page
+   reads as one column rather than as a stack of blocks that each chose their
+   own margin.  A setting is a label and its control on one line, which is what
+   it is: one word and the thing it names. */
+
+.wm-song-setting {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.25rem 1.25rem;
+}
+
+.wm-song-setting h4 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.wm-song-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 1.25rem;
+}
+
+/* ===== The size of a tablature =====
+
+   Three things in one pill: a step smaller, the share the tab is drawn at, and
+   a step larger.  The middle is a menu of the whole ladder, so a reader who
+   wants the largest does not have to press six times -- and it is as wide as
+   its widest value in tabular figures, because a control that changed width
+   with its own number would move under the pointer that is using it. */
+
+.wm-size-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.15rem;
+  border: 1px solid color-mix(in oklch, var(--wm-brand) 25%, transparent);
+  border-radius: 9999px;
+  background: color-mix(in oklch, white 80%, transparent);
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--wm-ink) 7%, transparent);
+}
+
+[data-theme="dark"] .wm-size-control {
+  border-color: color-mix(in oklch, white 13%, transparent);
+  background: color-mix(in oklch, var(--wm-ink) 84%, white);
+  box-shadow: none;
+}
+
+.wm-size-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem;
+  border-radius: 9999px;
+  color: color-mix(in oklch, var(--wm-ink) 55%, transparent);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+[data-theme="dark"] .wm-size-step {
+  color: color-mix(in oklch, white 70%, var(--wm-ink));
+}
+
+a.wm-size-step:hover {
+  background: color-mix(in oklch, var(--wm-brand) 16%, transparent);
+  color: var(--wm-brand);
+}
+
+.wm-size-step[aria-disabled="true"] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.wm-size-select {
+  width: 4.25rem;
+  padding: 0.25rem 0.1rem;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--wm-brand);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.wm-size-select:hover {
+  background: color-mix(in oklch, var(--wm-brand) 12%, transparent);
+}
+
+.wm-size-select:focus-visible {
+  outline: 2px solid var(--wm-brand);
+  outline-offset: 2px;
+}
+
 /* ===== The search =====
 
    One pill holding the field and the control that sends it: the two share a

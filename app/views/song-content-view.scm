@@ -199,7 +199,7 @@ the fingering, and what they are offered is the chord, played."
                      (render-chord-pill G_ pair)) chord-pairs))))
 
 (define* (render-song-content G_ song song-contents ascii-size)
-  `(div (div (@ (class ,(mk-class '(flex flex-col gap-6 md:p-4 xl:p-6))))
+  `(div (div (@ (class "wm-song-content"))
              (div ,(map (lambda (version)
                           (render-version G_ song version ascii-size))
                         song-contents))

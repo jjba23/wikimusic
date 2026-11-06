@@ -337,6 +337,20 @@ const wikimusicTuner = (() => {
       return;
     }
 
+    // A document the browser has been told may not use the microphone is not a
+    // question worth asking: the request fails, the reader is left with a
+    // console line about the policy, and the page looks like it did nothing.
+    const policy = document.permissionsPolicy || document.featurePolicy;
+    if (
+      policy &&
+      typeof policy.allowsFeature === "function" &&
+      !policy.allowsFeature("microphone")
+    ) {
+      showStatus(id, "-status-blocked");
+      showLabels(id, false);
+      return;
+    }
+
     // The page says the browser has been asked before it is: a prompt can open
     // behind the toolbar, or be answered by a remembered setting with no prompt
     // at all, and a control that looks like it did nothing is a control a reader
