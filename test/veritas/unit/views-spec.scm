@@ -34,6 +34,7 @@
                 #:select (sxml->xml-string))
   #:use-module (wikimusic config)
   #:use-module (wikimusic html)
+  #:use-module (app views song-content-view)
   #:export (spec))
 
 (define (G_ key)
@@ -355,8 +356,75 @@
                                               "static-assets/fonts")
                 #:name "and no typeface read from somebody's static assets"))))
 
+;; The preferences a tab is read with.  Every one of them arrives from an
+;; address or a cookie, so every one has to land on a value the page can draw:
+;; an old or invented name is read as the default rather than applied.  And a
+;; choice has to travel with the other two, or setting the paper would put the
+;; reader's size back to 100%.
+(define ascii-suite
+  (suite "The preferences a tab is read with"
+         (test "a name the deployment does not know is read as the default"
+               (assert-equal #:name "an invented paper"
+                             #:expect "auto"
+                             #:got (ascii-paper-known "sepia"))
+               (assert-equal #:name "an invented face"
+                             #:expect "mono"
+                             #:got (ascii-face-known "cursive")))
+
+         (test "a name it does know is read as itself"
+               (assert-equal #:name "the dark sheet"
+                             #:expect "dark"
+                             #:got (ascii-paper-known "dark"))
+               (assert-equal #:name "the serif face"
+                             #:expect "serif"
+                             #:got (ascii-face-known "serif")))
+
+         (test "each choice carries the other two preferences"
+               (let ((href (ascii-preference-href "/songs/uuid/one"
+                                                  #:key "ascii-size"
+                                                  #:value "text-8"
+                                                  #:size "text-4"
+                                                  #:paper "dark"
+                                                  #:face "serif")))
+                 (assert-true (and (string-contains href
+                                                   "ascii-size=text-8") #t)
+                              #:name "the choice being made")
+                 (assert-true (and (string-contains href
+                                                   "ascii-theme=dark") #t)
+                              #:name "the paper already chosen")
+                 (assert-true (and (string-contains href
+                                                   "ascii-face=serif") #t)
+                              #:name "and the face")))
+
+         (test "the reader's paper is painted on the block"
+               (let ((tokens (class-tokens (render (ascii-block "x"
+                                                                #:id "one"
+                                                                #:size "text-4"
+                                                                #:paper "light"
+                                                                #:face "serif"))
+                                           "wm-ascii")))
+                 (assert-true (and (member "bg-white" tokens) #t)
+                              #:name "a white sheet")
+                 (assert-false (member "dark:bg-onyx-900" tokens)
+                               #:name "whatever theme the page has")
+                 (assert-true (and (member "font-serif" tokens) #t)
+                              #:name "and the face the reader reads in")))
+
+         (test "the legend is drawn as Org prose, not kept in a pre"
+               (let ((html (render (ascii-legend-block
+                                    "- = means hold the note"))))
+                 (assert-true (and (string-contains html "wm-ascii-legend")
+                                   #t)
+                              #:name "the quiet block")
+                 (assert-false (string-contains html "<pre")
+                               #:name "not a tablature block")
+                 (assert-true (and (string-contains html "hold the note")
+                                   #t)
+                              #:name "and the words survive the markup")))))
+
 (define (spec)
   (veritas-run locale-suite
+               ascii-suite
                choose-suite
                reading-suite
                footer-suite

@@ -1,0 +1,786 @@
+openapi: 3.0.3
+info:
+  title: Wikimusic
+  version: 1.0.0
+  description: |
+    The public read API of a Wikimusic instance, the free music knowledge
+    encyclopaedia.
+
+    Every entity is identified by a UUID, and only content the instance has
+    approved is returned.  Version 1 is read-only: the site's own forms are how
+    a person adds or edits a song, an artist or a genre, so no operation here
+    needs a credential.
+
+    Lists are paginated with `limit` and `offset`.  `total` counts every match
+    before the page is cut, so a client can walk a whole collection a page at a
+    time.
+  license:
+    name: MIT
+    url: https://codeberg.org/jjba23/wikimusic/src/branch/main/LICENSE
+servers:
+  - url: https://wikimusic.jointhefreeworld.org
+    description: The reference instance
+  - url: http://127.0.0.1:50050
+    description: A local development instance
+tags:
+  - name: Songs
+    description: Songs, their tablature versions and their credits
+  - name: Artists
+    description: The people and groups a song is credited to
+  - name: Genres
+    description: The styles and traditions a song belongs to
+  - name: Instance
+    description: What this instance holds
+paths:
+  /api/v1/songs:
+    get:
+      operationId: list-songs
+      tags:
+        - Songs
+      summary: List songs
+      description: |
+        Songs of this instance, with the artists and genres each one credits.
+        A search matches the name and the description.
+      parameters:
+        - name: search
+          in: query
+          description: Only songs whose name or description contains this text.
+          schema:
+            type: string
+            minLength: 1
+        - name: artist
+          in: query
+          description: Only songs credited to this artist.
+          schema:
+            type: string
+            format: uuid
+        - name: genre
+          in: query
+          description: Only songs that belong to this genre.
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          description: The page size.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: How many matches to skip before the page starts.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: A page of songs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongList'
+        '400':
+          description: A query parameter is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}:
+    get:
+      operationId: get-song
+      tags:
+        - Songs
+      summary: Read one song
+      description: |
+        One song with its tablature versions, its artwork and its credits.  The
+        versions are where a song's ASCII tablature lives; the PDF and Guitar
+        Pro files are reported by their presence, not by their bytes.
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: One song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Song'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/versions:
+    get:
+      operationId: list-song-versions
+      tags:
+        - Songs
+      summary: List a song's versions
+      description: |
+        The tablature versions of one song, oldest first, with the ASCII
+        contents of each.  A version is identified separately from its song so
+        that a client can fetch one and cache it by its own identifier.
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The song's versions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SongVersion'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/artists:
+    get:
+      operationId: list-artists
+      tags:
+        - Artists
+      summary: List artists
+      parameters:
+        - name: search
+          in: query
+          description: Only artists whose name or description contains this text.
+          schema:
+            type: string
+            minLength: 1
+        - name: limit
+          in: query
+          description: The page size.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: How many matches to skip before the page starts.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: A page of artists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtistList'
+        '400':
+          description: A query parameter is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/artists/{artistId}:
+    get:
+      operationId: get-artist
+      tags:
+        - Artists
+      summary: Read one artist
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: One artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artist'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/artists/{artistId}/songs:
+    get:
+      operationId: list-artist-songs
+      tags:
+        - Artists
+      summary: List an artist's songs
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          description: The page size.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: How many matches to skip before the page starts.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: A page of the artist's songs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongList'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/genres:
+    get:
+      operationId: list-genres
+      tags:
+        - Genres
+      summary: List genres
+      description: |
+        Genres of this instance.  A genre may name a parent genre, which is how
+        the encyclopaedia records that a style belongs to a tradition.
+      parameters:
+        - name: search
+          in: query
+          description: Only genres whose name or description contains this text.
+          schema:
+            type: string
+            minLength: 1
+        - name: parent
+          in: query
+          description: Only genres directly below this parent genre.
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          description: The page size.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: How many matches to skip before the page starts.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: A page of genres.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenreList'
+        '400':
+          description: A query parameter is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/genres/{genreId}:
+    get:
+      operationId: get-genre
+      tags:
+        - Genres
+      summary: Read one genre
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: One genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Genre'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/genres/{genreId}/songs:
+    get:
+      operationId: list-genre-songs
+      tags:
+        - Genres
+      summary: List a genre's songs
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          description: The page size.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: How many matches to skip before the page starts.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: A page of the genre's songs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongList'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/instance:
+    get:
+      operationId: get-instance
+      tags:
+        - Instance
+      summary: Read what this instance holds
+      description: |
+        The instance's name and the number of songs, artists and genres it
+        serves.  A client uses this to tell one instance from another and to
+        show how much there is to read.
+      responses:
+        '200':
+          description: This instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instance'
+components:
+  schemas:
+    Error:
+      type: object
+      description: What went wrong, in a shape a client can show.
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: A stable identifier for the kind of failure.
+          example: not-found
+        message:
+          type: string
+          description: A sentence for the person reading the client.
+    ArtistRef:
+      type: object
+      description: An artist a song credits, without the artist's own details.
+      required:
+        - identifier
+        - displayName
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+    GenreRef:
+      type: object
+      description: A genre a song belongs to, without the genre's own details.
+      required:
+        - identifier
+        - displayName
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+    Artwork:
+      type: object
+      description: An image attached to a song, an artist or a genre.
+      required:
+        - identifier
+        - contentUrl
+        - orderValue
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        contentUrl:
+          type: string
+          format: uri
+          description: Where the image is served from.
+        contentCaption:
+          type: string
+          description: The caption shown under the image.
+        orderValue:
+          type: integer
+          description: The position of the image among the entity's artwork.
+    SongVersion:
+      type: object
+      description: |
+        One version of a song's tablature.  The ASCII contents are the tab
+        itself; a PDF or Guitar Pro file is reported by its presence so that a
+        listing does not carry binary payloads.
+      required:
+        - identifier
+        - versionName
+        - instrumentType
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        versionName:
+          type: string
+          description: The name the contributor gave this version.
+        instrumentType:
+          type: string
+          description: The instrument the tablature is written for.
+          example: guitar
+        asciiLegend:
+          type: string
+          description: The legend that explains the ASCII notation, when there is one.
+        asciiContents:
+          type: string
+          description: The tablature in ASCII notation.
+        hasPdf:
+          type: boolean
+          description: Whether a PDF of this version exists.
+        hasTablature:
+          type: boolean
+          description: Whether a Guitar Pro file of this version exists.
+        createdAt:
+          type: string
+          description: When the version was contributed, as an ISO 8601 timestamp.
+    SongSummary:
+      type: object
+      description: A song as a list shows it.
+      required:
+        - identifier
+        - displayName
+        - views
+        - artists
+        - genres
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        description:
+          type: string
+        musicKey:
+          type: string
+          description: The key the song is written in.
+          example: A minor
+        musicTuning:
+          type: string
+          description: The tuning the song is played in.
+          example: Drop D
+        albumName:
+          type: string
+        views:
+          type: integer
+          minimum: 0
+        artists:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArtistRef'
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/GenreRef'
+        createdAt:
+          type: string
+          description: When the song was added, as an ISO 8601 timestamp.
+    Song:
+      type: object
+      description: One song, with everything the API says about it.
+      required:
+        - identifier
+        - displayName
+        - views
+        - artists
+        - genres
+        - versions
+        - artworks
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        description:
+          type: string
+        musicKey:
+          type: string
+        musicTuning:
+          type: string
+        musicCreationDate:
+          type: string
+          description: When the song was written, as the contributor recorded it.
+        albumName:
+          type: string
+        albumInfoLink:
+          type: string
+          format: uri
+          description: A page with more about the album.
+        views:
+          type: integer
+          minimum: 0
+        artists:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArtistRef'
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/GenreRef'
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SongVersion'
+        artworks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Artwork'
+        createdAt:
+          type: string
+    ArtistSummary:
+      type: object
+      description: An artist as a list shows them.
+      required:
+        - identifier
+        - displayName
+        - views
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        description:
+          type: string
+        views:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+    Artist:
+      type: object
+      description: One artist, with everything the API says about them.
+      required:
+        - identifier
+        - displayName
+        - views
+        - artworks
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        description:
+          type: string
+        views:
+          type: integer
+          minimum: 0
+        artworks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Artwork'
+        createdAt:
+          type: string
+    GenreSummary:
+      type: object
+      description: A genre as a list shows it.
+      required:
+        - identifier
+        - displayName
+        - views
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        description:
+          type: string
+        parent:
+          $ref: '#/components/schemas/GenreRef'
+        views:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+    Genre:
+      type: object
+      description: One genre, with everything the API says about it.
+      required:
+        - identifier
+        - displayName
+        - views
+        - artworks
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        description:
+          type: string
+        parent:
+          $ref: '#/components/schemas/GenreRef'
+        views:
+          type: integer
+          minimum: 0
+        artworks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Artwork'
+        createdAt:
+          type: string
+    SongList:
+      type: object
+      description: One page of songs and the count of every match.
+      required:
+        - items
+        - total
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SongSummary'
+        total:
+          type: integer
+          minimum: 0
+          description: Every match, before the page was cut.
+        limit:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+    ArtistList:
+      type: object
+      description: One page of artists and the count of every match.
+      required:
+        - items
+        - total
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArtistSummary'
+        total:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+    GenreList:
+      type: object
+      description: One page of genres and the count of every match.
+      required:
+        - items
+        - total
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/GenreSummary'
+        total:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+    InstanceCounts:
+      type: object
+      description: How much of the encyclopaedia this instance holds.
+      required:
+        - songs
+        - artists
+        - genres
+      properties:
+        songs:
+          type: integer
+          minimum: 0
+        artists:
+          type: integer
+          minimum: 0
+        genres:
+          type: integer
+          minimum: 0
+    Instance:
+      type: object
+      description: The instance a client is talking to.
+      required:
+        - name
+        - version
+        - counts
+      properties:
+        name:
+          type: string
+          description: The instance's own name.
+        version:
+          type: string
+          description: The API version this instance serves.
+          example: 1.0.0
+        counts:
+          $ref: '#/components/schemas/InstanceCounts'

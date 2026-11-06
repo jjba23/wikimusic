@@ -53,6 +53,16 @@
                           ascii-size-default
                           ascii-size-known
                           ascii-size-control
+                          ascii-paper-steps
+                          ascii-paper-default
+                          ascii-paper-known
+                          ascii-paper-classes
+                          ascii-face-steps
+                          ascii-face-default
+                          ascii-face-known
+                          ascii-face-class
+                          ascii-preference-href
+                          ascii-choice-control
                           search-box
                           render-external-sources
                           artwork-social-image
@@ -1420,9 +1430,15 @@ and six.
                                                                              #f
                                                                              " ( ~a ) "
                                                                              dislike-count))))))))
+         ;; A description is Org markup, and a reader who has only ever seen
+         ;; plain text there would not know that a list or a link is theirs to
+         ;; write.  The note is a tooltip, so it costs the page no line.
          (maybe-description (render-if-nestring (lambda (description)
-                                                  (dl (list (dt (G_
-                                                                 "description")
+                                                  (dl (list (dt (tooltip
+                                                                 (G_
+                                                                  "description")
+                                                                 #:text (G_
+                                                                         "this description is written in Org markup"))
                                                                 #:dt-classes '(pt-3 sm:pt-4
                                                                                     pb-1))
                                                             (dd (org2html (html-unescape
@@ -1865,6 +1881,75 @@ disabled stepper rather than as a link to nowhere."
            previous)]
         [else (loop (cdr rest) (car rest))]))))
 
+;;; The paper a tablature is drawn on, and the face it is set in.
+;;;
+;;; Both are the reader's, stored beside the size (see the route that renders a
+;;; song): a tab is a printed page, and a reader may want it white on a dark
+;;; site, or dark on a light one, and may read columns more comfortably in a
+;;; face that is not the mono one.  `auto' is the page's own theme, which is
+;;; what every tab was drawn in before this preference existed, so the default
+;;; changes nothing.
+(define ascii-paper-steps '("auto" "light" "dark"))
+(define ascii-paper-default "auto")
+
+(define (ascii-paper-known paper)
+  "Return the paper @var{paper} names, or the default when it names none."
+  (if (member paper ascii-paper-steps)
+    paper
+    ascii-paper-default))
+
+(define (ascii-paper-classes paper)
+  "Return the classes an ascii block is painted on @var{paper} with."
+  (cond
+    [(equal? (ascii-paper-known paper) "light")
+     '(bg-white text-black border-stone-300)]
+    [(equal? (ascii-paper-known paper) "dark")
+     '(bg-onyx-900 text-white border-onyx-500)]
+    ;; `auto' keeps the page's own surface, and the pink hairline the paper
+    ;; has always carried against it.
+    [else '(bg-white dark:bg-onyx-900 text-black dark:text-white
+            border-persia-pink-100/25 dark:border-persia-pink-900/10)]))
+
+(define ascii-face-steps '("mono" "sans" "serif"))
+(define ascii-face-default "mono")
+
+(define (ascii-face-known face)
+  "Return the face @var{face} names, or the default when it names none."
+  (if (member face ascii-face-steps)
+    face
+    ascii-face-default))
+
+(define (ascii-face-class face)
+  "Return the class an ascii block is set in @var{face} with."
+  (case (string->symbol (ascii-face-known face))
+    [(sans) 'font-sans]
+    [(serif) 'font-serif]
+    [else 'font-mono]))
+
+;;; The address a preference is chosen at.
+;;;
+;;; The whole set travels with each choice: the size, the paper and the face
+;;; are three answers to one question, and a link that carried only its own
+;;; would put the other two back to their defaults on every press -- a reader
+;;; who set a dark paper would lose it by making the text larger.
+(define* (ascii-preference-href route
+                                #:key key value
+                                (size ascii-size-default)
+                                (paper ascii-paper-default)
+                                (face ascii-face-default))
+  "Return @var{route} with every ascii preference in its query, @var{key} set to @var{value}.
+
+KEY is `ascii-size', `ascii-theme' or `ascii-face'; the two it does not name
+keep the values passed here, read through the same guards as the page, so an
+address this builds is always one the page can draw."
+  (let ((chosen (lambda (name current)
+                  (if (equal? name key) value current))))
+    (format #f "~a?ascii-size=~a&ascii-theme=~a&ascii-face=~a"
+            route
+            (chosen "ascii-size" (ascii-size-known size))
+            (chosen "ascii-theme" (ascii-paper-known paper))
+            (chosen "ascii-face" (ascii-face-known face)))))
+
 ;;; The control a reader resizes the ascii contents of a song page with.
 ;;;
 ;;; It is three things in one group: a step down, the step the page is drawn at,
@@ -1879,20 +1964,30 @@ disabled stepper rather than as a link to nowhere."
 ;;; A stepper at either end of the ladder is a span rather than a link: there is
 ;;; nowhere for it to go, and a control that goes nowhere is not offered as one.
 (define* (ascii-size-control G_
-                             #:key route (size ascii-size-default))
+                             #:key route (size ascii-size-default)
+                             (paper ascii-paper-default)
+                             (face ascii-face-default))
   "Return the control a reader resizes a page's ascii contents with.
 
 ROUTE is the page's own address, which every control here hangs a query
 string off.  SIZE is the step the page is being drawn at; it is read through
-`ascii-size-known', so an unknown or former name lands on the step it means."
-  (let ((current (ascii-size-known size))
-        (stepper (lambda (step glyph wording)
+`ascii-size-known', so an unknown or former name lands on the step it means.
+PAPER and FACE are the other two preferences, and every address this control
+builds carries them, so resizing the text does not reset them."
+  (let* ((current (ascii-size-known size))
+         (href (lambda (step)
+                 (ascii-preference-href route
+                                        #:key "ascii-size"
+                                        #:value step
+                                        #:size current
+                                        #:paper paper
+                                        #:face face)))
+         (stepper (lambda (step glyph wording)
                    `(,(if step 'a 'span)
                      (@ (aria-label ,(G_ wording))
                         (title ,(G_ wording))
                         ,@(if step
-                            `((href ,(format #f "~a?ascii-size=~a" route
-                                             step)))
+                            `((href ,(href step)))
                             '((aria-disabled "true")))
                         (class
                          ,(mk-class
@@ -1932,10 +2027,7 @@ string off.  SIZE is the step the page is being drawn at; it is read through
                    ,@(map (lambda (step)
                             (let ((name (car step))
                                   (share (cdr step)))
-                              `(option (@ (value ,(format #f
-                                                          "~a?ascii-size=~a"
-                                                          route
-                                                          name))
+                              `(option (@ (value ,(href name))
                                           ,@(if (equal? name current)
                                               '((selected ""))
                                               '()))
@@ -1944,6 +2036,48 @@ string off.  SIZE is the step the page is being drawn at; it is read through
            ,(stepper (ascii-size-neighbour current 1)
                      'plus
                      "larger text")))))
+
+;;; The control a reader changes the paper or the face with.
+;;;
+;;; A menu of three, in the same pill the size control wears, because it is
+;;; the same kind of question: which of a few named answers the reader wants.
+;;; It is a menu rather than a stepper because these are not a ladder -- there
+;;; is no "larger" paper -- and the chosen answer is the row already selected
+;;; in it, so the pill says what the page is drawn in without being opened.
+(define* (ascii-choice-control G_
+                               #:key id label key options
+                               (selected ascii-paper-default)
+                               route (size ascii-size-default)
+                               (paper ascii-paper-default)
+                               (face ascii-face-default))
+  "Return a menu of one ascii preference, named for the reader.
+
+ID is the menu's id and what its label points at, LABEL its accessible name,
+and KEY the preference its options set (`ascii-theme' or `ascii-face').
+OPTIONS are the values offered, SELECTED the one already chosen.  Every
+option's address carries the other two preferences (see
+`ascii-preference-href'), so this menu cannot reset what it does not ask."
+  `((div (@ (role "group")
+            (aria-label ,(G_ label))
+            (class "wm-size-control wm-choice-control"))
+         (select (@ (onchange "window.location.href=this.value;")
+                    (name ,id)
+                    (id ,id)
+                    (aria-label ,(G_ label))
+                    (class "wm-size-select wm-choice-select"))
+                 ,@(map (lambda (option)
+                          `(option (@ (value ,(ascii-preference-href
+                                               route
+                                               #:key key
+                                               #:value option
+                                               #:size size
+                                               #:paper paper
+                                               #:face face))
+                                    ,@(if (equal? option selected)
+                                        '((selected ""))
+                                        '()))
+                             ,(G_ option)))
+                        options)))))
 
 ;;; The search control, and where it takes the words it is given.
 ;;;

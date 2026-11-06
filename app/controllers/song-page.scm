@@ -38,6 +38,34 @@
         (wikimusic sqlite song-content)
         (wikimusic sqlite user))
 
+;;; One reader's ascii preferences, read and remembered.
+;;;
+;;; A song page carries three: how large its tab is drawn, the paper under it
+;;; and the face it is set in.  Each arrives the same way -- the control's own
+;;; query string first, then the cookie it was remembered in, then the default
+;;; -- and each is remembered the moment a control names it, so a reader sets
+;;; it once and every song they open afterwards is drawn the same.  The
+;;; attributes are the size preference's own: a year, the whole site, and not
+;;; readable by a script.
+(define* (ascii-preference rc #:key query cookie fallback)
+  "Return the ascii preference this request asks for, and remember it.
+
+QUERY is the query-string key the control links with and COOKIE the name the
+choice is remembered under; FALLBACK is what an unset preference reads as."
+  (let ((from-query (get-from-qstr rc query))
+        (from-cookie (:cookies-value rc cookie)))
+    (cond
+      [(not (equal? #f from-query))
+       (:cookies-set! rc (string->symbol cookie) cookie from-query)
+       (:cookies-setattr! rc (string->symbol cookie)
+                          #:expires 12000000
+                          #:path "/"
+                          #:secure #t
+                          #:http-only #t)
+       from-query]
+      [(not (equal? #f from-cookie)) from-cookie]
+      [else fallback])))
+
 (get "/songs"
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -216,7 +244,8 @@
 (get "/songs/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-ascii-size x-bewaking-wikimusic)
+     #:cookies '(names wikimusic-ascii-size wikimusic-ascii-theme
+                       wikimusic-ascii-face x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((song-repo (make-sqlite-song-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
@@ -230,25 +259,18 @@
               (song-id (params rc "uuid"))
               (song (entity-or-404 (get-song-by-id song-repo song-id) "song"
                                    song-id))
-              (ascii-size (cond
-                            ((not (equal? #f
-                                          (get-from-qstr rc "ascii-size")))
-                             (:cookies-set! rc
-                                            'wikimusic-ascii-size
-                                            "wikimusic-ascii-size"
-                                            (get-from-qstr rc "ascii-size"))
-                             (:cookies-setattr! rc
-                                                'wikimusic-ascii-size
-                                                #:expires 12000000
-                                                #:path "/"
-                                                #:secure #t
-                                                #:http-only #t)
-                             (get-from-qstr rc "ascii-size"))
-                            ((not (equal? #f
-                                          (:cookies-value rc
-                                           "wikimusic-ascii-size")))
-                             (:cookies-value rc "wikimusic-ascii-size"))
-                            (else ascii-size-default)))
+              (ascii-size (ascii-preference rc
+                                            #:query "ascii-size"
+                                            #:cookie "wikimusic-ascii-size"
+                                            #:fallback ascii-size-default))
+              (ascii-theme (ascii-preference rc
+                                             #:query "ascii-theme"
+                                             #:cookie "wikimusic-ascii-theme"
+                                             #:fallback ascii-paper-default))
+              (ascii-face (ascii-preference rc
+                                            #:query "ascii-face"
+                                            #:cookie "wikimusic-ascii-face"
+                                            #:fallback ascii-face-default))
               (inc-v (+ 1
                         (assq-ref song
                                   'views)))
@@ -312,6 +334,8 @@
                                                  #:comments comments
                                                  #:user-alist user-alist
                                                  #:ascii-size ascii-size
+                                                 #:ascii-theme ascii-theme
+                                                 #:ascii-face ascii-face
                                                  #:external-sources
                                                  external-sources
                                                  #:is-logged-in (:cookies-value

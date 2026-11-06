@@ -254,6 +254,8 @@
                            comments
                            user-alist
                            (ascii-size 'text-md)
+                           (ascii-theme ascii-paper-default)
+                           (ascii-face ascii-face-default)
                            external-sources
                            is-logged-in)
 
@@ -528,13 +530,48 @@
                                       ;; `(wikimusic html)' and the route).
                                       ,(sub-h3 (G_ "ascii size"))
                                       ,(ascii-size-control G_
-                                                           #:route (format #f
-                                                                           "/~as/uuid/~a"
-                                                                           'song
-                                                                           (assq-ref
-                                                                            song
-                                                                            'identifier))
-                                                           #:size ascii-size)))
+                                                           #:route song-path
+                                                           #:size ascii-size
+                                                           #:paper (ascii-paper-known
+                                                                    ascii-theme)
+                                                           #:face (ascii-face-known
+                                                                   ascii-face)))
+                                 ;; The paper the tab is drawn on and the
+                                 ;; face it is set in.  Both are remembered
+                                 ;; beside the size and travel in the same
+                                 ;; address, so each control changes one
+                                 ;; without resetting the others (see
+                                 ;; `ascii-preference-href').
+                                 (div (@ (class "wm-song-setting"))
+                                      ,(sub-h3 (G_ "ascii paper"))
+                                      ,(ascii-choice-control
+                                        G_
+                                        #:id "ascii-theme"
+                                        #:label "ascii paper"
+                                        #:key "ascii-theme"
+                                        #:options ascii-paper-steps
+                                        #:selected (ascii-paper-known
+                                                    ascii-theme)
+                                        #:route song-path
+                                        #:size ascii-size
+                                        #:paper ascii-theme
+                                        #:face ascii-face))
+                                 (div (@ (class "wm-song-setting"))
+                                      ,(sub-h3 (G_ "ascii face"))
+                                      ,(ascii-choice-control
+                                        G_
+                                        #:id "ascii-face"
+                                        #:label "ascii face"
+                                        #:key "ascii-face"
+                                        #:options ascii-face-steps
+                                        #:selected (ascii-face-known
+                                                    ascii-face)
+                                        #:route song-path
+                                        #:size ascii-size
+                                        #:paper ascii-theme
+                                        #:face ascii-face)))
 
                             (div ,(render-song-content G_ song song-contents
-                                                       ascii-size))))))
+                                                       ascii-size
+                                                       #:paper ascii-theme
+                                                       #:face ascii-face))))))

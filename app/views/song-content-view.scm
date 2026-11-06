@@ -20,7 +20,8 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
   #:export (render-song-content render-version render-guitarpro-section
-                                guitarpro-facts guitarpro-filename))
+                                guitarpro-facts guitarpro-filename
+                                ascii-block ascii-legend-block))
 
 ;;; A chord guide a player can hear.
 ;;;
@@ -198,10 +199,14 @@ the fingering, and what they are offered is the chord, played."
             ,@(map (lambda (pair)
                      (render-chord-pill G_ pair)) chord-pairs))))
 
-(define* (render-song-content G_ song song-contents ascii-size)
+(define* (render-song-content G_ song song-contents ascii-size
+                              #:key (paper ascii-paper-default)
+                              (face ascii-face-default))
   `(div (div (@ (class "wm-song-content"))
              (div ,(map (lambda (version)
-                          (render-version G_ song version ascii-size))
+                          (render-version G_ song version ascii-size
+                                          #:paper paper
+                                          #:face face))
                         song-contents))
              (a (@ (href ,(format #f "/songs/uuid/~a/contents/new"
                                   (assq-ref song
@@ -284,11 +289,13 @@ is the only way to attach one."
                        #:on-click "startSongAutoScroll()")
          ,(line-scroll-select G_)
          ,(second-scroll-select G_)
+         ;; Only the tab is highlighted.  The legend is Org markup drawn as
+         ;; elements, and the highlighter works by rewriting an element's
+         ;; text, so pointing it at the legend would replace that markup with
+         ;; the words it held.
          ,(icon-button #:icon 'music-notes-simple
                        #:content (G_ "highlight chords")
-                       #:on-click (string-append
-                                   "highlightChords('ascii-content-container');"
-                                   "highlightChords('ascii-legend-container');")))))
+                       #:on-click "highlightChords('ascii-content-container');"))))
 
 ;; The heading of a disclosure, and the mark that says whether it is open.
 ;;
@@ -303,8 +310,11 @@ is the only way to attach one."
 ;; the other carries the transition that makes the turn read as a turn rather
 ;; than as a jump.  `<details>' folds and unfolds without any JavaScript, so
 ;; the animation is the only part of this that a browser without it misses.
-(define* (disclosure-summary G_ wording)
-  "Return the summary a disclosure is titled with, as a heading that turns."
+(define* (disclosure-summary G_ wording #:key note)
+  "Return the summary a disclosure is titled with, as a heading that turns.
+
+NOTE, when given, is a tooltip on the heading: a sentence about what the
+section holds that a reader should not have to open it to find out."
   `(summary (@ (class ,(mk-class '(flex flex-row items-center gap-2
                                    text-xl font-bold
                                    text-onyx-300 dark:text-stone-300
@@ -315,7 +325,9 @@ is the only way to attach one."
             (span (@ (aria-hidden "true")
                      (class ,(mk-class '(wm-disclosure-mark text-base))))
                   ,(icon #:type 'caret-down))
-            ,(G_ wording)))
+            ,(if note
+               (tooltip (G_ wording) #:text (G_ note))
+               (G_ wording))))
 
 ;; The block an ascii text is drawn in.
 ;;
@@ -329,33 +341,46 @@ is the only way to attach one."
 ;; handed that is not a step of the ladder -- `text-11', say, which an earlier
 ;; control offered and the stylesheet has no utility for -- is drawn at the
 ;; step it stands in for rather than at no size at all.
-(define* (ascii-block content #:key id size)
-  "Return CONTENT as the ascii block a song page draws it in, at SIZE."
+(define* (ascii-block content #:key id size
+                      (paper ascii-paper-default)
+                      (face ascii-face-default))
+  "Return CONTENT as the ascii block a song page draws it in.
+
+SIZE is the step it is drawn at, PAPER the surface under it and FACE the type
+it is set in; all three are the reader's, and all three are read through their
+guards, so a name this deployment does not know lands on the default rather
+than at no size and on no paper at all.
+
+The paper is the block's own rather than the page's, because a tablature is
+the music itself: it is opaque, so no colour wash and no content scrolling
+behind it tints a note, and it casts no shadow -- a shadow is an edge of paper,
+not of the music."
   `(pre (@ (id ,id)
            (class ,(mk-class (append (list (string->symbol
-                                            (ascii-size-known size)))
-                                     ;; A tablature is the music itself, so it
-                                     ;; is drawn on a surface of its own rather
-                                     ;; than on a pane of the page: the paper
-                                     ;; under it is opaque, so no colour wash
-                                     ;; and no content scrolling behind it
-                                     ;; tints a note, and it casts no shadow for
-                                     ;; the same reason -- a shadow is an edge
-                                     ;; of paper, not of the music.
+                                            (ascii-size-known size))
+                                          (ascii-face-class face))
+                                     (ascii-paper-classes paper)
                                      '(wm-ascii
                                        p-4 md:p-6
-                                       font-mono
-                                       bg-white
-                                       dark:bg-onyx-900
-                                       text-black
-                                       dark:text-white
                                        rounded-xl
                                        border-2
-                                       border-persia-pink-100/25
-                                       dark:border-persia-pink-900/10
                                        whitespace-pre
                                        overflow-x-auto)))))
        ,content))
+
+;; The legend, as the prose it is.
+;;
+;; A legend is a key to the marks a tab uses -- what a symbol means, which
+;; string is which, how a bar is counted -- so it is written in Org and drawn
+;; the way the rest of the page's Org is drawn, rather than kept in a `pre'
+;; where its markup would be shown as characters.  It is set smaller and in the
+;; page's reading ink, marked by a hairline down its edge instead of by a second
+;; sheet of paper: it explains the tab without competing with it.
+(define (ascii-legend-block content)
+  "Return CONTENT, an Org legend, as the quiet block it is read in."
+  `(div (@ (id "ascii-legend-container")
+           (class "wm-ascii-legend"))
+        ,(org2html (html-unescape content))))
 
 (define (format-chord-legend-ascii chord-alist)
   (if (or (not chord-alist)
@@ -367,7 +392,9 @@ is the only way to attach one."
                                                  (cdr pair))) chord-alist)
                                   "  |  ") "\n\n")))
 
-(define (render-ascii-content G_ ascii-size ascii-contents)
+(define* (render-ascii-content G_ ascii-size ascii-contents
+                               #:key (paper ascii-paper-default)
+                               (face ascii-face-default))
   (let* ((guitar-chord-guide-contents (generate-guitar-chord-guide
                                        ascii-contents)))
     `(,(ascii-button-section G_) ,(render-chord-guide G_
@@ -378,7 +405,9 @@ is the only way to attach one."
 
                ,(ascii-block ascii-contents
                              #:id "ascii-content-container"
-                             #:size ascii-size)))))
+                             #:size ascii-size
+                             #:paper paper
+                             #:face face)))))
 
 ;; The Guitar Pro 5 tab of a version: the file itself, which a browser cannot
 ;; open, offered back for download beside what its own header says about the
@@ -668,7 +697,9 @@ more than one tab has no ambiguity about which it is addressing."
                                                "this tablature could not be drawn here, but the file can still be downloaded"))))))))
         '())))
 
-(define* (render-version G_ song version ascii-size)
+(define* (render-version G_ song version ascii-size
+                         #:key (paper ascii-paper-default)
+                         (face ascii-face-default))
   (let* ((v-name (render-if-nempty (lambda (version-name)
                                      (format #f "~a ~a" version-name
                                              (assq-ref version
@@ -712,18 +743,25 @@ more than one tab has no ambiguity about which it is addressing."
                                 `(details (@ (open true)
                                              (class ,(mk-class '(wm-disclosure
                                                                  my-6))))
-                                          ,(disclosure-summary G_ "ascii legend")
-                                          ,(ascii-block ascii-legend
-                                                        #:id
-                                                        "ascii-legend-container"
-                                                        #:size ascii-size))))
+                                          ;; The legend is Org, and the heading
+                                          ;; says so on hover: a reader who
+                                          ;; wants to write one should not
+                                          ;; have to guess whether markup is
+                                          ;; welcome.
+                                          ,(disclosure-summary
+                                            G_ "ascii legend"
+                                            #:note
+                                            "this legend is written in Org markup")
+                                          ,(ascii-legend-block ascii-legend))))
          (ascii-legend-section (render-if-nestring render-ascii-legend
                                                    (assq-ref version
                                                              'ascii-legend)))
 
          (ascii-content-section (render-if-nestring (lambda (c)
                                                       (render-ascii-content G_
-                                                       ascii-size c))
+                                                       ascii-size c
+                                                       #:paper paper
+                                                       #:face face))
                                                     (assq-ref version
                                                               'ascii-contents)))
          (cleaned-pdf-data (if (equal? (assq-ref version

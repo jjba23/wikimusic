@@ -1,0 +1,10 @@
+input: openapi/wikimusic.yaml
+output: lib
+module: wikimusic-api
+targets:
+  - models
+  - controllers
+  - client
+controllers: vanilla
+http: guile
+self-contained: true

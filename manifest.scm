@@ -148,6 +148,34 @@ and compile-time macros.")
     (home-page "https://codeberg.org/jjba23/scriba")
     (license license:lgpl3+)))
 
+(define-public guile-openapi-generator
+  (package
+    (name "guile-openapi-generator")
+    (version "0.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/jjba23/guile-openapi-generator.git")
+             (commit "484baab682517f104e8e56acdd6567fba5257222")))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0wagkg0c4w7sp9frq9cp1ngd96k4ql8qiwz9fvscjjh440r2w7a3"))))
+    (build-system guile-build-system)
+    (arguments
+     (list
+      #:source-directory "src"))
+    (propagated-inputs (list guile-json-4))
+    (inputs (list guile-3.0))
+    (home-page "https://github.com/jjba23/guile-openapi-generator")
+    (synopsis "OpenAPI 3 to Guile Scheme code generator")
+    (description
+     "guile-openapi-generator reads an OpenAPI 3 specification and writes Guile
+Scheme records, controllers and a client from it.  The generated code is plain
+Scheme that links against a small runtime, so the generator runs at build time
+and the application only carries the result.")
+    (license license:expat)))
+
 (define-public guile-veritas
   (package
     (name "guile-veritas")
@@ -248,7 +276,7 @@ concurrently by default.")
                               (format #f format-string
                                       (search-input-file inputs
                                                          (string-append "bin/"
-                                                          program)))))))
+                                                                        program)))))))
                         '(("readlink -f " "readlink" "~s -f ")
                           ("realpath " "realpath" "~s ")
                           ("dirname " "dirname" "~s ")
@@ -279,6 +307,10 @@ checksums to track schema evolution in a @code{migrations_history} table.")
                           guile-kracht
                           guile-orgwebalchemy
                           guile-bewaking
+                          ;; The REST API under lib/wikimusic-api is generated
+                          ;; from openapi/wikimusic.yaml; maak's `api' task runs
+                          ;; this generator.
+                          guile-openapi-generator
                           ;; The test suite under test/veritas/unit is written
                           ;; for veritas; maak's `test' target runs it.
                           guile-veritas
@@ -289,4 +321,5 @@ checksums to track schema evolution in a @code{migrations_history} table.")
                           guile-dbd-sqlite3
                           mutastructura
                           watchexec
+                          sift
                           emacs-no-x))

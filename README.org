@@ -217,6 +217,8 @@ will reach for most:
 | =maak production-server=        | Run the site with ~conf/production.conf=                                |
 | =maak kill-server=              | Stop whatever is listening on the project's port                        |
 | =maak test=                     | Run the whole suite under ~test/veritas~                                 |
+| =maak api=                      | Generate the REST API code from ~openapi/wikimusic.yaml=                 |
+| =maak api-check=                | Fail when the generated API no longer matches its specification          |
 | =maak build-manual=             | Render this document to ~README.html=                                   |
 | =maak deploy=                   | Render this document and copy the rendering to the instance that serves it |
 | =maak fmt=                      | Format every Scheme file the way the Guix style guide does               |
@@ -227,6 +229,56 @@ will reach for most:
 | =maak vendor-assets=            | Refresh the typefaces, the glyphs and the project's picture in ~pub/=    |
 | =maak alphatab=                 | Refresh the vendored Guitar Pro renderer, music font and SoundFont       |
 | =maak olive-css=                | Refresh the Olive CSS stylesheet the interface is painted with           |
+
+* The REST API
+:PROPERTIES:
+:CUSTOM_ID: the-rest-api
+:END:
+
+wikimusic has a public read API under =/api/v1=: songs, artists and genres,
+the tablature versions of a song, and what the instance holds.  It is version 1
+of the interface, read-only on purpose -- the site's own forms remain the way a
+person writes -- and it returns only the content the instance has approved.
+Lists are paginated with =limit= and =offset= and carry =total=, so a client can
+walk a whole collection a page at a time.
+
+The specification is the source.  ~openapi/wikimusic.yaml~ describes every
+route, parameter and schema, and ~openapi/openapi-generator.yaml~ holds the
+options the build always uses.  The Scheme in ~lib/wikimusic-api/~ is generated
+from them and checked in, so a checkout runs without the generator:
+
+| File                                        | What it is                                       |
+|---------------------------------------------+--------------------------------------------------|
+| ~lib/wikimusic-api/models.scm=              | records, validators and JSON conversion          |
+| ~lib/wikimusic-api/controllers.scm=         | the route table and dispatcher                   |
+| ~lib/wikimusic-api/client.scm=              | one procedure per operation, over Guile's client |
+| ~lib/wikimusic-api/{jso,json,runtime}.scm=  | the runtime the tree carries (self-contained)    |
+
+Changing the specification means regenerating, not editing those files:
+
+#+begin_src sh
+maak api        # rewrite lib/wikimusic-api from openapi/wikimusic.yaml
+maak api-check  # fail when the checked-in tree no longer matches the spec
+#+end_src
+
+A client is ~(wikimusic-api client)~:
+
+#+begin_src scheme
+(use-modules (ice-9 receive)
+             (wikimusic-api client)
+             (wikimusic-api models))
+
+(define client (make-api-client #:base-url "http://127.0.0.1:50050"))
+
+(receive (songs response)
+    (list-songs client #:search "waltz" #:limit 10)
+  (format #t "~a of ~a songs~%" (length (song-list-items songs))
+          (song-list-total songs)))
+#+end_src
+
+Only the HTML routes are mounted on the Artanis server; the generated
+dispatcher is not registered there yet, so an instance does not answer
+=/api/v1= today.
 
 * Running WikiMusic
 :PROPERTIES:
@@ -772,6 +824,18 @@ only to read.
   says otherwise: a control above the tab steps from 50% to 400%, shows the
   share in use, and keeps the choice in a cookie, so the next song a reader
   opens is drawn at the size they chose for the last one.
+- The *paper* under the tab and the *face* it is set in are the reader's too,
+  remembered beside the size in the same cookie jar and carried in the same
+  address, so changing one never resets the others.  The paper follows the
+  page's own theme (=auto=) unless the reader asks for a white or a dark sheet
+  always; the face is the mono one a tab is written in unless they read better
+  in sans or serif.
+- The tab's *legend* is a key to the marks the tab uses rather than music, so it
+  is written in Org mode and rendered as prose -- smaller, in the page's
+  reading ink, and marked by a hairline down its edge instead of by a second
+  sheet of paper.  Its heading says so in a tooltip, and so does the word
+  =description= on every entity page that carries one, because that field is
+  Org markup as well.
 
 None of the three is needed to read the song, and none of them is a video or a
 third-party widget: they are three small scripts in =pub/js/=, offered by the

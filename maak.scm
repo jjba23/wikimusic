@@ -107,12 +107,12 @@ all rather than the strings it did find.  The directories are therefore asked
 for only when they are there, so adding or removing a source directory is all a
 translation refresh ever needs."
   (append (if (file-exists? "lib/wikimusic/job")
-              '("lib/wikimusic/job/*.scm")
-              '())
+            '("lib/wikimusic/job/*.scm")
+            '())
           '("lib/wikimusic/*.scm" "app/controllers/*.scm" "app/views/*.scm")
           (if (file-exists? "app/api")
-              '("app/api/*.scm")
-              '())
+            '("app/api/*.scm")
+            '())
           '("ENTRY")))
 
 (define* (i18n-extract* #:key (update? #t))
@@ -126,8 +126,8 @@ Args: update? represents whether we should update a template or create a new one
                    (~ "--output=~a/~a.pot" i18n-dir i18n-textdomain)
                    "--language=Scheme" "--keyword=G_" "--sort-by-file")
              (if update?
-                 (list "--join-existing")
-                 '())
+               (list "--join-existing")
+               '())
              (list (~ "--copyright-holder=\"~a\""
                       (string-join copyright-holders ","))
                    (~ "--package-name=~a" i18n-textdomain))
@@ -165,6 +165,26 @@ Args: update? represents whether we should update a template or create a new one
                                      (~ "'~s'" emacs-lisp-manual-publish-cmd))
                                #:verbose? #t))
 
+;; The API tree under `lib/wikimusic-api' is generated from
+;; `openapi/wikimusic.yaml'.  The specification is the source and the Scheme is
+;; the build product, checked in so a checkout runs without the generator; the
+;; `api' task rewrites it, and `api-check' refuses a tree that has drifted.
+(define (api)
+  "Generate the REST API code from openapi/wikimusic.yaml."
+  (time-machine-manifest-shell
+   (list "guile" "-L" "./lib" "-L" "."
+         "-c"
+         "'((@ (openapi-generator cli) main!) (list \"generate\" \"--config\" \"openapi/openapi-generator.yaml\"))'")
+   #:verbose? #t))
+
+(define (api-check)
+  "Report generated REST API files that are missing or out of date."
+  (time-machine-manifest-shell
+   (list "guile" "-L" "./lib" "-L" "."
+         "-c"
+         "'((@ (openapi-generator cli) main!) (list \"generate\" \"--config\" \"openapi/openapi-generator.yaml\" \"--check\"))'")
+   #:verbose? #t))
+
 (define (deploy)
   "Deploy the project's documentation.
 
@@ -179,7 +199,7 @@ which is where a reader of the site is sent."
 (define (fmt)
   "Format Scheme source code files according to the Guix style guide."
   (run (list "find" "." "-maxdepth" "8" "-name" "*.scm" "-type" "f"
-             "-exec" "guix" "style" "-f" "{}" ";")
+             "-exec" "sift" "format" "--write" "{}" ";")
        #:verbose? #t))
 
 (define (hot-reload)
@@ -214,11 +234,15 @@ which is where a reader of the site is sent."
 (define (server)
   "Target to start the wikimusic server with the default configuration."
   (kill-server)
+  (api-check)
+  (api)
   (time-machine-manifest-shell (list "art" "work")))
 
 (define (production-server)
   "Target to start the wikimusic server with the production configuration."
   (kill-server)
+  (api-check)
+  (api)
   (time-machine-manifest-shell (list "art" "work"
                                      "-c" "conf/production.conf")))
 
@@ -546,13 +570,13 @@ over general advice, and the narrowest rule here wins over the broadest.
 (define (slurp path)
   "Return the whole of @var{path} as a string."
   (call-with-input-file path
-    (lambda (port)
-      (let loop ((lines '())
-                 (line (read-line port)))
-        (if (eof-object? line)
-            (string-concatenate-reverse lines)
-            (loop (cons (string-append line "\n") lines)
-                  (read-line port)))))))
+                        (lambda (port)
+                          (let loop ((lines '())
+                                     (line (read-line port)))
+                            (if (eof-object? line)
+                              (string-concatenate-reverse lines)
+                              (loop (cons (string-append line "\n") lines)
+                                    (read-line port)))))))
 
 (define (fetch-skill name repository commit path)
   "Download one skill pinned at @var{commit}, into the reports tree.
@@ -579,19 +603,19 @@ over general advice, and the narrowest rule here wins over the broadest.
                                                   (list-ref skill 3)))))
                      agent-skills)))
     (call-with-output-file "AGENTS.md"
-      (lambda (port)
-        (display agents-header port)
-        (for-each (lambda (skill)
-                    (format port
-                            "~%## ~a~%~%`~a` at `~a`, `~a`, ~a licensed.~%~%"
-                            (list-ref skill 0)
-                            (list-ref skill 1)
-                            (list-ref skill 2)
-                            (list-ref skill 3)
-                            (list-ref skill 4))
-                    (display (list-ref skill 5) port))
-                  skills)
-        (for-each (lambda (practice)
-                    (newline port)
-                    (display practice port))
-                  agent-practices)))))
+                           (lambda (port)
+                             (display agents-header port)
+                             (for-each (lambda (skill)
+                                         (format port
+                                                 "~%## ~a~%~%`~a` at `~a`, `~a`, ~a licensed.~%~%"
+                                                 (list-ref skill 0)
+                                                 (list-ref skill 1)
+                                                 (list-ref skill 2)
+                                                 (list-ref skill 3)
+                                                 (list-ref skill 4))
+                                         (display (list-ref skill 5) port))
+                                       skills)
+                             (for-each (lambda (practice)
+                                         (newline port)
+                                         (display practice port))
+                                       agent-practices)))))
