@@ -574,6 +574,42 @@ this page to find out.
 
 ------
 
+* A song page: the artworks, and the form that makes one
+:PROPERTIES:
+:CUSTOM_ID: a-song-page-the-artworks-and-the-form-that-makes-one
+:END:
+
+** Looking through the artworks
+
+A song may carry several pictures -- a cover, a photograph, a scan -- and they
+are shown as one *track*: a horizontal strip with snap points, so a wheel, a
+trackpad, a pair of arrows or a thumb on a phone all move it, and a reader who
+stops lands on a whole picture rather than half of two.  The strip scrolls by
+itself: the page sends a few lines of JavaScript that draw a dot per picture and
+a counter and listen for the arrow keys, but all of them read the track's own
+scroll position, so a swipe and a dot never disagree, and with the script blocked
+the pictures are still there and still scrollable.  A song with one artwork gets
+no dots, because a set of one has nothing to count.
+
+The dot of the picture being looked at is drawn long rather than merely
+brighter, and the counter is announced politely to a screen reader, so =3 / 5=
+is read when it changes without interrupting what is being read.  Each dot takes
+the focus ring of the rest of the page and moves the track when pressed.
+
+** The form, in three parts
+
+Adding or editing a song asks for the same fields it always did, in the three
+groups a contributor thinks in -- *the song* (its name, key, tuning, date), *the
+album* it came from, and *the description* -- each a =fieldset= with its
+=legend=, so the grouping is visible to a screen reader as well as to the eye.
+The control that saves the form sits in a bar pinned to the bottom of the
+viewport: a long description is written *under* the form, and the button that
+finishes the job must not be the thing that scrolled away.  The description
+field says that it is written in Org mode rather than plain text, so the syntax
+is known before the page renders it and not after.
+
+------
+
 * Browsing the lists: sorting, tile size and search
 :PROPERTIES:
 :CUSTOM_ID: browsing-the-lists-sorting-tile-size-and-search
@@ -598,6 +634,13 @@ rather than a script.
 - *Search* keeps its words with the other two: choosing a size or a sort while
   looking at results carries the search along instead of throwing the results
   away.
+
+A tile answers two questions in the order a reader asks them.  The *name* is
+set heavier and larger, and the one who made it sits on the line under it, in
+the dimmer and smaller type of a caption, led by =by= and separated by commas:
+=/songs= is a shelf of songs, so the song is what the eye lands on and the
+artists are how two songs with the same name are told apart.  A song with no
+artists gets no second line rather than an empty one.
 
 Every page is built from the same responsive shell, so these controls reflow
 onto their own lines as the screen narrows, and no page -- list, detail or form
@@ -843,11 +886,18 @@ The routes live in =app/controllers/interchange.scm=.
   curl -O https://wikimusic.example/export/html
   #+end_src
 
-  The same rows, as one long self-contained page: every artist, genre and song
-  with its name linked to its page and its description already rendered from
-  Org.  It is what an archivist wants -- a copy that reads in a browser with no
-  server behind it -- and it links to the [[#the-machine-s-view-a-json-dump][JSON dump]] above for the machine's
-  copy.
+  The same rows, as a *book*: a cover that says what it is, when it was taken
+  and how much of it there is, a table of contents whose links jump into the
+  sections, and then every artist, genre and song in a section of its own -- the
+  name linked to the page it came from, the description already rendered from
+  Org, and each section headed with its count.
+
+  It is styled by the instance's own stylesheet, because it is served by the
+  instance, so the book looks like the site it came from.  It is also meant to
+  be printed: the cover ends the first page, each section starts a new one, and
+  an entry is never split across two sheets.  Those rules are what make it a
+  book -- printing it gives a legible document rather than a very long scroll
+  -- and it links to the [[#the-machine-s-view-a-json-dump][JSON dump]] above for the machine's copy.
 
 ** Loading a dump into another instance
 :PROPERTIES:
