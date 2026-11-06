@@ -214,6 +214,45 @@ a:focus-visible .wm-wordmark-accent {
   scroll-snap-align: center;
 }
 
+/* ===== The editor =====
+
+   The form is grouped the way a contributor thinks -- the song, the album, the
+   words -- rather than as one column of inputs, and the control that saves it
+   is pinned to the bottom of the viewport: a long description scrolls the page
+   under the form, and the button that ends the job must not scroll with it. */
+
+.wm-editor-group {
+  border: 1px solid color-mix(in oklch, var(--wm-brand) 22%, transparent);
+  border-radius: 1rem;
+  padding: 0.75rem 1rem 1rem;
+  margin: 0;
+}
+
+.wm-editor-legend {
+  padding-inline: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.wm-editor-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-block: 0.75rem;
+  border-top: 1px solid color-mix(in oklch, var(--wm-brand) 22%, transparent);
+  background: color-mix(in oklch, var(--wm-paper) 90%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .wm-editor-actions {
+  background: color-mix(in oklch, var(--wm-ink) 88%, transparent);
+}
+
 /* ===== The scheme the browser's own controls are drawn in =====
 
    A page styles what it draws and the browser styles the rest: the scrollbar

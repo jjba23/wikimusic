@@ -280,40 +280,54 @@
                     (album-name "")
                     (album-info-link "")
                     (description ""))
+  ;; The form asks for the same fields it always did, in the groups a
+  ;; contributor thinks in -- the song, the album it came from, the words that
+  ;; describe it -- and its control sits in a bar that stays in reach while the
+  ;; page is scrolled: a long description is written under the form, so the
+  ;; thing that saves it must not be the thing that scrolled away.
   `((form (@ (method POST)
              (action ,(if identifier
                           (format #f "/songs/uuid/~a/edit" identifier)
                           "/songs/new"))
-             (content-type application/x-www-form-urlencoded))
-          (div ,(input #:label (G_ "display name")
-                       #:name "display-name"
-                       #:value (html-unescape display-name)
-                       #:required #t)
-
-               ,(input #:label (G_ "music key")
-                       #:name "music-key"
-                       #:value (html-unescape music-key))
-               ,(input #:label (G_ "music tuning")
-                       #:name "music-tuning"
-                       #:value (html-unescape music-tuning))
-               ,(input #:label (G_ "music creation date")
-                       #:name "music-creation-date"
-                       #:value (html-unescape music-creation-date))
-               ,(input #:label (G_ "album name")
-                       #:name "album-name"
-                       #:value (html-unescape album-name))
-               ,(input #:label (G_ "album info url")
-                       #:name "album-info-link"
-                       #:value (uri-decode album-info-link))
-               ,(textarea #:label (G_ "description")
-                          #:name "description"
-                          ;; The column is rendered as Org by `org2html' when
-                          ;; the page is read, so the one who writes it is told
-                          ;; so here rather than left to find out.
-                          #:help-text (G_
-                                       "descriptions are written in Org mode syntax")
-                          #:value (html-unescape description)))
-          (div ,(submit-button (if identifier
+             (content-type application/x-www-form-urlencoded)
+             (class "flex flex-col gap-3"))
+          (fieldset (@ (class "wm-editor-group"))
+                    (legend (@ (class "wm-editor-legend"))
+                            ,(G_ "the song"))
+                    ,(input #:label (G_ "display name")
+                            #:name "display-name"
+                            #:value (html-unescape display-name)
+                            #:required #t)
+                    ,(input #:label (G_ "music key")
+                            #:name "music-key"
+                            #:value (html-unescape music-key))
+                    ,(input #:label (G_ "music tuning")
+                            #:name "music-tuning"
+                            #:value (html-unescape music-tuning))
+                    ,(input #:label (G_ "music creation date")
+                            #:name "music-creation-date"
+                            #:value (html-unescape music-creation-date)))
+          (fieldset (@ (class "wm-editor-group"))
+                    (legend (@ (class "wm-editor-legend"))
+                            ,(G_ "the album"))
+                    ,(input #:label (G_ "album name")
+                            #:name "album-name"
+                            #:value (html-unescape album-name))
+                    ,(input #:label (G_ "album info url")
+                            #:name "album-info-link"
+                            #:value (uri-decode album-info-link)))
+          (fieldset (@ (class "wm-editor-group"))
+                    (legend (@ (class "wm-editor-legend"))
+                            ,(G_ "the description"))
+                    ,(textarea #:label (G_ "description")
+                               #:name "description"
+                               ;; The column is rendered as Org by `org2html'
+                               ;; when the page is read, so the one who writes
+                               ;; it is told so here rather than left to find
+                               ;; out from the rendered page.
+                               #:help-text (G_ "descriptions are written in Org mode syntax")
+                               #:value (html-unescape description)))
+          (div (@ (class "wm-editor-actions"))
+               ,(submit-button (if identifier
                                    (G_ "edit")
                                    (G_ "create")))))))
-
