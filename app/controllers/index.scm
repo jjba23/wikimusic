@@ -6,24 +6,24 @@
 (define-artanis-controller index)
 
 (import (app views index)
-        (app views song-view)
-        (ice-9 string-fun)
-        (kracht prelude)
-        (web uri)
-        (wikimusic domain artist)
-        (wikimusic domain artwork)
-        (wikimusic domain comment)
-        (wikimusic domain genre)
-        (wikimusic domain song)
-        (wikimusic domain song-content)
-        (wikimusic domain)
-        (wikimusic html)
-        (wikimusic sqlite artist)
-        (wikimusic sqlite artwork)
-        (wikimusic sqlite comment)
-        (wikimusic sqlite genre)
-        (wikimusic sqlite song)
-        (wikimusic sqlite song-content))
+  (app views song-view)
+  (ice-9 string-fun)
+  (kracht prelude)
+  (web uri)
+  (wikimusic domain artist)
+  (wikimusic domain artwork)
+  (wikimusic domain comment)
+  (wikimusic domain genre)
+  (wikimusic domain song)
+  (wikimusic domain song-content)
+  (wikimusic domain)
+  (wikimusic html)
+  (wikimusic sqlite artist)
+  (wikimusic sqlite artwork)
+  (wikimusic sqlite comment)
+  (wikimusic sqlite genre)
+  (wikimusic sqlite song)
+  (wikimusic sqlite song-content))
 
 ;; How many songs the front page opens with.  The front page is a wall of
 ;; covers rather than a page of them: twelve is two full rows in the widest
@@ -94,27 +94,27 @@
                           (assq-ref s
                                     'identifier)) songs))
          (artworks (if (nil? song-ids)
-                       '()
-                       (get-artworks-by-entity-ids artwork-repo
-                                                   'song song-ids)))
+                     '()
+                     (get-artworks-by-entity-ids artwork-repo
+                                                 'song song-ids)))
          (comments (if (nil? song-ids)
-                       '()
-                       (get-comments-by-entity-ids comment-repo
-                                                   'song song-ids)))
+                     '()
+                     (get-comments-by-entity-ids comment-repo
+                                                 'song song-ids)))
          (song-contents (if (nil? song-ids)
-                            '()
-                            (get-song-content-ids-by-song-ids
-                             song-content-repo song-ids)))
+                          '()
+                          (get-song-content-ids-by-song-ids
+                           song-content-repo song-ids)))
          (song-artists (if (nil? song-ids)
-                           '()
-                           (get-song-artists-by-ids song-repo song-ids)))
+                         '()
+                         (get-song-artists-by-ids song-repo song-ids)))
          (artists (if (nil? song-artists)
-                      '()
-                      (get-artists-by-ids artist-repo
-                                          (map (lambda (a)
-                                                 (assq-ref a
-                                                           'artist-identifier))
-                                               song-artists))))
+                    '()
+                    (get-artists-by-ids artist-repo
+                                        (map (lambda (a)
+                                               (assq-ref a
+                                                         'artist-identifier))
+                                             song-artists))))
          (song-version-count-alist (map (lambda (song)
                                           (list (assq-ref song
                                                           'identifier)
@@ -162,13 +162,13 @@
                             (assq-ref a
                                       'identifier)) artists))
          (artworks (if (nil? artist-ids)
-                       '()
-                       (get-artworks-by-entity-ids artwork-repo
-                                                   'artist artist-ids)))
+                     '()
+                     (get-artworks-by-entity-ids artwork-repo
+                                                 'artist artist-ids)))
          (comments (if (nil? artist-ids)
-                       '()
-                       (get-comments-by-entity-ids comment-repo
-                                                   'artist artist-ids))))
+                     '()
+                     (get-comments-by-entity-ids comment-repo
+                                                 'artist artist-ids))))
     `(div (@ (class ,(item-tile-grid-face #:size "medium")))
           ,@(map (lambda (x)
                    `(div ,(item-tile (:i18n rc)
@@ -187,7 +187,7 @@
                                            #:selected-locale (:cookies-value
                                                               rc "lang")
                                            #:is-logged-in (:cookies-value rc
-                                                           "x-bewaking-wikimusic")
+                                                                          "x-bewaking-wikimusic")
                                            #:song-fragment (front-page-song-fragment
                                                             rc)
                                            #:artist-fragment (front-page-artist-fragment

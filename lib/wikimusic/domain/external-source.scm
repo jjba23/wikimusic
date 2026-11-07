@@ -26,12 +26,12 @@
 ;; --- eDSL: Embedded Domain Specific Language ---
 
 (define-repo-method get-external-sources-by-entity-ids
- repo-get-external-sources-by-entity-ids
- "Retrieves external-sources by their entity IDs from the given REPO.")
+                    repo-get-external-sources-by-entity-ids
+                    "Retrieves external-sources by their entity IDs from the given REPO.")
 
 (define-repo-method insert-external-source repo-insert-external-source
                     "Inserts a external-source with ATTRS in the given REPO.")
 
 (define-repo-method delete-external-source-by-id
- repo-delete-external-source-by-id
- "Deletes a external-source identified by ID in the given REPO.")
+                    repo-delete-external-source-by-id
+                    "Deletes a external-source identified by ID in the given REPO.")

@@ -6,43 +6,43 @@
 (define-artanis-controller genre-form)
 
 (import (wikimusic html)
-        (web uri)
-        (wikimusic env)
-        (wikimusic auth)
-        (wikimusic controller)
-        (wikimusic domain)
-        (ice-9 string-fun)
-        (app models artists)
-        (app models song_artists)
-        (app models songs)
-        (app models song_artworks)
-        (app models song_contents)
-        (app models song_opinions)
-        (app models genre_external_sources)
-        (app models song_comments)
-        (app models genres)
-        (app models genre_artworks)
-        (app models genre_comments)
-        (app models genre_opinions)
-        (app models users)
-        (bewaking bewaking)
-        (kracht prelude)
-        (uuid generate)
-        (wikimusic domain genre)
-        (wikimusic sqlite genre)
-        (wikimusic domain artwork)
-        (wikimusic sqlite artwork)
-        (wikimusic domain song)
-        (wikimusic sqlite song)
-        (wikimusic domain comment)
-        (wikimusic sqlite comment)
-        (wikimusic domain opinion)
-        (wikimusic sqlite opinion)
-        (wikimusic domain external-source)
-        (wikimusic sqlite external-source)
-        ;; `sql-execute!' is the one runner these edit routes reach for when a
-        ;; row has to be rewritten in place; it lives with the other runners.
-        (wikimusic sqlite util))
+  (web uri)
+  (wikimusic env)
+  (wikimusic auth)
+  (wikimusic controller)
+  (wikimusic domain)
+  (ice-9 string-fun)
+  (app models artists)
+  (app models song_artists)
+  (app models songs)
+  (app models song_artworks)
+  (app models song_contents)
+  (app models song_opinions)
+  (app models genre_external_sources)
+  (app models song_comments)
+  (app models genres)
+  (app models genre_artworks)
+  (app models genre_comments)
+  (app models genre_opinions)
+  (app models users)
+  (bewaking bewaking)
+  (kracht prelude)
+  (uuid generate)
+  (wikimusic domain genre)
+  (wikimusic sqlite genre)
+  (wikimusic domain artwork)
+  (wikimusic sqlite artwork)
+  (wikimusic domain song)
+  (wikimusic sqlite song)
+  (wikimusic domain comment)
+  (wikimusic sqlite comment)
+  (wikimusic domain opinion)
+  (wikimusic sqlite opinion)
+  (wikimusic domain external-source)
+  (wikimusic sqlite external-source)
+  ;; `sql-execute!' is the one runner these edit routes reach for when a
+  ;; row has to be rewritten in place; it lives with the other runners.
+  (wikimusic sqlite util))
 
 (post "/genres/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
@@ -56,10 +56,10 @@
                  ;; it (see `guard-owner').
                  (row (entity-or-404 (car ($genres 'get
                                                    #:condition (where
-                                                                      #:identifier
-                                                                      (params
-                                                                       rc
-                                                                       "uuid"))))
+                                                                #:identifier
+                                                                (params
+                                                                 rc
+                                                                 "uuid"))))
                                      "genre"
                                      (params rc "uuid")))
                  (created-by (assoc-ref row "created_by")))
@@ -83,11 +83,11 @@
                             #:name "edit-genre")
               (redirect-to rc
                            (string->uri (format #f
-                                         "~a/genres/uuid/~a?notify-title=~a"
-                                         (current-myhost)
-                                         (params rc "uuid")
-                                         (uri-encode (G_
-                                                      "Edited genre succesfully!"))))
+                                                "~a/genres/uuid/~a?notify-title=~a"
+                                                (current-myhost)
+                                                (params rc "uuid")
+                                                (uri-encode (G_
+                                                             "Edited genre succesfully!"))))
                            #:status 302))))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:genre-create)
@@ -126,7 +126,7 @@
                                                         (current-time)))
                                       #:where `((identifier unquote
                                                             (params rc
-                                                             "artwork-uuid"))))
+                                                                    "artwork-uuid"))))
                           #:name "edit-genre-artwork")
             (redirect-to rc
                          (string->uri (format #f "~a/genres/uuid/~a/edit"
@@ -150,7 +150,7 @@
         (define (do-new-artwork)
           (let* ((G_ (:i18n rc))
                  (t (decrypt-token #:token (:cookies-value rc
-                                            "x-bewaking-wikimusic")
+                                                           "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
                  (body (body-alist rc))
@@ -163,11 +163,11 @@
                              #:created_by user-identifier
                              #:visibility_status 0
                              #:content_url (uri-encode (assoc-ref body
-                                                        "content-url"))
+                                                                  "content-url"))
                              #:content_caption (html-escape (assoc-ref body
-                                                             "content-caption"))
+                                                                       "content-caption"))
                              #:order_value (html-escape (assoc-ref body
-                                                         "order-value"))
+                                                                   "order-value"))
                              #:created_at (current-time))
 
             (redirect-to rc
@@ -188,7 +188,7 @@
         (define (do-new)
           (let* ((G_ (:i18n rc))
                  (t (decrypt-token #:token (:cookies-value rc
-                                            "x-bewaking-wikimusic")
+                                                           "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
                  (body (body-alist rc))
@@ -231,10 +231,10 @@
                                          #:condition (where #:genre_identifier
                                                             uuid)))))
     (if (not (nil? ex-op))
-        ($genre_opinions 'mod
-                         'row-delete
-                         (where #:identifier (assoc-ref (car ex-op)
-                                                        "identifier"))))
+      ($genre_opinions 'mod
+                       'row-delete
+                       (where #:identifier (assoc-ref (car ex-op)
+                                                      "identifier"))))
     ($genre_opinions 'set
                      #:identifier new-uuid
                      #:genre_identifier uuid
@@ -246,8 +246,8 @@
                  (string->uri (format #f "~a/genres/uuid/~a?notify-title=~a"
                                       (current-myhost) uuid
                                       (if (equal? 1 is-like)
-                                          (uri-encode (G_ "Liked genre!"))
-                                          (uri-encode (G_ "Disliked genre!")))))
+                                        (uri-encode (G_ "Liked genre!"))
+                                        (uri-encode (G_ "Disliked genre!")))))
                  #:status 302)))
 
 (post "/genres/uuid/:uuid/like"
@@ -262,10 +262,10 @@
                                                       (decrypt-token #:token (:cookies-value
                                                                               rc
                                                                               "x-bewaking-wikimusic")
-                                                       #:encryption-key
-                                                       encryption-key
-                                                       #:signing-key
-                                                       signing-key)))
+                                                                     #:encryption-key
+                                                                     encryption-key
+                                                                     #:signing-key
+                                                                     signing-key)))
                            #:unhappy-flow back-to-login)))
 
 (post "/genres/uuid/:uuid/dislike"
@@ -280,10 +280,10 @@
                                                       (decrypt-token #:token (:cookies-value
                                                                               rc
                                                                               "x-bewaking-wikimusic")
-                                                       #:encryption-key
-                                                       encryption-key
-                                                       #:signing-key
-                                                       signing-key)))
+                                                                     #:encryption-key
+                                                                     encryption-key
+                                                                     #:signing-key
+                                                                     signing-key)))
                            #:unhappy-flow back-to-login)))
 
 ;; ====== Comment routes ======
@@ -399,15 +399,15 @@
                                                         (current-time)))
                                       #:where `((identifier unquote
                                                             (params rc
-                                                             "sourcesuuid"))))
+                                                                    "sourcesuuid"))))
                           #:name "edit-genre-external-sources")
             (redirect-to rc
                          (string->uri (format #f
-                                       "~a/genres/uuid/~a?notify-title=~a"
-                                       (current-myhost)
-                                       (params rc "uuid")
-                                       (uri-encode (G_
-                                                    "Edited genre succesfully!"))))
+                                              "~a/genres/uuid/~a?notify-title=~a"
+                                              (current-myhost)
+                                              (params rc "uuid")
+                                              (uri-encode (G_
+                                                           "Edited genre succesfully!"))))
                          #:status 302)))
 
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
@@ -423,7 +423,7 @@
         (define (do-new-external-sources)
           (let* ((G_ (:i18n rc))
                  (t (decrypt-token #:token (:cookies-value rc
-                                            "x-bewaking-wikimusic")
+                                                           "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
                  (body (body-alist rc))
@@ -440,19 +440,19 @@
                                                                    body
                                                                    "soundcloud-url"))
                                      #:youtube_url (uri-encode (assoc-ref body
-                                                                "youtube-url"))
+                                                                          "youtube-url"))
                                      #:spotify_url (uri-encode (assoc-ref body
-                                                                "spotify-url"))
+                                                                          "spotify-url"))
                                      #:created_by user-identifier
                                      #:created_at (current-time))
 
             (redirect-to rc
                          (string->uri (format #f
-                                       "~a/genres/uuid/~a?notify-title=~a"
-                                       (current-myhost)
-                                       (params rc "uuid")
-                                       (uri-encode (G_
-                                                    "Edited genre succesfully!"))))
+                                              "~a/genres/uuid/~a?notify-title=~a"
+                                              (current-myhost)
+                                              (params rc "uuid")
+                                              (uri-encode (G_
+                                                           "Edited genre succesfully!"))))
                          #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:genre-create)

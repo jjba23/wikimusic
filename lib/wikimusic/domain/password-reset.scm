@@ -25,12 +25,12 @@
 ;; --- eDSL: Embedded Domain Specific Language ---
 
 (define-repo-method get-password-reset-by-token
- repo-get-password-reset-by-token
- "Retrieves the password reset associated with a specific TOKEN from the REPO.")
+                    repo-get-password-reset-by-token
+                    "Retrieves the password reset associated with a specific TOKEN from the REPO.")
 
 (define-repo-method delete-password-reset-by-user-id
- repo-delete-password-reset-by-user-id
- "Deletes the password reset associated with a specific USER-ID from the REPO")
+                    repo-delete-password-reset-by-user-id
+                    "Deletes the password reset associated with a specific USER-ID from the REPO")
 
 (define-repo-method insert-password-reset repo-insert-password-reset
- "Inserts a new password-reset using ATTRS into the given REPO.")
+                    "Inserts a new password-reset using ATTRS into the given REPO.")

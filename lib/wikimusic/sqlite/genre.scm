@@ -41,7 +41,7 @@
                                           #:where (list (cons 'identifier id))
                                           #:limit 1))))
       (if (nil? rows) #f
-          (car rows))))
+        (car rows))))
 
   (define (get-genres-by-ids ids)
     (execute-read "get-genres-by-ids"
@@ -72,9 +72,9 @@
     (let ((search (format #f "%~a%" s)))
       (execute-read "search-genres"
                     (sql-parameterize (format #f
-                                       "SELECT ~a FROM genres WHERE (display_name LIKE ? OR description LIKE ?) ORDER BY ~a LIMIT ? OFFSET ?"
-                                       (symbols->sql-columns-list columns)
-                                       (sql-order-by-sql order-by))
+                                              "SELECT ~a FROM genres WHERE (display_name LIKE ? OR description LIKE ?) ORDER BY ~a LIMIT ? OFFSET ?"
+                                              (symbols->sql-columns-list columns)
+                                              (sql-order-by-sql order-by))
                                       (list search search limit offset)))))
 
   ;; A count is a statement kracht's `sql-select' cannot express -- it takes
@@ -83,19 +83,19 @@
   ;; `search-genres' uses, so a page count and a page of hits always agree.
   (define* (count-genres #:key search)
     (let* ((term (and search
-                      (format #f "%~a%" search)))
+                   (format #f "%~a%" search)))
            (rows (if term
-                     (execute-read "count-genres"
-                                   (sql-parameterize
-                                    "SELECT COUNT(*) AS count FROM genres WHERE (display_name LIKE ? OR description LIKE ?)"
-                                    (list term term)))
-                     (execute-read "count-genres"
-                                   (sql-parameterize
-                                    "SELECT COUNT(*) AS count FROM genres"
-                                    '())))))
+                   (execute-read "count-genres"
+                                 (sql-parameterize
+                                  "SELECT COUNT(*) AS count FROM genres WHERE (display_name LIKE ? OR description LIKE ?)"
+                                  (list term term)))
+                   (execute-read "count-genres"
+                                 (sql-parameterize
+                                  "SELECT COUNT(*) AS count FROM genres"
+                                  '())))))
       (if (nil? rows) 0
-          (or (assq-ref (car rows)
-                        'count) 0))))
+        (or (assq-ref (car rows)
+                      'count) 0))))
 
   (define (update-genre-by-id id attrs)
     (execute-write "update-genre-by-id"

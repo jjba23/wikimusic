@@ -55,7 +55,7 @@
                                           #:where (list (cons 'identifier id))
                                           #:limit 1))))
       (if (nil? rows) #f
-          (car rows))))
+        (car rows))))
 
   (define (update-comment-by-id entity id attrs)
     (execute-write "update-comment-by-id"

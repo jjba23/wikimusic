@@ -85,13 +85,13 @@
                  #:json-ld (list (append (list (schema-name "WebSite")
                                                (cons "name" "WikiMusic")
                                                (cons "alternateName"
-                                                "the free music knowledge encyclopaedia")
+                                                     "the free music knowledge encyclopaedia")
                                                (cons "description"
                                                      front-page-description))
                                          (if (absolute-url "/")
-                                             (list (cons "url"
-                                                         (absolute-url "/")))
-                                             '())))
+                                           (list (cons "url"
+                                                       (absolute-url "/")))
+                                           '())))
                  #:body `(div (@ (class ,(mk-class '(w-full flex
                                                             flex-col
                                                             items-center
@@ -162,12 +162,12 @@
                                          border-persia-pink-500/25))
                   ,@(front-page-action (G_ "add a song") "/songs/new"
                                        '(bg-stone-100/75 dark:bg-onyx-900/75
-                                         hover:bg-stone-300/75
-                                         dark:hover:bg-onyx-700/75
-                                         text-onyx-500
-                                         dark:text-stone-300
-                                         border-stone-500/25
-                                         dark:border-onyx-100/25))))))
+                                                         hover:bg-stone-300/75
+                                                         dark:hover:bg-onyx-700/75
+                                                         text-onyx-500
+                                                         dark:text-stone-300
+                                                         border-stone-500/25
+                                                         dark:border-onyx-100/25))))))
 
 ;; One of the two doors into the place: a link wearing the shape of a button,
 ;; because a landing page's first two links are an instruction and should look
@@ -277,57 +277,56 @@
                                                                      artists)
                                                      #:label (G_ "artists"))
                                         ,@(stat-card #:value (format #f "~a"
-                                                              genres-count)
+                                                                     genres-count)
                                                      #:label (G_ "genres")))))
          (genres-section (if (or (not (list? genres))
-                                 (null? genres)) #f
-                             `(section (@ (class ,(mk-class
-                                                   front-page-column-classes)))
-                                       (h2 (@ (class ,(mk-class '(text-center
-                                                                  font-sans
-                                                                  font-bold
-                                                                  text-2xl
-                                                                  text-onyx-500
-                                                                  dark:text-stone-300))))
-                                           ,(G_ "browse by genre"))
-                                       (ul (@ (class ,(mk-class '(list-none
-                                                                  p-0
-                                                                  flex
-                                                                  flex-row
-                                                                  flex-wrap
-                                                                  gap-2
-                                                                  items-center
-                                                                  justify-center))))
-                                           ,@(map (lambda (genre)
-                                                    `(li ,@(a (assq-ref genre
-                                                                        'display-name)
-                                                              #:href (format
-                                                                             #f
-                                                                             "/genres/uuid/~a"
-                                                                             (assq-ref
-                                                                              genre
-                                                                              'identifier))
-                                                              #:size '(text-md)
-                                                              #:weight '(font-medium)
-                                                              #:color '(text-onyx-500
-                                                                        dark:text-stone-300)
-                                                              #:hover '(hover:text-persia-pink-900
-                                                                        dark:hover:text-persia-pink-300)
-                                                              #:extra-classes '
-                                                              (no-underline
-                                                               rounded-full
-                                                               px-3
-                                                               py-1
-                                                               bg-stone-300/75
-                                                               dark:bg-onyx-700/75
-                                                               hover:bg-persia-pink-500/25
-                                                               dark:hover:bg-persia-pink-500/25
-                                                               transition-colors
-                                                               duration-200))))
-                                                  genres))))))
+                               (null? genres)) #f
+                           `(section (@ (class ,(mk-class
+                                                 front-page-column-classes)))
+                                     (h2 (@ (class ,(mk-class '(text-center
+                                                                font-sans
+                                                                font-bold
+                                                                text-2xl
+                                                                text-onyx-500
+                                                                dark:text-stone-300))))
+                                         ,(G_ "browse by genre"))
+                                     (ul (@ (class ,(mk-class '(list-none
+                                                                p-0
+                                                                flex
+                                                                flex-row
+                                                                flex-wrap
+                                                                gap-2
+                                                                items-center
+                                                                justify-center))))
+                                         ,@(map (lambda (genre)
+                                                  `(li ,@(a (assq-ref genre
+                                                                      'display-name)
+                                                            #:href (format
+                                                                    #f
+                                                                    "/genres/uuid/~a"
+                                                                    (assq-ref
+                                                                     genre
+                                                                     'identifier))
+                                                            #:size '(text-md)
+                                                            #:weight '(font-medium)
+                                                            #:color '(text-onyx-500
+                                                                      dark:text-stone-300)
+                                                            #:hover '(hover:text-persia-pink-900
+                                                                      dark:hover:text-persia-pink-300)
+                                                            #:extra-classes '(no-underline
+                                                                              rounded-full
+                                                                              px-3
+                                                                              py-1
+                                                                              bg-stone-300/75
+                                                                              dark:bg-onyx-700/75
+                                                                              hover:bg-persia-pink-500/25
+                                                                              dark:hover:bg-persia-pink-500/25
+                                                                              transition-colors
+                                                                              duration-200))))
+                                                genres))))))
     (if genres-section
-        (list counts-section genres-section)
-        (list counts-section))))
+      (list counts-section genres-section)
+      (list counts-section))))
 
 ;;; ====== The newest music ======
 
@@ -365,20 +364,20 @@
 ;; the tests, say -- is still the whole page it was.
 (define (front-page-artists G_ artist-fragment)
   (if (or (not artist-fragment)
-          (null? artist-fragment))
-      '()
-      (list `(section (@ (class ,(mk-class front-page-column-classes)))
-                      (div (@ (class ,(mk-class '(flex flex-row flex-wrap
-                                                       gap-2 items-baseline
-                                                       justify-between))))
-                           (h2 (@ (class ,(mk-class '(font-sans font-bold
-                                                      text-2xl text-onyx-500
-                                                      dark:text-stone-300))))
-                               ,(G_ "newest artists"))
-                           ,@(a (G_ "see all the artists")
-                                #:href "/artists"
-                                #:size '(text-md)))
-                      ,artist-fragment))))
+        (null? artist-fragment))
+    '()
+    (list `(section (@ (class ,(mk-class front-page-column-classes)))
+                    (div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                     gap-2 items-baseline
+                                                     justify-between))))
+                         (h2 (@ (class ,(mk-class '(font-sans font-bold
+                                                              text-2xl text-onyx-500
+                                                              dark:text-stone-300))))
+                             ,(G_ "newest artists"))
+                         ,@(a (G_ "see all the artists")
+                              #:href "/artists"
+                              #:size '(text-md)))
+                    ,artist-fragment))))
 
 ;;; ====== The project ======
 
@@ -394,17 +393,17 @@
   (let ((picture (wikimusic-img))
         (ask (wikimusic-support G_)))
     (if (null? ask) picture
-        `((section (@ (class ,(mk-class '(w-full max-w-196
-                                                 mx-auto
-                                                 flex
-                                                 flex-col
-                                                 items-center
-                                                 gap-4
-                                                 px-4
-                                                 py-2))))
-                   ,@picture
-                   (div (@ (class ,(mk-class '(flex flex-col items-center))))
-                        ,@ask))))))
+      `((section (@ (class ,(mk-class '(w-full max-w-196
+                                               mx-auto
+                                               flex
+                                               flex-col
+                                               items-center
+                                               gap-4
+                                               px-4
+                                               py-2))))
+                 ,@picture
+                 (div (@ (class ,(mk-class '(flex flex-col items-center))))
+                      ,@ask))))))
 
 ;;; ====== The way out ======
 
@@ -445,7 +444,7 @@
                                               dark:border-persia-pink-500/15
                                               border-3))))
               (figure (img (@ (alt "")
-                                           (class ,(mk-class '(rounded-2xl h-auto max-w-64
+                              (class ,(mk-class '(rounded-2xl h-auto max-w-64
                                                               sm:max-w-96)))
                               (loading lazy)
                               ;; The picture is the deployment's own asset,
@@ -468,18 +467,18 @@
 ;; may be nothing at all.
 (define (wikimusic-support G_)
   (if (not (donation-shown?))
-      '()
-      `((div (@ (class ,(mk-class '(text-center))))
-             (a (@ (class ,(mk-class '(font-bold text-china-violet-100
-                                       hover:text-persia-pink-900
-                                       dark:text-persia-pink-300
-                                       dark:hover:text-persia-pink-700
-                                       flex
-                                       flex-row
-                                       no-underline
-                                       hover:underline
-                                       gap-3)))
-                   (href ,(donate-url)))
-                (span "🩷")
-                ,(project-support-ask G_)
-                (span "🩷"))))))
+    '()
+    `((div (@ (class ,(mk-class '(text-center))))
+           (a (@ (class ,(mk-class '(font-bold text-china-violet-100
+                                               hover:text-persia-pink-900
+                                               dark:text-persia-pink-300
+                                               dark:hover:text-persia-pink-700
+                                               flex
+                                               flex-row
+                                               no-underline
+                                               hover:underline
+                                               gap-3)))
+                 (href ,(donate-url)))
+              (span "🩷")
+              ,(project-support-ask G_)
+              (span "🩷"))))))

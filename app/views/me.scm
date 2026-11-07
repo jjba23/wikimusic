@@ -18,11 +18,11 @@
 
 (define* (me-page G_
                   #:key is-logged-in token user)
-  
+
   (let* ((user-details `((div (@ (class ,(mk-class '(py-8 px-4 max-w-prose))))
                               ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a &lt;~a&gt;"
-                                           (assoc-ref user "username")
-                                           (assoc-ref user "email")))
+                                                                                                                                             (assoc-ref user "username")
+                                                                                                                                             (assoc-ref user "email")))
                               (div (@ (class ,(mk-class '(flex flex-row
                                                                flex-wrap
                                                                gap-2
@@ -80,11 +80,11 @@
                                                                   flex-wrap
                                                                   gap-6))))
                                       ,(if has-modify-permissions
-                                           `((a (@ (href "/users/manage"))
-                                                ,(icon-button #:icon 'user-switch
-                                                              #:content (G_
-                                                                         "go to user management"))))
-                                           '())
+                                         `((a (@ (href "/users/manage"))
+                                              ,(icon-button #:icon 'user-switch
+                                                            #:content (G_
+                                                                       "go to user management"))))
+                                         '())
                                       (a (@ (href "/logout"))
                                          ,(icon-button #:icon 'sign-out
                                                        #:content (G_ "logout")))
@@ -98,9 +98,7 @@
 
                                       (a (@ (href "/login"))
                                          ,(icon-button #:icon 'sign-in
-                                                       #:content (G_ "login")))
-
-                                      ))))))
+                                                       #:content (G_ "login")))))))))
 
 (define row-class
   (mk-class '(flex flex-row gap-4)))
@@ -134,10 +132,10 @@
                                    (hidden "")))
                          ,(button (G_ "delete")
                                   #:on-click (format #f
-                                              "return confirm('~a: ~a')"
-                                              (assoc-ref u "email")
-                                              (G_
-                                               "are you sure you want to delete this user?"))
+                                                     "return confirm('~a: ~a')"
+                                                     (assoc-ref u "email")
+                                                     (G_
+                                                      "are you sure you want to delete this user?"))
                                   #:type 'submit
                                   #:background '(bg-redwood-700)
                                   #:color '(text-stone-100)
@@ -162,13 +160,13 @@
                                        ,(icon-button #:icon 'user-plus
                                                      #:content (G_ "new user"))))
                                (div (@ (class ,(mk-class '(flex flex-col
-                                                           gap-4
-                                                           my-8
-                                                           py-8
-                                                           px-4
-                                                           rounded-xl
-                                                           bg-stone-300
-                                                           dark:bg-stone-900))))
+                                                                gap-4
+                                                                my-8
+                                                                py-8
+                                                                px-4
+                                                                rounded-xl
+                                                                bg-stone-300
+                                                                dark:bg-stone-900))))
                                     ,(map (lambda (u)
                                             (render-user G_ u)) users))))))
 
@@ -186,13 +184,13 @@
                  #:body `((div (@ (class ,(mk-class '())))
                                (div ,(h2 (G_ "New User")))
                                (div (@ (class ,(mk-class '(flex flex-col
-                                                           gap-4
-                                                           my-8
-                                                           py-8
-                                                           px-4
-                                                           rounded-xl
-                                                           bg-stone-300
-                                                           dark:bg-stone-900))))
+                                                                gap-4
+                                                                my-8
+                                                                py-8
+                                                                px-4
+                                                                rounded-xl
+                                                                bg-stone-300
+                                                                dark:bg-stone-900))))
                                     (form (@ (method POST)
                                              (action "/users/new"))
                                           (div ,(input #:label (G_ "username")
@@ -228,20 +226,20 @@
                                         (type 'checkbox)
                                         (checked #f)
                                         (input-css '(p-3 max-w-prose
-                                                     rounded-xl
-                                                     border-stone-100
-                                                     dark:border-stone-700
-                                                     dark:text-stone-300
-                                                     bg-stone-300/75
-                                                     dark:bg-stone-700/75
-                                                     border-2
-                                                     shadow-md))
+                                                         rounded-xl
+                                                         border-stone-100
+                                                         dark:border-stone-700
+                                                         dark:text-stone-300
+                                                         bg-stone-300/75
+                                                         dark:bg-stone-700/75
+                                                         border-2
+                                                         shadow-md))
                                         (label-css '(text-sm font-bold
-                                                     text-stone-500
-                                                     dark:text-stone-300))
+                                                             text-stone-500
+                                                             dark:text-stone-300))
                                         (input-flex-css '(my-2 flex flex-row
                                                                gap-1)))
-  
+
   `((div (@ (class ,(mk-class input-flex-css)))
          (label (@ (class ,(mk-class label-css))
                    (for ,name))
@@ -249,8 +247,8 @@
          (input (@ (class ,(mk-class input-css))
                    (name ,name)
                    ,(if checked
-                        '(checked "")
-                        '(not-checked ""))
+                      '(checked "")
+                      '(not-checked ""))
                    (type ,(symbol->string type))) ""))))
 
 (define* (edit-user-page G_ u)
@@ -261,30 +259,30 @@
                  #:body `((div (@ (class ,(mk-class '())))
                                (div ,(h2 (G_ "Edit User")))
                                (div (@ (class ,(mk-class '(flex flex-col
-                                                           gap-4
-                                                           my-8
-                                                           py-8
-                                                           px-4
-                                                           rounded-xl
-                                                           bg-stone-300
-                                                           dark:bg-stone-900))))
+                                                                gap-4
+                                                                my-8
+                                                                py-8
+                                                                px-4
+                                                                rounded-xl
+                                                                bg-stone-300
+                                                                dark:bg-stone-900))))
                                     (form (@ (method POST)
                                              (action ,(format #f
-                                                       "/users/edit/~a"
-                                                       (assoc-ref u
-                                                        "identifier"))))
+                                                              "/users/edit/~a"
+                                                              (assoc-ref u
+                                                                         "identifier"))))
                                           (input (@ (hidden "")
                                                     (value ,(assoc-ref u
-                                                             "identifier"))))
+                                                                       "identifier"))))
                                           (div ,(input #:label (G_ "username")
                                                        #:value (assoc-ref u
-                                                                "username")
+                                                                          "username")
                                                        #:name 'username
                                                        #:required #t))
                                           (div ,(input #:label (G_ "email")
                                                        #:name 'email
                                                        #:value (assoc-ref u
-                                                                "email")
+                                                                          "email")
                                                        #:type 'email
                                                        #:required #t))
                                           (div (@ (class ,(mk-class '(my-6))))
@@ -303,7 +301,7 @@
                                                                              (member
                                                                               p
 
-                                                                              
+
                                                                               (eval-string
                                                                                (assoc-ref
                                                                                 u
@@ -332,12 +330,12 @@
 (define* (reset-password-page G_
                               #:key token email rejected)
   (let ((rejection (cond
-                     ((equal? rejected "mismatch")
-                      (G_ "the two passwords you typed are not the same"))
-                     ((equal? rejected "weak")
+                     [(equal? rejected "mismatch")
+                      (G_ "the two passwords you typed are not the same")]
+                     [(equal? rejected "weak")
                       (G_
-                       "that password is too easy to guess, so it was not accepted; the rule below is what it has to pass"))
-                     (else #f))))
+                       "that password is too easy to guess, so it was not accepted; the rule below is what it has to pass")]
+                     [else #f])))
     (html-template G_
                    #:title "Choose a new password · WikiMusic"
                    #:robots "noindex, nofollow"
@@ -416,8 +414,7 @@
                                                          "new-password")
                                                  (progress (@ (max "4")
                                                               (value "0")
-                                                              (class ,(mk-class '
-                                                                       (hg-progress)))))
+                                                              (class ,(mk-class '(hg-progress)))))
                                                  (p (@ (data-password-strength-saying
                                                         "")
                                                        (aria-live polite)

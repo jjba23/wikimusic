@@ -167,8 +167,8 @@
 (define (describe-path path)
   (string-join (map (lambda (element)
                       (if (string? element)
-                          element
-                          (format #f "~a" element)))
+                        element
+                        (format #f "~a" element)))
                     path)
                "."))
 
@@ -181,20 +181,20 @@
 (define (check-type path value type)
   "Check that @var{value} has the OpenAPI @var{type}."
   (case type
-    ((string) (unless (string? value)
-                (validation-failure path "expected a string, got ~s" value)))
-    ((integer) (unless (integer? value)
-                 (validation-failure path "expected an integer, got ~s" value)))
-    ((number) (unless (number? value)
-                (validation-failure path "expected a number, got ~s" value)))
-    ((boolean) (unless (boolean? value)
-                 (validation-failure path "expected a boolean, got ~s" value)))
-    ((list) (unless (list? value)
-              (validation-failure path "expected a list, got ~s" value)))
-    ((map) (unless (and (list? value) (every pair? value))
-             (validation-failure path "expected an alist, got ~s" value)))
-    (else (unless (eq? type 'any)
-            (validation-failure path "unsupported type ~a" type))))
+    [(string) (unless (string? value)
+                (validation-failure path "expected a string, got ~s" value))]
+    [(integer) (unless (integer? value)
+                 (validation-failure path "expected an integer, got ~s" value))]
+    [(number) (unless (number? value)
+                (validation-failure path "expected a number, got ~s" value))]
+    [(boolean) (unless (boolean? value)
+                 (validation-failure path "expected a boolean, got ~s" value))]
+    [(list) (unless (list? value)
+              (validation-failure path "expected a list, got ~s" value))]
+    [(map) (unless (and (list? value) (every pair? value))
+             (validation-failure path "expected an alist, got ~s" value))]
+    [else (unless (eq? type 'any)
+            (validation-failure path "unsupported type ~a" type))])
   #t)
 
 (define (check-predicate path value predicate type-name)
@@ -254,8 +254,8 @@ an unknown format is accepted rather than rejected: a validator must not invent
 constraints the specification did not declare."
   (let ((entry (assq format-name format-patterns)))
     (cond
-      ((not entry) #t)
-      (else (and (string-match (cdr entry) value) #t)))))
+      [(not entry) #t]
+      [else (and (string-match (cdr entry) value) #t)])))
 
 (define (check-minimum path value minimum)
   (when (and (number? value) (< value minimum))
@@ -287,15 +287,15 @@ specification allows.  The quotient is therefore rounded and compared within a
 tolerance proportional to its size."
   (let ((ratio (/ value multiple)))
     (if (and (exact? value) (exact? multiple))
-        (integer? ratio)
-        (let ((nearest (round ratio)))
-          (<= (abs (- ratio nearest))
-              (* 1e-9 (max 1 (abs nearest))))))))
+      (integer? ratio)
+      (let ((nearest (round ratio)))
+        (<= (abs (- ratio nearest))
+            (* 1e-9 (max 1 (abs nearest))))))))
 
 (define (check-multiple-of path value multiple)
   (when (and (number? value)
-             (not (zero? multiple))
-             (not (multiple-of? value multiple)))
+          (not (zero? multiple))
+          (not (multiple-of? value multiple)))
     (validation-failure path "must be a multiple of ~a" multiple))
   #t)
 
@@ -356,13 +356,13 @@ tolerance proportional to its size."
   "Return @code{#t} when @var{thunk} returns without throwing @var{key}.
 
 @example
-(valid? (lambda () (make-pet #:name "")))  ;; => #f
+(valid? (lambda () (make-pet #:name " ")))  ;; => #f
 @end example"
   (catch key
-    (lambda ()
-      (thunk)
-      #t)
-    (lambda arguments #f)))
+         (lambda ()
+           (thunk)
+           #t)
+         (lambda arguments #f)))
 
 ;;; Commentary:
 ;;; HTTP request and response values
@@ -422,27 +422,27 @@ to spell them: @code{(web client)} wants symbols and libcurl wants an
 (define (cookie-value header name)
   "Return the value of the cookie @var{name} in the Cookie @var{header}, or #f."
   (and (string? header)
-       (let loop ((parts (string-split header #\;)))
-         (if (null? parts)
-             #f
-             (let* ((part (string-trim-both (car parts)))
-                    (equals (string-index part #\=)))
-               (if (and equals
-                        (string=? (string-trim-both
-                                   (substring part 0 equals))
-                                  name))
-                   (cookie-unquote
-                    (string-trim-both
-                     (substring part (+ equals 1) (string-length part))))
-                   (loop (cdr parts))))))))
+    (let loop ((parts (string-split header #\;)))
+      (if (null? parts)
+        #f
+        (let* ((part (string-trim-both (car parts)))
+               (equals (string-index part #\=)))
+          (if (and equals
+                (string=? (string-trim-both
+                           (substring part 0 equals))
+                          name))
+            (cookie-unquote
+             (string-trim-both
+              (substring part (+ equals 1) (string-length part))))
+            (loop (cdr parts))))))))
 
 (define (cookie-unquote value)
   "Return @var{value} without the quotes a cookie value may carry."
   (if (and (> (string-length value) 1)
-           (char=? (string-ref value 0) #\")
-           (char=? (string-ref value (- (string-length value) 1)) #\"))
-      (substring value 1 (- (string-length value) 1))
-      value))
+        (char=? (string-ref value 0) #\")
+        (char=? (string-ref value (- (string-length value) 1)) #\"))
+    (substring value 1 (- (string-length value) 1))
+    value))
 
 (define (cookie-string cookies)
   "Return @var{cookies}, an alist of name to value, as a Cookie header value."
@@ -463,13 +463,13 @@ values are joined in the order the entries were added."
                     (string-ci=? (header-name-string (car entry)) "Cookie")))
          (cookies (filter cookie? headers)))
     (if (null? cookies)
-        headers
-        (cons (cons "Cookie"
-                    (string-join (map (lambda (entry)
-                                        (format #f "~a" (cdr entry)))
-                                      cookies)
-                                 "; "))
-              (remove cookie? headers)))))
+      headers
+      (cons (cons "Cookie"
+                  (string-join (map (lambda (entry)
+                                      (format #f "~a" (cdr entry)))
+                                    cookies)
+                               "; "))
+            (remove cookie? headers)))))
 
 (define (http-request-query-ref request name)
   "Return the query parameter @var{name} of @var{request}."
@@ -508,10 +508,10 @@ A generated client calls this when the specification declares a success body and
 the caller asked for non-null payloads: a missing or null body is a server
 contract violation, not a value the caller can use."
   (if (eq? value #f)
-      (throw 'openapi-empty-body
-             (http-response-status response)
-             (http-response-body response))
-      value))
+    (throw 'openapi-empty-body
+           (http-response-status response)
+           (http-response-body response))
+    value))
 
 (define (make-multipart-boundary)
   "Return a boundary suitable for one multipart/form-data request."
@@ -550,12 +550,12 @@ listed one concrete code would either reject a success or accept a failure."
 
 @var{expected} is a list of status codes, or #f to accept any status."
   (if (or (not expected)
-          (memv (http-response-status response) expected)
-          (member (http-response-status response) expected))
-      response
-      (throw 'openapi-http-error
-             (http-response-status response)
-             (http-response-body response))))
+        (memv (http-response-status response) expected)
+        (member (http-response-status response) expected))
+    response
+    (throw 'openapi-http-error
+           (http-response-status response)
+           (http-response-body response))))
 
 (define (error-response status message)
   "Return an error response carrying @var{message} as JSON."
@@ -579,12 +579,12 @@ listed one concrete code would either reject a success or accept a failure."
     (lambda (port)
       (string-for-each (lambda (character)
                          (if (or (char-alphabetic? character)
-                                 (char-numeric? character)
-                                 (memv character
-                                       '(#\- #\_ #\. #\~ #\: #\/ #\@)))
-                             (display character port)
-                             (format port "%~2,0X"
-                                     (char->integer character))))
+                               (char-numeric? character)
+                               (memv character
+                                     '(#\- #\_ #\. #\~ #\: #\/ #\@)))
+                           (display character port)
+                           (format port "%~2,0X"
+                                   (char->integer character))))
                        text))))
 
 (define (query-value-string value)
@@ -593,11 +593,11 @@ listed one concrete code would either reject a success or accept a failure."
 Booleans are spelled the way a URL spells them, not the way Scheme prints them:
 @code{#t} is @code{true}, and the caller omits @code{#f} entirely."
   (cond
-    ((eq? value #t) "true")
-    ((eq? value #f) #f)
-    ((number? value) (number->string value))
-    ((string? value) value)
-    (else (format #f "~a" value))))
+    [(eq? value #t) "true"]
+    [(eq? value #f) #f]
+    [(number? value) (number->string value)]
+    [(string? value) value]
+    [else (format #f "~a" value)]))
 
 (define (query-string parameters)
   "Render the alist @var{parameters} as a query string, without the @code{?}."
@@ -606,23 +606,23 @@ Booleans are spelled the way a URL spells them, not the way Scheme prints them:
                  (let ((name (car entry))
                        (value (cdr entry)))
                    (cond
-                     ((eq? value #f) '())
-                     ((json-null? value) '())
-                     ((list? value)
+                     [(eq? value #f) '()]
+                     [(json-null? value) '()]
+                     [(list? value)
                       (filter-map (lambda (element)
                                     (let ((text (query-value-string element)))
                                       (and text
-                                           (format #f "~a=~a"
-                                                   (uri-encode name)
-                                                   (uri-encode text)))))
-                                  value))
-                     (else
-                      (let ((text (query-value-string value)))
-                        (if text
-                            (list (format #f "~a=~a"
-                                          (uri-encode name)
-                                          (uri-encode text)))
-                            '()))))))
+                                        (format #f "~a=~a"
+                                                (uri-encode name)
+                                                (uri-encode text)))))
+                                  value)]
+                     [else
+                       (let ((text (query-value-string value)))
+                         (if text
+                           (list (format #f "~a=~a"
+                                         (uri-encode name)
+                                         (uri-encode text)))
+                           '()))])))
                parameters)
    "&"))
 
@@ -636,17 +636,17 @@ Booleans are spelled the way a URL spells them, not the way Scheme prints them:
 (define (parameter-style-name style)
   "Return @var{style}, a string or symbol, as a symbol; @code{form} if absent."
   (cond
-    ((symbol? style) style)
-    ((string? style) (string->symbol style))
-    (else 'form)))
+    [(symbol? style) style]
+    [(string? style) (string->symbol style)]
+    [else 'form]))
 
 (define (query-delimiter style)
   "Return the character that separates the items of @var{style}."
   (let ((name (parameter-style-name style)))
     (cond
-      ((memq name '(spaceDelimited space-delimited)) #\space)
-      ((memq name '(pipeDelimited pipe-delimited)) #\|)
-      (else #\,))))
+      [(memq name '(spaceDelimited space-delimited)) #\space]
+      [(memq name '(pipeDelimited pipe-delimited)) #\|]
+      [else #\,])))
 
 (define (query-parameter-entries name value style explode?)
   "Return the query string entries that carry @var{value} for @var{name}.
@@ -656,42 +656,42 @@ Booleans are spelled the way a URL spells them, not the way Scheme prints them:
 The result is a list, so a caller can splice several parameters into one query."
   (let ((style (parameter-style-name style)))
     (cond
-      ((or (eq? value #f) (json-null? value)) '())
-      ((and (list? value) (every pair? value))
+      [(or (eq? value #f) (json-null? value)) '()]
+      [(and (list? value) (every pair? value))
        (if (memq style '(deepObject deep-object))
+         (filter-map (lambda (entry)
+                       (let ((text (query-value-string (cdr entry))))
+                         (and text
+                           (cons (format #f "~a[~a]" name (car entry))
+                                 text))))
+                     value)
+         (if (and (eq? style 'form) explode?)
            (filter-map (lambda (entry)
                          (let ((text (query-value-string (cdr entry))))
-                           (and text
-                                (cons (format #f "~a[~a]" name (car entry))
-                                      text))))
-                       value)
-           (if (and (eq? style 'form) explode?)
-               (filter-map (lambda (entry)
-                             (let ((text (query-value-string (cdr entry))))
-                               (and text (cons (car entry) text))))
-                           value)
-               (list (cons name
-                           (string-join
-                            (filter-map
-                             (lambda (entry)
-                               (append-map (lambda (part)
-                                             (let ((text (query-value-string part)))
-                                               (if text (list text) '())))
-                                           (list (car entry) (cdr entry))))
-                             value)
-                            (string (query-delimiter style))))))))
-      ((list? value)
-       (if (and (eq? style 'form) explode?)
-           (filter-map (lambda (element)
-                         (let ((text (query-value-string element)))
-                           (and text (cons name text))))
+                           (and text (cons (car entry) text))))
                        value)
            (list (cons name
-                       (string-join (filter-map query-value-string value)
-                                    (string (query-delimiter style)))))))
-      (else
-       (let ((text (query-value-string value)))
-         (if text (list (cons name text)) '()))))))
+                       (string-join
+                        (filter-map
+                         (lambda (entry)
+                           (append-map (lambda (part)
+                                         (let ((text (query-value-string part)))
+                                           (if text (list text) '())))
+                                       (list (car entry) (cdr entry))))
+                         value)
+                        (string (query-delimiter style)))))))]
+      [(list? value)
+       (if (and (eq? style 'form) explode?)
+         (filter-map (lambda (element)
+                       (let ((text (query-value-string element)))
+                         (and text (cons name text))))
+                     value)
+         (list (cons name
+                     (string-join (filter-map query-value-string value)
+                                  (string (query-delimiter style))))))]
+      [else
+        (let ((text (query-value-string value)))
+          (if text (list (cons name text)) '()))])))
 
 (define (coerce-query-value text type)
   "Return @var{text} as @var{type} when it parses, else @var{text} itself.
@@ -699,15 +699,15 @@ The result is a list, so a caller can splice several parameters into one query."
 Leaving an unparseable value alone is deliberate: the record validator reports
 it by field name instead of a coercion helper inventing a value."
   (case type
-    ((integer number)
-     (or (and (string? text) (string->number text)) text))
-    ((boolean)
+    [(integer number)
+     (or (and (string? text) (string->number text)) text)]
+    [(boolean)
      (let ((lowered (string-downcase (format #f "~a" (or text "")))))
        (cond
-         ((member lowered '("true" "1" "yes" "on")) #t)
-         ((member lowered '("false" "0" "no" "off" "")) #f)
-         (else text))))
-    (else text)))
+         [(member lowered '("true" "1" "yes" "on")) #t]
+         [(member lowered '("false" "0" "no" "off" "")) #f]
+         [else text]))]
+    [else text]))
 
 (define (query-parameter-value query name style explode? kind item-type)
   "Return the value of query parameter @var{name} in @var{query}, decoded.
@@ -718,58 +718,58 @@ single value; @code{#f} means the parameter was not sent at all."
   (let* ((style (parameter-style-name style))
          (matching (filter (lambda (entry)
                              (and (string? (car entry))
-                                  (string=? (car entry) name)))
+                               (string=? (car entry) name)))
                            query))
          (coerce (lambda (text) (coerce-query-value text item-type))))
     (case kind
-      ((array)
+      [(array)
        (if (null? matching)
-           #f
-           (if explode?
-               (map (lambda (entry) (coerce (cdr entry))) matching)
-               (let ((items (append-map
-                             (lambda (entry)
-                               (string-split (or (cdr entry) "")
-                                             (query-delimiter style)))
-                             matching)))
-                 (if (null? items) #f (map coerce items))))))
-      ((object)
+         #f
+         (if explode?
+           (map (lambda (entry) (coerce (cdr entry))) matching)
+           (let ((items (append-map
+                         (lambda (entry)
+                           (string-split (or (cdr entry) "")
+                                         (query-delimiter style)))
+                         matching)))
+             (if (null? items) #f (map coerce items)))))]
+      [(object)
        (if (memq style '(deepObject deep-object))
-           (let* ((prefix (string-append name "["))
-                  (members (filter-map
-                            (lambda (entry)
-                              (let ((key (car entry)))
-                                (and (string-prefix? prefix key)
-                                     (string-suffix? "]" key)
-                                     (cons (substring key (string-length prefix)
-                                                      (- (string-length key) 1))
-                                           (coerce (cdr entry))))))
-                            query)))
-             (if (null? members) #f members))
-           ;; An exploded object occupies the query under its own member names,
-           ;; so there is nothing to say which object they belong to; only the
-           ;; un-exploded spelling can be read back.
-           (if (or (null? matching) explode?)
-               #f
-               (let ((parts (append-map
-                             (lambda (entry)
-                               (string-split (or (cdr entry) "")
-                                             (query-delimiter style)))
-                             matching)))
-                 (let loop ((rest parts) (result '()))
-                   (cond
-                     ((or (null? rest) (null? (cdr rest)))
-                      (if (null? result) #f (reverse result)))
-                     (else
-                      (loop (cddr rest)
-                            (cons (cons (car rest) (coerce (cadr rest)))
-                                  result)))))))))
-      (else
-       (let ((entry (find (lambda (candidate)
-                            (and (string? (car candidate))
-                                 (string=? (car candidate) name)))
+         (let* ((prefix (string-append name "["))
+                (members (filter-map
+                          (lambda (entry)
+                            (let ((key (car entry)))
+                              (and (string-prefix? prefix key)
+                                (string-suffix? "]" key)
+                                (cons (substring key (string-length prefix)
+                                                 (- (string-length key) 1))
+                                      (coerce (cdr entry))))))
                           query)))
-         (and entry (coerce (cdr entry))))))))
+           (if (null? members) #f members))
+         ;; An exploded object occupies the query under its own member names,
+         ;; so there is nothing to say which object they belong to; only the
+         ;; un-exploded spelling can be read back.
+         (if (or (null? matching) explode?)
+           #f
+           (let ((parts (append-map
+                         (lambda (entry)
+                           (string-split (or (cdr entry) "")
+                                         (query-delimiter style)))
+                         matching)))
+             (let loop ((rest parts) (result '()))
+               (cond
+                 [(or (null? rest) (null? (cdr rest)))
+                  (if (null? result) #f (reverse result))]
+                 [else
+                   (loop (cddr rest)
+                         (cons (cons (car rest) (coerce (cadr rest)))
+                               result))])))))]
+      [else
+        (let ((entry (find (lambda (candidate)
+                             (and (string? (car candidate))
+                               (string=? (car candidate) name)))
+                           query)))
+          (and entry (coerce (cdr entry))))])))
 
 (define (form-value-string value)
   "Return VALUE the way an application/x-www-form-urlencoded body spells it.
@@ -778,11 +778,11 @@ Unlike a query string, a form field is not omitted when it is false: a form
 that declares a boolean sends @code{false}, so the server can tell the field
 was there."
   (cond
-    ((eq? value #t) "true")
-    ((eq? value #f) "false")
-    ((number? value) (number->string value))
-    ((string? value) value)
-    (else (format #f "~a" value))))
+    [(eq? value #t) "true"]
+    [(eq? value #f) "false"]
+    [(number? value) (number->string value)]
+    [(string? value) value]
+    [else (format #f "~a" value)]))
 
 (define (form-string parameters)
   "Render @var{parameters} as an application/x-www-form-urlencoded body."
@@ -791,17 +791,17 @@ was there."
                  (let ((name (car entry))
                        (value (cdr entry)))
                    (cond
-                     ((json-null? value) '())
-                     ((list? value)
+                     [(json-null? value) '()]
+                     [(list? value)
                       (map (lambda (element)
                              (format #f "~a=~a"
                                      (uri-encode name)
                                      (uri-encode (form-value-string element))))
-                           value))
-                     (else
-                      (list (format #f "~a=~a"
-                                    (uri-encode name)
-                                    (uri-encode (form-value-string value))))))))
+                           value)]
+                     [else
+                       (list (format #f "~a=~a"
+                                     (uri-encode name)
+                                     (uri-encode (form-value-string value))))])))
                parameters)
    "&"))
 
@@ -809,9 +809,9 @@ was there."
   "Return @var{value}, a form string, as a boolean when it spells one."
   (let ((text (string-downcase (format #f "~a" value))))
     (cond
-      ((member text '("true" "1" "yes" "on")) #t)
-      ((member text '("false" "0" "no" "off" "")) #f)
-      (else value))))
+      [(member text '("true" "1" "yes" "on")) #t]
+      [(member text '("false" "0" "no" "off" "")) #f]
+      [else value])))
 
 (define (coerce-form-values values types)
   "Return @var{values}, a form alist, with each value coerced to its type.
@@ -823,65 +823,65 @@ silently inventing a value."
   (map (lambda (entry)
          (let* ((name (car entry))
                 (type-entry (or (assoc name types)
-                                (and (string? name)
-                                     (assoc (string->symbol name) types)))))
+                              (and (string? name)
+                                (assoc (string->symbol name) types)))))
            (cons (car entry)
                  (if (not type-entry)
-                     (cdr entry)
-                     (case (cdr type-entry)
-                       ((integer number)
-                        (let ((number (and (string? (cdr entry))
-                                           (string->number (cdr entry)))))
-                          (or number (cdr entry))))
-                       ((boolean) (form-boolean (cdr entry)))
-                       (else (cdr entry)))))))
+                   (cdr entry)
+                   (case [cdr type-entry]
+                     [(integer number)
+                      (let ((number (and (string? (cdr entry))
+                                      (string->number (cdr entry)))))
+                        (or number (cdr entry)))]
+                     [(boolean) (form-boolean (cdr entry))]
+                     [else (cdr entry)])))))
        values))
 
 (define (multipart-boundary content-type)
   "Return the boundary named by @var{content-type}, or @code{#f}."
   (let* ((text (if (string? content-type)
-                   content-type
-                   (format #f "~a" (or content-type ""))))
+                 content-type
+                 (format #f "~a" (or content-type ""))))
          (lowered (string-downcase text))
          (index (string-contains lowered "boundary=")))
     (and index
-         (let* ((start (+ index (string-length "boundary=")))
-                (rest (substring text start (string-length text)))
-                (value (car (string-split rest #\;)))
-                (trimmed (string-trim-both value)))
-           (if (and (> (string-length trimmed) 1)
-                    (char=? (string-ref trimmed 0) #\")
-                    (char=? (string-ref trimmed
-                                        (- (string-length trimmed) 1))
-                            #\"))
-               (substring trimmed 1 (- (string-length trimmed) 1))
-               trimmed)))))
+      (let* ((start (+ index (string-length "boundary=")))
+             (rest (substring text start (string-length text)))
+             (value (car (string-split rest #\;)))
+             (trimmed (string-trim-both value)))
+        (if (and (> (string-length trimmed) 1)
+              (char=? (string-ref trimmed 0) #\")
+              (char=? (string-ref trimmed
+                                  (- (string-length trimmed) 1))
+                      #\"))
+          (substring trimmed 1 (- (string-length trimmed) 1))
+          trimmed)))))
 
 (define (split-on text delimiter)
   "Split @var{text} on every occurrence of the string @var{delimiter}."
   (let loop ((start 0) (out '()))
     (let ((index (string-contains text delimiter start)))
       (if index
-          (loop (+ index (string-length delimiter))
-                (cons (substring text start index) out))
-          (reverse (cons (substring text start (string-length text)) out))))))
+        (loop (+ index (string-length delimiter))
+              (cons (substring text start index) out))
+        (reverse (cons (substring text start (string-length text)) out))))))
 
 (define (multipart-part-name headers)
   "Return the form field name declared in @var{headers}, or @code{#f}."
   (let* ((lowered (string-downcase headers))
          (index (string-contains lowered "name=\"")))
     (and index
-         (let* ((start (+ index (string-length "name=\"")))
-                (end (string-index headers #\" start)))
-           (and end (substring headers start end))))))
+      (let* ((start (+ index (string-length "name=\"")))
+             (end (string-index headers #\" start)))
+        (and end (substring headers start end))))))
 
 (define (strip-crlf text)
   "Return @var{text} without one trailing CRLF."
   (if (and (>= (string-length text) 2)
-           (char=? (string-ref text (- (string-length text) 2)) #\return)
-           (char=? (string-ref text (- (string-length text) 1)) #\newline))
-      (substring text 0 (- (string-length text) 2))
-      text))
+        (char=? (string-ref text (- (string-length text) 2)) #\return)
+        (char=? (string-ref text (- (string-length text) 1)) #\newline))
+    (substring text 0 (- (string-length text) 2))
+    text))
 
 (define (parse-multipart-body body content-type)
   "Parse a multipart/form-data @var{body} into an alist of fields.
@@ -890,31 +890,31 @@ The values are strings; a file part is returned as its content, because the
 generated model describes the part's shape and not the browser's filename.  A
 body without a boundary, or one that is not text, yields the empty alist."
   (let* ((text (cond
-                 ((string? body) body)
-                 ((bytevector? body) (bytevector->string body "ISO-8859-1"))
-                 (else "")))
+                 [(string? body) body]
+                 [(bytevector? body) (bytevector->string body "ISO-8859-1")]
+                 [else ""]))
          (boundary (multipart-boundary content-type))
          (parts (and boundary
-                     (cdr (split-on text (string-append "--" boundary))))))
+                  (cdr (split-on text (string-append "--" boundary))))))
     (if (not parts)
-        '()
-        (filter-map
-         (lambda (part)
-           (let* ((part (if (string-prefix? "\r\n" part)
-                            (substring part 2 (string-length part))
-                            part))
-                  (separator (string-contains part "\r\n\r\n")))
-             (and separator
-                  (let* ((headers (substring part 0 separator))
-                         (value (strip-crlf
-                                 (substring part (+ separator 4)
-                                            (string-length part))))
-                         (name (multipart-part-name headers)))
-                    (and name (cons name value))))))
-         (filter (lambda (part)
-                   (and (not (string-null? part))
-                        (not (string-prefix? "--" part))))
-                 parts)))))
+      '()
+      (filter-map
+       (lambda (part)
+         (let* ((part (if (string-prefix? "\r\n" part)
+                        (substring part 2 (string-length part))
+                        part))
+                (separator (string-contains part "\r\n\r\n")))
+           (and separator
+             (let* ((headers (substring part 0 separator))
+                    (value (strip-crlf
+                            (substring part (+ separator 4)
+                                       (string-length part))))
+                    (name (multipart-part-name headers)))
+               (and name (cons name value))))))
+       (filter (lambda (part)
+                 (and (not (string-null? part))
+                   (not (string-prefix? "--" part))))
+               parts)))))
 
 (define (bytevector-concat parts)
   "Return the concatenation of the bytevectors @var{parts}."
@@ -922,10 +922,10 @@ body without a boundary, or one that is not text, yields the empty alist."
          (out (make-bytevector size 0)))
     (let loop ((rest parts) (offset 0))
       (if (null? rest)
-          out
-          (let ((part (car rest)))
-            (bytevector-copy! part 0 out offset (bytevector-length part))
-            (loop (cdr rest) (+ offset (bytevector-length part))))))))
+        out
+        (let ((part (car rest)))
+          (bytevector-copy! part 0 out offset (bytevector-length part))
+          (loop (cdr rest) (+ offset (bytevector-length part))))))))
 
 (define (multipart-part-bytes part boundary)
   "Return one multipart part as a list of bytevectors."
@@ -937,13 +937,13 @@ body without a boundary, or one that is not text, yields the empty alist."
             "--" boundary "\r\n"
             "Content-Disposition: form-data; name=\"" name "\""
             (if filename
-                (format #f "; filename=\"~a\"" filename)
-                "")
+              (format #f "; filename=\"~a\"" filename)
+              "")
             "\r\n\r\n"))
           (cond
-            ((bytevector? value) value)
-            ((string? value) (string->utf8 value))
-            (else (string->utf8 (format #f "~a" value))))
+            [(bytevector? value) value]
+            [(string? value) (string->utf8 value)]
+            [else (string->utf8 (format #f "~a" value))])
           (string->utf8 "\r\n"))))
 
 (define* (multipart-body parts #:key boundary)
@@ -959,18 +959,18 @@ body without a boundary, or one that is not text, yields the empty alist."
 (define (parse-query text)
   "Parse the query string @var{text} into an alist of decoded name/value pairs."
   (if (or (not (string? text)) (string-null? text))
-      '()
-      (map (lambda (pair)
-             (let* ((parts (string-split pair #\=))
-                    (name (uri-decode (car parts)))
-                    (value (if (pair? (cdr parts))
-                               (uri-decode (string-join (cdr parts) "="))
-                               "")))
-               (cons name value)))
-           (string-split (if (string-prefix? "?" text)
-                             (substring text 1 (string-length text))
-                             text)
-                         #\&))))
+    '()
+    (map (lambda (pair)
+           (let* ((parts (string-split pair #\=))
+                  (name (uri-decode (car parts)))
+                  (value (if (pair? (cdr parts))
+                           (uri-decode (string-join (cdr parts) "="))
+                           "")))
+             (cons name value)))
+         (string-split (if (string-prefix? "?" text)
+                         (substring text 1 (string-length text))
+                         text)
+                       #\&))))
 
 (define (uri-decode text)
   "Decode the percent escapes in @var{text}, and @code{+} as a space."
@@ -979,18 +979,18 @@ body without a boundary, or one that is not text, yields the empty alist."
       (lambda (port)
         (let loop ((index 0))
           (cond
-            ((>= index (string-length replaced)) #t)
-            ((and (char=? (string-ref replaced index) #\%)
-                  (< (+ index 2) (string-length replaced)))
+            [(>= index (string-length replaced)) #t]
+            [(and (char=? (string-ref replaced index) #\%)
+               (< (+ index 2) (string-length replaced)))
              (display (integer->char
                        (string->number (substring replaced (+ index 1)
                                                   (+ index 3))
                                        16))
                       port)
-             (loop (+ index 3)))
-            (else
-             (display (string-ref replaced index) port)
-             (loop (+ index 1)))))))))
+             (loop (+ index 3))]
+            [else
+              (display (string-ref replaced index) port)
+              (loop (+ index 1))]))))))
 
 (define (params->path template parameters)
   "Substitute @var{parameters} into the path @var{template}.
@@ -1055,28 +1055,28 @@ extra headers to send with every request.
   "Return the credential @var{auth} holds for the scheme @var{security-name}."
   (or (let ((entry (assoc security-name (auth-api-keys auth))))
         (and entry (cdr entry)))
-      (let ((name (assoc-ref descriptor "name")))
-        (and name
-             (let ((entry (assoc name (auth-api-keys auth))))
-               (and entry (cdr entry)))))))
+    (let ((name (assoc-ref descriptor "name")))
+      (and name
+        (let ((entry (assoc name (auth-api-keys auth))))
+          (and entry (cdr entry)))))))
 
 (define (auth-satisfiable? auth security-name descriptor)
   "Return @code{#t} when @var{auth} can satisfy the scheme @var{security-name}."
   (and auth
-       (case (scheme-type descriptor)
-         ((apiKey)
-          (and (scheme-value security-name descriptor auth) #t))
-         ((http)
-          (let ((scheme (string-downcase (or (assoc-ref descriptor "scheme") ""))))
-            (cond
-              ((string=? scheme "basic")
-               (and (auth-username auth) (auth-password auth) #t))
-              ((string=? scheme "bearer")
-               (and (auth-bearer-token auth) #t))
-              (else (and (auth-bearer-token auth) #t)))))
-         ((oauth2 openIdConnect)
-          (and (auth-bearer-token auth) #t))
-         (else #f))))
+    (case [scheme-type descriptor]
+      [(apiKey)
+       (and (scheme-value security-name descriptor auth) #t)]
+      [(http)
+       (let ((scheme (string-downcase (or (assoc-ref descriptor "scheme") ""))))
+         (cond
+           [(string=? scheme "basic")
+            (and (auth-username auth) (auth-password auth) #t)]
+           [(string=? scheme "bearer")
+            (and (auth-bearer-token auth) #t)]
+           [else (and (auth-bearer-token auth) #t)]))]
+      [(oauth2 openIdConnect)
+       (and (auth-bearer-token auth) #t)]
+      [else #f])))
 
 (define (scopes-satisfied? auth scopes)
   (every (lambda (scope)
@@ -1084,44 +1084,44 @@ extra headers to send with every request.
          scopes))
 
 (define (scheme-headers security-name descriptor auth)
-  (case (scheme-type descriptor)
-    ((apiKey)
+  (case [scheme-type descriptor]
+    [(apiKey)
      (let ((value (scheme-value security-name descriptor auth))
            (name (assoc-ref descriptor "name"))
            (location (assoc-ref descriptor "in")))
        (cond
-         ((and (string=? (or location "") "header") name)
-          (list (cons name value)))
-         ((and (string=? (or location "") "cookie") name)
-          (list (cons "Cookie" (format #f "~a=~a" name value))))
-         (else '()))))
-    ((http)
+         [(and (string=? (or location "") "header") name)
+          (list (cons name value))]
+         [(and (string=? (or location "") "cookie") name)
+          (list (cons "Cookie" (format #f "~a=~a" name value)))]
+         [else '()]))]
+    [(http)
      (let ((scheme (string-downcase (or (assoc-ref descriptor "scheme") ""))))
        (cond
-         ((string=? scheme "basic")
+         [(string=? scheme "basic")
           (list (cons "Authorization"
                       (string-append "Basic "
                                      (base64-encode
                                       (string-append (auth-username auth)
                                                      ":"
-                                                     (auth-password auth)))))))
-         (else
-          (list (cons "Authorization"
-                      (string-append "Bearer " (auth-bearer-token auth))))))))
-    ((oauth2 openIdConnect)
+                                                     (auth-password auth))))))]
+         [else
+           (list (cons "Authorization"
+                       (string-append "Bearer " (auth-bearer-token auth))))]))]
+    [(oauth2 openIdConnect)
      (list (cons "Authorization"
-                 (string-append "Bearer " (auth-bearer-token auth)))))
-    (else '())))
+                 (string-append "Bearer " (auth-bearer-token auth))))]
+    [else '()]))
 
 (define (scheme-query security-name descriptor auth)
   (if (and (eq? (scheme-type descriptor) 'apiKey)
-           (string=? (or (assoc-ref descriptor "in") "") "query"))
-      (let ((name (assoc-ref descriptor "name"))
-            (value (scheme-value security-name descriptor auth)))
-        (if (and name value)
-            (list (cons name value))
-            '()))
-      '()))
+        (string=? (or (assoc-ref descriptor "in") "") "query"))
+    (let ((name (assoc-ref descriptor "name"))
+          (value (scheme-value security-name descriptor auth)))
+      (if (and name value)
+        (list (cons name value))
+        '()))
+    '()))
 
 (define* (authenticate auth schemes requirements)
   "Return @code{(values headers query)} expressing @var{auth} for an operation.
@@ -1135,25 +1135,25 @@ A @code{<openapi-auth-error>} is raised when no alternative can be satisfied,
 because calling a secured operation anonymously is a programming error, not a
 problem the server should report."
   (cond
-    ((null? requirements)
-     (values (auth-headers-or-none auth) '()))
-    (else
-     (let loop ((alternatives requirements))
-       (cond
-         ((null? alternatives)
-          (auth-failure
-           "no credentials satisfy the security requirements of this operation"))
-         (else
-          (let* ((requirement (car alternatives))
-                 (applicable (filter (lambda (entry)
-                                       (and (assoc (car entry) schemes)
-                                            (auth-satisfiable?
-                                             auth
-                                             (car entry)
-                                             (assoc-ref schemes (car entry)))
-                                            (scopes-satisfied? auth (cdr entry))))
-                                     requirement)))
-            (if (= (length applicable) (length requirement))
+    [(null? requirements)
+     (values (auth-headers-or-none auth) '())]
+    [else
+      (let loop ((alternatives requirements))
+        (cond
+          [(null? alternatives)
+           (auth-failure
+            "no credentials satisfy the security requirements of this operation")]
+          [else
+            (let* ((requirement (car alternatives))
+                   (applicable (filter (lambda (entry)
+                                         (and (assoc (car entry) schemes)
+                                           (auth-satisfiable?
+                                            auth
+                                            (car entry)
+                                            (assoc-ref schemes (car entry)))
+                                           (scopes-satisfied? auth (cdr entry))))
+                                       requirement)))
+              (if (= (length applicable) (length requirement))
                 (values (append (auth-headers-or-none auth)
                                 (append-map (lambda (entry)
                                               (scheme-headers
@@ -1167,12 +1167,12 @@ problem the server should report."
                                        (assoc-ref schemes (car entry))
                                        auth))
                                     requirement))
-                (loop (cdr alternatives))))))))))
+                (loop (cdr alternatives))))]))]))
 
 (define (auth-headers-or-none auth)
   (if auth
-      (auth-headers auth)
-      '()))
+    (auth-headers auth)
+    '()))
 
 (define (base64-encode text)
   "Return the base64 encoding of @var{text}, for HTTP basic authentication."
@@ -1194,11 +1194,11 @@ problem the server should report."
                                    (remainder (quotient triple 4096) 64))
                        port)
               (if (> remaining 1)
-                  (display (string-ref alphabet
-                                       (remainder (quotient triple 64) 64))
-                           port)
-                  (display "=" port))
+                (display (string-ref alphabet
+                                     (remainder (quotient triple 64) 64))
+                         port)
+                (display "=" port))
               (if (> remaining 2)
-                  (display (string-ref alphabet (remainder triple 64)) port)
-                  (display "=" port))
+                (display (string-ref alphabet (remainder triple 64)) port)
+                (display "=" port))
               (loop (+ index 3)))))))))

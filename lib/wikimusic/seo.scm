@@ -82,11 +82,11 @@
 A development instance is reached over plain HTTP on the loopback interface,
 and upgrading its scheme to HTTPS would name an address that does not exist."
   (and (string? host)
-       (or (equal? host "localhost")
-           (equal? host "127.0.0.1")
-           (equal? host "::1")
-           (equal? host "[::1]")
-           (string-suffix? ".localhost" host))))
+    (or (equal? host "localhost")
+      (equal? host "127.0.0.1")
+      (equal? host "::1")
+      (equal? host "[::1]")
+      (string-suffix? ".localhost" host))))
 
 (define (with-https origin)
   "Return ORIGIN with its scheme changed to HTTPS when that is what a public
@@ -103,12 +103,12 @@ instance is left exactly as it is."
                     (lambda (key . args)
                       #f))))
     (if (and uri
-             (uri-host uri)
-             (not (loopback-host? (uri-host uri)))
-             (or (not (uri-port uri))
-                 (= (uri-port uri) 80)))
-        (uri->string (build-uri 'https
-                                #:host (uri-host uri))) origin)))
+          (uri-host uri)
+          (not (loopback-host? (uri-host uri)))
+          (or (not (uri-port uri))
+            (= (uri-port uri) 80)))
+      (uri->string (build-uri 'https
+                              #:host (uri-host uri))) origin)))
 
 (define (configured-site-origin)
   "Return the public origin an operator set for this instance, or #f.
@@ -120,7 +120,7 @@ needs to set it: an instance that does not is described by its own configured
 host name."
   (let ((value (config-value 'site-origin)))
     (and value
-         (string-trim value #\/))))
+      (string-trim value #\/))))
 
 (define* (site-origin)
   "Return this instance's public origin, without a trailing slash.
@@ -131,14 +131,14 @@ upgraded to HTTPS, or the empty string when neither is available -- which is
 the answer outside a request, and which makes every address built from it a
 plain path rather than a wrong full one."
   (or (configured-site-origin)
-      (let ((origin
-              (catch #t
-                     (lambda ()
-                       (current-myhost))
-                     (lambda (key . args)
-                       #f))))
-        (if (string? origin)
-            (with-https (string-trim origin #\/)) ""))))
+    (let ((origin
+            (catch #t
+                   (lambda ()
+                     (current-myhost))
+                   (lambda (key . args)
+                     #f))))
+      (if (string? origin)
+        (with-https (string-trim origin #\/)) ""))))
 
 (define* (absolute-url path
                        #:key (origin
@@ -149,17 +149,17 @@ build one on.
 A path that is already a full `http' or `https' address is returned unchanged,
 so a caller may hand in either the page's own path or an address from a row."
   (cond
-    ((not (string? path))
-     #f)
-    ((or (string-prefix? "http://" path)
-         (string-prefix? "https://" path))
-     path)
-    ((string-null? origin)
-     #f)
-    ((string-null? path)
-     (format #f "~a/" origin))
-    (else (format #f "~a/~a" origin
-                  (string-trim path #\/)))))
+    [(not (string? path))
+     #f]
+    [(or (string-prefix? "http://" path)
+       (string-prefix? "https://" path))
+     path]
+    [(string-null? origin)
+     #f]
+    [(string-null? path)
+     (format #f "~a/" origin)]
+    [else (format #f "~a/~a" origin
+                  (string-trim path #\/))]))
 
 ;;; ====== Turning a description into an announcement ======
 
@@ -184,46 +184,46 @@ and the emphasis markers that surround a word are removed."
   (define (keyword-line? line)
     (let ((trimmed (string-trim-both line)))
       (or (string-null? trimmed)
-          (string-prefix? "#+" trimmed)
-          (string-prefix? ":" trimmed))))
+        (string-prefix? "#+" trimmed)
+        (string-prefix? ":" trimmed))))
 
   (if (or (not (string? text))
-          (string-null? text)) ""
-      (let* ((kept (filter (lambda (line)
-                             (not (keyword-line? line)))
-                           (string-split text #\newline)))
-             (joined (string-join kept " "))
-             ;; [[address][the words shown]] keeps the words, and a bare
-             ;; [[address]] keeps the address itself.
-             (words (regexp-substitute/global #f
-                                              "\\[\\[[^\\]]*\\]\\[([^\\]]*)\\]\\]"
-                                              joined
-                                              'pre
-                                              1
-                                              'post))
-             (bare (regexp-substitute/global #f
-                                             "\\[\\[([^\\]]*)\\]\\]"
-                                             words
-                                             'pre
-                                             1
-                                             'post))
-             ;; The emphasis markers *bold*, /italic/, _underline_, =verbatim=
-             ;; and ~code~ are removed rather than their contents.
-             (plain (regexp-substitute/global #f
-                                              "[*_=~]"
-                                              bare
-                                              'pre
-                                              ""
-                                              'post))
-             ;; An ordered or bulleted list item begins with its marker.
-             (items (regexp-substitute/global #f
-                                              "(^| )[-+] "
-                                              plain
-                                              'pre
-                                              1
-                                              'post))
-             (squashed (collapse-whitespace items)))
-        (string-trim-both squashed))))
+        (string-null? text)) ""
+    (let* ((kept (filter (lambda (line)
+                           (not (keyword-line? line)))
+                         (string-split text #\newline)))
+           (joined (string-join kept " "))
+           ;; [[address][the words shown]] keeps the words, and a bare
+           ;; [[address]] keeps the address itself.
+           (words (regexp-substitute/global #f
+                                            "\\[\\[[^\\]]*\\]\\[([^\\]]*)\\]\\]"
+                                            joined
+                                            'pre
+                                            1
+                                            'post))
+           (bare (regexp-substitute/global #f
+                                           "\\[\\[([^\\]]*)\\]\\]"
+                                           words
+                                           'pre
+                                           1
+                                           'post))
+           ;; The emphasis markers *bold*, /italic/, _underline_, =verbatim=
+           ;; and ~code~ are removed rather than their contents.
+           (plain (regexp-substitute/global #f
+                                            "[*_=~]"
+                                            bare
+                                            'pre
+                                            ""
+                                            'post))
+           ;; An ordered or bulleted list item begins with its marker.
+           (items (regexp-substitute/global #f
+                                            "(^| )[-+] "
+                                            plain
+                                            'pre
+                                            1
+                                            'post))
+           (squashed (collapse-whitespace items)))
+      (string-trim-both squashed))))
 
 (define* (summarize text
                     #:key (limit 160))
@@ -237,22 +237,22 @@ without testing it again."
   (let* ((plain (org-plain-text text))
          (plain (if (string? plain) plain "")))
     (cond
-      ((string-null? plain)
-       "")
-      ((<= (string-length plain) limit)
-       plain)
-      (else (let* ((head (substring plain 0 limit))
+      [(string-null? plain)
+       ""]
+      [(<= (string-length plain) limit)
+       plain]
+      [else (let* ((head (substring plain 0 limit))
                    ;; Cutting mid-word makes a sentence look unfinished, so the cut
                    ;; moves back to the space after the last whole word -- unless
                    ;; the whole window is one very long word, which is then simply
                    ;; cut.
                    (space (string-rindex head #\space))
                    (head (if (and space
-                                  (> space
-                                     (/ limit 2)))
-                             (substring head 0 space) head)))
+                               (> space
+                                  (/ limit 2)))
+                           (substring head 0 space) head)))
               (format #f "~a…"
-                      (string-trim-right head)))))))
+                      (string-trim-right head)))])))
 
 ;;; ====== The head of a page ======
 
@@ -263,11 +263,11 @@ An attribute whose value is #f is left off the element entirely: an empty
 `og:image' tells a chat client that the page has an image and that it is
 nothing, which is worse than saying nothing at all."
   `(meta (@ ,@(if name
-                  `((name ,name))
-                  '())
+                `((name ,name))
+                '())
             ,@(if property
-                  `((property ,property))
-                  '())
+                `((property ,property))
+                '())
             (content ,content))))
 
 (define (json-ld-script data)
@@ -283,7 +283,7 @@ means the same character, which keeps what is written exactly what is parsed."
                                          "[<>&]"
                                          encoded
                                          'pre
-                                         (lambda (match )
+                                         (lambda (match)
                                            (format #f "\\u~4,'0x"
                                                    (char->integer (string-ref (match:substring
                                                                                match
@@ -300,9 +300,9 @@ A document's `lang' attribute names a language and not a place -- `en', not
 `en_US' -- so the region is dropped; a locale that is already a bare language
 is returned unchanged."
   (if (not (string? locale)) "en"
-      (let ((underscore (string-index locale #\_)))
-        (if underscore
-            (substring locale 0 underscore) locale))))
+    (let ((underscore (string-index locale #\_)))
+      (if underscore
+        (substring locale 0 underscore) locale))))
 
 (define* (schema-name type)
   "Return a node whose only fact is that it is of TYPE.
@@ -311,7 +311,7 @@ TYPES is a string naming a schema.org type, or a list of them, which becomes
 the JSON-LD array a node that is more than one kind of thing is written as."
   (cons "@type"
         (if (list? type)
-            (list->vector type) type)))
+          (list->vector type) type)))
 
 (define* (schema-node #:key type name extra)
   "Return a JSON-LD node of TYPE named NAME, with EXTRA's pairs as well.
@@ -321,11 +321,11 @@ and the couple of facts that make it worth describing -- without the caller
 having to remember to put `@type' first."
   (append (list (schema-name type))
           (if (and name
-                   (not (string-null? name)))
-              (list (cons "name" name))
-              '())
+                (not (string-null? name)))
+            (list (cons "name" name))
+            '())
           (or extra
-              '())))
+            '())))
 
 (define* (named-nodes #:key type names)
   "Return NAMES as a JSON-LD array of nodes of TYPE, or #f when there are none.
@@ -336,10 +336,10 @@ therefore drop the pair instead.  The list becomes a *vector* because that is
 what the JSON writer reads as an array -- a Scheme list is written as an
 object."
   (if (or (not (list? names))
-          (null? names)) #f
-      (list->vector (map (lambda (name)
-                           (schema-node #:type type
-                                        #:name name)) names))))
+        (null? names)) #f
+    (list->vector (map (lambda (name)
+                         (schema-node #:type type
+                                      #:name name)) names))))
 
 (define* (page-json-ld #:key type
                        (url #f)
@@ -372,23 +372,23 @@ page nor of its subject.
 @end table"
   (append (list (schema-name type))
           (if url
-              (list (cons "url" url))
-              '())
+            (list (cons "url" url))
+            '())
           (if (and name
-                   (not (string-null? name)))
-              (list (cons "name" name))
-              '())
+                (not (string-null? name)))
+            (list (cons "name" name))
+            '())
           (if (and description
-                   (not (string-null? description)))
-              (list (cons "description" description))
-              '())
+                (not (string-null? description)))
+            (list (cons "description" description))
+            '())
           (if main-entity
-              (list (cons "mainEntity"
-                          (if (list? main-entity) main-entity
-                              (list main-entity))))
-              '())
+            (list (cons "mainEntity"
+                        (if (list? main-entity) main-entity
+                          (list main-entity))))
+            '())
           (or extra
-              '())))
+            '())))
 
 (define* (seo-head #:key title
                    description
@@ -432,41 +432,41 @@ defaults apply.
 A list of JSON-LD nodes, each written into a script of its own.
 @end table"
   (let* ((absolute (or url
-                       (and path
-                            (absolute-url path))))
+                     (and path
+                       (absolute-url path))))
          (description (if (and (string? description)
-                               (not (string-null? description))) description
-                          #f))
+                            (not (string-null? description))) description
+                        #f))
          (image (or image
-                    (announced-image))))
+                  (announced-image))))
     (filter (lambda (element)
               element)
             (append (if description
-                        (list (meta #:name "description"
-                                    #:content description))
-                        '())
+                      (list (meta #:name "description"
+                                  #:content description))
+                      '())
                     (if absolute
-                        (list `(link (@ (rel "canonical")
-                                        (href ,absolute))))
-                        '())
+                      (list `(link (@ (rel "canonical")
+                                      (href ,absolute))))
+                      '())
                     (if robots
-                        (list (meta #:name "robots"
-                                    #:content robots))
-                        '())
+                      (list (meta #:name "robots"
+                                  #:content robots))
+                      '())
                     ;; Open Graph: the tags a chat client, a forum and a social site
                     ;; read a pasted link out of.
                     (if title
-                        (list (meta #:property "og:title"
-                                    #:content title))
-                        '())
+                      (list (meta #:property "og:title"
+                                  #:content title))
+                      '())
                     (if description
-                        (list (meta #:property "og:description"
-                                    #:content description))
-                        '())
+                      (list (meta #:property "og:description"
+                                  #:content description))
+                      '())
                     (if absolute
-                        (list (meta #:property "og:url"
-                                    #:content absolute))
-                        '())
+                      (list (meta #:property "og:url"
+                                  #:content absolute))
+                      '())
                     (list (meta #:property "og:type"
                                 #:content og-type)
                           (meta #:property "og:site_name"
@@ -474,38 +474,38 @@ A list of JSON-LD nodes, each written into a script of its own.
                           (meta #:property "og:locale"
                                 #:content locale))
                     (if image
-                        (append (list (meta #:property "og:image"
-                                            #:content image)
-                                      (meta #:property "og:image:width"
-                                            #:content announced-image-width)
-                                      (meta #:property "og:image:height"
-                                            #:content announced-image-height))
-                                (if image-alt
-                                    (list (meta #:property "og:image:alt"
-                                                #:content image-alt))
-                                    '()))
-                        '())
+                      (append (list (meta #:property "og:image"
+                                          #:content image)
+                                    (meta #:property "og:image:width"
+                                          #:content announced-image-width)
+                                    (meta #:property "og:image:height"
+                                          #:content announced-image-height))
+                              (if image-alt
+                                (list (meta #:property "og:image:alt"
+                                            #:content image-alt))
+                                '()))
+                      '())
                     ;; Twitter/X reads its own names first: the card is a large image
                     ;; card, and each tag is stated rather than left to be guessed
                     ;; from the Open Graph ones.
                     (list (meta #:name "twitter:card"
                                 #:content "summary_large_image"))
                     (if title
-                        (list (meta #:name "twitter:title"
-                                    #:content title))
-                        '())
+                      (list (meta #:name "twitter:title"
+                                  #:content title))
+                      '())
                     (if description
-                        (list (meta #:name "twitter:description"
-                                    #:content description))
-                        '())
+                      (list (meta #:name "twitter:description"
+                                  #:content description))
+                      '())
                     (if image
-                        (append (list (meta #:name "twitter:image"
-                                            #:content image))
-                                (if image-alt
-                                    (list (meta #:name "twitter:image:alt"
-                                                #:content image-alt))
-                                    '()))
-                        '())
+                      (append (list (meta #:name "twitter:image"
+                                          #:content image))
+                              (if image-alt
+                                (list (meta #:name "twitter:image:alt"
+                                            #:content image-alt))
+                                '()))
+                      '())
                     (map json-ld-script
                          (or json-ld
-                             '()))))))
+                           '()))))))

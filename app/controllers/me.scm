@@ -6,23 +6,23 @@
 (define-artanis-controller me)
 
 (import (wikimusic html)
-        (web uri)
-        (ice-9 string-fun)
-        (app models users)
-        (wikimusic config)
-        (wikimusic env)
-        (wikimusic auth)
-        (wikimusic controller)
-        (wikimusic sqlite util)
-        (kracht prelude)
-        (app views me)
-        (curl)
-        (uuid generate)
-        (rnrs bytevectors)
-        (json)
-        (artanis security nss)
-        (bewaking bewaking)
-        (bewaking password))
+  (web uri)
+  (ice-9 string-fun)
+  (app models users)
+  (wikimusic config)
+  (wikimusic env)
+  (wikimusic auth)
+  (wikimusic controller)
+  (wikimusic sqlite util)
+  (kracht prelude)
+  (app views me)
+  (curl)
+  (uuid generate)
+  (rnrs bytevectors)
+  (json)
+  (artanis security nss)
+  (bewaking bewaking)
+  (bewaking password))
 
 (get "/me"
      #:mime 'xml
@@ -30,14 +30,14 @@
      #:cookies '(names x-bewaking-wikimusic)
      (lambda (rc)
        (let* ((t (decrypt-token #:token (:cookies-value rc
-                                         "x-bewaking-wikimusic")
+                                                        "x-bewaking-wikimusic")
                                 #:encryption-key encryption-key
                                 #:signing-key signing-key))
               (user ($users 'get
                             #:ret 'top
                             #:condition (where #:identifier (assoc-ref t
                                                                        'owner-id)))))
-         
+
          (catch #t
                 (lambda ()
                   (response-emit (:mime rc
@@ -49,8 +49,8 @@
                                                                  "x-bewaking-wikimusic")))))
                 (lambda (key . args)
                   (display (format #f
-                            "error getting user details-me page: ~a: ~a" key
-                            args))
+                                   "error getting user details-me page: ~a: ~a" key
+                                   args))
                   (redirect-to rc
                                (string->uri (format #f "~a/login"
                                                     (current-myhost)))
@@ -63,7 +63,7 @@
      (lambda (rc)
        (define (go-to-users-management)
          (let* ((t (decrypt-token #:token (:cookies-value rc
-                                           "x-bewaking-wikimusic")
+                                                          "x-bewaking-wikimusic")
                                   #:encryption-key encryption-key
                                   #:signing-key signing-key))
                 (user ($users 'get
@@ -90,7 +90,7 @@
      (lambda (rc)
        (define (go-to-new-user)
          (let* ((t (decrypt-token #:token (:cookies-value rc
-                                           "x-bewaking-wikimusic")
+                                                          "x-bewaking-wikimusic")
                                   #:encryption-key encryption-key
                                   #:signing-key signing-key))
                 (user ($users 'get
@@ -118,7 +118,7 @@
          (let* ((user (car ($users 'get
                                    #:ret 'top
                                    #:condition (where #:identifier (params rc
-                                                                    "identifier"))))))
+                                                                           "identifier"))))))
            (response-emit (:mime rc
                                  (edit-user-page (:i18n rc) user)))))
 
@@ -139,12 +139,12 @@
         (define (do-new-user)
           (let* ((G_ (:i18n rc))
                  (existing-token (if (:cookies-value rc "x-bewaking-wikimusic")
-                                     (decrypt-token #:token (:cookies-value rc
-                                                             "x-bewaking-wikimusic")
-                                                    #:encryption-key
-                                                    encryption-key
-                                                    #:signing-key signing-key)
-                                     #f))
+                                   (decrypt-token #:token (:cookies-value rc
+                                                                          "x-bewaking-wikimusic")
+                                                  #:encryption-key
+                                                  encryption-key
+                                                  #:signing-key signing-key)
+                                   #f))
                  (body (body-alist rc))
                  (username (html-escape (assoc-ref body "username")))
                  (email (html-escape (assoc-ref body "email")))
@@ -180,19 +180,19 @@
             (let ((queued? (request-password-reset u)))
               (redirect-to rc
                            (string->uri (format #f
-                                         "~a/users/manage/?created=true~a"
-                                         (current-myhost)
-                                         (if queued?
-                                             (notice-query #:title (G_
-                                                                    "account created")
-                                                           #:body (G_
-                                                                   "an invitation to choose a password has been emailed to them"))
-                                             (notice-query #:title (G_
-                                                                    "account created, but the invitation was not sent")
-                                                           #:body (G_
-                                                                   "the mail service did not accept it; ask for a password reset for this account to try again")
-                                                           #:duration-millis
-                                                           10000))))
+                                                "~a/users/manage/?created=true~a"
+                                                (current-myhost)
+                                                (if queued?
+                                                  (notice-query #:title (G_
+                                                                         "account created")
+                                                                #:body (G_
+                                                                        "an invitation to choose a password has been emailed to them"))
+                                                  (notice-query #:title (G_
+                                                                         "account created, but the invitation was not sent")
+                                                                #:body (G_
+                                                                        "the mail service did not accept it; ask for a password reset for this account to try again")
+                                                                #:duration-millis
+                                                                10000))))
                            #:status 302))))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:user-create)
@@ -250,10 +250,10 @@
                                                 (email unquote email)
                                                 (permissions unquote
                                                              (format #f "~s"
-                                                              permissions)))
+                                                                     permissions)))
                                               #:where `((identifier unquote
                                                                     (params rc
-                                                                     "identifier"))))
+                                                                            "identifier"))))
                                   #:name "edit-user")))
             (redirect-to rc
                          (string->uri (format #f
@@ -281,39 +281,39 @@
                                               #:encryption-key encryption-key
                                               #:signing-key signing-key))
               (user-id (and (not (nil? sealed-payload))
-                            (equal? 'reset-password
-                                    (assoc-ref sealed-payload
-                                               'action))
-                            (assoc-ref sealed-payload
-                                       'user)))
+                         (equal? 'reset-password
+                                 (assoc-ref sealed-payload
+                                            'action))
+                         (assoc-ref sealed-payload
+                                    'user)))
               (user (and user-id
-                         ($users 'get
-                                 #:ret 'top
-                                 #:condition (where #:identifier user-id))))
+                      ($users 'get
+                              #:ret 'top
+                              #:condition (where #:identifier user-id))))
               (email (and (not (nil? user))
-                          (assoc-ref (car user) "email"))))
+                       (assoc-ref (car user) "email"))))
          (if (not email)
-             (redirect-to rc
-                          (string->uri (format #f
-                                        "~a/login?reset-link-expired=true~a"
-                                        (current-myhost)
-                                        (notice-query #:title (G_
-                                                               "this reset link has expired")
-                                                      #:body (G_
-                                                              "ask for a new one and a fresh link will be emailed to you")
-                                                      #:duration-millis 8000)))
-                          #:status 302)
-             (response-emit (:mime rc
-                                   (reset-password-page (:i18n rc)
-                                                        #:token (params rc
-                                                                 "token")
-                                                        ;; The reason the last submission came
-                                                        ;; back, when it did: `weak' or
-                                                        ;; `mismatch', and #f on a first visit.
-                                                        #:rejected (get-from-qstr
-                                                                    rc
-                                                                    "password-rejected")
-                                                        #:email email)))))))
+           (redirect-to rc
+                        (string->uri (format #f
+                                             "~a/login?reset-link-expired=true~a"
+                                             (current-myhost)
+                                             (notice-query #:title (G_
+                                                                    "this reset link has expired")
+                                                           #:body (G_
+                                                                   "ask for a new one and a fresh link will be emailed to you")
+                                                           #:duration-millis 8000)))
+                        #:status 302)
+           (response-emit (:mime rc
+                                 (reset-password-page (:i18n rc)
+                                                      #:token (params rc
+                                                                      "token")
+                                                      ;; The reason the last submission came
+                                                      ;; back, when it did: `weak' or
+                                                      ;; `mismatch', and #f on a first visit.
+                                                      #:rejected (get-from-qstr
+                                                                  rc
+                                                                  "password-rejected")
+                                                      #:email email)))))))
 
 ;; ====== Handing a mail to pingwing ======
 ;;
@@ -386,12 +386,12 @@
   (let loop
     ((rest paths))
     (cond
-      ((null? rest)
-       #f)
-      ((and (string? (car rest))
-            (file-exists? (car rest)))
-       (car rest))
-      (else (loop (cdr rest))))))
+      [(null? rest)
+       #f]
+      [(and (string? (car rest))
+         (file-exists? (car rest)))
+       (car rest)]
+      [else (loop (cdr rest))])))
 
 (define (trust-anchor-bundle)
   "Return the path of a file of certificate authorities, or #f."
@@ -422,11 +422,11 @@ reset link or an invitation, and neither belongs in a log."
   (let ((recipients (assoc-ref mail-payload
                                'recipients)))
     (if (vector? recipients)
-        (format #f "~{~a~^, ~}"
-                (map (lambda (one)
-                       (or (assoc-ref one
-                                      'address) "?"))
-                     (vector->list recipients))) "?")))
+      (format #f "~{~a~^, ~}"
+              (map (lambda (one)
+                     (or (assoc-ref one
+                                    'address) "?"))
+                   (vector->list recipients))) "?")))
 
 (define (post-mail-once mail-payload)
   "Hand MAIL-PAYLOAD to pingwing once, and answer whether it was accepted.
@@ -441,70 +441,70 @@ for it."
            (let ((handle (curl-easy-init)))
              (dynamic-wind (lambda ()
                              #t)
-                           (lambda ()
-                             (curl-easy-setopt handle
-                                               'post #t)
-                             (curl-easy-setopt handle
-                                               'url
-                                               (format #f "~a/api/v1/tasks"
-                                                       pingwing-url))
-                             (curl-easy-setopt handle
-                                               'postfields
-                                               (string->utf8 (scm->json-string
-                                                              mail-payload)))
-                             ;; The payload is JSON, and saying so is what lets the service
-                             ;; read it as one rather than as a form.
-                             (curl-easy-setopt handle
-                                               'httpheader
-                                               (list
-                                                "Content-Type: application/json"))
-                             (curl-easy-setopt handle
-                                               'connecttimeout
-                                               mail-connect-timeout-seconds)
-                             (curl-easy-setopt handle
-                                               'timeout mail-timeout-seconds)
-                             (curl-easy-setopt handle
-                                               'use-ssl 1)
-                             ;; Verification is on -- it is the point of TLS -- but curl has
-                             ;; to be told where to verify against, which is the one thing
-                             ;; this binding does not do for itself.
-                             (let ((bundle (trust-anchor-bundle)))
-                               (if bundle
-                                   (curl-easy-setopt handle
-                                                     'cainfo bundle)))
-                             (let ((anchors (trust-anchor-directory)))
-                               (if anchors
-                                   (curl-easy-setopt handle
-                                                     'capath anchors)))
-                             (curl-easy-setopt handle
-                                               'username
-                                               pingwing-basic-auth-user)
-                             (curl-easy-setopt handle
-                                               'password
-                                               pingwing-basic-auth-password)
-                             ;; `verbose' is left alone on purpose: it prints the request's
-                             ;; own headers, and one of them is the service's password.
-                             (let* ((answer (curl-easy-perform handle #t))
-                                    ;; A refusal arrives two ways: as a raised error, and as
-                                    ;; no answer at all, since this binding hands back a
-                                    ;; body or #f -- it exposes no status code.  Both are
-                                    ;; answered with #f, and what curl itself has to say
-                                    ;; about it is written where an operator can read it.
-                                    (body (and (bytevector? answer)
-                                               (catch #t
-                                                      (lambda ()
-                                                        (utf8->string answer))
-                                                      (lambda (key . args)
-                                                        "")))))
-                               (if (and body
-                                        (string-contains body
-                                         mail-accepted-sentence)) #t
-                                   (begin
-                                     (format (current-error-port)
-                                      "wikimusic mail: the service did not accept the task (curl: ~a)~%"
-                                      (curl-error-string)) #f))))
-                           (lambda ()
-                             (curl-easy-cleanup handle)))))
+               (lambda ()
+                 (curl-easy-setopt handle
+                                   'post #t)
+                 (curl-easy-setopt handle
+                                   'url
+                                   (format #f "~a/api/v1/tasks"
+                                           pingwing-url))
+                 (curl-easy-setopt handle
+                                   'postfields
+                                   (string->utf8 (scm->json-string
+                                                  mail-payload)))
+                 ;; The payload is JSON, and saying so is what lets the service
+                 ;; read it as one rather than as a form.
+                 (curl-easy-setopt handle
+                                   'httpheader
+                                   (list
+                                    "Content-Type: application/json"))
+                 (curl-easy-setopt handle
+                                   'connecttimeout
+                                   mail-connect-timeout-seconds)
+                 (curl-easy-setopt handle
+                                   'timeout mail-timeout-seconds)
+                 (curl-easy-setopt handle
+                                   'use-ssl 1)
+                 ;; Verification is on -- it is the point of TLS -- but curl has
+                 ;; to be told where to verify against, which is the one thing
+                 ;; this binding does not do for itself.
+                 (let ((bundle (trust-anchor-bundle)))
+                   (if bundle
+                     (curl-easy-setopt handle
+                                       'cainfo bundle)))
+                 (let ((anchors (trust-anchor-directory)))
+                   (if anchors
+                     (curl-easy-setopt handle
+                                       'capath anchors)))
+                 (curl-easy-setopt handle
+                                   'username
+                                   pingwing-basic-auth-user)
+                 (curl-easy-setopt handle
+                                   'password
+                                   pingwing-basic-auth-password)
+                 ;; `verbose' is left alone on purpose: it prints the request's
+                 ;; own headers, and one of them is the service's password.
+                 (let* ((answer (curl-easy-perform handle #t))
+                        ;; A refusal arrives two ways: as a raised error, and as
+                        ;; no answer at all, since this binding hands back a
+                        ;; body or #f -- it exposes no status code.  Both are
+                        ;; answered with #f, and what curl itself has to say
+                        ;; about it is written where an operator can read it.
+                        (body (and (bytevector? answer)
+                                (catch #t
+                                       (lambda ()
+                                         (utf8->string answer))
+                                       (lambda (key . args)
+                                         "")))))
+                   (if (and body
+                         (string-contains body
+                                          mail-accepted-sentence)) #t
+                     (begin
+                       (format (current-error-port)
+                               "wikimusic mail: the service did not accept the task (curl: ~a)~%"
+                               (curl-error-string)) #f))))
+               (lambda ()
+                 (curl-easy-cleanup handle)))))
          (lambda (key . args)
            ;; Why an attempt failed is worth a line of its own: a request the
            ;; service refused and a request this side could not even build
@@ -532,34 +532,34 @@ operator has to be able to find out, and nothing else can tell them."
       ;; reading this file is reading it *because* something is wrong now.
       (force-output (current-error-port))
       (if landed?
+        (begin
+          (format (current-error-port)
+                  "wikimusic mail: queued ~a for ~a (attempt ~a, ~,1fs)~%"
+                  (assoc-ref body
+                             'template)
+                  (mail-recipient-addresses body)
+                  attempt
+                  elapsed) #t)
+        (if (>= attempt mail-attempts)
           (begin
             (format (current-error-port)
-                    "wikimusic mail: queued ~a for ~a (attempt ~a, ~,1fs)~%"
+                    "wikimusic mail: could not queue ~a for ~a after ~a attempt(s) in ~,1fs~%"
                     (assoc-ref body
                                'template)
                     (mail-recipient-addresses body)
                     attempt
-                    elapsed) #t)
-          (if (>= attempt mail-attempts)
-              (begin
-                (format (current-error-port)
-                 "wikimusic mail: could not queue ~a for ~a after ~a attempt(s) in ~,1fs~%"
-                 (assoc-ref body
-                            'template)
-                 (mail-recipient-addresses body)
-                 attempt
-                 elapsed) #f)
-              (begin
-                ;; How long each attempt took is worth saying: it is the
-                ;; difference between a service that is refusing and one
-                ;; that never answers, and the two want different fixes.
-                (format (current-error-port)
-                 "wikimusic mail: attempt ~a did not land after ~,1fs; trying again in ~ams~%"
-                 attempt elapsed pause)
-                (force-output (current-error-port))
-                (usleep (* pause 1000))
-                (loop (+ attempt 1)
-                      (* 2 pause) started)))))))
+                    elapsed) #f)
+          (begin
+            ;; How long each attempt took is worth saying: it is the
+            ;; difference between a service that is refusing and one
+            ;; that never answers, and the two want different fixes.
+            (format (current-error-port)
+                    "wikimusic mail: attempt ~a did not land after ~,1fs; trying again in ~ams~%"
+                    attempt elapsed pause)
+            (force-output (current-error-port))
+            (usleep (* pause 1000))
+            (loop (+ attempt 1)
+                  (* 2 pause) started)))))))
 
 (define (request-password-reset u)
   "Mail U, the row of the account, a link to choose a new password.
@@ -587,9 +587,9 @@ exists and that a mail was expected -- can say that it was not."
                                               (assoc-ref (car u) "email"))
                                         (reset-link unquote
                                                     (format #f
-                                                     "~a/password/reset/token/~a"
-                                                     (current-myhost)
-                                                     reset-token)))
+                                                            "~a/password/reset/token/~a"
+                                                            (current-myhost)
+                                                            reset-token)))
                          ;; Who the mail comes from is the deployment's to
                          ;; name: an instance's own domain, and its own name on
                          ;; the envelope (see `(wikimusic config)').
@@ -607,23 +607,23 @@ exists and that a mail was expected -- can say that it was not."
       (lambda (rc)
         (let* ((G_ (:i18n rc))
                (existing-token (if (:cookies-value rc "x-bewaking-wikimusic")
-                                   (decrypt-token #:token (:cookies-value rc
-                                                           "x-bewaking-wikimusic")
-                                                  #:encryption-key
-                                                  encryption-key
-                                                  #:signing-key signing-key)
-                                   #f))
+                                 (decrypt-token #:token (:cookies-value rc
+                                                                        "x-bewaking-wikimusic")
+                                                #:encryption-key
+                                                encryption-key
+                                                #:signing-key signing-key)
+                                 #f))
                (body (body-alist rc))
                (email (assoc-ref body "email"))
                (u (if (not email)
-                      ($users 'get
-                              #:ret 'top
-                              #:condition (where #:identifier (assoc-ref
-                                                               existing-token
-                                                               'owner-id)))
-                      ($users 'get
-                              #:ret 'top
-                              #:condition (where #:email email)))))
+                    ($users 'get
+                            #:ret 'top
+                            #:condition (where #:identifier (assoc-ref
+                                                             existing-token
+                                                             'owner-id)))
+                    ($users 'get
+                            #:ret 'top
+                            #:condition (where #:email email)))))
           ;; An address that is not on file is answered exactly like one that
           ;; is: the same redirect, and no mail.  Asking for a reset used to
           ;; raise here -- `car' of an empty result -- which turned a typo in
@@ -671,32 +671,32 @@ exists and that a mail was expected -- can say that it was not."
                ;; nothing to try again with.  The envelope is read first, so
                ;; a link that no longer opens never reaches the KDF.
                (link-works? (and (not (nil? sealed-payload))
-                                 (equal? 'reset-password
-                                         (assoc-ref sealed-payload
-                                                    'action)))))
+                              (equal? 'reset-password
+                                      (assoc-ref sealed-payload
+                                                 'action)))))
           (cond
-            ((not link-works?)
+            [(not link-works?)
              (redirect-to rc
                           (string->uri (format #f
-                                        "~a/login?reset-link-expired=true"
-                                        (current-myhost)))
-                          #:status 302))
+                                               "~a/login?reset-link-expired=true"
+                                               (current-myhost)))
+                          #:status 302)]
             ;; Which of the two reasons it was is kept, because the form says
             ;; it back: a reader sent to the same form with no explanation
             ;; types the same password again.
-            ((not (and (string? new-password)
-                       (equal? new-password confirm-password)
-                       (strong-password? #:password new-password)))
+            [(not (and (string? new-password)
+                    (equal? new-password confirm-password)
+                    (strong-password? #:password new-password)))
              (redirect-to rc
                           (string->uri (format #f
-                                        "~a/password/reset/token/~a?password-rejected=~a"
-                                        (current-myhost)
-                                        (uri-encode reset-token)
-                                        (if (equal? new-password
-                                                    confirm-password) "weak"
-                                            "mismatch")))
-                          #:status 302))
-            (else (sql-execute! rc
+                                               "~a/password/reset/token/~a?password-rejected=~a"
+                                               (current-myhost)
+                                               (uri-encode reset-token)
+                                               (if (equal? new-password
+                                                           confirm-password) "weak"
+                                                 "mismatch")))
+                          #:status 302)]
+            [else (sql-execute! rc
                                 (sql-update 'users
                                             `((password unquote
                                                         (hash-password
@@ -707,23 +707,23 @@ exists and that a mail was expected -- can say that it was not."
                                                                    sealed-payload
                                                                    'user))))
                                 #:name "reset-user-password")
-                  (:cookies-set! rc
-                                 'x-bewaking-wikimusic "x-bewaking-wikimusic"
-                                 "")
-                  (:cookies-setattr! rc
-                                     'x-bewaking-wikimusic
-                                     #:expires 1
-                                     #:path "/"
-                                     #:secure #t
-                                     #:http-only #t)
-                  (redirect-to rc
-                               (string->uri (format #f
-                                             "~a/login?has-reset-password=true~a"
-                                             (current-myhost)
-                                             (notice-query #:title (G_
-                                                                    "your password has been changed")
-                                                           #:body (G_
-                                                                   "sign in with the new one")
-                                                           #:duration-millis
-                                                           8000)))
-                               #:status 302))))))
+              (:cookies-set! rc
+                             'x-bewaking-wikimusic "x-bewaking-wikimusic"
+                             "")
+              (:cookies-setattr! rc
+                                 'x-bewaking-wikimusic
+                                 #:expires 1
+                                 #:path "/"
+                                 #:secure #t
+                                 #:http-only #t)
+              (redirect-to rc
+                           (string->uri (format #f
+                                                "~a/login?has-reset-password=true~a"
+                                                (current-myhost)
+                                                (notice-query #:title (G_
+                                                                       "your password has been changed")
+                                                              #:body (G_
+                                                                      "sign in with the new one")
+                                                              #:duration-millis
+                                                              8000)))
+                           #:status 302)]))))

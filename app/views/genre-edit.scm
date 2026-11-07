@@ -32,7 +32,7 @@
                             ,(artwork-form G_
                                            #:entity 'genre
                                            #:entity-identifier (assq-ref genre
-                                                                'identifier)
+                                                                         'identifier)
                                            #:artwork-identifier (assq-ref a
                                                                           'identifier)
                                            #:content-url (uri-decode (assq-ref
@@ -48,11 +48,11 @@
                      (div (@ (class ,(mk-class '(py-3))))
                           ,(if (assq-ref genre
                                          'identifier)
-                               (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a: ~a"
-                                           (G_ "editing genre")
-                                           (assq-ref genre
-                                                     'display-name)))
-                               (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "new genre"))))
+                             (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a: ~a"
+                                                                                                                                           (G_ "editing genre")
+                                                                                                                                           (assq-ref genre
+                                                                                                                                                     'display-name)))
+                             (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "new genre"))))
                      (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
                                                               dark:text-stone-300
@@ -141,8 +141,8 @@
                      (description ""))
   `((form (@ (method POST)
              (action ,(if identifier
-                          (format #f "/genres/uuid/~a/edit" identifier)
-                          "/genres/new"))
+                        (format #f "/genres/uuid/~a/edit" identifier)
+                        "/genres/new"))
              (content-type application/x-www-form-urlencoded))
           (div ,(input #:label (G_ "display name")
                        #:name "display-name"
@@ -157,6 +157,6 @@
                                        "descriptions are written in Org mode syntax")
                           #:value (html-unescape description)))
           (div ,(submit-button (if identifier
-                                   (G_ "edit")
-                                   (G_ "create")))))))
+                                 (G_ "edit")
+                                 (G_ "create")))))))
 

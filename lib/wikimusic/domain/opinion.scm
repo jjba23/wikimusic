@@ -22,7 +22,7 @@
 ;; --- eDSL: Embedded Domain Specific Language ---
 
 (define-repo-method get-opinions-by-entity-ids repo-get-opinions-by-entity-ids
- "Retrieves opinions by their entity IDs from the given REPO.")
+                    "Retrieves opinions by their entity IDs from the given REPO.")
 
 (define-repo-method insert-opinion repo-insert-opinion
                     "Inserts a opinion with ATTRS in the given REPO.")

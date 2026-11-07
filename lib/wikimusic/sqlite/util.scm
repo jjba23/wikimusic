@@ -55,7 +55,7 @@
 printed to the current error port."
   (let ((value (getenv "WIKIMUSIC_SQL_LOG")))
     (and value
-         (not (string-null? value)))))
+      (not (string-null? value)))))
 
 (define (log-sql name query)
   "Print QUERY, labelled NAME, when SQL logging is enabled."
@@ -66,7 +66,7 @@ printed to the current error port."
   "Return Q unchanged when it is a <sql-query> or a statement string, and
 raise an error naming WHO otherwise."
   (unless (or (string? q)
-              (sql-query? q))
+            (sql-query? q))
     (error (format #f "~a: expected a kracht SQL query or a statement string"
                    who) q)) q)
 
@@ -84,27 +84,27 @@ than a quietly wrong statement, which also means a template holding a literal
 `?' is refused: kracht's `sql-parameterize' makes the same promise."
   (require-sql-query "sql-query->dbi-sql" q)
   (if (string? q) q
-      (let loop
-        ((chars (string->list (sql-query-sql q)))
-         (params (sql-query-params q))
-         (out '()))
-        (cond
-          ((null? chars)
-           (when (pair? params)
-             (error "sql-query->dbi-sql: more bound values than placeholders"
-                    q))
-           (list->string (reverse out)))
-          ((char=? (car chars) #\?)
-           (when (null? params)
-             (error "sql-query->dbi-sql: fewer bound values than placeholders"
-              q))
-           (loop (cdr chars)
-                 (cdr params)
-                 (append (reverse (string->list (value->sql-literal (car
-                                                                     params))))
-                         out)))
-          (else (loop (cdr chars) params
-                      (cons (car chars) out)))))))
+    (let loop
+      ((chars (string->list (sql-query-sql q)))
+       (params (sql-query-params q))
+       (out '()))
+      (cond
+        [(null? chars)
+         (when (pair? params)
+           (error "sql-query->dbi-sql: more bound values than placeholders"
+                  q))
+         (list->string (reverse out))]
+        [(char=? (car chars) #\?)
+         (when (null? params)
+           (error "sql-query->dbi-sql: fewer bound values than placeholders"
+                  q))
+         (loop (cdr chars)
+               (cdr params)
+               (append (reverse (string->list (value->sql-literal (car
+                                                                   params))))
+                       out))]
+        [else (loop (cdr chars) params
+                    (cons (car chars) out))]))))
 
 (define (order-by-clauses order-by)
   "Return ORDER-BY as the list of clause lists `sql-select' expects.
@@ -118,12 +118,12 @@ clauses, so both spellings are accepted:
                                              ;=> ((views desc) (display-name asc))
   (order-by-clauses '())                    ;=> ()"
   (cond
-    ((null? order-by)
-     '())
-    ((and (pair? (car order-by))
-          (not (null? (car order-by))))
-     order-by)
-    (else (list order-by))))
+    [(null? order-by)
+     '()]
+    [(and (pair? (car order-by))
+       (not (null? (car order-by))))
+     order-by]
+    [else (list order-by)]))
 
 (define (sql-order-by-sql clauses)
   "Render CLAUSES -- the clause list `sql-select' takes, as returned by
@@ -140,17 +140,17 @@ Raise an error on a direction that is none of `asc', `desc' or absent."
                       (let ((column (quote-sql-identifier (symbol->sql-column (car
                                                                                clause))))
                             (direction (and (pair? (cdr clause))
-                                            (cadr clause))))
+                                         (cadr clause))))
                         (case direction
-                          ((#f)
-                           column)
-                          ((asc asc!)
-                           (string-append column " ASC"))
-                          ((desc desc!)
-                           (string-append column " DESC"))
-                          (else (error
+                          [(#f)
+                           column]
+                          [(asc asc!)
+                           (string-append column " ASC")]
+                          [(desc desc!)
+                           (string-append column " DESC")]
+                          [else (error
                                  "sql-order-by-sql: unknown ORDER BY direction"
-                                 direction)))))
+                                 direction)])))
                     (order-by-clauses clauses)) ", "))
 
 (define (attrs->row attrs columns)

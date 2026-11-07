@@ -21,10 +21,10 @@
                                  #:key song song-contents is-logged-in)
   (let* ((clean-pdf-contents (lambda (x)
                                (if (equal? x
-                                    "data:application/octet-stream;base64,")
-                                   ""
-                                   (html-unescape (assq-ref song-contents
-                                                            'pdf-contents)))))
+                                           "data:application/octet-stream;base64,")
+                                 ""
+                                 (html-unescape (assq-ref song-contents
+                                                          'pdf-contents)))))
          (body `(div (@ (class ,(mk-class '(px-2 py-6))))
                      ((div ,(hr)
                            ,(song-content-form G_
@@ -82,15 +82,15 @@
                             (pdf-contents ""))
   `((div (@ (class ,(mk-class '(py-3))))
          ,(if (and song-identifier song-content-identifier)
-              (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a: ~a ~a"
-                          (G_ "editing version") version-name instrument-type))
-              (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "new version"))))
+            (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a: ~a ~a"
+                                                                                                                          (G_ "editing version") version-name instrument-type))
+            (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "new version"))))
     (form (@ (method POST)
              (action ,(if (and song-identifier song-content-identifier)
-                          (format #f "/songs/uuid/~a/contents/~a/edit"
-                                  song-identifier song-content-identifier)
-                          (format #f "/songs/uuid/~a/contents/new"
-                                  song-identifier)))
+                        (format #f "/songs/uuid/~a/contents/~a/edit"
+                                song-identifier song-content-identifier)
+                        (format #f "/songs/uuid/~a/contents/new"
+                                song-identifier)))
              (content-type application/x-www-form-urlencoded))
           (div ,(input #:label (G_ "instrument type")
                        #:name 'instrument-type
@@ -185,5 +185,5 @@
                          (name guitarpro-contents)
                          (hidden "")) ""))
           (div ,(submit-button (if song-content-identifier
-                                   (G_ "edit")
-                                   (G_ "create")))))))
+                                 (G_ "edit")
+                                 (G_ "create")))))))

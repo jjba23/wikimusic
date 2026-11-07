@@ -82,11 +82,11 @@ reader and constructor in this project builds objects that way, and checking the
 whole list on every lookup made reading a large specification quadratic in the
 number of members."
   (cond
-    ((null? value) #t)
-    ((pair? value)
+    [(null? value) #t]
+    [(pair? value)
      (let ((entry (car value)))
-       (and (pair? entry) (string? (car entry)))))
-    (else #f)))
+       (and (pair? entry) (string? (car entry))))]
+    [else #f]))
 
 (define (jso-array? value)
   "Return @code{#t} when @var{value} is a JSON array."
@@ -95,17 +95,17 @@ number of members."
 (define (jso-scalar? value)
   "Return @code{#t} when @var{value} is a JSON string, number, boolean or null."
   (or (string? value)
-      (number? value)
-      (boolean? value)
-      (json-null? value)))
+    (number? value)
+    (boolean? value)
+    (json-null? value)))
 
 ;;; Commentary:
 ;;; Accessors
 
 (define (jso-object-or-null value)
   (if (jso-object? value)
-      value
-      '()))
+    value
+    '()))
 
 (define (jso-keys object)
   "Return the keys of @var{object}, in document order."
@@ -118,13 +118,13 @@ number of members."
 (define (jso-assq object key)
   "Return the @code{(key . value)} pair of @var{key} in @var{object}, or #f."
   (and (jso-object? object)
-       (assoc key object)))
+    (assoc key object)))
 
 (define (jso-has? object key)
   "Return @code{#t} when @var{object} has a member named @var{key}."
   (if (jso-assq object key)
-      #t
-      #f))
+    #t
+    #f))
 
 (define* (jso-ref object key #:optional (default #f))
   "Return the member @var{key} of @var{object}, or @var{default} when absent.
@@ -133,31 +133,31 @@ An explicitly null member yields @code{json-null}, never @var{default}: the two
 situations are different, and the merge patch implementation depends on it."
   (let ((entry (jso-assq object key)))
     (if entry
-        (cdr entry)
-        default)))
+      (cdr entry)
+      default)))
 
 (define (jso-ref-path object . keys)
   "Follow @var{keys} through nested objects, returning #f when a step is absent."
   (let loop ((node object)
              (keys keys))
     (cond
-      ((null? keys)
-       node)
-      ((jso-object? node)
-       (loop (jso-ref node (car keys)) (cdr keys)))
-      (else #f))))
+      [(null? keys)
+       node]
+      [(jso-object? node)
+       (loop (jso-ref node (car keys)) (cdr keys))]
+      [else #f])))
 
 (define* (jso-default value #:optional (default #f))
   "Return @var{default} when @var{value} is absent or null, else @var{value}."
   (if (or (eq? value #f) (json-null? value))
-      default
-      value))
+    default
+    value))
 
 (define (jso-array->list array)
   "Return the elements of the JSON @var{array} as a list."
   (if (vector? array)
-      (vector->list array)
-      '()))
+    (vector->list array)
+    '()))
 
 (define (jso-list->array list)
   "Return @var{list} as a JSON array."
@@ -178,12 +178,12 @@ situations are different, and the merge patch implementation depends on it."
 (define (jso-put object key value)
   "Return @var{object} with @var{key} set to @var{value}, keeping its position."
   (if (jso-has? object key)
-      (map (lambda (entry)
-             (if (string=? (car entry) key)
-                 (cons key value)
-                 entry))
-           object)
-      (append object (list (cons key value)))))
+    (map (lambda (entry)
+           (if (string=? (car entry) key)
+             (cons key value)
+             entry))
+         object)
+    (append object (list (cons key value)))))
 
 (define (jso-delete object key)
   "Return @var{object} without the member @var{key}."
@@ -205,15 +205,15 @@ situations are different, and the merge patch implementation depends on it."
 (define (jso-deep-copy value)
   "Return a copy of @var{value} that shares no pairs or vectors with it."
   (cond
-    ((json-null? value)
-     json-null)
-    ((jso-object? value)
+    [(json-null? value)
+     json-null]
+    [(jso-object? value)
      (map (lambda (entry)
             (cons (car entry) (jso-deep-copy (cdr entry))))
-          value))
-    ((vector? value)
-     (list->vector (map jso-deep-copy (vector->list value))))
-    (else value)))
+          value)]
+    [(vector? value)
+     (list->vector (map jso-deep-copy (vector->list value)))]
+    [else value]))
 
 ;;; Commentary:
 ;;; Normalisation
@@ -224,30 +224,30 @@ situations are different, and the merge patch implementation depends on it."
 guile-json hands back symbol keys by default; the rest of this project only
 ever deals with string keys, so documents are normalised once, at the edge."
   (cond
-    ((or (json-null? value) (eq? value #nil))
-     json-null)
-    ((eq? value #f)
-     #f)
-    ((vector? value)
-     (list->vector (map jso-normalize (vector->list value))))
-    ((and (list? value)
-          (every pair? value))
+    [(or (json-null? value) (eq? value #nil))
+     json-null]
+    [(eq? value #f)
+     #f]
+    [(vector? value)
+     (list->vector (map jso-normalize (vector->list value)))]
+    [(and (list? value)
+       (every pair? value))
      (map (lambda (entry)
             (cons (jso-key->string (car entry))
                   (jso-normalize (cdr entry))))
-          value))
-    (else value)))
+          value)]
+    [else value]))
 
 (define (jso-key->string key)
   "Return @var{key} as the string this project uses to name object members."
   (cond
-    ((string? key)
-     key)
-    ((symbol? key)
-     (symbol->string key))
-    ((keyword? key)
-     (symbol->string (keyword->symbol key)))
-    (else (format #f "~a" key))))
+    [(string? key)
+     key]
+    [(symbol? key)
+     (symbol->string key)]
+    [(keyword? key)
+     (symbol->string (keyword->symbol key))]
+    [else (format #f "~a" key)]))
 
 ;;; Commentary:
 ;;; Types
@@ -259,35 +259,35 @@ ever deals with string keys, so documents are normalised once, at the edge."
 (define* (jso-string value #:optional (default #f))
   "Return @var{value} when it is a string, else @var{default}."
   (if (string? value)
-      value
-      default))
+    value
+    default))
 
 (define* (jso-number value #:optional (default #f))
   "Return @var{value} when it is a number, else @var{default}."
   (if (number? value)
-      value
-      default))
+    value
+    default))
 
 (define (jso->string value)
   "Return a short, log friendly rendering of @var{value}."
   (cond
-    ((json-null? value)
-     "null")
-    ((string? value)
-     (format #f "~s" value))
-    ((vector? value)
+    [(json-null? value)
+     "null"]
+    [(string? value)
+     (format #f "~s" value)]
+    [(vector? value)
      (format #f "[~a]"
              (string-join (map jso->string (vector->list value))
-                          ", ")))
-    ((jso-object? value)
+                          ", "))]
+    [(jso-object? value)
      (format #f "{~a}"
              (string-join (map (lambda (entry)
                                  (format #f "~s: ~a"
                                          (car entry)
                                          (jso->string (cdr entry))))
                                value)
-                          ", ")))
-    (else (format #f "~a" value))))
+                          ", "))]
+    [else (format #f "~a" value)]))
 
 ;;; Commentary:
 ;;; JSON merge patch (RFC 7386)
@@ -305,23 +305,23 @@ ever deals with string keys, so documents are normalised once, at the edge."
 ;; => ((\"a\" . 1) (\"b\" . 3))
 @end example"
   (if (jso-object? patch)
-      (fold (lambda (entry result)
-              (let ((key (car entry))
-                    (value (cdr entry)))
-                (cond
-                  ((json-null? value)
-                   (jso-delete result key))
-                  ((jso-object? value)
-                   (let ((existing (jso-ref result key)))
-                     (jso-put result key
-                              (json-merge-patch (if (jso-object? existing)
-                                                    existing
-                                                    '())
-                                                value))))
-                  (else
-                   (jso-put result key (jso-deep-copy value))))))
-            (if (jso-object? target)
-                target
-                '())
-            patch)
-      (jso-deep-copy patch)))
+    (fold (lambda (entry result)
+            (let ((key (car entry))
+                  (value (cdr entry)))
+              (cond
+                [(json-null? value)
+                 (jso-delete result key)]
+                [(jso-object? value)
+                 (let ((existing (jso-ref result key)))
+                   (jso-put result key
+                            (json-merge-patch (if (jso-object? existing)
+                                                existing
+                                                '())
+                                              value)))]
+                [else
+                  (jso-put result key (jso-deep-copy value))])))
+          (if (jso-object? target)
+            target
+            '())
+          patch)
+    (jso-deep-copy patch)))

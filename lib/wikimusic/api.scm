@@ -67,10 +67,10 @@ out rather than sending an empty string a client would have to know to ignore."
 SQLite gives the columns back as the driver read them; a count and a view are
 numbers to every caller, so the conversion is made once, here."
   (cond
-    ((integer? value) value)
-    ((number? value) (inexact->exact value))
-    ((string? value) (or (string->number value) 0))
-    (else 0)))
+    [(integer? value) value]
+    [(number? value) (inexact->exact value)]
+    [(string? value) (or (string->number value) 0)]
+    [else 0]))
 
 (define (by-identifier rows)
   "Return ROWS as an alist of identifier to row."
@@ -88,8 +88,8 @@ numbers to every caller, so the conversion is made once, here."
   "Return the records of the rows LINK names for SONG-ID."
   (filter-map (lambda (link)
                 (and (equal? (column link 'song-identifier) song-id)
-                     (let ((row (assoc-ref rows (column link link-key))))
-                       (and row (make-ref row)))))
+                  (let ((row (assoc-ref rows (column link link-key))))
+                    (and row (make-ref row)))))
               links))
 
 (define (song-relations song-repo artist-repo genre-repo ids)
@@ -99,24 +99,24 @@ The first two are the join-table rows, the last two the artists and genres they
 name as alists of identifier to row, so a page of songs is four statements and
 not two per song."
   (if (null? ids)
-      (values '() '() '() '())
-      (let* ((artist-links (get-song-artists-by-ids song-repo ids))
-             (genre-links (get-song-genres-by-ids song-repo ids))
-             (artist-ids (delete-duplicates
-                          (map (lambda (link)
-                                 (column link 'artist-identifier))
-                               artist-links)))
-             (genre-ids (delete-duplicates
-                         (map (lambda (link)
-                                (column link 'genre-identifier))
-                              genre-links))))
-        (values artist-links genre-links
-                (if (null? artist-ids)
-                    '()
-                    (by-identifier (get-artists-by-ids artist-repo artist-ids)))
-                (if (null? genre-ids)
-                    '()
-                    (by-identifier (get-genres-by-ids genre-repo genre-ids)))))))
+    (values '() '() '() '())
+    (let* ((artist-links (get-song-artists-by-ids song-repo ids))
+           (genre-links (get-song-genres-by-ids song-repo ids))
+           (artist-ids (delete-duplicates
+                        (map (lambda (link)
+                               (column link 'artist-identifier))
+                             artist-links)))
+           (genre-ids (delete-duplicates
+                       (map (lambda (link)
+                              (column link 'genre-identifier))
+                            genre-links))))
+      (values artist-links genre-links
+              (if (null? artist-ids)
+                '()
+                (by-identifier (get-artists-by-ids artist-repo artist-ids)))
+              (if (null? genre-ids)
+                '()
+                (by-identifier (get-genres-by-ids genre-repo genre-ids)))))))
 
 (define (song-summary row artist-links genre-links artists genres)
   (make-song-summary
@@ -191,175 +191,175 @@ not two per song."
 
 (define (list-songs-handler song-repo artist-repo genre-repo args)
   (receive (limit offset) (pagination args)
-    (let* ((search (text (assq-ref args 'search)))
-           (rows (if search
-                     (search-songs song-repo search
-                                   #:limit limit #:offset offset)
-                     (get-songs song-repo #:limit limit #:offset offset)))
-           (total (count-songs song-repo #:search search)))
-      (receive (artist-links genre-links artists genres)
-          (song-relations song-repo artist-repo genre-repo
-                          (map (lambda (row) (column row 'identifier)) rows))
-        (ok (song-list->jso
-             (make-song-list
-              #:items (map (lambda (row)
-                             (song-summary row artist-links genre-links
-                                           artists genres))
-                           rows)
-              #:total total
-              #:limit limit
-              #:offset offset)))))))
+           (let* ((search (text (assq-ref args 'search)))
+                  (rows (if search
+                          (search-songs song-repo search
+                                        #:limit limit #:offset offset)
+                          (get-songs song-repo #:limit limit #:offset offset)))
+                  (total (count-songs song-repo #:search search)))
+             (receive (artist-links genre-links artists genres)
+                      (song-relations song-repo artist-repo genre-repo
+                                      (map (lambda (row) (column row 'identifier)) rows))
+                      (ok (song-list->jso
+                           (make-song-list
+                            #:items (map (lambda (row)
+                                           (song-summary row artist-links genre-links
+                                                         artists genres))
+                                         rows)
+                            #:total total
+                            #:limit limit
+                            #:offset offset)))))))
 
 (define (get-song-handler song-repo artist-repo genre-repo
                           content-repo artwork-repo args)
   (let ((id (assq-ref args 'song-id)))
     (let ((row (get-song-by-id song-repo id)))
       (if (not row)
-          (json-error 404 "not-found" "No such song")
-          (let ((ids (list id)))
-            (receive (artist-links genre-links artists genres)
-                (song-relations song-repo artist-repo genre-repo ids)
-              (let ((summary (song-summary row artist-links genre-links
-                                           artists genres)))
-                (ok (song->jso
-                     (make-song
-                      #:identifier (song-summary-identifier summary)
-                      #:display-name (song-summary-display-name summary)
-                      #:description (song-summary-description summary)
-                      #:music-key (song-summary-music-key summary)
-                      #:music-tuning (song-summary-music-tuning summary)
-                      #:music-creation-date (text (column row
-                                                          'music-creation-date))
-                      #:album-name (song-summary-album-name summary)
-                      #:album-info-link (text (column row 'album-info-link))
-                      #:views (song-summary-views summary)
-                      #:artists (song-summary-artists summary)
-                      #:genres (song-summary-genres summary)
-                      #:versions
-                      (map version-record
-                           (get-song-contents-by-song-ids content-repo ids))
-                      #:artworks
-                      (map artwork-record
-                           (get-artworks-by-entity-ids artwork-repo 'song ids))
-                      #:created-at (song-summary-created-at summary)))))))))))
+        (json-error 404 "not-found" "No such song")
+        (let ((ids (list id)))
+          (receive (artist-links genre-links artists genres)
+                   (song-relations song-repo artist-repo genre-repo ids)
+                   (let ((summary (song-summary row artist-links genre-links
+                                                artists genres)))
+                     (ok (song->jso
+                          (make-song
+                           #:identifier (song-summary-identifier summary)
+                           #:display-name (song-summary-display-name summary)
+                           #:description (song-summary-description summary)
+                           #:music-key (song-summary-music-key summary)
+                           #:music-tuning (song-summary-music-tuning summary)
+                           #:music-creation-date (text (column row
+                                                               'music-creation-date))
+                           #:album-name (song-summary-album-name summary)
+                           #:album-info-link (text (column row 'album-info-link))
+                           #:views (song-summary-views summary)
+                           #:artists (song-summary-artists summary)
+                           #:genres (song-summary-genres summary)
+                           #:versions
+                           (map version-record
+                                (get-song-contents-by-song-ids content-repo ids))
+                           #:artworks
+                           (map artwork-record
+                                (get-artworks-by-entity-ids artwork-repo 'song ids))
+                           #:created-at (song-summary-created-at summary)))))))))))
 
 (define (list-song-versions-handler song-repo content-repo args)
   (let ((id (assq-ref args 'song-id)))
     (if (not (get-song-by-id song-repo id))
-        (json-error 404 "not-found" "No such song")
-        (ok (list->vector
-             (map song-version->jso
-                  (map version-record
-                       (get-song-contents-by-song-ids content-repo
-                                                      (list id)))))))))
+      (json-error 404 "not-found" "No such song")
+      (ok (list->vector
+           (map song-version->jso
+                (map version-record
+                     (get-song-contents-by-song-ids content-repo
+                                                    (list id)))))))))
 
 (define (list-artists-handler artist-repo args)
   (receive (limit offset) (pagination args)
-    (let* ((search (text (assq-ref args 'search)))
-           (rows (if search
-                     (search-artists artist-repo search
-                                     #:limit limit #:offset offset)
-                     (get-artists artist-repo #:limit limit #:offset offset)))
-           (total (count-artists artist-repo #:search search)))
-      (ok (artist-list->jso
-           (make-artist-list
-            #:items (map artist-summary rows)
-            #:total total
-            #:limit limit
-            #:offset offset))))))
+           (let* ((search (text (assq-ref args 'search)))
+                  (rows (if search
+                          (search-artists artist-repo search
+                                          #:limit limit #:offset offset)
+                          (get-artists artist-repo #:limit limit #:offset offset)))
+                  (total (count-artists artist-repo #:search search)))
+             (ok (artist-list->jso
+                  (make-artist-list
+                   #:items (map artist-summary rows)
+                   #:total total
+                   #:limit limit
+                   #:offset offset))))))
 
 (define (get-artist-handler artist-repo artwork-repo args)
   (let ((id (assq-ref args 'artist-id)))
     (let ((row (get-artist-by-id artist-repo id)))
       (if (not row)
-          (json-error 404 "not-found" "No such artist")
-          (let ((summary (artist-summary row)))
-            (ok (artist->jso
-                 (make-artist
-                  #:identifier (artist-summary-identifier summary)
-                  #:display-name (artist-summary-display-name summary)
-                  #:description (artist-summary-description summary)
-                  #:views (artist-summary-views summary)
-                  #:artworks
-                  (map artwork-record
-                       (get-artworks-by-entity-ids artwork-repo 'artist
-                                                   (list id)))
-                  #:created-at (artist-summary-created-at summary)))))))))
+        (json-error 404 "not-found" "No such artist")
+        (let ((summary (artist-summary row)))
+          (ok (artist->jso
+               (make-artist
+                #:identifier (artist-summary-identifier summary)
+                #:display-name (artist-summary-display-name summary)
+                #:description (artist-summary-description summary)
+                #:views (artist-summary-views summary)
+                #:artworks
+                (map artwork-record
+                     (get-artworks-by-entity-ids artwork-repo 'artist
+                                                 (list id)))
+                #:created-at (artist-summary-created-at summary)))))))))
 
 (define (list-artist-songs-handler song-repo artist-repo genre-repo args)
   (let ((id (assq-ref args 'artist-id)))
     (if (not (get-artist-by-id artist-repo id))
-        (json-error 404 "not-found" "No such artist")
-        (receive (limit offset) (pagination args)
-          (let* ((rows (get-songs-by-artist-id song-repo id))
-                 (total (length rows)))
-            (receive (artist-links genre-links artists genres)
-                (song-relations song-repo artist-repo genre-repo
-                                (map (lambda (row) (column row 'identifier))
-                                     rows))
-              (ok (song-list->jso
-                   (make-song-list
-                    #:items (map (lambda (row)
-                                   (song-summary row artist-links genre-links
-                                                 artists genres))
-                                 (slice rows limit offset))
-                    #:total total
-                    #:limit limit
-                    #:offset offset)))))))))
+      (json-error 404 "not-found" "No such artist")
+      (receive (limit offset) (pagination args)
+               (let* ((rows (get-songs-by-artist-id song-repo id))
+                      (total (length rows)))
+                 (receive (artist-links genre-links artists genres)
+                          (song-relations song-repo artist-repo genre-repo
+                                          (map (lambda (row) (column row 'identifier))
+                                               rows))
+                          (ok (song-list->jso
+                               (make-song-list
+                                #:items (map (lambda (row)
+                                               (song-summary row artist-links genre-links
+                                                             artists genres))
+                                             (slice rows limit offset))
+                                #:total total
+                                #:limit limit
+                                #:offset offset)))))))))
 
 (define (list-genres-handler genre-repo args)
   (receive (limit offset) (pagination args)
-    (let* ((search (text (assq-ref args 'search)))
-           (rows (if search
-                     (search-genres genre-repo search
-                                    #:limit limit #:offset offset)
-                     (get-genres genre-repo #:limit limit #:offset offset)))
-           (total (count-genres genre-repo #:search search)))
-      (ok (genre-list->jso
-           (make-genre-list
-            #:items (map genre-summary rows)
-            #:total total
-            #:limit limit
-            #:offset offset))))))
+           (let* ((search (text (assq-ref args 'search)))
+                  (rows (if search
+                          (search-genres genre-repo search
+                                         #:limit limit #:offset offset)
+                          (get-genres genre-repo #:limit limit #:offset offset)))
+                  (total (count-genres genre-repo #:search search)))
+             (ok (genre-list->jso
+                  (make-genre-list
+                   #:items (map genre-summary rows)
+                   #:total total
+                   #:limit limit
+                   #:offset offset))))))
 
 (define (get-genre-handler genre-repo artwork-repo args)
   (let ((id (assq-ref args 'genre-id)))
     (let ((row (get-genre-by-id genre-repo id)))
       (if (not row)
-          (json-error 404 "not-found" "No such genre")
-          (let ((summary (genre-summary row)))
-            (ok (genre->jso
-                 (make-genre
-                  #:identifier (genre-summary-identifier summary)
-                  #:display-name (genre-summary-display-name summary)
-                  #:description (genre-summary-description summary)
-                  #:views (genre-summary-views summary)
-                  #:artworks
-                  (map artwork-record
-                       (get-artworks-by-entity-ids artwork-repo 'genre
-                                                   (list id)))
-                  #:created-at (genre-summary-created-at summary)))))))))
+        (json-error 404 "not-found" "No such genre")
+        (let ((summary (genre-summary row)))
+          (ok (genre->jso
+               (make-genre
+                #:identifier (genre-summary-identifier summary)
+                #:display-name (genre-summary-display-name summary)
+                #:description (genre-summary-description summary)
+                #:views (genre-summary-views summary)
+                #:artworks
+                (map artwork-record
+                     (get-artworks-by-entity-ids artwork-repo 'genre
+                                                 (list id)))
+                #:created-at (genre-summary-created-at summary)))))))))
 
 (define (list-genre-songs-handler song-repo artist-repo genre-repo args)
   (let ((id (assq-ref args 'genre-id)))
     (if (not (get-genre-by-id genre-repo id))
-        (json-error 404 "not-found" "No such genre")
-        (receive (limit offset) (pagination args)
-          (let* ((rows (get-songs-by-genre-id song-repo id))
-                 (total (length rows)))
-            (receive (artist-links genre-links artists genres)
-                (song-relations song-repo artist-repo genre-repo
-                                (map (lambda (row) (column row 'identifier))
-                                     rows))
-              (ok (song-list->jso
-                   (make-song-list
-                    #:items (map (lambda (row)
-                                   (song-summary row artist-links genre-links
-                                                 artists genres))
-                                 (slice rows limit offset))
-                    #:total total
-                    #:limit limit
-                    #:offset offset)))))))))
+      (json-error 404 "not-found" "No such genre")
+      (receive (limit offset) (pagination args)
+               (let* ((rows (get-songs-by-genre-id song-repo id))
+                      (total (length rows)))
+                 (receive (artist-links genre-links artists genres)
+                          (song-relations song-repo artist-repo genre-repo
+                                          (map (lambda (row) (column row 'identifier))
+                                               rows))
+                          (ok (song-list->jso
+                               (make-song-list
+                                #:items (map (lambda (row)
+                                               (song-summary row artist-links genre-links
+                                                             artists genres))
+                                             (slice rows limit offset))
+                                #:total total
+                                #:limit limit
+                                #:offset offset)))))))))
 
 (define (get-instance-handler song-repo artist-repo genre-repo args)
   (ok (instance->jso
@@ -427,21 +427,21 @@ not two per song."
   "Answer the Artanis request RC with the generated dispatcher."
   (parameterize ((api-handlers (handlers-for rc)))
     (catch #t
-      (lambda ()
-        (dispatch (artanis->http-request rc)))
-      (lambda (key . args)
-        (case key
-          ((api-bad-request)
-           (json-error 400 "invalid-parameter" (car args)))
-          ((openapi-no-route)
-           (json-error 404 "not-found" "No such endpoint"))
-          ((openapi-validation-error)
-           (json-error 400 "invalid-request"
-                      "The request does not match the specification"))
-          ((openapi-not-implemented)
-           (json-error 501 "not-implemented"
-                      "This operation is not implemented"))
-          (else (apply throw key args)))))))
+           (lambda ()
+             (dispatch (artanis->http-request rc)))
+           (lambda (key . args)
+             (case key
+               [(api-bad-request)
+                (json-error 400 "invalid-parameter" (car args))]
+               [(openapi-no-route)
+                (json-error 404 "not-found" "No such endpoint")]
+               [(openapi-validation-error)
+                (json-error 400 "invalid-request"
+                            "The request does not match the specification")]
+               [(openapi-not-implemented)
+                (json-error 501 "not-implemented"
+                            "This operation is not implemented")]
+               [else (apply throw key args)])))))
 
 (define (emit-api-response response)
   "Return RESPONSE in the two values Artanis' response-emit expects."
@@ -449,5 +449,5 @@ not two per song."
     (response-emit (if (string? body) body (jso->json-string body))
                    #:status (http-response-status response)
                    #:headers (list (cons 'content-type
-                                        (list 'application/json
-                                              (cons 'charset "utf-8")))))))
+                                         (list 'application/json
+                                               (cons 'charset "utf-8")))))))

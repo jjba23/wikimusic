@@ -28,19 +28,19 @@
     (let ((match-tab-line (regexp-exec (guitar-tab-line-pattern) text start))
           (match-chord (regexp-exec (guitar-chord-pattern) text start)))
       (if (or match-tab-line
-              (not match-chord))
-          (delete-duplicates (reverse acc))
-          (let ((guitar-chord (match:substring match-chord 0))
-                (next-start (match:end match-chord)))
-            (loop next-start
-                  (cons (string-trim-both guitar-chord) acc)))))))
+            (not match-chord))
+        (delete-duplicates (reverse acc))
+        (let ((guitar-chord (match:substring match-chord 0))
+              (next-start (match:end match-chord)))
+          (loop next-start
+                (cons (string-trim-both guitar-chord) acc)))))))
 
 (define (guitar-chord->fingering guitar-chord)
   "Looks up 6-string fret positions for a given guitar-chord symbol."
   (let ((entry (assoc guitar-chord
                       (guitar-chord-database))))
     (if entry
-        (cdr entry) "???")))
+      (cdr entry) "???")))
 ; Default/unknown representation
 
 (define (generate-guitar-chord-guide text)
@@ -52,8 +52,8 @@
 
 ;; === Dictionary mapping chord names to fret positions ===
 (define guitar-chord-database
-  (make-parameter '( ;C chords
-                     ("C" . "x32010")
+  (make-parameter '(;C chords
+                    ("C" . "x32010")
                     ("Cm" . "x35543")
                     ("C5" . "x355xx")
                     ("C7" . "x32310")

@@ -45,6 +45,6 @@
 (define (jso->json-file value path)
   "Write the jso @var{value} to @var{path} as JSON, and return @var{path}."
   (call-with-output-file path
-    (lambda (port)
-      (display (jso->json-string value) port)))
+                         (lambda (port)
+                           (display (jso->json-string value) port)))
   path)

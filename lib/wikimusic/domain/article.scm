@@ -23,8 +23,8 @@
   #:use-module (srfi srfi-13)
   #:use-module (wikimusic domain repo)
   #:export (article-kinds article-kind-named
-            honeypot-field-name honeypot-tripped?
-            get-articles get-article-by-id count-articles insert-article))
+                          honeypot-field-name honeypot-tripped?
+                          get-articles get-article-by-id count-articles insert-article))
 
 ;; --- Record definition ---
 
@@ -39,16 +39,16 @@
 ;; --- eDSL: Embedded Domain Specific Language ---
 
 (define-repo-method get-articles repo-get-articles
- "Retrieves articles from REPO, newest first unless told otherwise.")
+                    "Retrieves articles from REPO, newest first unless told otherwise.")
 
 (define-repo-method get-article-by-id repo-get-article-by-id
- "Retrieves the article ID identifies, or #f when there is none.")
+                    "Retrieves the article ID identifies, or #f when there is none.")
 
 (define-repo-method count-articles repo-count-articles
- "Returns how many articles REPO holds.")
+                    "Returns how many articles REPO holds.")
 
 (define-repo-method insert-article repo-insert-article
- "Inserts the article ATTRS describes into REPO.")
+                    "Inserts the article ATTRS describes into REPO.")
 
 ;;; ====== What an article is ======
 
@@ -66,9 +66,9 @@ NAME is whatever a form posted -- a string, or #f when nothing was posted -- so
 it is compared against the kinds that exist rather than turned into a symbol
 and stored: a kind nobody offers is a form that was edited, not a sixth kind."
   (let ((offered (and (string? name)
-                      (find (lambda (kind)
-                              (string=? name (symbol->string kind)))
-                            article-kinds))))
+                   (find (lambda (kind)
+                           (string=? name (symbol->string kind)))
+                         article-kinds))))
     (if offered offered 'tutorial)))
 
 ;;; ====== The trap ======
@@ -90,6 +90,6 @@ FIELDS is a posted body as an association list.  Whitespace alone is still an
 answer: a script that padded the field to look innocent is the one thing this
 cannot tell from a script that typed in it."
   (let ((answer (and (list? fields)
-                     (assoc-ref fields honeypot-field-name))))
+                  (assoc-ref fields honeypot-field-name))))
     (and (string? answer)
-         (not (string-null? answer)))))
+      (not (string-null? answer)))))

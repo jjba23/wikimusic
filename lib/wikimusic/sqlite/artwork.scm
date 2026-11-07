@@ -48,8 +48,8 @@
                   (sql-select (table entity)
                               #:columns (columns entity)
                               #:where (list (list (string->symbol (format #f
-                                                                   "~a-identifier"
-                                                                   entity))
+                                                                          "~a-identifier"
+                                                                          entity))
                                                   'in ids))
                               #:order-by order-by)))
 

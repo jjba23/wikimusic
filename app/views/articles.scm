@@ -32,7 +32,7 @@
   #:use-module (ice-9 format)
   #:use-module (ice-9 string-fun)
   #:export (article-kind-word articles-list-page article-page
-            article-new-page article-comment-form))
+                              article-new-page article-comment-form))
 
 ;; The column every page here stands in, the same frame the rest of the site is
 ;; drawn in.
@@ -42,16 +42,16 @@
 (define (kind-string kind)
   "Return KIND as the word a form posted it as, or #f."
   (cond
-    ((symbol? kind) (symbol->string kind))
-    ((string? kind) kind)
-    (else #f)))
+    [(symbol? kind) (symbol->string kind)]
+    [(string? kind) kind]
+    [else #f]))
 
 (define (article-kind-word G_ kind)
   "Return the words the kind KIND is offered under.
 
 The words are written here rather than in the domain, because a word is a thing
 to translate and `G_' only translates a literal."
-  (case (article-kind-named (kind-string kind))
+  (case [article-kind-named (kind-string kind)]
     [(video) (G_ "video")]
     [(chord-guide) (G_ "chord guide")]
     [(theory) (G_ "music theory")]
@@ -76,15 +76,15 @@ to translate and `G_' only translates a literal."
 (define (article-excerpt contents)
   "Return a short preview of CONTENTS, at most 220 letters."
   (let* ((flat (string-join (string-split (string-map (lambda (ch)
-                                                       (if (char-whitespace? ch)
-                                                           #\space ch))
-                                                     (or contents ""))
+                                                        (if (char-whitespace? ch)
+                                                          #\space ch))
+                                                      (or contents ""))
                                           #\space)
                             " "))
          (trimmed (string-trim-both flat)))
     (if (> (string-length trimmed) 220)
-        (string-append (substring trimmed 0 220) " …")
-        trimmed)))
+      (string-append (substring trimmed 0 220) " …")
+      trimmed)))
 
 (define* (article-comment-form G_ #:key article is-logged-in)
   "Return the form a comment on ARTICLE is left in.
@@ -100,9 +100,9 @@ something that reads the markup rather than the page."
                                article-identifier))
               (class ,(mk-class '(flex flex-col gap-2 my-3))))
            ,@(if is-logged-in
-                 '()
-                 (list (input #:label (G_ "your name")
-                              #:name "author-name")))
+               '()
+               (list (input #:label (G_ "your name")
+                            #:name "author-name")))
            ,(textarea #:label (G_ "your comment")
                       #:name "contents"
                       #:required #t)
@@ -121,16 +121,16 @@ That is what its reader typed, the name of the account it was written from, or
 -- for the one case neither of those covers -- the page's word for a reader."
   (let ((typed (assq-ref comment 'author-name)))
     (cond
-      ((and (string? typed)
-            (not (string-null? typed))) typed)
-      (else (let* ((creator (assq-ref comment 'created-by))
+      [(and (string? typed)
+         (not (string-null? typed))) typed]
+      [else (let* ((creator (assq-ref comment 'created-by))
                    (user (and creator
-                              (assoc-ref (or user-alist '()) creator))))
+                           (assoc-ref (or user-alist '()) creator))))
               (or (and user
-                       (assq-ref user 'display-name))
-                  (and user
-                       (assq-ref user 'username))
-                  (G_ "a reader")))))))
+                    (assq-ref user 'display-name))
+                (and user
+                  (assq-ref user 'username))
+                (G_ "a reader")))])))
 
 (define* (render-article-comment G_ comment #:key user-alist)
   (let ((author (comment-author G_ comment user-alist)))
@@ -160,12 +160,12 @@ That is what its reader typed, the name of the account it was written from, or
   (let* ((title "Articles: tutorials, chord guides and discussions | WikiMusic")
          (description "Tutorials, videos, chord guides, music theory and discussions written by the readers of WikiMusic, with a comment thread on every one.")
          (page-buttons (if (and pages (> pages 1))
-                           (pagination #:current page
-                                       #:total pages
-                                       #:base-url "/articles?page="
-                                       #:prev-label (G_ "previous")
-                                       #:next-label (G_ "next"))
-                           '()))
+                         (pagination #:current page
+                                     #:total pages
+                                     #:base-url "/articles?page="
+                                     #:prev-label (G_ "previous")
+                                     #:next-label (G_ "next"))
+                         '()))
          (cards (map (lambda (article)
                        (let ((path (format #f "/articles/uuid/~a"
                                            (assq-ref article 'identifier))))
@@ -191,8 +191,8 @@ That is what its reader typed, the name of the account it was written from, or
                                                                      text-onyx-500
                                                                      dark:text-stone-300))))
                                               ,(or (assq-ref article
-                                                              'created-at)
-                                                   "")))
+                                                             'created-at)
+                                                 "")))
                                    (a (@ (href ,path)
                                          (class ,(mk-class '(no-underline
                                                              text-xl
@@ -200,7 +200,7 @@ That is what its reader typed, the name of the account it was written from, or
                                                              text-onyx-900
                                                              dark:text-stone-100))))
                                       ,(or (assq-ref article 'display-name)
-                                           ""))
+                                         ""))
                                    (p (@ (class ,(mk-class '(text-md
                                                              text-onyx-500
                                                              dark:text-stone-300))))
@@ -232,14 +232,14 @@ That is what its reader typed, the name of the account it was written from, or
                                                            dark:text-stone-300))))
                                     ,(G_ "tutorials, videos, chord guides, music theory and discussions, written by readers; every one of them takes a comment, and no account is needed to leave one"))
                                  ,(if (null? articles)
-                                      `(p (@ (class ,(mk-class '(text-md
-                                                                 text-onyx-500
-                                                                 dark:text-stone-300))))
-                                          ,(G_ "nothing has been posted yet"))
-                                      `(div (@ (class ,(mk-class '(flex
-                                                                   flex-col
-                                                                   gap-4))))
-                                            ,@cards))
+                                    `(p (@ (class ,(mk-class '(text-md
+                                                               text-onyx-500
+                                                               dark:text-stone-300))))
+                                        ,(G_ "nothing has been posted yet"))
+                                    `(div (@ (class ,(mk-class '(flex
+                                                                 flex-col
+                                                                 gap-4))))
+                                          ,@cards))
                                  ,page-buttons
                                  ,(hr)
                                  (div (@ (class ,(mk-class '(flex flex-row
@@ -262,23 +262,23 @@ That is what its reader typed, the name of the account it was written from, or
          (video-url (assq-ref article 'video-url))
          (video-fragment
           (if (and (string? video-url)
-                   (not (string-null? video-url)))
-              (list `(video (@ (controls "controls")
-                               (preload "metadata")
-                               (class "w-full max-w-196 rounded-2xl"))
-                            (source (@ (src ,video-url))) ""))
-              '()))
+                (not (string-null? video-url)))
+            (list `(video (@ (controls "controls")
+                             (preload "metadata")
+                             (class "w-full max-w-196 rounded-2xl"))
+                          (source (@ (src ,video-url))) ""))
+            '()))
          (comment-fragments
           (if (null? comments)
-              (list `(p (@ (class ,(mk-class '(text-md
-                                              text-onyx-500
-                                              dark:text-stone-300))))
-                        ,(G_ "no comments yet")))
-              (map (lambda (comment)
-                     (render-article-comment G_
-                                             comment
-                                             #:user-alist user-alist))
-                   comments))))
+            (list `(p (@ (class ,(mk-class '(text-md
+                                             text-onyx-500
+                                             dark:text-stone-300))))
+                      ,(G_ "no comments yet")))
+            (map (lambda (comment)
+                   (render-article-comment G_
+                                           comment
+                                           #:user-alist user-alist))
+                 comments))))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:title page-title
@@ -304,13 +304,13 @@ That is what its reader typed, the name of the account it was written from, or
                                                                    text-onyx-500
                                                                    dark:text-stone-300))))
                                             ,(or (assq-ref article 'created-at)
-                                                 "")))
+                                               "")))
                                  ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" display-name)
                                  ,@video-fragment
                                  (div (@ (class ,(mk-class '(max-w-prose))))
                                       ,(org2html (or (assq-ref article
                                                                'contents)
-                                                     "")))
+                                                   "")))
                                  (div (@ (id "comments")
                                          (class ,(mk-class '(flex
                                                              flex-col
@@ -358,11 +358,11 @@ That is what its reader typed, the name of the account it was written from, or
          (body `((div (@ (class ,(mk-class articles-column-classes)))
                       ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "write an article"))
                       ,@(if is-logged-in
-                            (list write-form)
-                            (list (list 'p
-                                        (list '@ (list 'class
-                                                       "max-w-prose text-md text-onyx-500 dark:text-stone-300"))
-                                        (G_ "an account is needed to write; anyone may comment"))))))))
+                          (list write-form)
+                          (list (list 'p
+                                      (list '@ (list 'class
+                                                     "max-w-prose text-md text-onyx-500 dark:text-stone-300"))
+                                      (G_ "an account is needed to write; anyone may comment"))))))))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:title "Write an article | WikiMusic"

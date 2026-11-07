@@ -41,11 +41,11 @@ FINGERING is what the guide stores: one character per string from the lowest,
                       (cond
                         [(char=? character #\x) -1]
                         [(char-numeric? character) (- (char->integer character)
-                                                     (char->integer #\0))]
+                                                      (char->integer #\0))]
                         [else #f]))
                     (string->list fingering))))
     (and (every (lambda (fret) fret) frets)
-         frets)))
+      frets)))
 
 (define (svg-number value)
   "Return VALUE as the text an SVG attribute is written with."
@@ -59,12 +59,12 @@ is decoration to a screen reader and is named as such: what a reader is told is
 the fingering, and what they are offered is the chord, played."
   (let ((frets (fingering-frets fingering)))
     (if (not (and frets
-                  (= 6 (length frets))))
+               (= 6 (length frets))))
       '()
       (let* ((held (filter (lambda (fret)
                              (> fret 0)) frets))
              (base (if (and (pair? held)
-                            (> (apply min held) 1))
+                         (> (apply min held) 1))
                      (apply min held)
                      1))
              (x0 10)
@@ -117,13 +117,13 @@ the fingering, and what they are offered is the chord, played."
                                               (cy ,(svg-number (- (fret-y 0) 7)))
                                               (r "2.6")))]
                                  [else
-                                  `(circle (@ (cx ,(svg-number x))
-                                              (cy ,(svg-number (+ (fret-y (- fret
-                                                                          base))
-                                                                  6.5)))
-                                              (r "3.4")
-                                              (fill "currentColor")
-                                              (stroke "none")))])))
+                                   `(circle (@ (cx ,(svg-number x))
+                                               (cy ,(svg-number (+ (fret-y (- fret
+                                                                              base))
+                                                                   6.5)))
+                                               (r "3.4")
+                                               (fill "currentColor")
+                                               (stroke "none")))])))
                            frets '(0 1 2 3 4 5))
                     ;; A shape played high up the neck says which fret it
                     ;; starts at, the way a printed chord chart does.
@@ -183,21 +183,21 @@ the fingering, and what they are offered is the chord, played."
                                                    dark:text-stone-100))))
                   ,chord)
             (span (@ (class ,(mk-class '(font-mono text-md
-                                                 px-3
-                                                 py-2
-                                                 bg-stone-100
-                                                 dark:bg-onyx-900
-                                                 rounded-xl
-                                                 text-onyx-700
-                                                 dark:text-stone-300))))
+                                                   px-3
+                                                   py-2
+                                                   bg-stone-100
+                                                   dark:bg-onyx-900
+                                                   rounded-xl
+                                                   text-onyx-700
+                                                   dark:text-stone-300))))
                   ,fingering)))))
 
 (define (render-chord-guide G_ chord-pairs)
   "Return the guide's chords as one row of playable pills."
   (if (null? chord-pairs) ""
-      `(div (@ (class ,(mk-class '(flex flex-wrap gap-3 py-6 items-center))))
-            ,@(map (lambda (pair)
-                     (render-chord-pill G_ pair)) chord-pairs))))
+    `(div (@ (class ,(mk-class '(flex flex-wrap gap-3 py-6 items-center))))
+          ,@(map (lambda (pair)
+                   (render-chord-pill G_ pair)) chord-pairs))))
 
 (define* (render-song-content G_ song song-contents ascii-size
                               #:key (paper ascii-paper-default)
@@ -316,12 +316,12 @@ is the only way to attach one."
 NOTE, when given, is a tooltip on the heading: a sentence about what the
 section holds that a reader should not have to open it to find out."
   `(summary (@ (class ,(mk-class '(flex flex-row items-center gap-2
-                                   text-xl font-bold
-                                   text-onyx-300 dark:text-stone-300
-                                   select-none
-                                   transition-colors duration-150
-                                   hover:text-persia-pink-500
-                                   dark:hover:text-persia-pink-300))))
+                                        text-xl font-bold
+                                        text-onyx-300 dark:text-stone-300
+                                        select-none
+                                        transition-colors duration-150
+                                        hover:text-persia-pink-500
+                                        dark:hover:text-persia-pink-300))))
             (span (@ (aria-hidden "true")
                      (class ,(mk-class '(wm-disclosure-mark text-base))))
                   ,(icon #:type 'caret-down))
@@ -358,7 +358,7 @@ not of the music."
   `(pre (@ (id ,id)
            (class ,(mk-class (append (list (string->symbol
                                             (ascii-size-known size))
-                                          (ascii-face-class face))
+                                           (ascii-face-class face))
                                      (ascii-paper-classes paper)
                                      '(wm-ascii
                                        p-4 md:p-6
@@ -366,7 +366,7 @@ not of the music."
                                        border-2
                                        whitespace-pre
                                        overflow-x-auto)))))
-       ,content))
+        ,content))
 
 ;; The legend, as the prose it is.
 ;;
@@ -384,13 +384,13 @@ not of the music."
 
 (define (format-chord-legend-ascii chord-alist)
   (if (or (not chord-alist)
-          (null? chord-alist)) ""
-      (string-append "Chords:\n\n"
-                     (string-join (map (lambda (pair)
-                                         (format #f "~a (~a)"
-                                                 (car pair)
-                                                 (cdr pair))) chord-alist)
-                                  "  |  ") "\n\n")))
+        (null? chord-alist)) ""
+    (string-append "Chords:\n\n"
+                   (string-join (map (lambda (pair)
+                                       (format #f "~a (~a)"
+                                               (car pair)
+                                               (cdr pair))) chord-alist)
+                                "  |  ") "\n\n")))
 
 (define* (render-ascii-content G_ ascii-size ascii-contents
                                #:key (paper ascii-paper-default)
@@ -398,7 +398,7 @@ not of the music."
   (let* ((guitar-chord-guide-contents (generate-guitar-chord-guide
                                        ascii-contents)))
     `(,(ascii-button-section G_) ,(render-chord-guide G_
-                                                       guitar-chord-guide-contents)
+                                                      guitar-chord-guide-contents)
       (details (@ (open true)
                   (class ,(mk-class '(wm-disclosure my-6))))
                ,(disclosure-summary G_ "ascii contents")
@@ -425,11 +425,11 @@ listed, since they are what a reader is deciding about."
   (let ((text (lambda (key)
                 (let ((value (assq-ref metadata key)))
                   (and (string? value)
-                       (not (string-null? value)) value))))
+                    (not (string-null? value)) value))))
         (number (lambda (key)
                   (let ((value (assq-ref metadata key)))
                     (and (number? value)
-                         (number->string value))))))
+                      (number->string value))))))
     (filter (lambda (fact)
               (cdr fact))
             (list (cons (G_ "title")
@@ -444,7 +444,7 @@ listed, since they are what a reader is deciding about."
                         (let ((tempo (assq-ref metadata
                                                'tempo)))
                           (and (number? tempo)
-                               (format #f "~a bpm" tempo))))
+                            (format #f "~a bpm" tempo))))
                   (cons (G_ "music key")
                         (text 'key-name))
                   (cons (G_ "measures")
@@ -473,13 +473,13 @@ song and which version the file is: a tab saved as `tab.gp5' among many is a
 file its reader has to open to identify."
   (let* ((parts (filter (lambda (part)
                           (and (string? part)
-                               (not (string-null? part))))
+                            (not (string-null? part))))
                         (list (assq-ref song
                                         'display-name)
                               (assq-ref version
                                         'version-name))))
          (base (if (null? parts) "wikimusic-tab"
-                   (string-join parts " - "))))
+                 (string-join parts " - "))))
     (string-append (filename-safe base) ".gp5")))
 
 (define* (render-guitarpro-section G_ song version)
@@ -506,196 +506,191 @@ more than one tab has no ambiguity about which it is addressing."
                              'guitarpro-contents))
          (tab-bytes (data-url-payload data-url)))
     (if (and tab-bytes
-             (not (zero? (bytevector-length tab-bytes))))
-        (let* ((metadata (gp5-bytes-metadata tab-bytes))
-               (id (format #f "guitarpro-~a"
-                           (assq-ref version
-                                     'identifier)))
-               (filename (guitarpro-filename song version))
-               (named (lambda (part)
-                        (string-append id part)))
-               ;; One small vocabulary for the two controls that are fields
-               ;; rather than buttons, so they read as the same kind of thing
-               ;; the rest of the site's forms are made of.
-               (label-class (mk-class '(dark:text-stone-300 text-stone-500
-                                                            font-bold text-sm)))
-               (field-class (mk-class '(bg-stone-100/75 dark:bg-onyx-500
-                                                        dark:text-stone-300
-                                                        text-onyx-900
-                                                        border
-                                                        border-stone-300
-                                                        dark:border-stone-700
-                                                        rounded-lg
-                                                        px-2
-                                                        py-1
-                                                        text-sm
-                                                        w-20))))
-          (list `(details (@ (open true)
-                             (class ,(mk-class '(wm-disclosure my-6))))
-                          ,(disclosure-summary G_ "Guitar Pro 5 tab")
-                          (div (@ (id ,id)
-                                  (class ,(mk-class '(flex flex-col gap-4 py-4))))
-                               ,(if metadata
-                                    `(div (@ (class ,(mk-class '(flex flex-col
-                                                                 gap-2))))
-                                          ,@(map (lambda (fact)
-                                                   `(div (@ (class ,(mk-class '
-                                                                              (flex
-                                                                               flex-row
-                                                                               flex-wrap
-                                                                               gap-2))))
-                                                         (span (@ (class ,(mk-class '
-                                                                           (font-bold
-                                                                            text-onyx-300
-                                                                            dark:text-stone-300))))
-                                                               ,(car fact))
-                                                         (span (@ (class ,(mk-class '
-                                                                           (text-onyx-300
-                                                                            dark:text-stone-300))))
-                                                               ,(cdr fact))))
-                                                 (guitarpro-facts G_ metadata)))
-                                    `(p (@ (class ,(mk-class '(text-onyx-300
-                                                               dark:text-stone-300))))
-                                        ,(G_
-                                          "the header of this tab could not be read, but the file itself can be downloaded")))
-                               ;; The file, and the offer to draw it here.  The
-                               ;; renderer is not on the page until the offer is
-                               ;; taken, so a reader who came for the song pays
-                               ;; nothing for a tablature they never open.
-                               (div (@ (class ,(mk-class '(flex flex-row
-                                                                flex-wrap
-                                                                gap-3
-                                                                items-center))))
-                                    (a (@ (id ,(named "-file"))
-                                          (href ,data-url)
-                                          (download ,filename))
-                                       ,(icon-button #:icon 'download
-                                                     #:content (G_
-                                                                "download the tab")))
-                                    (span (@ (id ,(named "-ask")))
-                                          ,(icon-button #:icon 'music-notes-simple
-                                                        #:content (G_
-                                                                   "show the tablature")
-                                                        #:on-click (format #f
-                                                                    "wikimusicGuitarProShow('~a')"
-                                                                    id))))
-                               ;; The tablature and the controls that come with it.
-                               ;; The controls are hidden until a score is drawn:
-                               ;; there is nothing to play before there is
-                               ;; something written down.
-                               (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                                    (div (@ (id ,(named "-controls"))
-                                            (hidden "")
-                                            (class ,(mk-class '(flex flex-row
-                                                                flex-wrap
-                                                                gap-3
-                                                                items-center))))
-                                         ,(icon-button #:icon 'play
-                                                       #:content (G_ "play")
-                                                       #:on-click (format #f
-                                                                   "wikimusicGuitarProPlayPause('~a')"
-                                                                   id))
-                                         ,(icon-button #:icon 'stop
-                                                       #:content (G_ "stop")
-                                                       #:on-click (format #f
-                                                                   "wikimusicGuitarProStop('~a')"
-                                                                   id))
-                                         ;; How fast the tab is played back.  The
-                                         ;; first choice is the tempo the tab is
-                                         ;; written in, which is the number
-                                         ;; already listed above it.
-                                         (label (@ (for ,(named "-speed"))
-                                                   (class ,label-class))
-                                                ,(G_ "tempo"))
-                                         (select (@ (id ,(named "-speed"))
-                                                    (name ,(named "-speed"))
-                                                    (onchange ,(format #f
-                                                                "wikimusicGuitarProSpeed('~a', this.value)"
-                                                                id))
-                                                    (class ,field-class))
-                                                 (option (@ (value "1"))
-                                                         ,(format #f
-                                                                  "100% — ~a"
-                                                                  (G_
-                                                                   "the tab's own tempo")))
-                                                 (option (@ (value "0.75"))
-                                                         "75%")
-                                                 (option (@ (value "0.5"))
-                                                         "50%")
-                                                 (option (@ (value "0.35"))
-                                                         "35%")
-                                                 (option (@ (value "0.25"))
-                                                         "25%"))
-                                         ;; A passage to drill: the bars it runs from
-                                         ;; and to, and the control that arms it.
-                                         (label (@ (for ,(named "-loop-from"))
-                                                   (class ,label-class))
-                                                ,(G_ "loop bars"))
-                                         (input (@ (type number)
-                                                   (id ,(named "-loop-from"))
-                                                   (name ,(named "-loop-from"))
-                                                   (min "1")
-                                                   (value "1")
-                                                   (inputmode numeric)
-                                                   (class ,field-class)))
-                                         (span ,(G_ "to"))
-                                         (input (@ (type number)
-                                                   (id ,(named "-loop-to"))
-                                                   (name ,(named "-loop-to"))
-                                                   (min "1")
-                                                   (value "4")
-                                                   (inputmode numeric)
-                                                   (class ,field-class)))
-                                         ,(icon-button #:icon 'repeat
-                                                       #:id (named "-loop")
-                                                       #:on-click (format #f
-                                                                   "wikimusicGuitarProToggleLoop('~a')"
-                                                                   id)
-                                                       #:content `((span (@ (id ,
-                                                                             (named
-                                                                              "-loop-idle")))
-                                                                         ,(G_
-                                                                           "loop these bars"))
-                                                                   (span (@ (id ,
-                                                                             (named
-                                                                              "-loop-armed"))
-                                                                            (hidden
-                                                                             ""))
-                                                                         ,(G_
-                                                                           "stop looping")))))
-                                    ;; What the two bar fields are for, in the
-                                    ;; page's own words: a reader who has never met
-                                    ;; a practice loop should not have to find out
-                                    ;; by arming one.
-                                    (p (@ (class ,(mk-class '(text-sm
-                                                              text-onyx-300
-                                                              dark:text-stone-300))))
-                                       ,(G_
-                                         "a passage plays over and over between the two bars, after a bar of count-in"))
-                                    (div (@ (id ,(named "-score"))
-                                            (class ,(mk-class '(overflow-x-auto))))
-                                         "")
-                                    ;; What the player is doing, in the page's own
-                                    ;; words: all three sentences are written here
-                                    ;; and the script un-hides the one that is
-                                    ;; true, so a translated page stays translated
-                                    ;; when a tablature loads.
-                                    (p (@ (class ,(mk-class '(text-sm
-                                                              text-onyx-300
-                                                              dark:text-stone-300)))
-                                          (aria-live "polite"))
-                                       (span (@ (id ,(named "-status-loading"))
-                                                (hidden ""))
-                                             ,(G_ "loading the tablature …"))
-                                       (span (@ (id ,(named "-status-ready"))
-                                                (hidden ""))
-                                             ,(G_
-                                               "the tablature is drawn below: press play to hear it"))
-                                       (span (@ (id ,(named "-status-failed"))
-                                                (hidden ""))
-                                             ,(G_
-                                               "this tablature could not be drawn here, but the file can still be downloaded"))))))))
-        '())))
+          (not (zero? (bytevector-length tab-bytes))))
+      (let* ((metadata (gp5-bytes-metadata tab-bytes))
+             (id (format #f "guitarpro-~a"
+                         (assq-ref version
+                                   'identifier)))
+             (filename (guitarpro-filename song version))
+             (named (lambda (part)
+                      (string-append id part)))
+             ;; One small vocabulary for the two controls that are fields
+             ;; rather than buttons, so they read as the same kind of thing
+             ;; the rest of the site's forms are made of.
+             (label-class (mk-class '(dark:text-stone-300 text-stone-500
+                                                          font-bold text-sm)))
+             (field-class (mk-class '(bg-stone-100/75 dark:bg-onyx-500
+                                                      dark:text-stone-300
+                                                      text-onyx-900
+                                                      border
+                                                      border-stone-300
+                                                      dark:border-stone-700
+                                                      rounded-lg
+                                                      px-2
+                                                      py-1
+                                                      text-sm
+                                                      w-20))))
+        (list `(details (@ (open true)
+                           (class ,(mk-class '(wm-disclosure my-6))))
+                        ,(disclosure-summary G_ "Guitar Pro 5 tab")
+                        (div (@ (id ,id)
+                                (class ,(mk-class '(flex flex-col gap-4 py-4))))
+                             ,(if metadata
+                                `(div (@ (class ,(mk-class '(flex flex-col
+                                                                  gap-2))))
+                                      ,@(map (lambda (fact)
+                                               `(div (@ (class ,(mk-class '(flex
+                                                                            flex-row
+                                                                            flex-wrap
+                                                                            gap-2))))
+                                                     (span (@ (class ,(mk-class '(font-bold
+                                                                                  text-onyx-300
+                                                                                  dark:text-stone-300))))
+                                                           ,(car fact))
+                                                     (span (@ (class ,(mk-class '(text-onyx-300
+                                                                                  dark:text-stone-300))))
+                                                           ,(cdr fact))))
+                                             (guitarpro-facts G_ metadata)))
+                                `(p (@ (class ,(mk-class '(text-onyx-300
+                                                           dark:text-stone-300))))
+                                    ,(G_
+                                      "the header of this tab could not be read, but the file itself can be downloaded")))
+                             ;; The file, and the offer to draw it here.  The
+                             ;; renderer is not on the page until the offer is
+                             ;; taken, so a reader who came for the song pays
+                             ;; nothing for a tablature they never open.
+                             (div (@ (class ,(mk-class '(flex flex-row
+                                                              flex-wrap
+                                                              gap-3
+                                                              items-center))))
+                                  (a (@ (id ,(named "-file"))
+                                        (href ,data-url)
+                                        (download ,filename))
+                                     ,(icon-button #:icon 'download
+                                                   #:content (G_
+                                                              "download the tab")))
+                                  (span (@ (id ,(named "-ask")))
+                                        ,(icon-button #:icon 'music-notes-simple
+                                                      #:content (G_
+                                                                 "show the tablature")
+                                                      #:on-click (format #f
+                                                                         "wikimusicGuitarProShow('~a')"
+                                                                         id))))
+                             ;; The tablature and the controls that come with it.
+                             ;; The controls are hidden until a score is drawn:
+                             ;; there is nothing to play before there is
+                             ;; something written down.
+                             (div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                                  (div (@ (id ,(named "-controls"))
+                                          (hidden "")
+                                          (class ,(mk-class '(flex flex-row
+                                                                   flex-wrap
+                                                                   gap-3
+                                                                   items-center))))
+                                       ,(icon-button #:icon 'play
+                                                     #:content (G_ "play")
+                                                     #:on-click (format #f
+                                                                        "wikimusicGuitarProPlayPause('~a')"
+                                                                        id))
+                                       ,(icon-button #:icon 'stop
+                                                     #:content (G_ "stop")
+                                                     #:on-click (format #f
+                                                                        "wikimusicGuitarProStop('~a')"
+                                                                        id))
+                                       ;; How fast the tab is played back.  The
+                                       ;; first choice is the tempo the tab is
+                                       ;; written in, which is the number
+                                       ;; already listed above it.
+                                       (label (@ (for ,(named "-speed"))
+                                                 (class ,label-class))
+                                              ,(G_ "tempo"))
+                                       (select (@ (id ,(named "-speed"))
+                                                  (name ,(named "-speed"))
+                                                  (onchange ,(format #f
+                                                                     "wikimusicGuitarProSpeed('~a', this.value)"
+                                                                     id))
+                                                  (class ,field-class))
+                                               (option (@ (value "1"))
+                                                       ,(format #f
+                                                                "100% — ~a"
+                                                                (G_
+                                                                 "the tab's own tempo")))
+                                               (option (@ (value "0.75"))
+                                                       "75%")
+                                               (option (@ (value "0.5"))
+                                                       "50%")
+                                               (option (@ (value "0.35"))
+                                                       "35%")
+                                               (option (@ (value "0.25"))
+                                                       "25%"))
+                                       ;; A passage to drill: the bars it runs from
+                                       ;; and to, and the control that arms it.
+                                       (label (@ (for ,(named "-loop-from"))
+                                                 (class ,label-class))
+                                              ,(G_ "loop bars"))
+                                       (input (@ (type number)
+                                                 (id ,(named "-loop-from"))
+                                                 (name ,(named "-loop-from"))
+                                                 (min "1")
+                                                 (value "1")
+                                                 (inputmode numeric)
+                                                 (class ,field-class)))
+                                       (span ,(G_ "to"))
+                                       (input (@ (type number)
+                                                 (id ,(named "-loop-to"))
+                                                 (name ,(named "-loop-to"))
+                                                 (min "1")
+                                                 (value "4")
+                                                 (inputmode numeric)
+                                                 (class ,field-class)))
+                                       ,(icon-button #:icon 'repeat
+                                                     #:id (named "-loop")
+                                                     #:on-click (format #f
+                                                                        "wikimusicGuitarProToggleLoop('~a')"
+                                                                        id)
+                                                     #:content `((span (@ (id ,(named
+                                                                                "-loop-idle")))
+                                                                       ,(G_
+                                                                         "loop these bars"))
+                                                                 (span (@ (id ,(named
+                                                                                "-loop-armed"))
+                                                                          (hidden
+                                                                           ""))
+                                                                       ,(G_
+                                                                         "stop looping")))))
+                                  ;; What the two bar fields are for, in the
+                                  ;; page's own words: a reader who has never met
+                                  ;; a practice loop should not have to find out
+                                  ;; by arming one.
+                                  (p (@ (class ,(mk-class '(text-sm
+                                                            text-onyx-300
+                                                            dark:text-stone-300))))
+                                     ,(G_
+                                       "a passage plays over and over between the two bars, after a bar of count-in"))
+                                  (div (@ (id ,(named "-score"))
+                                          (class ,(mk-class '(overflow-x-auto))))
+                                       "")
+                                  ;; What the player is doing, in the page's own
+                                  ;; words: all three sentences are written here
+                                  ;; and the script un-hides the one that is
+                                  ;; true, so a translated page stays translated
+                                  ;; when a tablature loads.
+                                  (p (@ (class ,(mk-class '(text-sm
+                                                            text-onyx-300
+                                                            dark:text-stone-300)))
+                                        (aria-live "polite"))
+                                     (span (@ (id ,(named "-status-loading"))
+                                              (hidden ""))
+                                           ,(G_ "loading the tablature …"))
+                                     (span (@ (id ,(named "-status-ready"))
+                                              (hidden ""))
+                                           ,(G_
+                                             "the tablature is drawn below: press play to hear it"))
+                                     (span (@ (id ,(named "-status-failed"))
+                                              (hidden ""))
+                                           ,(G_
+                                             "this tablature could not be drawn here, but the file can still be downloaded"))))))))
+      '())))
 
 (define* (render-version G_ song version ascii-size
                          #:key (paper ascii-paper-default)
@@ -711,31 +706,28 @@ more than one tab has no ambiguity about which it is addressing."
                                                                    flex-row
                                                                    gap-2))))
                                             (a (@ (href ,(format #f
-                                                          "/songs/uuid/~a/contents/~a/edit"
-                                                          (assq-ref song
-                                                                    'identifier)
-                                                          (assq-ref version
-                                                                    'identifier))))
+                                                                 "/songs/uuid/~a/contents/~a/edit"
+                                                                 (assq-ref song
+                                                                           'identifier)
+                                                                 (assq-ref version
+                                                                           'identifier))))
                                                ,(icon-button #:icon 'pencil
                                                              #:content (G_
                                                                         "edit version")))
                                             (form (@ (method POST)
                                                      (action ,(format #f
-                                                               "/songs/uuid/~a/contents/~a/delete"
-                                                               (assq-ref song
-                                                                         'identifier)
-                                                               (assq-ref
-                                                                version
-                                                                'identifier))))
+                                                                      "/songs/uuid/~a/contents/~a/delete"
+                                                                      (assq-ref song
+                                                                                'identifier)
+                                                                      (assq-ref
+                                                                       version
+                                                                       'identifier))))
                                                   ,(icon-button #:icon 'trash
-                                                                #:background '
-                                                                (bg-redwood-700)
-                                                                #:hover-background '
-                                                                (hover:bg-redwood-900
-                                                                 dark:hover:bg-redwood-500)
-                                                                #:border-color '
-                                                                (border-stone-300
-                                                                 dark:border-stone-700)
+                                                                #:background '(bg-redwood-700)
+                                                                #:hover-background '(hover:bg-redwood-900
+                                                                                     dark:hover:bg-redwood-500)
+                                                                #:border-color '(border-stone-300
+                                                                                 dark:border-stone-700)
                                                                 #:type 'submit
                                                                 #:content (G_
                                                                            "delete version"))))))
@@ -759,16 +751,16 @@ more than one tab has no ambiguity about which it is addressing."
 
          (ascii-content-section (render-if-nestring (lambda (c)
                                                       (render-ascii-content G_
-                                                       ascii-size c
-                                                       #:paper paper
-                                                       #:face face))
+                                                                            ascii-size c
+                                                                            #:paper paper
+                                                                            #:face face))
                                                     (assq-ref version
                                                               'ascii-contents)))
          (cleaned-pdf-data (if (equal? (assq-ref version
                                                  'pdf-contents)
-                                "data:application/octet-stream;base64,") ""
-                               (assq-ref version
-                                         'pdf-contents)))
+                                       "data:application/octet-stream;base64,") ""
+                             (assq-ref version
+                                       'pdf-contents)))
          (render-pdf-content (lambda (pdf-contents)
                                `((details (@ (open true)
                                              (class ,(mk-class '(wm-disclosure
@@ -782,17 +774,17 @@ more than one tab has no ambiguity about which it is addressing."
                                                   cleaned-pdf-data))
          (guitarpro-section (render-guitarpro-section G_ song version)))
     `(,(hr) (details (@ (open true)
-                          (class ,(mk-class '(wm-disclosure))))
+                        (class ,(mk-class '(wm-disclosure))))
                      (summary (@ (class ,(mk-class '(flex flex-row items-center
-                                                     gap-2
-                                                     text-xl font-bold
-                                                     text-onyx-300
-                                                     dark:text-stone-300
-                                                     select-none
-                                                     transition-colors
-                                                     duration-150
-                                                     hover:text-persia-pink-500
-                                                     dark:hover:text-persia-pink-300))))
+                                                          gap-2
+                                                          text-xl font-bold
+                                                          text-onyx-300
+                                                          dark:text-stone-300
+                                                          select-none
+                                                          transition-colors
+                                                          duration-150
+                                                          hover:text-persia-pink-500
+                                                          dark:hover:text-persia-pink-300))))
                               (span (@ (aria-hidden "true")
                                        (class ,(mk-class '(wm-disclosure-mark
                                                            text-base))))

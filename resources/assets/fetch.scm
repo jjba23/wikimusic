@@ -41,9 +41,9 @@
 (define project-root
   (let ((file (current-filename)))
     (if (and file
-             (absolute-file-name? file))
-        (dirname (dirname (dirname file)))
-        (getcwd))))
+          (absolute-file-name? file))
+      (dirname (dirname (dirname file)))
+      (getcwd))))
 
 (define (path-under-root . parts)
   "Return the path PARTS name inside the project."
@@ -131,13 +131,13 @@ the project's other asset task reaches for."
   "Return the text of URL, keeping a copy of it in FILE."
   (fetch! url file)
   (call-with-input-file file
-    get-string-all))
+                        get-string-all))
 
 (define (write-text! text file)
   "Write TEXT to FILE."
   (call-with-output-file file
-    (lambda (port)
-      (display text port))))
+                         (lambda (port)
+                           (display text port))))
 
 ;;; ====== Rewriting a fetched stylesheet ======
 
@@ -174,34 +174,34 @@ named while the block that describes it is still in hand."
      (kept '())
      (faces '()))
     (if (null? lines)
-        (list (string-join (reverse kept) "\n")
-              (reverse faces))
-        (let* ((line (car lines))
-               (announced (string-match "^/\\* (.+) \\*/[[:space:]]*$" line))
-               (sloped (string-match "font-style:[[:space:]]*italic" line))
-               (straight (string-match "font-style:[[:space:]]*normal" line))
-               (face (string-match "url\\((https://[^)]+\\.woff2)\\)" line)))
-          (cond
-            (announced (loop (cdr lines)
-                             (match:substring announced 1) italic?
-                             (cons line kept) faces))
-            (sloped (loop (cdr lines) subset #t
-                          (cons line kept) faces))
-            (straight (loop (cdr lines) subset #f
-                            (cons line kept) faces))
-            (face (let* ((url (match:substring face 1))
-                         (name (font-file-name url subset italic?)))
-                    (loop (cdr lines) subset italic?
-                          (cons (regexp-substitute #f
-                                                   face
-                                                   'pre
-                                                   "url(./"
-                                                   name
-                                                   ")"
-                                                   'post) kept)
-                          (cons (cons url name) faces))))
-            (else (loop (cdr lines) subset italic?
-                        (cons line kept) faces)))))))
+      (list (string-join (reverse kept) "\n")
+            (reverse faces))
+      (let* ((line (car lines))
+             (announced (string-match "^/\\* (.+) \\*/[[:space:]]*$" line))
+             (sloped (string-match "font-style:[[:space:]]*italic" line))
+             (straight (string-match "font-style:[[:space:]]*normal" line))
+             (face (string-match "url\\((https://[^)]+\\.woff2)\\)" line)))
+        (cond
+          [announced (loop (cdr lines)
+                           (match:substring announced 1) italic?
+                           (cons line kept) faces)]
+          [sloped (loop (cdr lines) subset #t
+                        (cons line kept) faces)]
+          [straight (loop (cdr lines) subset #f
+                          (cons line kept) faces)]
+          [face (let* ((url (match:substring face 1))
+                       (name (font-file-name url subset italic?)))
+                  (loop (cdr lines) subset italic?
+                        (cons (regexp-substitute #f
+                                                 face
+                                                 'pre
+                                                 "url(./"
+                                                 name
+                                                 ")"
+                                                 'post) kept)
+                        (cons (cons url name) faces)))]
+          [else (loop (cdr lines) subset italic?
+                      (cons line kept) faces)])))))
 
 (define (prune-phosphor-stylesheet css)
   "Return CSS with the older formats of its font dropped from the face.
@@ -212,12 +212,12 @@ interface reads it -- and a stylesheet that went on naming the three files it
 does not ship would be a copy that does not describe what is beside it.  What is
 left of the face names one file, so the list it ends is ended by a semicolon."
   (let ((terminated ;what the face still names is the last of what it named
-                    (regexp-substitute/global #f
-                                              "format\\(\"woff2\"\\),"
-                                              css
-                                              'pre
-                                              "format(\"woff2\");"
-                                              'post)))
+         (regexp-substitute/global #f
+                                   "format\\(\"woff2\"\\),"
+                                   css
+                                   'pre
+                                   "format(\"woff2\");"
+                                   'post)))
     (regexp-substitute/global
      ;; a clause naming a file this instance does not serve, with the
      ;; whitespace in front of it -- the newline that ended the clause before
@@ -302,7 +302,7 @@ left of the face names one file, so the list it ends is ended by a semicolon."
 (define (run-when-main!)
   (when (any (lambda (argument)
                (and (string? argument)
-                    (string-contains argument "assets/fetch.scm")))
+                 (string-contains argument "assets/fetch.scm")))
              (command-line))
     (fetch-theme-assets!)))
 

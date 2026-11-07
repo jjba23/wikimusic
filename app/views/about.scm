@@ -147,10 +147,10 @@ and the foundation last."
         ;; it, or a paragraph about what donations pay for, is the ask by
         ;; another name (see `(wikimusic config)').
         ,@(if (donation-shown?)
-              `((div (@ (class ,(mk-class about-ask-classes)))
-                     ,@(wikimusic-support G_)
-                     (p ,(project-support-note G_))))
-              '())
+            `((div (@ (class ,(mk-class about-ask-classes)))
+                   ,@(wikimusic-support G_)
+                   (p ,(project-support-note G_))))
+            '())
 
         (p ,(project-invitation G_))))
 
@@ -188,11 +188,11 @@ index and no reason to hide it."
                                                                             "the free music knowledge encyclopaedia"))
                                                                      (if (absolute-url
                                                                           "/")
-                                                                         (list
-                                                                          (cons
-                                                                           "url"
-                                                                           (absolute-url
-                                                                            "/")))
-                                                                         '()))))
+                                                                       (list
+                                                                        (cons
+                                                                         "url"
+                                                                         (absolute-url
+                                                                          "/")))
+                                                                       '()))))
                  #:body `((div (@ (class ,(mk-class about-page-classes)))
                                ,(about-panel G_)))))

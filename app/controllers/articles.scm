@@ -20,21 +20,21 @@
 (define-artanis-controller articles)
 
 (import (wikimusic html)
-        (web uri)
-        (ice-9 string-fun)
-        (ice-9 time)
-        (kracht prelude)
-        (uuid generate)
-        (wikimusic env)
-        (wikimusic auth)
-        (wikimusic controller)
-        (wikimusic domain user)
-        (wikimusic sqlite user)
-        (wikimusic domain article)
-        (wikimusic sqlite article)
-        (wikimusic domain article-comment)
-        (wikimusic sqlite article-comment)
-        (app views articles))
+  (web uri)
+  (ice-9 string-fun)
+  (ice-9 time)
+  (kracht prelude)
+  (uuid generate)
+  (wikimusic env)
+  (wikimusic auth)
+  (wikimusic controller)
+  (wikimusic domain user)
+  (wikimusic sqlite user)
+  (wikimusic domain article)
+  (wikimusic sqlite article)
+  (wikimusic domain article-comment)
+  (wikimusic sqlite article-comment)
+  (app views articles))
 
 ;; A page of the list holds twenty articles: enough to fill a screen without
 ;; making the page a scroll to the end, and small enough that a slow instance
@@ -50,7 +50,7 @@
        (let* ((repo (make-sqlite-article-repository rc))
               (page (max 1
                          (or (string->number (or (get-from-qstr rc "page") "1"))
-                             1)))
+                           1)))
               (offset (* (- page 1) articles-per-page))
               (total (count-articles repo))
               (pages (max 1
@@ -90,34 +90,34 @@
       (lambda (rc)
         (let* ((session (session-payload rc))
                (created-by (and session
-                                (assoc-ref session
-                                           'owner-id)))
+                             (assoc-ref session
+                                        'owner-id)))
                (body (body-alist rc))
                (display-name (html-escape (or (assoc-ref body "display-name")
-                                              "")))
+                                            "")))
                (kind (assoc-ref body "kind"))
                (video-url (assoc-ref body "video-url"))
                (contents (html-escape (or (assoc-ref body "contents") ""))))
           (cond
-            ((not created-by) (forbidden rc))
-            ((string-null? (string-trim-both display-name)) (forbidden rc))
-            (else (let ((identifier (generate-string-uuid)))
+            [(not created-by) (forbidden rc)]
+            [(string-null? (string-trim-both display-name)) (forbidden rc)]
+            [else (let ((identifier (generate-string-uuid)))
                     (insert-article (make-sqlite-article-repository rc)
-                                  (list (cons 'identifier
-                                              (generate-string-uuid))
-                                        (cons 'display-name display-name)
-                                        (cons 'kind
-                                              (symbol->string
-                                               (article-kind-named kind)))
-                                        (cons 'contents contents)
-                                        (cons 'created-by created-by)
-                                        (cons 'visibility-status 0)
-                                        (cons 'created-at (current-time))
-                                        (cons 'views 0)))
+                                    (list (cons 'identifier
+                                                (generate-string-uuid))
+                                          (cons 'display-name display-name)
+                                          (cons 'kind
+                                                (symbol->string
+                                                 (article-kind-named kind)))
+                                          (cons 'contents contents)
+                                          (cons 'created-by created-by)
+                                          (cons 'visibility-status 0)
+                                          (cons 'created-at (current-time))
+                                          (cons 'views 0)))
                     (redirect-to rc
                                  (format #f "/articles/uuid/~a"
-                                          identifier)
-                                 #:status 302)))))))
+                                         identifier)
+                                 #:status 302))]))))
 
 (get "/articles/uuid/:uuid"
      #:mime 'xml
@@ -169,21 +169,21 @@
                (session (session-payload rc))
                (created-by (and session (assoc-ref session 'owner-id)))
                (posted-name (and (not created-by)
-                                 (assoc-ref body "author-name")))
+                              (assoc-ref body "author-name")))
                (typed-name (and (string? posted-name)
-                                (not (string-null?
-                                      (string-trim-both posted-name)))
-                                (substring (string-trim-both posted-name)
-                                           0
-                                           (min 80
-                                                (string-length
-                                                 (string-trim-both
-                                                  posted-name))))))
+                             (not (string-null?
+                                   (string-trim-both posted-name)))
+                             (substring (string-trim-both posted-name)
+                                        0
+                                        (min 80
+                                             (string-length
+                                              (string-trim-both
+                                               posted-name))))))
                (posted (assoc-ref body "contents"))
                (contents (and (string? posted)
-                              (not (string-null?
-                                    (string-trim-both posted)))
-                              posted))
+                           (not (string-null?
+                                 (string-trim-both posted)))
+                           posted))
                (where (format #f "/articles/uuid/~a#comments"
                               article-id)))
           (unless (or (honeypot-tripped? body) (not contents))
@@ -195,9 +195,9 @@
                            (cons 'contents contents)
                            (cons 'created-at (current-time)))
                      (if created-by
-                         (list (cons 'created-by created-by))
-                         '())
+                       (list (cons 'created-by created-by))
+                       '())
                      (if typed-name
-                         (list (cons 'author-name typed-name))
-                         '()))))
+                       (list (cons 'author-name typed-name))
+                       '()))))
           (redirect-to rc where #:status 302))))

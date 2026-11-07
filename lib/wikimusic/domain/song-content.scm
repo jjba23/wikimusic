@@ -33,21 +33,21 @@
 ;; --- eDSL: Embedded Domain Specific Language ---
 
 (define-repo-method get-song-contents-by-song-ids
- repo-get-song-contents-by-song-ids
- "Retrieves song-contents by their song IDs from the given REPO.")
+                    repo-get-song-contents-by-song-ids
+                    "Retrieves song-contents by their song IDs from the given REPO.")
 
 (define-repo-method get-song-contents-by-ids repo-get-song-contents-by-ids
- "Retrieves song-contents by their IDs from the given REPO.")
+                    "Retrieves song-contents by their IDs from the given REPO.")
 
 (define-repo-method get-song-content-ids-by-song-ids
- repo-get-song-content-ids-by-song-ids
- "Retrieves song-content ids by their song IDs from the given REPO.")
+                    repo-get-song-content-ids-by-song-ids
+                    "Retrieves song-content ids by their song IDs from the given REPO.")
 
 (define-repo-method insert-song-content repo-insert-song-content
                     "Inserts a song-content with ATTRS in the given REPO.")
 
 (define-repo-method update-song-content-by-id repo-update-song-content-by-id
- "Updates a song-content identified by ID with ATTRS in the given REPO.")
+                    "Updates a song-content identified by ID with ATTRS in the given REPO.")
 
 (define-repo-method delete-song-content-by-id repo-delete-song-content-by-id
- "Deletes a song-content identified by ID in the given REPO.")
+                    "Deletes a song-content identified by ID in the given REPO.")

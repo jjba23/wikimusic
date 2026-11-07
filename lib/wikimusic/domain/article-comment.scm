@@ -32,7 +32,7 @@
 ;; --- eDSL: Embedded Domain Specific Language ---
 
 (define-repo-method get-article-comments repo-get-article-comments
- "Retrieves the comments of the articles IDS from REPO, oldest first.")
+                    "Retrieves the comments of the articles IDS from REPO, oldest first.")
 
 (define-repo-method insert-article-comment repo-insert-article-comment
- "Inserts the comment ATTRS describes into REPO.")
+                    "Inserts the comment ATTRS describes into REPO.")

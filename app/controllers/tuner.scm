@@ -14,9 +14,9 @@
 (define-artanis-controller tuner)
 
 (import (app views tuner)
-        (kracht prelude)
-        (wikimusic domain tuning)
-        (wikimusic html))
+  (kracht prelude)
+  (wikimusic domain tuning)
+  (wikimusic html))
 
 (get "/tuner"
      #:mime 'xml
@@ -28,4 +28,4 @@
                                          #:preset (preset-id-named
                                                    (get-from-qstr rc "preset"))
                                          #:is-logged-in (:cookies-value rc
-                                                         "x-bewaking-wikimusic"))))))
+                                                                        "x-bewaking-wikimusic"))))))

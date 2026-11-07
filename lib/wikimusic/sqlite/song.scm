@@ -46,7 +46,7 @@
                                           #:where (list (cons 'identifier id))
                                           #:limit 1))))
       (if (nil? rows) #f
-          (car rows))))
+        (car rows))))
 
   (define* (get-songs #:key (order-by '((created-at desc)))
                       (limit 100)
@@ -110,9 +110,9 @@
     (let ((search (format #f "%~a%" s)))
       (execute-read "search-songs"
                     (sql-parameterize (format #f
-                                       "SELECT ~a FROM songs WHERE (display_name LIKE ? OR description LIKE ?) ORDER BY ~a LIMIT ? OFFSET ?"
-                                       (symbols->sql-columns-list columns)
-                                       (sql-order-by-sql order-by))
+                                              "SELECT ~a FROM songs WHERE (display_name LIKE ? OR description LIKE ?) ORDER BY ~a LIMIT ? OFFSET ?"
+                                              (symbols->sql-columns-list columns)
+                                              (sql-order-by-sql order-by))
                                       (list search search limit offset)))))
 
   ;; A count is a statement kracht's `sql-select' cannot express -- it takes
@@ -121,19 +121,19 @@
   ;; `search-songs' uses, so a page count and a page of hits always agree.
   (define* (count-songs #:key search)
     (let* ((term (and search
-                      (format #f "%~a%" search)))
+                   (format #f "%~a%" search)))
            (rows (if term
-                     (execute-read "count-songs"
-                                   (sql-parameterize
-                                    "SELECT COUNT(*) AS count FROM songs WHERE (display_name LIKE ? OR description LIKE ?)"
-                                    (list term term)))
-                     (execute-read "count-songs"
-                                   (sql-parameterize
-                                    "SELECT COUNT(*) AS count FROM songs"
-                                    '())))))
+                   (execute-read "count-songs"
+                                 (sql-parameterize
+                                  "SELECT COUNT(*) AS count FROM songs WHERE (display_name LIKE ? OR description LIKE ?)"
+                                  (list term term)))
+                   (execute-read "count-songs"
+                                 (sql-parameterize
+                                  "SELECT COUNT(*) AS count FROM songs"
+                                  '())))))
       (if (nil? rows) 0
-          (or (assq-ref (car rows)
-                        'count) 0))))
+        (or (assq-ref (car rows)
+                      'count) 0))))
 
   (define* (get-song-artists-by-ids ids)
     (execute-read "get-song-artists-by-ids"

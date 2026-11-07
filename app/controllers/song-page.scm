@@ -6,37 +6,37 @@
 (define-artanis-controller song-page)
 
 (import (app views song-content-edit)
-        (app views song-content-view)
-        (app views song-edit)
-        (app views song-view)
-        (bewaking bewaking)
-        (ice-9 string-fun)
-        (kracht prelude)
-        (uuid generate)
-        (web uri)
-        (wikimusic auth)
-        (wikimusic controller)
-        (wikimusic domain artist)
-        (wikimusic domain artwork)
-        (wikimusic domain comment)
-        (wikimusic domain external-source)
-        (wikimusic domain genre)
-        (wikimusic domain opinion)
-        (wikimusic domain song)
-        (wikimusic domain song-content)
-        (wikimusic domain user)
-        (wikimusic domain)
-        (wikimusic env)
-        (wikimusic html)
-        (wikimusic sqlite artist)
-        (wikimusic sqlite artwork)
-        (wikimusic sqlite comment)
-        (wikimusic sqlite external-source)
-        (wikimusic sqlite genre)
-        (wikimusic sqlite opinion)
-        (wikimusic sqlite song)
-        (wikimusic sqlite song-content)
-        (wikimusic sqlite user))
+  (app views song-content-view)
+  (app views song-edit)
+  (app views song-view)
+  (bewaking bewaking)
+  (ice-9 string-fun)
+  (kracht prelude)
+  (uuid generate)
+  (web uri)
+  (wikimusic auth)
+  (wikimusic controller)
+  (wikimusic domain artist)
+  (wikimusic domain artwork)
+  (wikimusic domain comment)
+  (wikimusic domain external-source)
+  (wikimusic domain genre)
+  (wikimusic domain opinion)
+  (wikimusic domain song)
+  (wikimusic domain song-content)
+  (wikimusic domain user)
+  (wikimusic domain)
+  (wikimusic env)
+  (wikimusic html)
+  (wikimusic sqlite artist)
+  (wikimusic sqlite artwork)
+  (wikimusic sqlite comment)
+  (wikimusic sqlite external-source)
+  (wikimusic sqlite genre)
+  (wikimusic sqlite opinion)
+  (wikimusic sqlite song)
+  (wikimusic sqlite song-content)
+  (wikimusic sqlite user))
 
 ;;; One reader's ascii preferences, read and remembered.
 ;;;
@@ -80,12 +80,12 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
               (song-content-repo (make-sqlite-song-content-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (user-search (cond
-                             ((equal? #f
+                             [(equal? #f
                                       (get-from-qstr rc "search"))
-                              #f)
-                             (else (html-escape (get-from-qstr rc "search")))))
+                              #f]
+                             [else (html-escape (get-from-qstr rc "search"))]))
               (user-sort (cond
-                           ((not (equal? #f
+                           [(not (equal? #f
                                          (get-from-qstr rc "sort")))
                             (:cookies-set! rc
                                            'wikimusic-song-sort
@@ -97,18 +97,18 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
                                                #:path "/"
                                                #:secure #t
                                                #:http-only #t)
-                            (get-from-qstr rc "sort"))
-                           ((not (equal? #f
+                            (get-from-qstr rc "sort")]
+                           [(not (equal? #f
                                          (:cookies-value rc
-                                          "wikimusic-song-sort")))
-                            (:cookies-value rc "wikimusic-song-sort"))
-                           (else "display-name-asc")))
+                                                         "wikimusic-song-sort")))
+                            (:cookies-value rc "wikimusic-song-sort")]
+                           [else "display-name-asc"]))
               ;; The tile-size preference travels the same way the sort does:
               ;; a `grid-size' in the query string is stored in a cookie and
               ;; every later visit reads it back, so the choice outlives the
               ;; page it was made on.
               (grid-size (cond
-                           ((not (equal? #f
+                           [(not (equal? #f
                                          (get-from-qstr rc "grid-size")))
                             (:cookies-set! rc
                                            'wikimusic-grid-size
@@ -120,12 +120,12 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
                                                #:path "/"
                                                #:secure #t
                                                #:http-only #t)
-                            (get-from-qstr rc "grid-size"))
-                           ((not (equal? #f
+                            (get-from-qstr rc "grid-size")]
+                           [(not (equal? #f
                                          (:cookies-value rc
-                                          "wikimusic-grid-size")))
-                            (:cookies-value rc "wikimusic-grid-size"))
-                           (else "medium")))
+                                                         "wikimusic-grid-size")))
+                            (:cookies-value rc "wikimusic-grid-size")]
+                           [else "medium"]))
               (query-sort (entity-sort-from-query user-sort))
               ;; The list is read a page at a time.  Forty rows fill a
               ;; screenful of tiles without making the reader scroll far, and
@@ -133,70 +133,70 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
               ;; carry, so a page is a plain `offset = (page - 1) * 40'.
               (query-page (let ((p (get-from-qstr rc "page")))
                             (if (nil? p) 1
-                                (max 1
-                                     (or (string->number p) 1)))))
+                              (max 1
+                                   (or (string->number p) 1)))))
               (query-limit 40)
               (query-offset (* (- query-page 1) query-limit))
               (songs (cond
-                       ((equal? #f user-search)
+                       [(equal? #f user-search)
                         (get-songs song-repo
                                    #:order-by query-sort
                                    #:limit query-limit
-                                   #:offset query-offset))
-                       (else (search-songs song-repo
+                                   #:offset query-offset)]
+                       [else (search-songs song-repo
                                            (html-escape user-search)
                                            #:order-by query-sort
                                            #:limit query-limit
-                                           #:offset query-offset))))
+                                           #:offset query-offset)]))
               (song-total (count-songs song-repo
                                        #:search (and user-search
-                                                     (html-escape user-search))))
+                                                  (html-escape user-search))))
               (song-pages (max 1
                                (ceiling (/ song-total query-limit))))
               (song-ids (map (lambda (s)
                                (assq-ref s
                                          'identifier)) songs))
               (artworks (cond
-                          ((nil? song-ids)
-                           '())
-                          (else (get-artworks-by-entity-ids artwork-repo
-                                                            'song song-ids))))
+                          [(nil? song-ids)
+                           '()]
+                          [else (get-artworks-by-entity-ids artwork-repo
+                                                            'song song-ids)]))
               (comments (cond
-                          ((nil? song-ids)
-                           '())
-                          (else (get-comments-by-entity-ids comment-repo
-                                                            'song song-ids))))
+                          [(nil? song-ids)
+                           '()]
+                          [else (get-comments-by-entity-ids comment-repo
+                                                            'song song-ids)]))
               (song-contents (get-song-content-ids-by-song-ids
                               song-content-repo song-ids))
               (song-artists (cond
-                              ((nil? song-ids)
-                               '())
-                              (else (get-song-artists-by-ids song-repo
-                                                             song-ids))))
+                              [(nil? song-ids)
+                               '()]
+                              [else (get-song-artists-by-ids song-repo
+                                                             song-ids)]))
               (artists (if (nil? song-artists)
-                           '()
-                           (get-artists-by-ids artist-repo
-                                               (map (lambda (a)
-                                                      (assq-ref a
-                                                                'artist-identifier))
-                                                    song-artists))))
+                         '()
+                         (get-artists-by-ids artist-repo
+                                             (map (lambda (a)
+                                                    (assq-ref a
+                                                              'artist-identifier))
+                                                  song-artists))))
               (song-version-count-alist (map (lambda (song)
                                                `(,(assq-ref song
                                                             'identifier) ,(length
-                                                                           (filter (lambda 
-                                                                                           (sc)
-                                                                                     
-                                                                                     
+                                                                           (filter (lambda
+                                                                                     (sc)
+
+
                                                                                      (equal?
                                                                                       (assq-ref
                                                                                        sc
                                                                                        'song-identifier)
 
-                                                                                      
+
                                                                                       (assq-ref
                                                                                        song
                                                                                        'identifier)))
-                                                                            song-contents))))
+                                                                                   song-contents))))
                                              songs)))
          (response-emit (:mime rc
                                (song-list-page (:i18n rc)
@@ -225,7 +225,7 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
        (response-emit (:mime rc
                              (song-new-page (:i18n rc)
                                             #:is-logged-in (:cookies-value rc
-                                                            "x-bewaking-wikimusic"))))))
+                                                                           "x-bewaking-wikimusic"))))))
 
 (get "/songs/uuid/:uuid/contents/new"
      #:mime 'xml
@@ -288,8 +288,8 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
                                      'song
                                      (list song-id)))
               (external-sources (if (nil? raw-external-sources)
-                                    '()
-                                    (car raw-external-sources)))
+                                  '()
+                                  (car raw-external-sources)))
               (user (get-user-by-id user-repo
                                     (assq-ref song
                                               'created-by)))
@@ -300,22 +300,22 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
               (song-genres (get-song-genres-by-ids song-repo
                                                    (list song-id)))
               (genres (if (nil? song-genres)
-                          '()
-                          (get-genres-by-ids genre-repo
-                                             (map (lambda (g)
-                                                    (assq-ref g
-                                                              'genre-identifier))
-                                                  song-genres))))
+                        '()
+                        (get-genres-by-ids genre-repo
+                                           (map (lambda (g)
+                                                  (assq-ref g
+                                                            'genre-identifier))
+                                                song-genres))))
               (song-artists (get-song-artists-by-ids song-repo
                                                      (list song-id)))
               (artists (if (nil? song-artists)
-                           '()
-                           (get-artists-by-ids artist-repo
-                                               (map (lambda (a)
-                                                      (assq-ref a
-                                                                'artist-identifier))
-                                                    song-artists)))))
-         
+                         '()
+                         (get-artists-by-ids artist-repo
+                                             (map (lambda (a)
+                                                    (assq-ref a
+                                                              'artist-identifier))
+                                                  song-artists)))))
+
          ;; do views update
          (update-song-by-id song-repo song-id
                             `((views unquote inc-v)))
@@ -365,28 +365,28 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
               (song-genres (get-song-genres-by-ids song-repo
                                                    (list song-id)))
               (genres (if (nil? song-genres)
-                          '()
-                          (get-genres-by-ids genre-repo
-                                             (map (lambda (g)
-                                                    (assq-ref g
-                                                              'genre-identifier))
-                                                  song-genres))))
+                        '()
+                        (get-genres-by-ids genre-repo
+                                           (map (lambda (g)
+                                                  (assq-ref g
+                                                            'genre-identifier))
+                                                song-genres))))
               (song-artists (get-song-artists-by-ids song-repo
                                                      (list song-id)))
               (artists (if (nil? song-artists)
-                           '()
-                           (get-artists-by-ids artist-repo
-                                               (map (lambda (a)
-                                                      (assq-ref a
-                                                                'artist-identifier))
-                                                    song-artists))))
+                         '()
+                         (get-artists-by-ids artist-repo
+                                             (map (lambda (a)
+                                                    (assq-ref a
+                                                              'artist-identifier))
+                                                  song-artists))))
               (e (get-external-sources-by-entity-ids external-source-repo
                                                      'song
                                                      (list song-id)))
               (external-sources (if (not (nil? e))
-                                    (car e)
-                                    '())))
-         
+                                  (car e)
+                                  '())))
+
          (response-emit (:mime rc
                                (song-edit-page (:i18n rc)
                                                #:song song
@@ -412,8 +412,8 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
                                    (params rc "uuid")))
               (song-contents (car (get-song-contents-by-ids song-content-repo
                                                             (list (params rc
-                                                                   "version-uuid"))))))
-         
+                                                                          "version-uuid"))))))
+
          (response-emit (:mime rc
                                (song-content-edit-page (:i18n rc)
                                                        #:song song

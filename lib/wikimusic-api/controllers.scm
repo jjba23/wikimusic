@@ -19,30 +19,30 @@
   #:use-module (web uri)
   #:use-module (web http)
   #:export (
-    <route>
-    route?
-    make-route
-    route-method
-    route-pattern
-    route-parameters
-    route-operation
-    api-handlers
-    invoke-handler
-    find-route
-    dispatch-route
-    dispatch
-    guile-handler
-    routes
-    list-songs
-    get-song
-    list-song-versions
-    list-artists
-    get-artist
-    list-artist-songs
-    list-genres
-    get-genre
-    list-genre-songs
-    get-instance))
+            <route>
+            route?
+            make-route
+            route-method
+            route-pattern
+            route-parameters
+            route-operation
+            api-handlers
+            invoke-handler
+            find-route
+            dispatch-route
+            dispatch
+            guile-handler
+            routes
+            list-songs
+            get-song
+            list-song-versions
+            list-artists
+            get-artist
+            list-artist-songs
+            list-genres
+            get-genre
+            list-genre-songs
+            get-instance))
 
 (define-record-type <route>
   (make-route method pattern parameters operation)
@@ -55,16 +55,16 @@
 ;; The route table of the specification, in declaration order.
 (define routes
   (list
-    (make-route 'GET (make-regexp "^/api/v1/songs/?$") '() 'list-songs)
-    (make-route 'GET (make-regexp "^/api/v1/songs/([^/]+)/?$") '("songId") 'get-song)
-    (make-route 'GET (make-regexp "^/api/v1/songs/([^/]+)/versions/?$") '("songId") 'list-song-versions)
-    (make-route 'GET (make-regexp "^/api/v1/artists/?$") '() 'list-artists)
-    (make-route 'GET (make-regexp "^/api/v1/artists/([^/]+)/?$") '("artistId") 'get-artist)
-    (make-route 'GET (make-regexp "^/api/v1/artists/([^/]+)/songs/?$") '("artistId") 'list-artist-songs)
-    (make-route 'GET (make-regexp "^/api/v1/genres/?$") '() 'list-genres)
-    (make-route 'GET (make-regexp "^/api/v1/genres/([^/]+)/?$") '("genreId") 'get-genre)
-    (make-route 'GET (make-regexp "^/api/v1/genres/([^/]+)/songs/?$") '("genreId") 'list-genre-songs)
-    (make-route 'GET (make-regexp "^/api/v1/instance/?$") '() 'get-instance)))
+   (make-route 'GET (make-regexp "^/api/v1/songs/?$") '() 'list-songs)
+   (make-route 'GET (make-regexp "^/api/v1/songs/([^/]+)/?$") '("songId") 'get-song)
+   (make-route 'GET (make-regexp "^/api/v1/songs/([^/]+)/versions/?$") '("songId") 'list-song-versions)
+   (make-route 'GET (make-regexp "^/api/v1/artists/?$") '() 'list-artists)
+   (make-route 'GET (make-regexp "^/api/v1/artists/([^/]+)/?$") '("artistId") 'get-artist)
+   (make-route 'GET (make-regexp "^/api/v1/artists/([^/]+)/songs/?$") '("artistId") 'list-artist-songs)
+   (make-route 'GET (make-regexp "^/api/v1/genres/?$") '() 'list-genres)
+   (make-route 'GET (make-regexp "^/api/v1/genres/([^/]+)/?$") '("genreId") 'get-genre)
+   (make-route 'GET (make-regexp "^/api/v1/genres/([^/]+)/songs/?$") '("genreId") 'list-genre-songs)
+   (make-route 'GET (make-regexp "^/api/v1/instance/?$") '() 'get-instance)))
 
 ;; An alist of operation name to handler procedure.
 ;;
@@ -81,8 +81,8 @@ The api-handlers parameter holds the table, so a test can parameterize it and
 a server can install its handlers once at start up."
   (let ((handler (assq-ref (api-handlers) operation)))
     (if handler
-        (handler request arguments)
-        (unimplemented-operation operation request))))
+      (handler request arguments)
+      (unimplemented-operation operation request))))
 
 (define (find-route request)
   "Return the first route matching REQUEST, or #f."
@@ -90,7 +90,7 @@ a server can install its handlers once at start up."
         (path (http-request-path request)))
     (find (lambda (route)
             (and (eq? (route-method route) method)
-                 (regexp-exec (route-pattern route) path)))
+              (regexp-exec (route-pattern route) path)))
           routes)))
 
 (define (dispatch-route route request)
@@ -101,18 +101,18 @@ a server can install its handlers once at start up."
                           (match:substring match index))
                         (iota (length (route-parameters route)) 1)))
          (path-arguments (map cons (route-parameters route) captured)))
-    (case (route-operation route)
-      ((list-songs) (list-songs request path-arguments))
-      ((get-song) (get-song request path-arguments))
-      ((list-song-versions) (list-song-versions request path-arguments))
-      ((list-artists) (list-artists request path-arguments))
-      ((get-artist) (get-artist request path-arguments))
-      ((list-artist-songs) (list-artist-songs request path-arguments))
-      ((list-genres) (list-genres request path-arguments))
-      ((get-genre) (get-genre request path-arguments))
-      ((list-genre-songs) (list-genre-songs request path-arguments))
-      ((get-instance) (get-instance request path-arguments))
-      (else (unimplemented-operation (route-operation route) request)))))
+    (case [route-operation route]
+      [(list-songs) (list-songs request path-arguments)]
+      [(get-song) (get-song request path-arguments)]
+      [(list-song-versions) (list-song-versions request path-arguments)]
+      [(list-artists) (list-artists request path-arguments)]
+      [(get-artist) (get-artist request path-arguments)]
+      [(list-artist-songs) (list-artist-songs request path-arguments)]
+      [(list-genres) (list-genres request path-arguments)]
+      [(get-genre) (get-genre request path-arguments)]
+      [(list-genre-songs) (list-genre-songs request path-arguments)]
+      [(get-instance) (get-instance request path-arguments)]
+      [else (unimplemented-operation (route-operation route) request)])))
 
 (define* (dispatch request #:key (handlers (api-handlers)))
   "Answer REQUEST with the response of the handler of the matching route.
@@ -130,31 +130,31 @@ route whose operation has no handler raises 'openapi-not-implemented."
 (define (guile-header-value value)
   "Return VALUE, a header parsed by (web http), as its text."
   (cond
-    ((string? value) value)
-    ((pair? value)
+    [(string? value) value]
+    [(pair? value)
      (let ((parameters (cdr value)))
        (string-append
         (format #f "~a" (car value))
         (if (list? parameters)
-            (apply string-append
-                   (map (lambda (parameter)
-                          (if (pair? parameter)
-                              (format #f "; ~a=~a"
-                                      (car parameter) (cdr parameter))
-                              (format #f "; ~a" parameter)))
-                        parameters))
-            ""))))
-    (else (format #f "~a" value))))
+          (apply string-append
+                 (map (lambda (parameter)
+                        (if (pair? parameter)
+                          (format #f "; ~a=~a"
+                                  (car parameter) (cdr parameter))
+                          (format #f "; ~a" parameter)))
+                      parameters))
+          "")))]
+    [else (format #f "~a" value)]))
 
 (define (guile-request-body body content-type)
   "Return BODY, as (web server) read it, in the shape the runtime expects."
   (if (and (bytevector? body)
-           (or (string-contains content-type "json")
-               (string-contains content-type "text/")
-               (string-contains content-type
-                                "x-www-form-urlencoded")))
-      (utf8->string body)
-      body))
+        (or (string-contains content-type "json")
+          (string-contains content-type "text/")
+          (string-contains content-type
+                           "x-www-form-urlencoded")))
+    (utf8->string body)
+    body))
 
 (define (guile-request request body)
   "Return the <http-request> that corresponds to a (web request) REQUEST."
@@ -178,8 +178,8 @@ route whose operation has no handler raises 'openapi-not-implemented."
                       (string-downcase (format #f "~a" (car entry))))))
            (cons name
                  (if (string? (cdr entry))
-                     (parse-header name (cdr entry))
-                     (cdr entry)))))
+                   (parse-header name (cdr entry))
+                   (cdr entry)))))
        (http-response-headers response)))
 
 (define (guile-response-body response)
@@ -187,12 +187,12 @@ route whose operation has no handler raises 'openapi-not-implemented."
   (let ((body (http-response-body response))
         (content-type (guile-header-value
                        (or (http-response-header response "Content-Type")
-                           ""))))
+                         ""))))
     (cond
-      ((or (string? body) (bytevector? body)) body)
-      ((or (eq? body #f) (json-null? body)) "")
-      ((string-contains content-type "json") (jso->json-string body))
-      (else (format #f "~a" body)))))
+      [(or (string? body) (bytevector? body)) body]
+      [(or (eq? body #f) (json-null? body)) ""]
+      [(string-contains content-type "json") (jso->json-string body)]
+      [else (format #f "~a" body)])))
 
 (define (guile-handler)
   "Return a handler for (web server)'s run-server.
@@ -209,7 +209,6 @@ result to run-server:
                #:headers (guile-response-headers response))
               (guile-response-body response)))))
 
-
 (define (list-songs request path-arguments)
   "GET /api/v1/songs
 
@@ -225,10 +224,10 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'list-songs request
-    (list
-      (cons 'search (let ((raw (http-request-query-ref request "search"))) (if raw raw #f)))
-      (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
-      (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
+                  (list
+                   (cons 'search (let ((raw (http-request-query-ref request "search"))) (if raw raw #f)))
+                   (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
+                   (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
 (define (get-song request path-arguments)
   "GET /api/v1/songs/{songId}
@@ -243,8 +242,8 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'get-song request
-    (list
-      (cons 'song-id (assoc-ref path-arguments "songId")))))
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId")))))
 
 (define (list-song-versions request path-arguments)
   "GET /api/v1/songs/{songId}/versions
@@ -259,8 +258,8 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'list-song-versions request
-    (list
-      (cons 'song-id (assoc-ref path-arguments "songId")))))
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId")))))
 
 (define (list-artists request path-arguments)
   "GET /api/v1/artists
@@ -275,10 +274,10 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'list-artists request
-    (list
-      (cons 'search (let ((raw (http-request-query-ref request "search"))) (if raw raw #f)))
-      (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
-      (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
+                  (list
+                   (cons 'search (let ((raw (http-request-query-ref request "search"))) (if raw raw #f)))
+                   (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
+                   (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
 (define (get-artist request path-arguments)
   "GET /api/v1/artists/{artistId}
@@ -291,8 +290,8 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'get-artist request
-    (list
-      (cons 'artist-id (assoc-ref path-arguments "artistId")))))
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId")))))
 
 (define (list-artist-songs request path-arguments)
   "GET /api/v1/artists/{artistId}/songs
@@ -307,10 +306,10 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'list-artist-songs request
-    (list
-      (cons 'artist-id (assoc-ref path-arguments "artistId"))
-      (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
-      (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId"))
+                   (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
+                   (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
 (define (list-genres request path-arguments)
   "GET /api/v1/genres
@@ -325,10 +324,10 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'list-genres request
-    (list
-      (cons 'search (let ((raw (http-request-query-ref request "search"))) (if raw raw #f)))
-      (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
-      (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
+                  (list
+                   (cons 'search (let ((raw (http-request-query-ref request "search"))) (if raw raw #f)))
+                   (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
+                   (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
 (define (get-genre request path-arguments)
   "GET /api/v1/genres/{genreId}
@@ -341,8 +340,8 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'get-genre request
-    (list
-      (cons 'genre-id (assoc-ref path-arguments "genreId")))))
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId")))))
 
 (define (list-genre-songs request path-arguments)
   "GET /api/v1/genres/{genreId}/songs
@@ -357,10 +356,10 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'list-genre-songs request
-    (list
-      (cons 'genre-id (assoc-ref path-arguments "genreId"))
-      (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
-      (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId"))
+                   (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
+                   (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
 (define (get-instance request path-arguments)
   "GET /api/v1/instance

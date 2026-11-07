@@ -51,23 +51,23 @@
 
          (artist-links (map (lambda (ar)
                               `(a (@ (href ,(format #f "/artists/uuid/~a"
-                                                 (assq-ref ar
-                                                           'identifier)))
-                           (class "wm-tile-by-link"))
-                        ,(assq-ref ar
-                                   'display-name)))
+                                                    (assq-ref ar
+                                                              'identifier)))
+                                     (class "wm-tile-by-link"))
+                                  ,(assq-ref ar
+                                             'display-name)))
                             art))
          ;; "by" and then the players, on the card's second line, separated by
          ;; commas: a reader reads a name and then who made it, and the last
          ;; comma is dropped because a list of two does not end in one.
          (subtitle (if (null? artist-links)
-                       '()
-                       (cons (G_ "by ")
-                             (drop-right (append-map
-                                          (lambda (line)
-                                            (list line ", "))
-                                          artist-links)
-                                         1)))))
+                     '()
+                     (cons (G_ "by ")
+                           (drop-right (append-map
+                                        (lambda (line)
+                                          (list line ", "))
+                                        artist-links)
+                                       1)))))
     `((div ,(item-tile G_
                        'song
                        x
@@ -166,43 +166,43 @@
                                                  md:justify-between))))
                      (,(unless only-tiles
                          (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-title text-2xl text-onyx-300" `(span (@ (class ,(mk-class '(flex flex-row
-                                                               items-center
-                                                               items-center
-                                                               gap-1))))
-                                   ,(G_ "viewing songs:")))) ,(unless only-tiles
-                                                        `(div (@ (class ,(mk-class '(flex
-                                                                                     flex-wrap
-                                                                                     flex-row
-                                                                                     justify-center
-                                                                                     gap-2))))
-                                                              (div (@ (class ,(mk-class '(flex
-                                                                                          flex-wrap
-                                                                                          flex-row
-                                                                                          justify-start
-                                                                                          items-center))))
-                                                                   ,(sort-select
-                                                                     G_
-                                                                     #:entity 'song
-                                                                     #:user-sort
-                                                                     user-sort)
-                                                                   ,(grid-size-select
-                                                                     G_
-                                                                     #:entity 'song
-                                                                     #:size
-                                                                     grid-size
-                                                                     #:search-query
-                                                                     search-query))
-                                                              (div (@ (class ,(mk-class '(flex
-                                                                                          flex-wrap
-                                                                                          flex-row
-                                                                                          gap-3
-                                                                                          justify-end
-                                                                                          items-center))))
+                                                                                                                                                                items-center
+                                                                                                                                                                items-center
+                                                                                                                                                                gap-1))))
+                                                                                                                                    ,(G_ "viewing songs:")))) ,(unless only-tiles
+                                                                                                                                                                 `(div (@ (class ,(mk-class '(flex
+                                                                                                                                                                                              flex-wrap
+                                                                                                                                                                                              flex-row
+                                                                                                                                                                                              justify-center
+                                                                                                                                                                                              gap-2))))
+                                                                                                                                                                       (div (@ (class ,(mk-class '(flex
+                                                                                                                                                                                                   flex-wrap
+                                                                                                                                                                                                   flex-row
+                                                                                                                                                                                                   justify-start
+                                                                                                                                                                                                   items-center))))
+                                                                                                                                                                            ,(sort-select
+                                                                                                                                                                              G_
+                                                                                                                                                                              #:entity 'song
+                                                                                                                                                                              #:user-sort
+                                                                                                                                                                              user-sort)
+                                                                                                                                                                            ,(grid-size-select
+                                                                                                                                                                              G_
+                                                                                                                                                                              #:entity 'song
+                                                                                                                                                                              #:size
+                                                                                                                                                                              grid-size
+                                                                                                                                                                              #:search-query
+                                                                                                                                                                              search-query))
+                                                                                                                                                                       (div (@ (class ,(mk-class '(flex
+                                                                                                                                                                                                   flex-wrap
+                                                                                                                                                                                                   flex-row
+                                                                                                                                                                                                   gap-3
+                                                                                                                                                                                                   justify-end
+                                                                                                                                                                                                   items-center))))
 
-                                                                   ,(search-box
-                                                                     G_
-                                                                     #:search-query
-                                                                     search-query))))
+                                                                                                                                                                            ,(search-box
+                                                                                                                                                                              G_
+                                                                                                                                                                              #:search-query
+                                                                                                                                                                              search-query))))
                       (div (div (@ (class ,(item-tile-grid-face #:size
                                                                 grid-size)))
                                 ,(map (lambda (x)
@@ -476,7 +476,7 @@
                                                                    gap-4))))
                                        (div (@ (class ,(mk-class '(py-4))))
                                             ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display leading-10 md:text-10 text-3xl text-onyx-300" (assq-ref song
-                                                           'display-name)))
+                                                                                                                                                                                   'display-name)))
                                        ,(when (not (nil? artists))
                                           `((div (@ (class ,(mk-class '(flex
                                                                         flex-row

@@ -65,52 +65,52 @@ timeout in seconds."
   (let ((base (string-trim-right (api-client-base-url client) #\/))
         (parameters (query-string query)))
     (if (string-null? parameters)
-        (string-append base path)
-        (string-append base path "?" parameters))))
+      (string-append base path)
+      (string-append base path "?" parameters))))
 
 (define (encode-request-body body encoding)
   "Return BODY encoded as the request body ENCODING names, as bytes."
   (case encoding
-    ((json) (string->utf8 (jso->json-string body)))
-    ((form) (string->utf8 (form-string body)))
-    ((binary raw) (if (bytevector? body) body (string->utf8 body)))
-    ((text) (string->utf8 body))
-    (else body)))
+    [(json) (string->utf8 (jso->json-string body))]
+    [(form) (string->utf8 (form-string body))]
+    [(binary raw) (if (bytevector? body) body (string->utf8 body))]
+    [(text) (string->utf8 body)]
+    [else body]))
 
 (define (response-text body)
   "Return BODY, a string or a bytevector, as text."
   (cond
-    ((string? body) body)
-    ((bytevector? body) (utf8->string body))
-    (else "")))
+    [(string? body) body]
+    [(bytevector? body) (utf8->string body)]
+    [else ""]))
 
 (define (encoding-for-content-type content-type default)
   "Return the encoding implied by CONTENT-TYPE, or DEFAULT when it says nothing."
   (let ((text
-          (string-downcase
-                           (if (string? content-type)
-                               content-type
-                               (format #f "~a" (or content-type ""))))))
+         (string-downcase
+          (if (string? content-type)
+            content-type
+            (format #f "~a" (or content-type ""))))))
     (cond
-      ((or (string-contains text "application/json") (string-contains text "+json"))
-                                                                                     'json)
-      ((string-contains text "text/") 'text)
-      ((string-contains text "x-www-form-urlencoded") 'form)
-      ((string-contains text "multipart/") 'multipart)
-      (else default))))
+      [(or (string-contains text "application/json") (string-contains text "+json"))
+       'json]
+      [(string-contains text "text/") 'text]
+      [(string-contains text "x-www-form-urlencoded") 'form]
+      [(string-contains text "multipart/") 'multipart]
+      [else default])))
 
 (define (decode-response-body body encoding)
   "Return BODY decoded as the response ENCODING names."
   (case encoding
-    ((json)
-            (let ((text (response-text body)))
-              (if (string-null? (string-trim-both text))
-                  json-null
-                  (json-string->jso text))))
-    ((text) (response-text body))
-    ((form) (parse-query (response-text body)))
-    ((multipart binary) body)
-    (else body)))
+    [(json)
+     (let ((text (response-text body)))
+       (if (string-null? (string-trim-both text))
+         json-null
+         (json-string->jso text)))]
+    [(text) (response-text body)]
+    [(form) (parse-query (response-text body))]
+    [(multipart binary) body]
+    [else body]))
 
 (define (content-type-header value)
   "Return VALUE, a Content-Type string, in (web http)'s representation."
@@ -123,68 +123,68 @@ timeout in seconds."
   "Return one NAME=VALUE content-type parameter as a pair."
   (let ((equals (string-index parameter #\=)))
     (if equals
-        (cons
-              (string->symbol
-                              (string-downcase
-                                               (string-trim-both
-                                                                 (substring
-                                                                            parameter
-                                                                            0
-                                                                            equals))))
-              (content-type-value
-                                  (string-trim-both
-                                                    (substring parameter
-                                                               (+ equals 1)
-                                                               (string-length
-                                                                              parameter)))))
-        (cons (string->symbol (string-downcase parameter)) #t))))
+      (cons
+       (string->symbol
+        (string-downcase
+         (string-trim-both
+          (substring
+           parameter
+           0
+           equals))))
+       (content-type-value
+        (string-trim-both
+         (substring parameter
+                    (+ equals 1)
+                    (string-length
+                     parameter)))))
+      (cons (string->symbol (string-downcase parameter)) #t))))
 
 (define (content-type-value value)
   "Return VALUE without the quotes a content-type parameter may carry."
   (if (and (> (string-length value) 1) (char=? (string-ref value 0) #\")
-           (char=? (string-ref value (- (string-length value) 1)) #\"))
-      (substring value 1 (- (string-length value) 1))
-      value))
+        (char=? (string-ref value (- (string-length value) 1)) #\"))
+    (substring value 1 (- (string-length value) 1))
+    value))
 
 (define* (client-send
-                      client
-                      method
-                      path
-                      #:key
-                      query
-                      headers
-                      body
-                      (body-encoding 'json)
-                      (content-type "application/json")
-                      (accept "application/json")
-                      (response-encoding 'json))
+          client
+          method
+          path
+          #:key
+          query
+          headers
+          body
+          (body-encoding 'json)
+          (content-type "application/json")
+          (accept "application/json")
+          (response-encoding 'json))
   "Send METHOD to PATH and return the <http-response>."
   (let* ((url (client-url client path query))
          (payload (and body (encode-request-body body body-encoding)))
          (headers
-           (if (and body content-type
-                    (not (header-ref headers "Content-Type")))
-               (header-set headers "Content-Type" content-type)
-               headers))
+          (if (and body content-type
+                (not (header-ref headers "Content-Type")))
+            (header-set headers "Content-Type" content-type)
+            headers))
          (headers
-           (if (and accept (not (header-ref headers "Accept")))
-               (header-set headers "Accept" accept)
-               headers))
+          (if (and accept (not (header-ref headers "Accept")))
+            (header-set headers "Accept" accept)
+            headers))
          (request-headers
-           (merge-cookie-headers (append headers (api-client-headers client)))))
+          (merge-cookie-headers (append headers (api-client-headers client)))))
     (receive (response response-body)
-        (http-request url
-                      #:method method
-                      #:headers (guile-headers request-headers)
-                      #:body payload)
-      (make-http-response (response-code response) (response-headers response)
-                          (decode-response-body response-body
-                                                (encoding-for-content-type
-                                                                           (header-ref
-                                                                                       (response-headers
-                                                                                                         response)
-                                                                                       "Content-Type")
-                                                                           response-encoding))))))
+             (http-request url
+                           #:method method
+                           #:headers (guile-headers request-headers)
+                           #:body payload)
+             (make-http-response (response-code response) (response-headers response)
+                                 (decode-response-body response-body
+                                                       (encoding-for-content-type
+                                                        (header-ref
+                                                         (response-headers
+                                                          response)
+                                                         "Content-Type")
+                                                        response-encoding))))))
 
 (define (guile-headers headers)
   "Return HEADERS as (web client) wants them.
@@ -193,13 +193,13 @@ timeout in seconds."
 own representation of that one header; the rest keep a title-case name and a
 string value, which is written through unchanged."
   (map
-       (lambda (header)
-         (let ((name (string-downcase (car header)))
-               (value (cdr header)))
-           (if (string=? name "content-type")
-               (cons 'content-type (content-type-header value))
-               (cons (string->symbol (header-name (car header))) value))))
-       headers))
+   (lambda (header)
+     (let ((name (string-downcase (car header)))
+           (value (cdr header)))
+       (if (string=? name "content-type")
+         (cons 'content-type (content-type-header value))
+         (cons (string->symbol (header-name (car header))) value))))
+   headers))
 
 (define (header-name name)
   "Return NAME with each hyphen-separated part capitalised."
@@ -208,24 +208,24 @@ string value, which is written through unchanged."
 (define (header-name-loop characters start? out)
   "Walk CHARACTERS, capitalising the first letter of each part."
   (if (null? characters)
-      (list->string (reverse out))
-      (let ((character (car characters)))
-        (cond
-          ((char=? character #\-)
-                                  (header-name-loop (cdr characters) #t
-                                                    (cons character out)))
-          (start?
-                  (header-name-loop (cdr characters) #f
-                                    (cons (char-upcase character) out)))
-          (else (header-name-loop (cdr characters) #f (cons character out)))))))
+    (list->string (reverse out))
+    (let ((character (car characters)))
+      (cond
+        [(char=? character #\-)
+         (header-name-loop (cdr characters) #t
+                           (cons character out))]
+        [start?
+          (header-name-loop (cdr characters) #f
+                            (cons (char-upcase character) out))]
+        [else (header-name-loop (cdr characters) #f (cons character out))]))))
 
 (define* (list-songs
-                     client
-                     #:key
-                     (search #f)
-                     (limit #f)
-                     (offset #f)
-                     (auth (api-client-auth client)))
+          client
+          #:key
+          (search #f)
+          (limit #f)
+          (offset #f)
+          (auth (api-client-auth client)))
   "GET /api/v1/songs
 
 Songs of this instance, with the artists and genres each one credits.
@@ -241,19 +241,19 @@ Returns two values: the decoded body (a SongList) and the <http-response>.
 
 Credentials come from AUTH, which defaults to the client's."
   (receive (auth-headers auth-query)
-      (authenticate auth api-security-schemes '())
-    (let ((path "/api/v1/songs"))
-      (let ((response
-              (client-send client 'GET path
-                           #:query
-                           (append (list (cons "search" search))
-                                   (list (cons "limit" limit))
-                                   (list (cons "offset" offset)) auth-query)
-                           #:headers auth-headers
-                           #:accept "application/json"
-                           #:response-encoding 'json)))
-        (expect-status response '(200))
-        (values (jso->song-list (http-response-body response)) response)))))
+           (authenticate auth api-security-schemes '())
+           (let ((path "/api/v1/songs"))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query
+                                 (append (list (cons "search" search))
+                                         (list (cons "limit" limit))
+                                         (list (cons "offset" offset)) auth-query)
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->song-list (http-response-body response)) response)))))
 
 (define* (get-song client #:key song-id (auth (api-client-auth client)))
   "GET /api/v1/songs/{songId}
@@ -269,24 +269,24 @@ Returns two values: the decoded body (a Song) and the <http-response>.
 
 Credentials come from AUTH, which defaults to the client's."
   (receive (auth-headers auth-query)
-      (authenticate auth api-security-schemes '())
-    (let ((path
-            (params->path "/api/v1/songs/{songId}"
-                          (list (cons "songId" song-id)))))
-      (let ((response
-              (client-send client 'GET path
-                           #:query auth-query
-                           #:headers auth-headers
-                           #:accept "application/json"
-                           #:response-encoding 'json)))
-        (expect-status response '(200))
-        (values (jso->song (http-response-body response)) response)))))
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->song (http-response-body response)) response)))))
 
 (define* (list-song-versions
-                             client
-                             #:key
-                             song-id
-                             (auth (api-client-auth client)))
+          client
+          #:key
+          song-id
+          (auth (api-client-auth client)))
   "GET /api/v1/songs/{songId}/versions
 
 The tablature versions of one song, oldest first, with the ASCII
@@ -300,31 +300,31 @@ Returns two values: the decoded body (a list of SongVersion) and the <http-respo
 
 Credentials come from AUTH, which defaults to the client's."
   (receive (auth-headers auth-query)
-      (authenticate auth api-security-schemes '())
-    (let ((path
-            (params->path "/api/v1/songs/{songId}/versions"
-                          (list (cons "songId" song-id)))))
-      (let ((response
-              (client-send client 'GET path
-                           #:query auth-query
-                           #:headers auth-headers
-                           #:accept "application/json"
-                           #:response-encoding 'json)))
-        (expect-status response '(200))
-        (values
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/versions"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values
                 (let ((value (http-response-body response)))
                   (if (or (eq? value #f) (json-null? value))
-                      #f
-                      (map (lambda (element) (jso->song-version element))
-                           (jso-array->list value)))) response)))))
+                    #f
+                    (map (lambda (element) (jso->song-version element))
+                         (jso-array->list value)))) response)))))
 
 (define* (list-artists
-                       client
-                       #:key
-                       (search #f)
-                       (limit #f)
-                       (offset #f)
-                       (auth (api-client-auth client)))
+          client
+          #:key
+          (search #f)
+          (limit #f)
+          (offset #f)
+          (auth (api-client-auth client)))
   "GET /api/v1/artists
 
 List artists
@@ -338,19 +338,19 @@ Returns two values: the decoded body (a ArtistList) and the <http-response>.
 
 Credentials come from AUTH, which defaults to the client's."
   (receive (auth-headers auth-query)
-      (authenticate auth api-security-schemes '())
-    (let ((path "/api/v1/artists"))
-      (let ((response
-              (client-send client 'GET path
-                           #:query
-                           (append (list (cons "search" search))
-                                   (list (cons "limit" limit))
-                                   (list (cons "offset" offset)) auth-query)
-                           #:headers auth-headers
-                           #:accept "application/json"
-                           #:response-encoding 'json)))
-        (expect-status response '(200))
-        (values (jso->artist-list (http-response-body response)) response)))))
+           (authenticate auth api-security-schemes '())
+           (let ((path "/api/v1/artists"))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query
+                                 (append (list (cons "search" search))
+                                         (list (cons "limit" limit))
+                                         (list (cons "offset" offset)) auth-query)
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->artist-list (http-response-body response)) response)))))
 
 (define* (get-artist client #:key artist-id (auth (api-client-auth client)))
   "GET /api/v1/artists/{artistId}
@@ -364,26 +364,26 @@ Returns two values: the decoded body (a Artist) and the <http-response>.
 
 Credentials come from AUTH, which defaults to the client's."
   (receive (auth-headers auth-query)
-      (authenticate auth api-security-schemes '())
-    (let ((path
-            (params->path "/api/v1/artists/{artistId}"
-                          (list (cons "artistId" artist-id)))))
-      (let ((response
-              (client-send client 'GET path
-                           #:query auth-query
-                           #:headers auth-headers
-                           #:accept "application/json"
-                           #:response-encoding 'json)))
-        (expect-status response '(200))
-        (values (jso->artist (http-response-body response)) response)))))
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->artist (http-response-body response)) response)))))
 
 (define* (list-artist-songs
-                            client
-                            #:key
-                            artist-id
-                            (limit #f)
-                            (offset #f)
-                            (auth (api-client-auth client)))
+          client
+          #:key
+          artist-id
+          (limit #f)
+          (offset #f)
+          (auth (api-client-auth client)))
   "GET /api/v1/artists/{artistId}/songs
 
 List an artist's songs
@@ -397,28 +397,28 @@ Returns two values: the decoded body (a SongList) and the <http-response>.
 
 Credentials come from AUTH, which defaults to the client's."
   (receive (auth-headers auth-query)
-      (authenticate auth api-security-schemes '())
-    (let ((path
-            (params->path "/api/v1/artists/{artistId}/songs"
-                          (list (cons "artistId" artist-id)))))
-      (let ((response
-              (client-send client 'GET path
-                           #:query
-                           (append (list (cons "limit" limit))
-                                   (list (cons "offset" offset)) auth-query)
-                           #:headers auth-headers
-                           #:accept "application/json"
-                           #:response-encoding 'json)))
-        (expect-status response '(200))
-        (values (jso->song-list (http-response-body response)) response)))))
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/songs"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query
+                                 (append (list (cons "limit" limit))
+                                         (list (cons "offset" offset)) auth-query)
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->song-list (http-response-body response)) response)))))
 
 (define* (list-genres
-                      client
-                      #:key
-                      (search #f)
-                      (limit #f)
-                      (offset #f)
-                      (auth (api-client-auth client)))
+          client
+          #:key
+          (search #f)
+          (limit #f)
+          (offset #f)
+          (auth (api-client-auth client)))
   "GET /api/v1/genres
 
 Genres of this instance.
@@ -432,19 +432,19 @@ Returns two values: the decoded body (a GenreList) and the <http-response>.
 
 Credentials come from AUTH, which defaults to the client's."
   (receive (auth-headers auth-query)
-      (authenticate auth api-security-schemes '())
-    (let ((path "/api/v1/genres"))
-      (let ((response
-              (client-send client 'GET path
-                           #:query
-                           (append (list (cons "search" search))
-                                   (list (cons "limit" limit))
-                                   (list (cons "offset" offset)) auth-query)
-                           #:headers auth-headers
-                           #:accept "application/json"
-                           #:response-encoding 'json)))
-        (expect-status response '(200))
-        (values (jso->genre-list (http-response-body response)) response)))))
+           (authenticate auth api-security-schemes '())
+           (let ((path "/api/v1/genres"))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query
+                                 (append (list (cons "search" search))
+                                         (list (cons "limit" limit))
+                                         (list (cons "offset" offset)) auth-query)
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->genre-list (http-response-body response)) response)))))
 
 (define* (get-genre client #:key genre-id (auth (api-client-auth client)))
   "GET /api/v1/genres/{genreId}
@@ -458,26 +458,26 @@ Returns two values: the decoded body (a Genre) and the <http-response>.
 
 Credentials come from AUTH, which defaults to the client's."
   (receive (auth-headers auth-query)
-      (authenticate auth api-security-schemes '())
-    (let ((path
-            (params->path "/api/v1/genres/{genreId}"
-                          (list (cons "genreId" genre-id)))))
-      (let ((response
-              (client-send client 'GET path
-                           #:query auth-query
-                           #:headers auth-headers
-                           #:accept "application/json"
-                           #:response-encoding 'json)))
-        (expect-status response '(200))
-        (values (jso->genre (http-response-body response)) response)))))
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->genre (http-response-body response)) response)))))
 
 (define* (list-genre-songs
-                           client
-                           #:key
-                           genre-id
-                           (limit #f)
-                           (offset #f)
-                           (auth (api-client-auth client)))
+          client
+          #:key
+          genre-id
+          (limit #f)
+          (offset #f)
+          (auth (api-client-auth client)))
   "GET /api/v1/genres/{genreId}/songs
 
 List a genre's songs
@@ -491,20 +491,20 @@ Returns two values: the decoded body (a SongList) and the <http-response>.
 
 Credentials come from AUTH, which defaults to the client's."
   (receive (auth-headers auth-query)
-      (authenticate auth api-security-schemes '())
-    (let ((path
-            (params->path "/api/v1/genres/{genreId}/songs"
-                          (list (cons "genreId" genre-id)))))
-      (let ((response
-              (client-send client 'GET path
-                           #:query
-                           (append (list (cons "limit" limit))
-                                   (list (cons "offset" offset)) auth-query)
-                           #:headers auth-headers
-                           #:accept "application/json"
-                           #:response-encoding 'json)))
-        (expect-status response '(200))
-        (values (jso->song-list (http-response-body response)) response)))))
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/songs"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query
+                                 (append (list (cons "limit" limit))
+                                         (list (cons "offset" offset)) auth-query)
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->song-list (http-response-body response)) response)))))
 
 (define* (get-instance client #:key (auth (api-client-auth client)))
   "GET /api/v1/instance
@@ -517,13 +517,13 @@ Returns two values: the decoded body (a Instance) and the <http-response>.
 
 Credentials come from AUTH, which defaults to the client's."
   (receive (auth-headers auth-query)
-      (authenticate auth api-security-schemes '())
-    (let ((path "/api/v1/instance"))
-      (let ((response
-              (client-send client 'GET path
-                           #:query auth-query
-                           #:headers auth-headers
-                           #:accept "application/json"
-                           #:response-encoding 'json)))
-        (expect-status response '(200))
-        (values (jso->instance (http-response-body response)) response)))))
+           (authenticate auth api-security-schemes '())
+           (let ((path "/api/v1/instance"))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->instance (http-response-body response)) response)))))

@@ -84,16 +84,16 @@ without editing the deployment's file."
   (let ((overlaid (assq name
                         (deployment-overrides))))
     (if overlaid
-        (cdr overlaid)
-        (catch #t
-               (lambda ()
-                 (let* ((module (resolve-module '(wikimusic env)))
-                        (variable (module-variable module name)))
-                   (if (and variable
-                            (variable-bound? variable))
-                       (variable-ref variable) unbound)))
-               (lambda (key . args)
-                 unbound)))))
+      (cdr overlaid)
+      (catch #t
+             (lambda ()
+               (let* ((module (resolve-module '(wikimusic env)))
+                      (variable (module-variable module name)))
+                 (if (and variable
+                       (variable-bound? variable))
+                   (variable-ref variable) unbound)))
+             (lambda (key . args)
+               unbound)))))
 
 (define (deployment-value name)
   "Return what this deployment set NAME to as text, or #f.
@@ -103,8 +103,8 @@ variable does, so that a caller falls back to the project's own value: a line an
 operator commented out cannot leave the instance with nothing to say."
   (let ((value (deployment-binding name)))
     (and (string? value)
-         (let ((trimmed (string-trim-both value)))
-           (and (not (string-null? trimmed)) trimmed)))))
+      (let ((trimmed (string-trim-both value)))
+        (and (not (string-null? trimmed)) trimmed)))))
 
 (define* (config-value name
                        #:key default)
@@ -130,15 +130,15 @@ all: a blank is read as the absent line it looks like, which is the reading a
 deployment might leave empty."
   (let ((value (deployment-binding name)))
     (cond
-      ((eq? value unbound)
-       default)
-      ((string? value)
+      [(eq? value unbound)
+       default]
+      [(string? value)
        (let ((word (string-trim-both value)))
          (if (string-null? word) default
-             (not (any (lambda (no)
-                         (string-ci=? no word))
-                       '("false" "no" "off" "0"))))))
-      (else (and value #t)))))
+           (not (any (lambda (no)
+                       (string-ci=? no word))
+                     '("false" "no" "off" "0")))))]
+      [else (and value #t)])))
 
 ;;; ====== Where the project is ======
 
@@ -241,8 +241,8 @@ a file."
   (let ((base (string-trim-right (assets-url) #\/))
         (path (string-trim path #\/)))
     (if (string-null? base)
-        (format #f "/~a" path)
-        (format #f "~a/~a" base path))))
+      (format #f "/~a" path)
+      (format #f "~a/~a" base path))))
 
 ;;; ====== The mail an instance sends ======
 

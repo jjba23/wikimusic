@@ -44,31 +44,31 @@
                     "Retrieves a song by their ID from the given REPO.")
 
 (define-repo-method get-songs repo-get-songs
- "Retrieves a list of all active songs from the given REPO.")
+                    "Retrieves a list of all active songs from the given REPO.")
 
 (define-repo-method count-songs repo-count-songs
- "Counts the songs in the given REPO, optionally those a SEARCH matches.")
+                    "Counts the songs in the given REPO, optionally those a SEARCH matches.")
 
 (define-repo-method get-songs-by-artist-id repo-get-songs-by-artist-id
- "Retrieves a list of all active songs by artist ID from the given REPO.")
+                    "Retrieves a list of all active songs by artist ID from the given REPO.")
 
 (define-repo-method get-songs-by-genre-id repo-get-songs-by-genre-id
- "Retrieves a list of all active songs by genre ID from the given REPO.")
+                    "Retrieves a list of all active songs by genre ID from the given REPO.")
 
 (define-repo-method get-song-genres-by-ids repo-get-song-genres-by-ids
- "Retrieves a list of song genres by IDS from the given REPO.")
+                    "Retrieves a list of song genres by IDS from the given REPO.")
 
 (define-repo-method get-song-artists-by-ids repo-get-song-artists-by-ids
- "Retrieves a list of song artists by IDS from the given REPO.")
+                    "Retrieves a list of song artists by IDS from the given REPO.")
 
 (define-repo-method search-songs repo-search-songs
- "Retrieves a search list of all active songs from the given REPO.")
+                    "Retrieves a search list of all active songs from the given REPO.")
 
 (define-repo-method insert-song repo-insert-song
                     "Inserts a song with ATTRS in the given REPO.")
 
 (define-repo-method update-song-by-id repo-update-song-by-id
- "Updates a song identified by ID with ATTRS in the given REPO.")
+                    "Updates a song identified by ID with ATTRS in the given REPO.")
 
 (define-repo-method delete-song-by-id repo-delete-song-by-id
                     "Deletes a song identified by ID in the given REPO.")

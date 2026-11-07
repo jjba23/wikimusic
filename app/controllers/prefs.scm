@@ -6,9 +6,9 @@
 (define-artanis-controller prefs)
 
 (import (ice-9 string-fun)
-        (kracht prelude)
-        (web uri)
-        (wikimusic html))
+  (kracht prelude)
+  (web uri)
+  (wikimusic html))
 
 ;; A reader's preferences are not session state -- they are what the reader
 ;; wants the pages to be -- so the choice outlives the visit that made it:
@@ -31,9 +31,9 @@
                ;; fill in, and one beginning `//' would send them to another
                ;; host entirely.
                (target (if (and (string? return-to)
-                                (string-prefix? "/" return-to)
-                                (not (string-prefix? "//" return-to)))
-                           return-to "/")))
+                             (string-prefix? "/" return-to)
+                             (not (string-prefix? "//" return-to)))
+                         return-to "/")))
           (when (assoc user-lang wikimusic-locales)
             (:cookies-set! rc
                            'lang "lang" user-lang)

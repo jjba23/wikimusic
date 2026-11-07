@@ -6,37 +6,37 @@
 (define-artanis-controller genre-page)
 
 (import (wikimusic html)
-        (web uri)
-        (wikimusic env)
-        (wikimusic auth)
-        (wikimusic controller)
-        (wikimusic domain)
-        (ice-9 string-fun)
-        (bewaking bewaking)
-        (kracht prelude)
-        (uuid generate)
-        (wikimusic domain genre)
-        (wikimusic sqlite genre)
-        (wikimusic domain artwork)
-        (wikimusic sqlite artwork)
-        (wikimusic domain song)
-        (wikimusic sqlite song)
-        (wikimusic domain song-content)
-        (wikimusic sqlite song-content)
-        (wikimusic domain comment)
-        (wikimusic sqlite comment)
-        (wikimusic domain opinion)
-        (wikimusic sqlite opinion)
-        (wikimusic domain external-source)
-        (wikimusic sqlite external-source)
-        (wikimusic domain user)
-        (wikimusic sqlite user)
-        (wikimusic domain artist)
-        (wikimusic sqlite artist)
-        (app views genre-view)
-        (app views genre-edit)
-        (app views song-view)
-        (app views song-edit))
+  (web uri)
+  (wikimusic env)
+  (wikimusic auth)
+  (wikimusic controller)
+  (wikimusic domain)
+  (ice-9 string-fun)
+  (bewaking bewaking)
+  (kracht prelude)
+  (uuid generate)
+  (wikimusic domain genre)
+  (wikimusic sqlite genre)
+  (wikimusic domain artwork)
+  (wikimusic sqlite artwork)
+  (wikimusic domain song)
+  (wikimusic sqlite song)
+  (wikimusic domain song-content)
+  (wikimusic sqlite song-content)
+  (wikimusic domain comment)
+  (wikimusic sqlite comment)
+  (wikimusic domain opinion)
+  (wikimusic sqlite opinion)
+  (wikimusic domain external-source)
+  (wikimusic sqlite external-source)
+  (wikimusic domain user)
+  (wikimusic sqlite user)
+  (wikimusic domain artist)
+  (wikimusic sqlite artist)
+  (app views genre-view)
+  (app views genre-edit)
+  (app views song-view)
+  (app views song-edit))
 
 (get "/genres"
      #:mime 'xml
@@ -50,12 +50,12 @@
               (comment-repo (make-sqlite-comment-repository rc))
               (external-source-repo (make-sqlite-external-source-repository rc))
               (user-search (cond
-                             ((equal? #f
+                             [(equal? #f
                                       (get-from-qstr rc "search"))
-                              #f)
-                             (else (html-escape (get-from-qstr rc "search")))))
+                              #f]
+                             [else (html-escape (get-from-qstr rc "search"))]))
               (user-sort (cond
-                           ((not (equal? #f
+                           [(not (equal? #f
                                          (get-from-qstr rc "sort")))
                             (:cookies-set! rc
                                            'wikimusic-genre-sort
@@ -67,18 +67,18 @@
                                                #:path "/"
                                                #:secure #t
                                                #:http-only #t)
-                            (get-from-qstr rc "sort"))
-                           ((not (equal? #f
+                            (get-from-qstr rc "sort")]
+                           [(not (equal? #f
                                          (:cookies-value rc
-                                          "wikimusic-genre-sort")))
-                            (:cookies-value rc "wikimusic-genre-sort"))
-                           (else "display-name-asc")))
+                                                         "wikimusic-genre-sort")))
+                            (:cookies-value rc "wikimusic-genre-sort")]
+                           [else "display-name-asc"]))
               ;; The tile-size preference travels the same way the sort does:
               ;; a `grid-size' in the query string is stored in a cookie and
               ;; every later visit reads it back, so the choice outlives the
               ;; page it was made on.
               (grid-size (cond
-                           ((not (equal? #f
+                           [(not (equal? #f
                                          (get-from-qstr rc "grid-size")))
                             (:cookies-set! rc
                                            'wikimusic-grid-size
@@ -90,12 +90,12 @@
                                                #:path "/"
                                                #:secure #t
                                                #:http-only #t)
-                            (get-from-qstr rc "grid-size"))
-                           ((not (equal? #f
+                            (get-from-qstr rc "grid-size")]
+                           [(not (equal? #f
                                          (:cookies-value rc
-                                          "wikimusic-grid-size")))
-                            (:cookies-value rc "wikimusic-grid-size"))
-                           (else "medium")))
+                                                         "wikimusic-grid-size")))
+                            (:cookies-value rc "wikimusic-grid-size")]
+                           [else "medium"]))
               (query-sort (entity-sort-from-query user-sort))
               ;; The list is read a page at a time.  Forty rows fill a
               ;; screenful of tiles without making the reader scroll far, and
@@ -103,40 +103,40 @@
               ;; carry, so a page is a plain `offset = (page - 1) * 40'.
               (query-page (let ((p (get-from-qstr rc "page")))
                             (if (nil? p) 1
-                                (max 1
-                                     (or (string->number p) 1)))))
+                              (max 1
+                                   (or (string->number p) 1)))))
               (query-limit 40)
               (query-offset (* (- query-page 1) query-limit))
               (genres (cond
-                        ((equal? #f user-search)
+                        [(equal? #f user-search)
                          (get-genres genre-repo
                                      #:order-by query-sort
                                      #:limit query-limit
-                                     #:offset query-offset))
-                        (else (search-genres genre-repo
+                                     #:offset query-offset)]
+                        [else (search-genres genre-repo
                                              (html-escape user-search)
                                              #:order-by query-sort
                                              #:limit query-limit
-                                             #:offset query-offset))))
+                                             #:offset query-offset)]))
               (genre-total (count-genres genre-repo
                                          #:search (and user-search
-                                                       (html-escape
-                                                        user-search))))
+                                                    (html-escape
+                                                     user-search))))
               (genre-pages (max 1
                                 (ceiling (/ genre-total query-limit))))
               (genre-ids (map (lambda (s)
                                 (assq-ref s
                                           'identifier)) genres))
               (artworks (cond
-                          ((nil? genre-ids)
-                           '())
-                          (else (get-artworks-by-entity-ids artwork-repo
-                                                            'genre genre-ids))))
+                          [(nil? genre-ids)
+                           '()]
+                          [else (get-artworks-by-entity-ids artwork-repo
+                                                            'genre genre-ids)]))
               (comments (cond
-                          ((nil? genre-ids)
-                           '())
-                          (else (get-comments-by-entity-ids comment-repo
-                                                            'genre genre-ids)))))
+                          [(nil? genre-ids)
+                           '()]
+                          [else (get-comments-by-entity-ids comment-repo
+                                                            'genre genre-ids)])))
          (response-emit (:mime rc
                                (genre-list-page (:i18n rc)
                                                 #:genres genres
@@ -160,7 +160,7 @@
        (response-emit (:mime rc
                              (genre-new-page (:i18n rc)
                                              #:is-logged-in (:cookies-value rc
-                                                             "x-bewaking-wikimusic"))))))
+                                                                            "x-bewaking-wikimusic"))))))
 
 (get "/genres/uuid/:uuid"
      #:mime 'xml
@@ -196,8 +196,8 @@
                                      'genre
                                      (list genre-id)))
               (external-sources (if (nil? raw-external-sources)
-                                    '()
-                                    (car raw-external-sources)))
+                                  '()
+                                  (car raw-external-sources)))
               (user (get-user-by-id user-repo
                                     (assq-ref genre
                                               'created-by)))
@@ -205,7 +205,7 @@
                                                 'identifier) user)))
               ;; song-specific
               (song-user-sort (cond
-                                ((not (equal? #f
+                                [(not (equal? #f
                                               (get-from-qstr rc "sort")))
                                  (:cookies-set! rc
                                                 'wikimusic-song-sort
@@ -217,12 +217,12 @@
                                                     #:path "/"
                                                     #:secure #t
                                                     #:http-only #t)
-                                 (get-from-qstr rc "sort"))
-                                ((not (equal? #f
+                                 (get-from-qstr rc "sort")]
+                                [(not (equal? #f
                                               (:cookies-value rc
-                                               "wikimusic-song-sort")))
-                                 (:cookies-value rc "wikimusic-song-sort"))
-                                (else "display-name-asc")))
+                                                              "wikimusic-song-sort")))
+                                 (:cookies-value rc "wikimusic-song-sort")]
+                                [else "display-name-asc"]))
               (song-query-sort (entity-sort-from-query song-user-sort))
 
               (songs (get-songs-by-genre-id song-repo genre-id
@@ -231,53 +231,53 @@
                                (assq-ref s
                                          'identifier)) songs))
               (song-artworks (cond
-                               ((nil? song-ids)
-                                '())
-                               (else (get-artworks-by-entity-ids artwork-repo
+                               [(nil? song-ids)
+                                '()]
+                               [else (get-artworks-by-entity-ids artwork-repo
                                                                  'song
-                                                                 song-ids))))
+                                                                 song-ids)]))
               (song-comments (cond
-                               ((nil? song-ids)
-                                '())
-                               (else (get-comments-by-entity-ids comment-repo
+                               [(nil? song-ids)
+                                '()]
+                               [else (get-comments-by-entity-ids comment-repo
                                                                  'song
-                                                                 song-ids))))
+                                                                 song-ids)]))
               (song-contents (cond
-                               ((nil? song-ids)
-                                '())
-                               (else (get-song-contents-by-song-ids
-                                      song-content-repo song-ids))))
+                               [(nil? song-ids)
+                                '()]
+                               [else (get-song-contents-by-song-ids
+                                      song-content-repo song-ids)]))
 
               (song-version-count-alist (map (lambda (song)
                                                `(,(assq-ref song
                                                             'identifier) ,(length
-                                                                           (filter (lambda 
-                                                                                           (sc)
-                                                                                     
-                                                                                     
+                                                                           (filter (lambda
+                                                                                     (sc)
+
+
                                                                                      (equal?
                                                                                       (assq-ref
                                                                                        sc
                                                                                        'song-identifier)
 
-                                                                                      
+
                                                                                       (assq-ref
                                                                                        song
                                                                                        'identifier)))
-                                                                            song-contents))))
+                                                                                   song-contents))))
                                              songs))
               (song-artists (cond
-                              ((nil? song-ids)
-                               '())
-                              (else (get-song-artists-by-ids song-repo
-                                                             song-ids))))
+                              [(nil? song-ids)
+                               '()]
+                              [else (get-song-artists-by-ids song-repo
+                                                             song-ids)]))
               (artists (if (nil? song-artists)
-                           '()
-                           (get-artists-by-ids artist-repo
-                                               (map (lambda (a)
-                                                      (assq-ref a
-                                                                'artist-identifier))
-                                                    song-artists))))
+                         '()
+                         (get-artists-by-ids artist-repo
+                                             (map (lambda (a)
+                                                    (assq-ref a
+                                                              'artist-identifier))
+                                                  song-artists))))
               (song-fragment (song-list-page (:i18n rc)
                                              #:only-tiles #t
                                              #:songs songs
@@ -323,12 +323,12 @@
                                                      'genre
                                                      (list genre-id)))
               (external-sources (if (not (nil? e))
-                                    (car e)
-                                    '()))
+                                  (car e)
+                                  '()))
               (artworks (get-artworks-by-entity-ids artwork-repo
                                                     'genre
                                                     (list genre-id))))
-         
+
          (response-emit (:mime rc
                                (genre-edit-page (:i18n rc)
                                                 #:genre genre

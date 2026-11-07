@@ -33,11 +33,11 @@
                      (div (@ (class ,(mk-class '(py-3))))
                           ,(if (assq-ref song
                                          'identifier)
-                               (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a: ~a"
-                                           (G_ "editing song")
-                                           (assq-ref song
-                                                     'display-name)))
-                               (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "new song"))))
+                             (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a: ~a"
+                                                                                                                                           (G_ "editing song")
+                                                                                                                                           (assq-ref song
+                                                                                                                                                     'display-name)))
+                             (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "new song"))))
                      (details (summary (@ (class ,(mk-class '(font-black
                                                               text-onyx-300
                                                               dark:text-stone-300
@@ -48,9 +48,8 @@
                                       `(div (figure (@ (class ,(mk-class '(py-3
                                                                            sm:w-32))))
                                                     (img (@ (loading lazy)
-                                                            (class ,(mk-class '
-                                                                              (rounded-xl
-                                                                               max-w-full)))
+                                                            (class ,(mk-class '(rounded-xl
+                                                                                max-w-full)))
                                                             (src ,(uri-decode (assq-ref
                                                                                a
                                                                                'content-url))))))
@@ -161,9 +160,9 @@
                                             (content-type
                                              application/x-www-form-urlencoded)
                                             (action ,(format #f
-                                                      "/songs/uuid/~a/artists"
-                                                      (assq-ref song
-                                                                'identifier))))
+                                                             "/songs/uuid/~a/artists"
+                                                             (assq-ref song
+                                                                       'identifier))))
                                          (div ,(input #:label "artist UUID"
                                                       #:name 'artist-identifier
                                                       #:value ""
@@ -177,29 +176,25 @@
                                                       (content-type
                                                        application/x-www-form-urlencoded)
                                                       (action ,(format #f
-                                                                "/songs/uuid/~a/artists/~a/delete"
-                                                                (assq-ref song
-                                                                 'identifier)
-                                                                (assq-ref a
-                                                                          'identifier))))
-                                                   (div (@ (class ,(mk-class '
-                                                                             (flex
-                                                                              flex-row
-                                                                              flex-wrap
-                                                                              gap-2
-                                                                              items-center))))
+                                                                       "/songs/uuid/~a/artists/~a/delete"
+                                                                       (assq-ref song
+                                                                                 'identifier)
+                                                                       (assq-ref a
+                                                                                 'identifier))))
+                                                   (div (@ (class ,(mk-class '(flex
+                                                                               flex-row
+                                                                               flex-wrap
+                                                                               gap-2
+                                                                               items-center))))
                                                         ,(h4 (assq-ref a
                                                                        'display-name))
                                                         ,(icon-button #:icon 'trash
                                                                       #:content
                                                                       ""
                                                                       #:type 'submit
-                                                                      #:background '
-                                                                      (bg-red-700)
-                                                                      #:color '
-                                                                      (text-stone-200)
-                                                                      #:hover-background '
-                                                                      (hover:bg-red-900))))))
+                                                                      #:background '(bg-red-700)
+                                                                      #:color '(text-stone-200)
+                                                                      #:hover-background '(hover:bg-red-900))))))
                                          artists)))
                      ,(hr)
                      (details (summary (@ (class ,(mk-class '(font-black
@@ -214,9 +209,9 @@
                                             (content-type
                                              application/x-www-form-urlencoded)
                                             (action ,(format #f
-                                                      "/songs/uuid/~a/genres"
-                                                      (assq-ref song
-                                                                'identifier))))
+                                                             "/songs/uuid/~a/genres"
+                                                             (assq-ref song
+                                                                       'identifier))))
                                          (div ,(input #:label "genre UUID"
                                                       #:name 'genre-identifier
                                                       #:value ""
@@ -230,29 +225,25 @@
                                                       (content-type
                                                        application/x-www-form-urlencoded)
                                                       (action ,(format #f
-                                                                "/songs/uuid/~a/genres/~a/delete"
-                                                                (assq-ref song
-                                                                 'identifier)
-                                                                (assq-ref a
-                                                                          'identifier))))
-                                                   (div (@ (class ,(mk-class '
-                                                                             (flex
-                                                                              flex-row
-                                                                              flex-wrap
-                                                                              gap-2
-                                                                              items-center))))
+                                                                       "/songs/uuid/~a/genres/~a/delete"
+                                                                       (assq-ref song
+                                                                                 'identifier)
+                                                                       (assq-ref a
+                                                                                 'identifier))))
+                                                   (div (@ (class ,(mk-class '(flex
+                                                                               flex-row
+                                                                               flex-wrap
+                                                                               gap-2
+                                                                               items-center))))
                                                         ,(h4 (assq-ref a
                                                                        'display-name))
                                                         ,(icon-button #:icon 'trash
                                                                       #:content
                                                                       ""
                                                                       #:type 'submit
-                                                                      #:background '
-                                                                      (bg-red-700)
-                                                                      #:color '
-                                                                      (text-stone-200)
-                                                                      #:hover-background '
-                                                                      (hover:bg-red-900))))))
+                                                                      #:background '(bg-red-700)
+                                                                      #:color '(text-stone-200)
+                                                                      #:hover-background '(hover:bg-red-900))))))
                                          genres))))))
     (html-template G_
                    #:is-logged-in is-logged-in
@@ -287,8 +278,8 @@
   ;; thing that saves it must not be the thing that scrolled away.
   `((form (@ (method POST)
              (action ,(if identifier
-                          (format #f "/songs/uuid/~a/edit" identifier)
-                          "/songs/new"))
+                        (format #f "/songs/uuid/~a/edit" identifier)
+                        "/songs/new"))
              (content-type application/x-www-form-urlencoded)
              (class "flex flex-col gap-3"))
           (fieldset (@ (class "wm-editor-group"))
@@ -329,5 +320,5 @@
                                #:value (html-unescape description)))
           (div (@ (class "wm-editor-actions"))
                ,(submit-button (if identifier
-                                   (G_ "edit")
-                                   (G_ "create")))))))
+                                 (G_ "edit")
+                                 (G_ "create")))))))

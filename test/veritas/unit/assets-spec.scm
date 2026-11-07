@@ -45,9 +45,9 @@
      (count 0))
     (if (>= index
             (string-length text)) count
-        (loop (+ index 1)
-              (if (char=? (string-ref text index) character)
-                  (+ count 1) count)))))
+      (loop (+ index 1)
+            (if (char=? (string-ref text index) character)
+              (+ count 1) count)))))
 
 ;; What Google answers with for the two families the interface is set in.  The
 ;; shape is the one the service is known to use: every face is announced by the
@@ -55,35 +55,35 @@
 ;; on the gstatic host -- which is exactly the address that must not survive.
 (define google-answer
   (string-append "/* latin-ext */\n"
-   "@font-face {\n"
-   "  font-family: 'Work Sans';\n"
-   "  font-style: italic;\n"
-   "  font-weight: 100 900;\n"
-   "  font-display: swap;\n"
-   "  src: url(https://fonts.gstatic.com/s/worksans/v25/aaa111.woff2) format('woff2');
+                 "@font-face {\n"
+                 "  font-family: 'Work Sans';\n"
+                 "  font-style: italic;\n"
+                 "  font-weight: 100 900;\n"
+                 "  font-display: swap;\n"
+                 "  src: url(https://fonts.gstatic.com/s/worksans/v25/aaa111.woff2) format('woff2');
 "
-   "  unicode-range: U+0100-02BA, U+02BD-02C5;\n"
-   "}\n"
-   "/* latin */\n"
-   "@font-face {\n"
-   "  font-family: 'Work Sans';\n"
-   "  font-style: normal;\n"
-   "  font-weight: 100 900;\n"
-   "  font-display: swap;\n"
-   "  src: url(https://fonts.gstatic.com/s/worksans/v25/bbb222.woff2) format('woff2');
+                 "  unicode-range: U+0100-02BA, U+02BD-02C5;\n"
+                 "}\n"
+                 "/* latin */\n"
+                 "@font-face {\n"
+                 "  font-family: 'Work Sans';\n"
+                 "  font-style: normal;\n"
+                 "  font-weight: 100 900;\n"
+                 "  font-display: swap;\n"
+                 "  src: url(https://fonts.gstatic.com/s/worksans/v25/bbb222.woff2) format('woff2');
 "
-   "  unicode-range: U+0000-00FF, U+0131;\n"
-   "}\n"
-   "/* latin */\n"
-   "@font-face {\n"
-   "  font-family: 'Source Serif 4';\n"
-   "  font-style: italic;\n"
-   "  font-weight: 200 900;\n"
-   "  font-display: swap;\n"
-   "  src: url(https://fonts.gstatic.com/s/sourceserif4/v9/ccc333.woff2) format('woff2');
+                 "  unicode-range: U+0000-00FF, U+0131;\n"
+                 "}\n"
+                 "/* latin */\n"
+                 "@font-face {\n"
+                 "  font-family: 'Source Serif 4';\n"
+                 "  font-style: italic;\n"
+                 "  font-weight: 200 900;\n"
+                 "  font-display: swap;\n"
+                 "  src: url(https://fonts.gstatic.com/s/sourceserif4/v9/ccc333.woff2) format('woff2');
 "
-   "  unicode-range: U+0000-00FF, U+0131;\n"
-   "}\n"))
+                 "  unicode-range: U+0000-00FF, U+0131;\n"
+                 "}\n"))
 
 ;; The same, as Phosphor publishes it: one face, four files, one to a line.
 (define phosphor-answer
@@ -126,115 +126,115 @@
 ;; named in is what tells the namer which subset and slope those are.
 (define naming-suite
   (suite "A face is named after what it carries"
-         (test "the family, the subset and the slope are all in the name"
-               (assert-equal #:name "a straight face names no slope"
-                             #:expect "worksans-latin.woff2"
-                             #:got (font-file-name
-                                    "https://fonts.gstatic.com/s/worksans/v25/bbb222.woff2"
-                                    "latin" #f))
-               (assert-equal #:name "a sloped one says so"
-                             #:expect "sourceserif4-latin-italic.woff2"
-                             #:got (font-file-name
-                                    "https://fonts.gstatic.com/s/sourceserif4/v9/ccc333.woff2"
-                                    "latin" #t))
-               (assert-equal #:name
-                             "and a subset that is not latin is kept apart"
-                             #:expect "worksans-latin-ext-italic.woff2"
-                             #:got (font-file-name
-                                    "https://fonts.gstatic.com/s/worksans/v25/aaa111.woff2"
-                                    "latin-ext" #t)))))
+    (test "the family, the subset and the slope are all in the name"
+      (assert-equal #:name "a straight face names no slope"
+        #:expect "worksans-latin.woff2"
+        #:got (font-file-name
+               "https://fonts.gstatic.com/s/worksans/v25/bbb222.woff2"
+               "latin" #f))
+      (assert-equal #:name "a sloped one says so"
+        #:expect "sourceserif4-latin-italic.woff2"
+        #:got (font-file-name
+               "https://fonts.gstatic.com/s/sourceserif4/v9/ccc333.woff2"
+               "latin" #t))
+      (assert-equal #:name
+        "and a subset that is not latin is kept apart"
+        #:expect "worksans-latin-ext-italic.woff2"
+        #:got (font-file-name
+               "https://fonts.gstatic.com/s/worksans/v25/aaa111.woff2"
+               "latin-ext" #t)))))
 
 ;; The rewrite itself: nobody else's address survives it, and everything that is
 ;; not an address is left as the stylesheet wrote it.
 (define rewrite-suite
   (suite "A fetched stylesheet names the files beside it"
-         (test "the address of the host it came from is gone"
-               (let ((css (rewritten-google-stylesheet)))
-                 (assert-true (not (string-contains css "fonts.gstatic.com"))
-                              #:name "no gstatic face is asked for")
-                 (assert-true (not (string-contains css "https://"))
-                              #:name "nor any other absolute address")
-                 (assert-true (and (string-contains css
-                                    "url(./worksans-latin.woff2)") #t)
-                              #:name "the file beside it is named instead")))
+    (test "the address of the host it came from is gone"
+      (let ((css (rewritten-google-stylesheet)))
+        (assert-true (not (string-contains css "fonts.gstatic.com"))
+          #:name "no gstatic face is asked for")
+        (assert-true (not (string-contains css "https://"))
+          #:name "nor any other absolute address")
+        (assert-true (and (string-contains css
+                                           "url(./worksans-latin.woff2)") #t)
+          #:name "the file beside it is named instead")))
 
-         (test "what the face says about itself is kept"
-               (let ((css (rewritten-google-stylesheet)))
-                 (assert-true (and (string-contains css "format('woff2')") #t)
-                              #:name "the format stays on the line")
-                 (assert-true (and (string-contains css "font-display: swap;")
-                                   #t)
-                              #:name
-                              "so does what the face asks of the reader")
-                 (assert-true (and (string-contains css
-                                    "unicode-range: U+0000-00FF, U+0131;") #t)
-                              #:name "and the range it carries")
-                 (assert-true (and (string-contains css "/* latin-ext */") #t)
-                              #:name "the line saying which subset follows")
-                 (assert-equal #:name
-                               "and the stylesheet is as long as it was"
-                               #:expect (count-character #\newline
-                                                         google-answer)
-                               #:got (count-character #\newline css))))
+    (test "what the face says about itself is kept"
+      (let ((css (rewritten-google-stylesheet)))
+        (assert-true (and (string-contains css "format('woff2')") #t)
+          #:name "the format stays on the line")
+        (assert-true (and (string-contains css "font-display: swap;")
+                       #t)
+          #:name
+          "so does what the face asks of the reader")
+        (assert-true (and (string-contains css
+                                           "unicode-range: U+0000-00FF, U+0131;") #t)
+          #:name "and the range it carries")
+        (assert-true (and (string-contains css "/* latin-ext */") #t)
+          #:name "the line saying which subset follows")
+        (assert-equal #:name
+          "and the stylesheet is as long as it was"
+          #:expect (count-character #\newline
+                                    google-answer)
+          #:got (count-character #\newline css))))
 
-         (test "each face is named for the block it stands in"
-               ;; The subsets and the slopes are read in the order the
-               ;; stylesheet writes them, so a face is named while the line that
-               ;; describes it is still in hand.  The lists are compared whole,
-               ;; in order, because the mistake this catches is exactly a name
-               ;; taken from the block before or after.
-               (assert-equal #:name "the addresses and the names line up"
-                             #:expect '(("https://fonts.gstatic.com/s/worksans/v25/aaa111.woff2" . "worksans-latin-ext-italic.woff2")
-                                        ("https://fonts.gstatic.com/s/worksans/v25/bbb222.woff2" . "worksans-latin.woff2")
-                                        ("https://fonts.gstatic.com/s/sourceserif4/v9/ccc333.woff2" . "sourceserif4-latin-italic.woff2"))
-                             #:got (rewritten-google-faces)))
+    (test "each face is named for the block it stands in"
+      ;; The subsets and the slopes are read in the order the
+      ;; stylesheet writes them, so a face is named while the line that
+      ;; describes it is still in hand.  The lists are compared whole,
+      ;; in order, because the mistake this catches is exactly a name
+      ;; taken from the block before or after.
+      (assert-equal #:name "the addresses and the names line up"
+        #:expect '(("https://fonts.gstatic.com/s/worksans/v25/aaa111.woff2" . "worksans-latin-ext-italic.woff2")
+                   ("https://fonts.gstatic.com/s/worksans/v25/bbb222.woff2" . "worksans-latin.woff2")
+                   ("https://fonts.gstatic.com/s/sourceserif4/v9/ccc333.woff2" . "sourceserif4-latin-italic.woff2"))
+        #:got (rewritten-google-faces)))
 
-         (test "every face the answer named is a face to fetch"
-               (assert-length #:name "three faces, three files"
-                              #:expect 3
-                              #:got (rewritten-google-faces)))))
+    (test "every face the answer named is a face to fetch"
+      (assert-length #:name "three faces, three files"
+        #:expect 3
+        #:got (rewritten-google-faces)))))
 
 ;; Phosphor's answer offers four files for one face; the tree ships one.
 (define pruning-suite
   (suite "An icon set is copied with what is served of it"
-         (test "the face names the file that is beside it, and only it"
-               (let ((css (prune-phosphor-stylesheet phosphor-answer)))
-                 (assert-true (and (string-contains css
-                                    "url(\"./Phosphor.woff2\") format(\"woff2\");")
-                                   #t)
-                              #:name "the woff2 clause ends the list")
-                 (assert-true (not (string-contains css "Phosphor.woff\""))
-                              #:name "the older woff is not named")
-                 (assert-true (not (string-contains css "Phosphor.ttf"))
-                              #:name "nor the ttf")
-                 (assert-true (not (string-contains css "Phosphor.svg"))
-                              #:name "nor the svg")))
+    (test "the face names the file that is beside it, and only it"
+      (let ((css (prune-phosphor-stylesheet phosphor-answer)))
+        (assert-true (and (string-contains css
+                                           "url(\"./Phosphor.woff2\") format(\"woff2\");")
+                       #t)
+          #:name "the woff2 clause ends the list")
+        (assert-true (not (string-contains css "Phosphor.woff\""))
+          #:name "the older woff is not named")
+        (assert-true (not (string-contains css "Phosphor.ttf"))
+          #:name "nor the ttf")
+        (assert-true (not (string-contains css "Phosphor.svg"))
+          #:name "nor the svg")))
 
-         (test "what is left is still a stylesheet"
-               (let ((css (prune-phosphor-stylesheet phosphor-answer)))
-                 (assert-equal #:name "the braces still balance"
-                               #:expect (count-character #\{ phosphor-answer)
-                               #:got (count-character #\{ css))
-                 (assert-equal #:name "and they close as often"
-                               #:expect (count-character #\} phosphor-answer)
-                               #:got (count-character #\} css))
-                 (assert-true (and (string-contains css
-                                    "font-family: \"Phosphor\";") #t)
-                              #:name "the face keeps its family")
-                 (assert-true (and (string-contains css ".ph {") #t)
-                              #:name "and the class the glyphs are worn with")
-                 (assert-true (not (string-contains css ",;"))
-                              #:name "no clause is left dangling")))
+    (test "what is left is still a stylesheet"
+      (let ((css (prune-phosphor-stylesheet phosphor-answer)))
+        (assert-equal #:name "the braces still balance"
+          #:expect (count-character #\{ phosphor-answer)
+          #:got (count-character #\{ css))
+        (assert-equal #:name "and they close as often"
+          #:expect (count-character #\} phosphor-answer)
+          #:got (count-character #\} css))
+        (assert-true (and (string-contains css
+                                           "font-family: \"Phosphor\";") #t)
+          #:name "the face keeps its family")
+        (assert-true (and (string-contains css ".ph {") #t)
+          #:name "and the class the glyphs are worn with")
+        (assert-true (not (string-contains css ",;"))
+          #:name "no clause is left dangling")))
 
-         (test "a stylesheet with nothing to prune is left alone"
-               ;; The rule is written against the three formats that are not
-               ;; shipped, so a face that names none of them passes through it
-               ;; unchanged -- which is what a set that stops publishing them
-               ;; would need, and what this must not mangle if it does.
-               (assert-equal #:name "the text comes back as it went in"
-                             #:expect (prune-phosphor-stylesheet (prune-phosphor-stylesheet
-                                                                  phosphor-answer))
-                             #:got (prune-phosphor-stylesheet phosphor-answer)))))
+    (test "a stylesheet with nothing to prune is left alone"
+      ;; The rule is written against the three formats that are not
+      ;; shipped, so a face that names none of them passes through it
+      ;; unchanged -- which is what a set that stops publishing them
+      ;; would need, and what this must not mangle if it does.
+      (assert-equal #:name "the text comes back as it went in"
+        #:expect (prune-phosphor-stylesheet (prune-phosphor-stylesheet
+                                             phosphor-answer))
+        #:got (prune-phosphor-stylesheet phosphor-answer)))))
 
 (define (spec)
   (veritas-run naming-suite rewrite-suite pruning-suite))

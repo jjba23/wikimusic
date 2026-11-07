@@ -25,16 +25,16 @@
 ;; --- eDSL: Embedded Domain Specific Language ---
 
 (define-repo-method get-comments-by-entity-ids repo-get-comments-by-entity-ids
- "Retrieves comments by their entity IDs from the given REPO.")
+                    "Retrieves comments by their entity IDs from the given REPO.")
 
 (define-repo-method insert-comment repo-insert-comment
                     "Inserts a comment with ATTRS in the given REPO.")
 
 (define-repo-method get-comment-by-id repo-get-comment-by-id
- "Retrieves a single comment of ENTITY identified by ID from the given REPO.")
+                    "Retrieves a single comment of ENTITY identified by ID from the given REPO.")
 
 (define-repo-method update-comment-by-id repo-update-comment-by-id
- "Updates a comment of ENTITY identified by ID with ATTRS in the given REPO.")
+                    "Updates a comment of ENTITY identified by ID with ATTRS in the given REPO.")
 
 (define-repo-method delete-comment-by-id repo-delete-comment-by-id
                     "Deletes a comment identified by ID in the given REPO.")

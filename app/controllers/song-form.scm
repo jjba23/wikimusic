@@ -6,47 +6,47 @@
 (define-artanis-controller song-form)
 
 (import (wikimusic html)
-        (wikimusic domain)
-        (wikimusic controller)
-        (web uri)
-        (ice-9 string-fun)
-        (wikimusic auth)
-        (app models songs)
-        (app models genres)
-        (wikimusic env)
-        (app models artists)
-        (app models song_artworks)
-        (app models song_contents)
-        (app models song_comments)
-        (app models song_opinions)
-        (app models artists)
-        (app models genres)
-        (kracht prelude)
-        (app models song_artists)
-        (app models song_genres)
-        (app views song-view)
-        (app views song-edit)
-        (app views song-content-view)
-        (app views song-content-edit)
-        (app models song_external_sources)
-        (uuid generate)
-        (bewaking bewaking)
-        (app models users)
-        (wikimusic sqlite song)
-        (wikimusic domain song)
-        (wikimusic sqlite artwork)
-        (wikimusic domain artwork)
-        (wikimusic domain comment)
-        (wikimusic sqlite comment)
-        (wikimusic domain opinion)
-        (wikimusic sqlite opinion)
-        (wikimusic domain external-source)
-        (wikimusic sqlite external-source)
-        (wikimusic sqlite artist)
-        (wikimusic domain artist)
-        ;; `sql-execute!' is the one runner these edit routes reach for when a
-        ;; row has to be rewritten in place; it lives with the other runners.
-        (wikimusic sqlite util))
+  (wikimusic domain)
+  (wikimusic controller)
+  (web uri)
+  (ice-9 string-fun)
+  (wikimusic auth)
+  (app models songs)
+  (app models genres)
+  (wikimusic env)
+  (app models artists)
+  (app models song_artworks)
+  (app models song_contents)
+  (app models song_comments)
+  (app models song_opinions)
+  (app models artists)
+  (app models genres)
+  (kracht prelude)
+  (app models song_artists)
+  (app models song_genres)
+  (app views song-view)
+  (app views song-edit)
+  (app views song-content-view)
+  (app views song-content-edit)
+  (app models song_external_sources)
+  (uuid generate)
+  (bewaking bewaking)
+  (app models users)
+  (wikimusic sqlite song)
+  (wikimusic domain song)
+  (wikimusic sqlite artwork)
+  (wikimusic domain artwork)
+  (wikimusic domain comment)
+  (wikimusic sqlite comment)
+  (wikimusic domain opinion)
+  (wikimusic sqlite opinion)
+  (wikimusic domain external-source)
+  (wikimusic sqlite external-source)
+  (wikimusic sqlite artist)
+  (wikimusic domain artist)
+  ;; `sql-execute!' is the one runner these edit routes reach for when a
+  ;; row has to be rewritten in place; it lives with the other runners.
+  (wikimusic sqlite util))
 
 (post "/songs/uuid/:uuid/edit"
       #:cookies '(names x-bewaking-wikimusic)
@@ -60,10 +60,10 @@
                  ;; change it (see `guard-owner').
                  (row (entity-or-404 (car ($songs 'get
                                                   #:condition (where
-                                                                     #:identifier
-                                                                     (params
-                                                                      rc
-                                                                      "uuid"))))
+                                                               #:identifier
+                                                               (params
+                                                                rc
+                                                                "uuid"))))
                                      "song"
                                      (params rc "uuid")))
                  (created-by (assoc-ref row "created_by")))
@@ -107,11 +107,11 @@
                             #:name "edit-song")
               (redirect-to rc
                            (string->uri (format #f
-                                         "~a/songs/uuid/~a?notify-title=~a"
-                                         (current-myhost)
-                                         (params rc "uuid")
-                                         (uri-encode (G_
-                                                      "Edited song succesfully!"))))
+                                                "~a/songs/uuid/~a?notify-title=~a"
+                                                (current-myhost)
+                                                (params rc "uuid")
+                                                (uri-encode (G_
+                                                             "Edited song succesfully!"))))
                            #:status 302))))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:song-create)
@@ -152,15 +152,15 @@
                                                                       "ascii-contents")))
                                         (pdf-contents unquote
                                                       (assoc-ref body
-                                                       "pdf-contents"))
+                                                                 "pdf-contents"))
                                         (guitarpro-contents unquote
                                                             (assoc-ref body
-                                                             "guitarpro-contents"))
+                                                                       "guitarpro-contents"))
                                         (last-edited-at unquote
                                                         (current-time)))
                                       #:where `((identifier unquote
                                                             (params rc
-                                                             "version-uuid"))))
+                                                                    "version-uuid"))))
                           #:name "edit-song-contents")
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a"
@@ -205,7 +205,7 @@
                                                         (current-time)))
                                       #:where `((identifier unquote
                                                             (params rc
-                                                             "artwork-uuid"))))
+                                                                    "artwork-uuid"))))
                           #:name "edit-song-artwork")
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a/edit"
@@ -229,7 +229,7 @@
         (define (do-new-content)
           (let* ((G_ (:i18n rc))
                  (t (decrypt-token #:token (:cookies-value rc
-                                            "x-bewaking-wikimusic")
+                                                           "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
                  (body (body-alist rc))
@@ -242,16 +242,16 @@
                             #:created_by user-identifier
                             #:visibility_status 0
                             #:instrument_type (html-escape (assoc-ref body
-                                                            "instrument-type"))
+                                                                      "instrument-type"))
                             #:version_name (html-escape (assoc-ref body
-                                                         "version-name"))
+                                                                   "version-name"))
                             #:ascii_legend (html-escape (assoc-ref body
-                                                         "ascii-legend"))
+                                                                   "ascii-legend"))
                             #:ascii_contents (html-escape (assoc-ref body
-                                                           "ascii-contents"))
+                                                                     "ascii-contents"))
                             #:pdf_contents (assoc-ref body "pdf-contents")
                             #:guitarpro_contents (assoc-ref body
-                                                  "guitarpro-contents")
+                                                            "guitarpro-contents")
                             #:created_at (current-time))
 
             (redirect-to rc
@@ -272,7 +272,7 @@
         (define (do-new-artwork)
           (let* ((G_ (:i18n rc))
                  (t (decrypt-token #:token (:cookies-value rc
-                                            "x-bewaking-wikimusic")
+                                                           "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
                  (body (body-alist rc))
@@ -285,11 +285,11 @@
                             #:created_by user-identifier
                             #:visibility_status 0
                             #:content_url (uri-encode (assoc-ref body
-                                                       "content-url"))
+                                                                 "content-url"))
                             #:content_caption (html-escape (assoc-ref body
-                                                            "content-caption"))
+                                                                      "content-caption"))
                             #:order_value (html-escape (assoc-ref body
-                                                        "order-value"))
+                                                                  "order-value"))
                             #:created_at (current-time))
 
             (redirect-to rc
@@ -310,7 +310,7 @@
         (define (do-new-song-artist)
           (let* ((G_ (:i18n rc))
                  (t (decrypt-token #:token (:cookies-value rc
-                                            "x-bewaking-wikimusic")
+                                                           "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
                  (body (body-alist rc))
@@ -327,7 +327,7 @@
                              #:identifier new-uuid
                              #:song_identifier (params rc "uuid")
                              #:artist_identifier (assoc-ref body
-                                                  "artist-identifier")
+                                                            "artist-identifier")
                              #:created_by user-identifier
                              #:created_at (current-time)))
 
@@ -349,7 +349,7 @@
         (define (do-new-song-genre)
           (let* ((G_ (:i18n rc))
                  (t (decrypt-token #:token (:cookies-value rc
-                                            "x-bewaking-wikimusic")
+                                                           "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
                  (body (body-alist rc))
@@ -389,7 +389,7 @@
         (define (do-new)
           (let* ((G_ (:i18n rc))
                  (t (decrypt-token #:token (:cookies-value rc
-                                            "x-bewaking-wikimusic")
+                                                           "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
                  (body (body-alist rc))
@@ -402,10 +402,10 @@
                     #:music_key (html-escape (assoc-ref body "music-key"))
                     #:music_tuning (html-escape (assoc-ref body "music-tuning"))
                     #:music_creation_date (html-escape (assoc-ref body
-                                                        "music-creation-date"))
+                                                                  "music-creation-date"))
                     #:album_name (html-escape (assoc-ref body "album-name"))
                     #:album_info_link (uri-encode (assoc-ref body
-                                                   "album-info-link"))
+                                                             "album-info-link"))
                     #:description (html-escape (assoc-ref body "description"))
                     #:created_by user-identifier
                     #:visibility_status 0
@@ -437,10 +437,10 @@
                                         #:condition (where #:song_identifier
                                                            uuid)))))
     (if (not (nil? ex-op))
-        ($song_opinions 'mod
-                        'row-delete
-                        (where #:identifier (assoc-ref (car ex-op)
-                                                       "identifier"))))
+      ($song_opinions 'mod
+                      'row-delete
+                      (where #:identifier (assoc-ref (car ex-op)
+                                                     "identifier"))))
     ($song_opinions 'set
                     #:identifier new-uuid
                     #:song_identifier uuid
@@ -452,8 +452,8 @@
                  (string->uri (format #f "~a/songs/uuid/~a?notify-title=~a"
                                       (current-myhost) uuid
                                       (if (equal? 1 is-like)
-                                          (uri-encode (G_ "Liked song!"))
-                                          (uri-encode (G_ "Disliked song!")))))
+                                        (uri-encode (G_ "Liked song!"))
+                                        (uri-encode (G_ "Disliked song!")))))
                  #:status 302)))
 
 (post "/songs/uuid/:uuid/like"
@@ -468,10 +468,10 @@
                                                       (decrypt-token #:token (:cookies-value
                                                                               rc
                                                                               "x-bewaking-wikimusic")
-                                                       #:encryption-key
-                                                       encryption-key
-                                                       #:signing-key
-                                                       signing-key)))
+                                                                     #:encryption-key
+                                                                     encryption-key
+                                                                     #:signing-key
+                                                                     signing-key)))
                            #:unhappy-flow back-to-login)))
 
 (post "/songs/uuid/:uuid/dislike"
@@ -486,10 +486,10 @@
                                                       (decrypt-token #:token (:cookies-value
                                                                               rc
                                                                               "x-bewaking-wikimusic")
-                                                       #:encryption-key
-                                                       encryption-key
-                                                       #:signing-key
-                                                       signing-key)))
+                                                                     #:encryption-key
+                                                                     encryption-key
+                                                                     #:signing-key
+                                                                     signing-key)))
                            #:unhappy-flow back-to-login)))
 
 ;; ====== Comment routes ======
@@ -586,7 +586,7 @@
                           (sql-delete 'song_contents
                                       #:where `((identifier unquote
                                                             (params rc
-                                                             "version-uuid"))))
+                                                                    "version-uuid"))))
                           #:name "delete-song-content")
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a"
@@ -611,17 +611,17 @@
                                #:table 'song_artists
                                #:where `((artist-identifier unquote
                                                             (params rc
-                                                             "artist-uuid"))
+                                                                    "artist-uuid"))
                                          (song-identifier unquote
                                                           (params rc "uuid"))))
             (sql-execute! rc
                           (sql-delete 'song_artists
                                       #:where `((artist-identifier unquote
                                                                    (params rc
-                                                                    "artist-uuid"))
+                                                                           "artist-uuid"))
                                                 (song-identifier unquote
                                                                  (params rc
-                                                                  "uuid"))))
+                                                                         "uuid"))))
                           #:name "delete-song-artist")
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a/edit"
@@ -646,17 +646,17 @@
                                #:table 'song_genres
                                #:where `((genre-identifier unquote
                                                            (params rc
-                                                            "genre-uuid"))
+                                                                   "genre-uuid"))
                                          (song-identifier unquote
                                                           (params rc "uuid"))))
             (sql-execute! rc
                           (sql-delete 'song_genres
                                       #:where `((genre-identifier unquote
                                                                   (params rc
-                                                                   "genre-uuid"))
+                                                                          "genre-uuid"))
                                                 (song-identifier unquote
                                                                  (params rc
-                                                                  "uuid"))))
+                                                                         "uuid"))))
                           #:name "delete-song-genre")
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a/edit"
@@ -704,15 +704,15 @@
                                                         (current-time)))
                                       #:where `((identifier unquote
                                                             (params rc
-                                                             "sourcesuuid"))))
+                                                                    "sourcesuuid"))))
                           #:name "edit-song-external-sources")
             (redirect-to rc
                          (string->uri (format #f
-                                       "~a/songs/uuid/~a?notify-title=~a"
-                                       (current-myhost)
-                                       (params rc "uuid")
-                                       (uri-encode (G_
-                                                    "Edited song succesfully!"))))
+                                              "~a/songs/uuid/~a?notify-title=~a"
+                                              (current-myhost)
+                                              (params rc "uuid")
+                                              (uri-encode (G_
+                                                           "Edited song succesfully!"))))
                          #:status 302)))
 
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
@@ -728,7 +728,7 @@
         (define (do-new-external-sources)
           (let* ((G_ (:i18n rc))
                  (t (decrypt-token #:token (:cookies-value rc
-                                            "x-bewaking-wikimusic")
+                                                           "x-bewaking-wikimusic")
                                    #:encryption-key encryption-key
                                    #:signing-key signing-key))
                  (body (body-alist rc))
@@ -745,19 +745,19 @@
                                                                   body
                                                                   "soundcloud-url"))
                                     #:youtube_url (uri-encode (assoc-ref body
-                                                               "youtube-url"))
+                                                                         "youtube-url"))
                                     #:spotify_url (uri-encode (assoc-ref body
-                                                               "spotify-url"))
+                                                                         "spotify-url"))
                                     #:created_by user-identifier
                                     #:created_at (current-time))
 
             (redirect-to rc
                          (string->uri (format #f
-                                       "~a/songs/uuid/~a?notify-title=~a"
-                                       (current-myhost)
-                                       (params rc "uuid")
-                                       (uri-encode (G_
-                                                    "Edited song succesfully!"))))
+                                              "~a/songs/uuid/~a?notify-title=~a"
+                                              (current-myhost)
+                                              (params rc "uuid")
+                                              (uri-encode (G_
+                                                           "Edited song succesfully!"))))
                          #:status 302)))
 
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic

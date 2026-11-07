@@ -38,16 +38,16 @@
   For 'genre', it compares against the 'genre_identifier'.
   For 'song' (or any other ENTITY), it compares against the 'song_identifier'."
   (let* ((k (cond
-              ((eq? entity
+              [(eq? entity
                     'artist)
-               'artist-identifier)
-              ((eq? entity
+               'artist-identifier]
+              [(eq? entity
                     'genre)
-               'genre-identifier)
-              ((eq? entity
+               'genre-identifier]
+              [(eq? entity
                     'song)
-               'song-identifier)
-              (else 'song-identifier))))
+               'song-identifier]
+              [else 'song-identifier])))
     (filter (lambda (related-entity)
               (equal? (assq-ref x
                                 'identifier)
@@ -74,20 +74,20 @@
   `asc' or `desc'.  The repository hands the result straight to `sql-select',
   so no query string is ever built out of it."
   (cond
-    ((equal? "created-at-desc" user-sort)
-     '((created-at desc)))
-    ((equal? "created-at-asc" user-sort)
-     '((created-at asc)))
-    ((equal? "last-edited-at-desc" user-sort)
-     '((last-edited-at desc)))
-    ((equal? "last-edited-at-asc" user-sort)
-     '((last-edited-at asc)))
-    ((equal? "display-name-desc" user-sort)
-     '((display-name desc)))
-    ((equal? "display-name-asc" user-sort)
-     '((display-name asc)))
-    ((equal? "views-desc" user-sort)
-     '((views desc)))
-    ((equal? "views-asc" user-sort)
-     '((views asc)))
-    (else '((last-edited-at desc)))))
+    [(equal? "created-at-desc" user-sort)
+     '((created-at desc))]
+    [(equal? "created-at-asc" user-sort)
+     '((created-at asc))]
+    [(equal? "last-edited-at-desc" user-sort)
+     '((last-edited-at desc))]
+    [(equal? "last-edited-at-asc" user-sort)
+     '((last-edited-at asc))]
+    [(equal? "display-name-desc" user-sort)
+     '((display-name desc))]
+    [(equal? "display-name-asc" user-sort)
+     '((display-name asc))]
+    [(equal? "views-desc" user-sort)
+     '((views desc))]
+    [(equal? "views-asc" user-sort)
+     '((views asc))]
+    [else '((last-edited-at desc))]))

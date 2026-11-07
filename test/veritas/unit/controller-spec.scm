@@ -52,74 +52,74 @@ format string with its arguments, which is the shape built here."
 (define (status-of answer)
   "Return the HTTP status ANSWER carries, or #f when there is no answer."
   (and answer
-       (car answer)))
+    (car answer)))
 
 (define (message-of answer)
   "Return the format string ANSWER carries, or #f when there is no answer."
   (and answer
-       (>= (length answer) 3)
-       (caddr answer)))
+    (>= (length answer) 3)
+    (caddr answer)))
 
 (define (message-args-of answer)
   "Return the arguments ANSWER's format string is filled in with, or #f when
 there is no answer."
   (and answer
-       (>= (length answer) 3)
-       (cdddr answer)))
+    (>= (length answer) 3)
+    (cdddr answer)))
 
 (define guard-suite
   (suite "The guard a mistyped address reaches"
-         (test "a row that was found is handed on as it is"
-               (assert-true (eq? found-row
-                                 (entity-or-404 found-row "song" "1c9a"))
-                            #:name "the very row comes back, not a copy")
-               (assert-equal #:name "and nothing about it is rewritten"
-                             #:expect found-row
-                             #:got (entity-or-404 found-row "song" "1c9a"))
-               (assert-true (eq? found-row
-                                 (entity-or-404 found-row "artist"
-                                                "a-mistyped-identifier"))
-                #:name "what it is called does not decide what it returns"))
+    (test "a row that was found is handed on as it is"
+      (assert-true (eq? found-row
+                        (entity-or-404 found-row "song" "1c9a"))
+        #:name "the very row comes back, not a copy")
+      (assert-equal #:name "and nothing about it is rewritten"
+        #:expect found-row
+        #:got (entity-or-404 found-row "song" "1c9a"))
+      (assert-true (eq? found-row
+                        (entity-or-404 found-row "artist"
+                                       "a-mistyped-identifier"))
+        #:name "what it is called does not decide what it returns"))
 
-         (test "a lookup that found nothing is answered with a 404"
-               (let ((answer (answer-for (lambda ()
-                                           (entity-or-404 #f "song" "nope")))))
-                 (assert-true (and answer #t)
-                              #:name "it raises rather than returning nothing")
-                 (assert-equal #:name
-                               "with the code artanis renders a page for"
-                               #:expect 404
-                               #:got (status-of answer))
-                 (assert-true (and (>= (length answer) 4) #t)
-                  #:name
-                  "in the shape artanis reads: code, name, message, arguments")
-                 (assert-true (and (string? (message-of answer)) #t)
-                              #:name "the message is a format string")
-                 (assert-true (and (list? (message-args-of answer)) #t)
-                              #:name "and its arguments come as a list")))
+    (test "a lookup that found nothing is answered with a 404"
+      (let ((answer (answer-for (lambda ()
+                                  (entity-or-404 #f "song" "nope")))))
+        (assert-true (and answer #t)
+          #:name "it raises rather than returning nothing")
+        (assert-equal #:name
+          "with the code artanis renders a page for"
+          #:expect 404
+          #:got (status-of answer))
+        (assert-true (and (>= (length answer) 4) #t)
+          #:name
+          "in the shape artanis reads: code, name, message, arguments")
+        (assert-true (and (string? (message-of answer)) #t)
+          #:name "the message is a format string")
+        (assert-true (and (list? (message-args-of answer)) #t)
+          #:name "and its arguments come as a list")))
 
-         (test "the answer says what was looked for, and where"
-               (let ((answer (answer-for (lambda ()
-                                           (entity-or-404 #f "genre"
-                                            "a-genre-that-is-not-there")))))
-                 (assert-equal #:name
-                  "the message names the kind of thing and the identifier"
-                  #:expect
-                  "no genre with the identifier a-genre-that-is-not-there"
-                  #:got (apply format #f
-                               (message-of answer)
-                               (message-args-of answer)))))
+    (test "the answer says what was looked for, and where"
+      (let ((answer (answer-for (lambda ()
+                                  (entity-or-404 #f "genre"
+                                                 "a-genre-that-is-not-there")))))
+        (assert-equal #:name
+          "the message names the kind of thing and the identifier"
+          #:expect
+          "no genre with the identifier a-genre-that-is-not-there"
+          #:got (apply format #f
+                       (message-of answer)
+                       (message-args-of answer)))))
 
-         (test
-          "a lookup that found an empty list is a lookup that found nothing"
-          ;; #f is what the repositories answer with, and the guard has to
-          ;; agree with them about what "there is no such thing" is.
-          (assert-equal #:name "an empty list is answered like #f"
-                        #:expect 404
-                        #:got (status-of (answer-for (lambda ()
-                                                       (entity-or-404 '()
-                                                                      "song"
-                                                                      "nope"))))))))
+    (test
+      "a lookup that found an empty list is a lookup that found nothing"
+      ;; #f is what the repositories answer with, and the guard has to
+      ;; agree with them about what "there is no such thing" is.
+      (assert-equal #:name "an empty list is answered like #f"
+        #:expect 404
+        #:got (status-of (answer-for (lambda ()
+                                       (entity-or-404 '()
+                                                      "song"
+                                                      "nope"))))))))
 
 ;;; ====== Who may change a row ======
 ;;;
@@ -141,32 +141,32 @@ there is no answer."
 
 (define ownership-suite
   (suite "The ownership half of who may change a row"
-         (test "the super grant changes any row, whoever made it"
-               (assert-true (may-mutate? #:session super-session
-                                         #:created-by "another-user")
-                            #:name "a row another user created")
-               (assert-true (may-mutate? #:session super-session
-                                         #:created-by "the-maintainer")
-                            #:name "and a row of its own"))
+    (test "the super grant changes any row, whoever made it"
+      (assert-true (may-mutate? #:session super-session
+                                #:created-by "another-user")
+        #:name "a row another user created")
+      (assert-true (may-mutate? #:session super-session
+                                #:created-by "the-maintainer")
+        #:name "and a row of its own"))
 
-         (test "a contributor changes the row they made"
-               (assert-true (may-mutate? #:session contributor-session
-                                         #:created-by "a-contributor")
-                            #:name "their own row is theirs to change"))
+    (test "a contributor changes the row they made"
+      (assert-true (may-mutate? #:session contributor-session
+                                #:created-by "a-contributor")
+        #:name "their own row is theirs to change"))
 
-         (test "a contributor does not change a row somebody else made"
-               (assert-false (may-mutate? #:session contributor-session
-                                          #:created-by "another-contributor")
-                             #:name "someone else's row is refused"))
+    (test "a contributor does not change a row somebody else made"
+      (assert-false (may-mutate? #:session contributor-session
+                                 #:created-by "another-contributor")
+        #:name "someone else's row is refused"))
 
-         (test
-          "a row that names no creator is only the super grant's to change"
-          (assert-false (may-mutate? #:session contributor-session
-                                     #:created-by #f)
-                        #:name "a row with no creator is refused")
-          (assert-true (may-mutate? #:session super-session
-                                    #:created-by #f)
-                       #:name "while the super grant may still change it"))))
+    (test
+      "a row that names no creator is only the super grant's to change"
+      (assert-false (may-mutate? #:session contributor-session
+                                 #:created-by #f)
+        #:name "a row with no creator is refused")
+      (assert-true (may-mutate? #:session super-session
+                                #:created-by #f)
+        #:name "while the super grant may still change it"))))
 
 (define (spec)
   (veritas-run guard-suite ownership-suite))

@@ -120,17 +120,17 @@ their own language rather than spelling as an address."
                             dark:text-stone-300
                             hover:text-persia-pink-500
                             dark:hover:text-persia-pink-300))))))
-           ,(preset-name G_ named))))
+          ,(preset-name G_ named))))
   `(nav (@ (aria-label ,(G_ "tuning presets"))
            (class ,(mk-class '(flex flex-col gap-3))))
         ,@(map (lambda (family)
                  `(div (@ (class ,(mk-class '(flex flex-col gap-1))))
                        (span (@ (class ,(mk-class '(text-xs
-                                                   uppercase
-                                                   tracking-wide
-                                                   font-semibold
-                                                   text-onyx-500
-                                                   dark:text-stone-300))))
+                                                    uppercase
+                                                    tracking-wide
+                                                    font-semibold
+                                                    text-onyx-500
+                                                    dark:text-stone-300))))
                              ,(family-name G_ family))
                        (div (@ (class ,(mk-class '(flex
                                                    flex-row
@@ -204,12 +204,12 @@ their own language rather than spelling as an address."
                                       items-end
                                       gap-4))))
                (span (@ (id ,(part "-note"))
-                         (class ,(mk-class '(text-5xl
-                                             font-bold
-                                             tabular-nums
-                                             leading-none
-                                             text-onyx-900
-                                             dark:text-stone-100))))
+                        (class ,(mk-class '(text-5xl
+                                            font-bold
+                                            tabular-nums
+                                            leading-none
+                                            text-onyx-900
+                                            dark:text-stone-100))))
                      "—")
                (div (@ (class ,(mk-class '(flex
                                            flex-row
@@ -238,8 +238,8 @@ their own language rather than spelling as an address."
                (div (@ (class "wm-tuner-track")) "")
                ,@(map (lambda (cents)
                         `(div (@ (class ,(if (zero? cents)
-                                            "wm-tuner-tick wm-tuner-tick-centre"
-                                            "wm-tuner-tick"))
+                                           "wm-tuner-tick wm-tuner-tick-centre"
+                                           "wm-tuner-tick"))
                                  (style ,(format #f "left: calc(50% + ~a%%)"
                                                  cents)))
                               ""))

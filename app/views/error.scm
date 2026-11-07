@@ -89,11 +89,11 @@ one: it is described by its class when it has one, and as a server failure
 when it has not, because that is what a page rendered for it would mean."
   (let ((row (assv status error-notes)))
     (cond
-      (row (cdr row))
-      ((and (>= status 400)
-            (< status 500))
-       (cdr (assv 400 error-notes)))
-      (else (cdr (assv 500 error-notes))))))
+      [row (cdr row)]
+      [(and (>= status 400)
+         (< status 500))
+       (cdr (assv 400 error-notes))]
+      [else (cdr (assv 500 error-notes))])))
 
 (define (error-headline status)
   "Return the one-line headline the page for STATUS leads with, in English.
@@ -103,8 +103,8 @@ wording of its own is described by its class -- the page still says what
 happened, even when nothing named that code."
   (let ((row (assv status error-notes)))
     (if row
-        (caddr (cdr row))
-        (format #f "the server answered ~a" status))))
+      (caddr (cdr row))
+      (format #f "the server answered ~a" status))))
 
 (define (error-detail status)
   "Return the paragraph the page for STATUS explains itself with.
@@ -113,8 +113,8 @@ The detail says what the reader can do next rather than what the server
 did wrong: a reader cannot act on the second and can act on the first."
   (let ((row (assv status error-notes)))
     (if row
-        (cadddr (cdr row))
-        "the server could not serve this request.  the pages below are still
+      (cadddr (cdr row))
+      "the server could not serve this request.  the pages below are still
 there.")))
 
 ;; The statuses the deployment answers with a page of its own.  The five are
@@ -190,7 +190,7 @@ invited to sign in again."
          ;; the class it reads as is what the page shows, over the code it
          ;; actually answered with.
          (drawing (car (error-note (if (assv status error-notes) status
-                                       (if (< status 500) 400 500))))))
+                                     (if (< status 500) 400 500))))))
     (html-template G_
                    #:title (format #f "~a · WikiMusic" status)
                    ;; A refusal is nothing to index and nothing to preview; the
@@ -243,11 +243,10 @@ invited to sign in again."
                                                   #:icon-css (append tone
                                                                      '(text-4xl
                                                                        sm:text-5xl)))
-                                           (span (@ (class ,(mk-class (append '
-                                                                       (font-bold
-                                                                        text-4xl
-                                                                        sm:text-5xl)
-                                                                       tone))))
+                                           (span (@ (class ,(mk-class (append '(font-bold
+                                                                                text-4xl
+                                                                                sm:text-5xl)
+                                                                              tone))))
                                                  ,(format #f "~a" status)))
                                       ,(wm-page-heading "dark:text-stone-500 font-light font-sans hg-leading-subtitle italic text-onyx-300 text-xl" (G_ (error-headline status)))
                                       (p (@ (class ,(mk-class '(text-onyx-300

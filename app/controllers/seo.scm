@@ -19,17 +19,17 @@
 (define-artanis-controller seo)
 
 (import (ice-9 format)
-        (ice-9 string-fun)
-        (kracht prelude)
-        (srfi srfi-1)
-        (srfi srfi-19)
-        (wikimusic domain artist)
-        (wikimusic domain genre)
-        (wikimusic domain song)
-        (wikimusic seo)
-        (wikimusic sqlite artist)
-        (wikimusic sqlite genre)
-        (wikimusic sqlite song))
+  (ice-9 string-fun)
+  (kracht prelude)
+  (srfi srfi-1)
+  (srfi srfi-19)
+  (wikimusic domain artist)
+  (wikimusic domain genre)
+  (wikimusic domain song)
+  (wikimusic seo)
+  (wikimusic sqlite artist)
+  (wikimusic sqlite genre)
+  (wikimusic sqlite song))
 
 ;; How many rows of each kind one sitemap carries.  The protocol's ceiling is
 ;; 50,000 addresses in a file of at most 50 MB, and the whole corpus of a
@@ -51,15 +51,15 @@
   "Return VALUE -- seconds since the epoch, as a number or as its digits -- as
 the `YYYY-MM-DD' a sitemap states, or #f when it is not a time at all."
   (let ((seconds (cond
-                   ((integer? value)
-                    value)
-                   ((string? value)
-                    (string->number value))
-                   (else #f))))
+                   [(integer? value)
+                    value]
+                   [(string? value)
+                    (string->number value)]
+                   [else #f])))
     (if (and seconds
-             (> seconds 0))
-        (date->string (time-utc->date (make-time time-utc 0 seconds))
-                      "~Y-~m-~d") #f)))
+          (> seconds 0))
+      (date->string (time-utc->date (make-time time-utc 0 seconds))
+                    "~Y-~m-~d") #f)))
 
 ;;; ====== Building the sitemap ======
 
@@ -71,14 +71,14 @@ keyword and left out of the element when it is #f, so a caller states only what
 it actually knows."
   `(url (loc ,loc)
         ,@(if lastmod
-              `((lastmod ,lastmod))
-              '())
+            `((lastmod ,lastmod))
+            '())
         ,@(if changefreq
-              `((changefreq ,changefreq))
-              '())
+            `((changefreq ,changefreq))
+            '())
         ,@(if priority
-              `((priority ,priority))
-              '())))
+            `((priority ,priority))
+            '())))
 
 (define* (entity-sitemap-entries rows
                                  #:key entity)
@@ -146,7 +146,7 @@ namespace has it in scope throughout, and a sitemap a crawler has to resolve a
 prefix in is one more thing that can be got wrong."
   (when (string-null? (site-origin))
     (throw 'artanis-err 500 sitemap
-     "no host name is configured, so this instance has no addresses to publish"))
+           "no host name is configured, so this instance has no addresses to publish"))
   `(urlset (@ (xmlns "http://www.sitemaps.org/schemas/sitemap/0.9"))
            ,@(sitemap-entries rc)))
 

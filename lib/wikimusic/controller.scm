@@ -60,8 +60,8 @@ handler that reads one field out of a body wants the same answer to it: an
 empty list, on which `assoc-ref' answers #f for every name."
   (let ((body (rc-body rc)))
     (if (nil? body)
-        '()
-        (alist-from-url-encoded-body body))))
+      '()
+      (alist-from-url-encoded-body body))))
 
 ;; A controller that has just done something the reader cannot see -- sent a
 ;; mail, refused a sign-in, changed a password -- has to say so on the page it
@@ -84,16 +84,16 @@ the flag the redirect already carries -- the flag @code{?created=true} becomes
 @code{?created=true&notify-title=...}.  When neither line is given the empty
 string comes back, so a caller may append the answer unconditionally."
   (if (and (or (not (string? title))
-               (equal? "" title))
-           (or (not (string? body))
-               (equal? "" body))) ""
-      (string-append "&notify-title="
-                     (uri-encode (if (string? title) title ""))
-                     "&notify-body="
-                     (uri-encode (if (string? body) body ""))
-                     (if duration-millis
-                         (format #f "&notify-duration-millis=~a"
-                                 duration-millis) ""))))
+             (equal? "" title))
+        (or (not (string? body))
+          (equal? "" body))) ""
+    (string-append "&notify-title="
+                   (uri-encode (if (string? title) title ""))
+                   "&notify-body="
+                   (uri-encode (if (string? body) body ""))
+                   (if duration-millis
+                     (format #f "&notify-duration-millis=~a"
+                             duration-millis) ""))))
 
 (define* (entity-or-404 entity entity-name identifier)
   "Return ENTITY, or answer the request with a 404 page when there is none.
@@ -127,12 +127,12 @@ The identifier the lookup was made with, so the log says which one.
 (entity-or-404 (get-song-by-id song-repo song-id) \"song\" song-id)
 @end example"
   (if (nil? entity)
-      (throw 'artanis-err
-             404
-             entity-or-404
-             "no ~a with the identifier ~a"
-             entity-name
-             identifier) entity))
+    (throw 'artanis-err
+           404
+           entity-or-404
+           "no ~a with the identifier ~a"
+           entity-name
+           identifier) entity))
 
 ;;; ====== Who may change a row ======
 ;;;
@@ -148,10 +148,10 @@ This is the same token `authorized-payload' opens, read again where a route
 needs to know *who* is asking rather than only whether they hold a permission."
   (let ((token (:cookies-value rc session-cookie-name)))
     (and (string? token)
-         (not (string-null? token))
-         (decrypt-token #:token token
-                        #:encryption-key encryption-key
-                        #:signing-key signing-key))))
+      (not (string-null? token))
+      (decrypt-token #:token token
+                     #:encryption-key encryption-key
+                     #:signing-key signing-key))))
 
 (define* (may-mutate? #:key session created-by)
   "Return #t when SESSION may change a row whose `created_by' is CREATED-BY.
@@ -163,10 +163,10 @@ session may change it."
   (or (has-needed-permissions? #:needed '(wikimusic:modify-permissions)
                                #:present (assoc-ref session
                                                     'owner-permissions))
-      (and (assoc-ref session
-                      'owner-id)
-           (equal? (assoc-ref session
-                              'owner-id) created-by))))
+    (and (assoc-ref session
+                    'owner-id)
+      (equal? (assoc-ref session
+                         'owner-id) created-by))))
 
 (define (forbidden rc)
   "Answer the request in RC with the 403 page, the same one every other status
@@ -189,8 +189,8 @@ route, so a caller only has to write
 and cannot forget to refuse."
   (let ((session (session-payload rc)))
     (unless (and session
-                 (may-mutate? #:session session
-                              #:created-by created-by))
+              (may-mutate? #:session session
+                           #:created-by created-by))
       (throw 'artanis-err 403 guard-owner
              "the session may not change a row created by ~a" created-by)) #t))
 
@@ -218,8 +218,8 @@ nothing there to change."
                                      #:limit 1)
                          #:name (format #f "guard-~a" table)))
          (created-by (and (pair? rows)
-                          (assq-ref (car rows)
-                                    'created-by))))
+                       (assq-ref (car rows)
+                                 'created-by))))
     (when (null? rows)
       (throw 'artanis-err
              404
@@ -253,16 +253,16 @@ the session's own user."
   (let* ((body (body-alist rc))
          (session (session-payload rc))
          (created-by (and session
-                          (assoc-ref session
-                                     'owner-id)))
+                       (assoc-ref session
+                                  'owner-id)))
          (contents (assoc-ref body "contents"))
          (parent (assoc-ref body "parent-identifier"))
          (parent (and (string? parent)
-                      (not (string=? parent ""))
-                      (html-escape parent))))
+                   (not (string=? parent ""))
+                   (html-escape parent))))
     (when (and created-by
-               (string? contents)
-               (not (string=? contents "")))
+            (string? contents)
+            (not (string=? contents "")))
       ;; A nullable column is left out rather than written as #f: kracht
       ;; renders a bound #f as the literal 0, which `approved_by' -- a foreign
       ;; key to a user -- would then have to resolve, so an absent parent is an
@@ -279,8 +279,8 @@ the session's own user."
                         (created-at unquote
                                     (current-time))
                         ,@(if parent
-                              `((parent-identifier unquote parent))
-                              '()))))
+                            `((parent-identifier unquote parent))
+                            '()))))
     (redirect-to rc
                  (string->uri redirect-url)
                  #:status 302)))
@@ -296,22 +296,22 @@ comment that is not there is a 404; one somebody else wrote is a 403."
          (row (get-comment-by-id repository entity comment-identifier))
          (contents (assoc-ref (body-alist rc) "contents")))
     (cond
-      ((not row)
-       (forbidden rc))
-      ((not (guard-owner #:rc rc
+      [(not row)
+       (forbidden rc)]
+      [(not (guard-owner #:rc rc
                          #:created-by (assq-ref row
                                                 'created-by)))
-       #f)
-      (else (when (and (string? contents)
-                       (not (string=? contents "")))
+       #f]
+      [else (when (and (string? contents)
+                    (not (string=? contents "")))
               (update-comment-by-id repository entity comment-identifier
                                     `((contents unquote
                                                 (html-escape contents))
                                       (last-edited-at unquote
                                                       (current-time)))))
-            (redirect-to rc
-                         (string->uri redirect-url)
-                         #:status 302)))))
+        (redirect-to rc
+                     (string->uri redirect-url)
+                     #:status 302)])))
 
 (define* (comment-delete #:key rc entity comment-identifier redirect-url)
   "Delete the comment COMMENT-IDENTIFIER of ENTITY, then send the client on to
@@ -325,16 +325,16 @@ taking their words with it."
   (let* ((repository (make-sqlite-comment-repository rc))
          (row (get-comment-by-id repository entity comment-identifier)))
     (cond
-      ((not row)
-       (forbidden rc))
-      ((not (guard-owner #:rc rc
+      [(not row)
+       (forbidden rc)]
+      [(not (guard-owner #:rc rc
                          #:created-by (assq-ref row
                                                 'created-by)))
-       #f)
-      (else (delete-comment-by-id repository entity comment-identifier)
-            (redirect-to rc
-                         (string->uri redirect-url)
-                         #:status 302)))))
+       #f]
+      [else (delete-comment-by-id repository entity comment-identifier)
+        (redirect-to rc
+                     (string->uri redirect-url)
+                     #:status 302)])))
 
 (define* (delete-artwork #:key rc entity artwork-identifier redirect-url)
   "Delete one artwork of ENTITY, identified by ARTWORK-IDENTIFIER, and send the

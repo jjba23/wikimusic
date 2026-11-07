@@ -32,38 +32,38 @@
                            pages
                            is-logged-in)
   (let* ((page (if (and limit
-                        (> limit 0))
-                   (+ 1
-                      (quotient offset limit)) 1))
+                     (> limit 0))
+                 (+ 1
+                    (quotient offset limit)) 1))
          (searching? (and (string? search-query)
-                          (not (string-null? search-query))))
+                       (not (string-null? search-query))))
          (list-title (if searching?
-                      (format #f "Artists matching “~a” | WikiMusic"
-                              search-query)
-                      "Artists: bands and musicians, with their songs and tabs | WikiMusic"))
+                       (format #f "Artists matching “~a” | WikiMusic"
+                               search-query)
+                       "Artists: bands and musicians, with their songs and tabs | WikiMusic"))
          (list-description (if searching?
-                            (format #f
-                             "Artists on WikiMusic matching “~a”, with their songs, tabs and chords."
-                             search-query)
-                            "Every artist and band on WikiMusic, with the songs, guitar and bass tabs and chords written about them."))
+                             (format #f
+                                     "Artists on WikiMusic matching “~a”, with their songs, tabs and chords."
+                                     search-query)
+                             "Every artist and band on WikiMusic, with the songs, guitar and bass tabs and chords written about them."))
          (page-buttons (if (and pages
-                                (> pages 1))
-                           (pagination #:current page
-                                       #:total pages
-                                       #:base-url (format #f
-                                                   "/artists?limit=~a&sort=~a~a&page="
-                                                   limit
-                                                   (or user-sort "")
-                                                   (if (and search-query
-                                                            (not (equal?
-                                                                  search-query
-                                                                  "")))
-                                                       (format #f "&search=~a"
-                                                               search-query)
-                                                       ""))
-                                       #:prev-label (G_ "previous")
-                                       #:next-label (G_ "next"))
-                           '()))
+                             (> pages 1))
+                         (pagination #:current page
+                                     #:total pages
+                                     #:base-url (format #f
+                                                        "/artists?limit=~a&sort=~a~a&page="
+                                                        limit
+                                                        (or user-sort "")
+                                                        (if (and search-query
+                                                              (not (equal?
+                                                                    search-query
+                                                                    "")))
+                                                          (format #f "&search=~a"
+                                                                  search-query)
+                                                          ""))
+                                     #:prev-label (G_ "previous")
+                                     #:next-label (G_ "next"))
+                         '()))
          (body `(div (@ (class ,(mk-class '(px-4 md:px-8
                                                  py-2
                                                  flex
@@ -77,50 +77,48 @@
                                                  justify-center
                                                  md:justify-between))))
                      (,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-title text-2xl text-onyx-300" `(span (@ (class ,(mk-class '(flex flex-row
-                                                             items-center
-                                                             items-center
-                                                             gap-1))))
-                                 ,(G_ "viewing artists:"))) (div (@ (class ,(mk-class '(flex
-                                                                              flex-wrap
-                                                                              flex-row
-                                                                              justify-center
-                                                                              gap-2))))
-                                                       (div (@ (class ,(mk-class '
-                                                                        (flex
-                                                                         flex-wrap
-                                                                         flex-row
-                                                                         justify-start
-                                                                         items-center))))
-                                                            ,(sort-select G_
-                                                              #:entity 'artist
-                                                              #:user-sort
-                                                              user-sort)
-                                                            ,(grid-size-select
-                                                              G_
-                                                              #:entity 'artist
-                                                              #:size grid-size
-                                                              #:search-query
-                                                              search-query))
-                                                       (div (@ (class ,(mk-class '
-                                                                        (flex
-                                                                         flex-wrap
-                                                                         flex-row
-                                                                         gap-3
-                                                                         justify-end
-                                                                         items-center))))
+                                                                                                                                                              items-center
+                                                                                                                                                              items-center
+                                                                                                                                                              gap-1))))
+                                                                                                                                  ,(G_ "viewing artists:"))) (div (@ (class ,(mk-class '(flex
+                                                                                                                                                                                         flex-wrap
+                                                                                                                                                                                         flex-row
+                                                                                                                                                                                         justify-center
+                                                                                                                                                                                         gap-2))))
+                                                                                                                                                                  (div (@ (class ,(mk-class '(flex
+                                                                                                                                                                                              flex-wrap
+                                                                                                                                                                                              flex-row
+                                                                                                                                                                                              justify-start
+                                                                                                                                                                                              items-center))))
+                                                                                                                                                                       ,(sort-select G_
+                                                                                                                                                                                     #:entity 'artist
+                                                                                                                                                                                     #:user-sort
+                                                                                                                                                                                     user-sort)
+                                                                                                                                                                       ,(grid-size-select
+                                                                                                                                                                         G_
+                                                                                                                                                                         #:entity 'artist
+                                                                                                                                                                         #:size grid-size
+                                                                                                                                                                         #:search-query
+                                                                                                                                                                         search-query))
+                                                                                                                                                                  (div (@ (class ,(mk-class '(flex
+                                                                                                                                                                                              flex-wrap
+                                                                                                                                                                                              flex-row
+                                                                                                                                                                                              gap-3
+                                                                                                                                                                                              justify-end
+                                                                                                                                                                                              items-center))))
 
-                                                            ,(search-box G_
-                                                              #:search-query
-                                                              search-query)))
+                                                                                                                                                                       ,(search-box G_
+                                                                                                                                                                                    #:search-query
+                                                                                                                                                                                    search-query)))
                       (div (div (@ (class ,(item-tile-grid-face #:size
                                                                 grid-size)))
                                 ,(map (lambda (x)
                                         `(div ,(item-tile G_
                                                           'artist x
                                                           (relevant-entities 'artist
-                                                           artworks x)
+                                                                             artworks x)
                                                           (relevant-entities 'artist
-                                                           comments x))))
+                                                                             comments x))))
                                       artists))
                            ,page-buttons
                            ,(hr)
@@ -133,13 +131,13 @@
                    #:title list-title
                    #:description list-description
                    #:path (if (and (= page 1)
-                                   (not searching?)) "/artists" #f)
+                                (not searching?)) "/artists" #f)
                    #:robots (if (or searching?
-                                    (> page 1)) "noindex, follow" #f)
+                                  (> page 1)) "noindex, follow" #f)
                    #:json-ld (list (page-json-ld #:type "CollectionPage"
                                                  #:url (if searching? #f
-                                                           (absolute-url
-                                                            "/artists"))
+                                                         (absolute-url
+                                                          "/artists"))
                                                  #:name list-title
                                                  #:description
                                                  list-description))
@@ -162,10 +160,10 @@
          (page-title (format #f "~a — songs, guitar tabs & chords | WikiMusic"
                              artist-name))
          (page-description (summarize (string-append artist-name
-                                       " on WikiMusic: the songs written about them, with their chords, keys and tabs. "
-                                       (let ((written (assq-ref artist
-                                                                'description)))
-                                         (if (string? written) written "")))
+                                                     " on WikiMusic: the songs written about them, with their chords, keys and tabs. "
+                                                     (let ((written (assq-ref artist
+                                                                              'description)))
+                                                       (if (string? written) written "")))
                                       #:limit 300)))
     (html-template G_
                    #:is-logged-in is-logged-in
@@ -191,21 +189,21 @@
                                                                             (assq-ref
                                                                              artist
                                                                              'description))
-                                                                           (list
-                                                                            (cons
-                                                                             "description"
-                                                                             (summarize
-                                                                              (assq-ref
-                                                                               artist
-                                                                               'description)
-                                                                              #:limit
-                                                                              300)))
-                                                                           '()))))
+                                                                         (list
+                                                                          (cons
+                                                                           "description"
+                                                                           (summarize
+                                                                            (assq-ref
+                                                                             artist
+                                                                             'description)
+                                                                            #:limit
+                                                                            300)))
+                                                                         '()))))
                    #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
                                                              md:py-4))))
                                  ((div (@ (class ,(mk-class '(py-4))))
                                        ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display leading-10 md:text-10 text-3xl text-onyx-300" (assq-ref artist
-                                                      'display-name)))
+                                                                                                                                                                              'display-name)))
                                   (div (div ,(entity-details G_
                                                              #:entity 'artist
                                                              #:x artist

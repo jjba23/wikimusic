@@ -225,21 +225,21 @@ the menu with @code{for}, so it reaches assistive technology as well."
              (method "POST")
              (enctype "application/x-www-form-urlencoded")
              (class ,(mk-class '(wm-locale
-                                      flex flex-row
-                                      flex-wrap
-                                      items-center
-                                      gap-1
-                                      px-2
-                                      py-1
-                                      w-fit
-                                      rounded-xl
-                                      hg-frost
-                                      bg-stone-100/75
-                                      dark:bg-onyx-900/75
-                                      border-2
-                                      border-china-violet-500/25
-                                      dark:border-china-violet-300/25
-                                      shadow-md))))
+                                 flex flex-row
+                                 flex-wrap
+                                 items-center
+                                 gap-1
+                                 px-2
+                                 py-1
+                                 w-fit
+                                 rounded-xl
+                                 hg-frost
+                                 bg-stone-100/75
+                                 dark:bg-onyx-900/75
+                                 border-2
+                                 border-china-violet-500/25
+                                 dark:border-china-violet-300/25
+                                 shadow-md))))
           ,@(if return-to
               `((input (@ (type "hidden")
                           (name "return-to")
@@ -281,9 +281,9 @@ the menu with @code{for}, so it reaches assistive technology as well."
                         #:content (G_ "use")
                         #:type 'submit
                         #:extra-classes '(shrink-0 py-1 px-2 max-w-prose
-                                               cursor-pointer
-                                               text-onyx-700
-                                               dark:text-stone-300)
+                                                   cursor-pointer
+                                                   text-onyx-700
+                                                   dark:text-stone-300)
                         #:icon-css '(text-lg text-onyx-700 dark:text-stone-300)))))
 
 ;;; Every page carries these, so they are the site's smallest scripts: what a
@@ -1745,16 +1745,16 @@ throw the results away."
     `((div (@ (role "group")
               (aria-label ,(G_ "tile size"))
               (class ,(mk-class '(wm-tile-size
-                                              inline-flex flex-row
-                                              items-center
-                                              gap-1
-                                              p-1
-                                              rounded-xl
-                                              border
-                                              border-persia-pink-100/25
-                                              dark:border-persia-pink-900/10
-                                              bg-stone-100/50
-                                              dark:bg-onyx-900/50))))
+                                  inline-flex flex-row
+                                  items-center
+                                  gap-1
+                                  p-1
+                                  rounded-xl
+                                  border
+                                  border-persia-pink-100/25
+                                  dark:border-persia-pink-900/10
+                                  bg-stone-100/50
+                                  dark:bg-onyx-900/50))))
            ,@(map (lambda (choice)
                     (let ((name (car choice))
                           (glyph (cadr choice))
@@ -1897,7 +1897,7 @@ disabled stepper rather than as a link to nowhere."
     ;; `auto' keeps the page's own surface, and the pink hairline the paper
     ;; has always carried against it.
     [else '(bg-white dark:bg-onyx-900 text-black dark:text-white
-            border-persia-pink-100/25 dark:border-persia-pink-900/10)]))
+                     border-persia-pink-100/25 dark:border-persia-pink-900/10)]))
 
 (define ascii-face-steps '("mono" "sans" "serif"))
 (define ascii-face-default "mono")
@@ -1910,7 +1910,7 @@ disabled stepper rather than as a link to nowhere."
 
 (define (ascii-face-class face)
   "Return the class an ascii block is set in @var{face} with."
-  (case (string->symbol (ascii-face-known face))
+  (case [string->symbol (ascii-face-known face)]
     [(sans) 'font-sans]
     [(serif) 'font-serif]
     [else 'font-mono]))
@@ -1972,36 +1972,36 @@ builds carries them, so resizing the text does not reset them."
                                         #:paper paper
                                         #:face face)))
          (stepper (lambda (step glyph wording)
-                   `(,(if step 'a 'span)
-                     (@ (aria-label ,(G_ wording))
-                        (title ,(G_ wording))
-                        ,@(if step
-                            `((href ,(href step)))
-                            '((aria-disabled "true")))
-                        (class
-                         ,(mk-class
-                           (append '(wm-size-step
-                                                     inline-flex items-center
-                                                 justify-center
-                                                 p-1
-                                                 rounded-lg
-                                                 select-none
-                                                 transition-colors
-                                                 duration-150)
-                                   (if step
-                                     '(cursor-pointer
-                                       text-onyx-300/70
-                                       dark:text-stone-300/70
-                                       hover:bg-stone-300/40
-                                       dark:hover:bg-onyx-500/40
-                                       hover:text-persia-pink-500
-                                       dark:hover:text-persia-pink-300
-                                       active:scale-95)
-                                     '(cursor-not-allowed
-                                       text-onyx-300/25
-                                       dark:text-stone-300/25))))))
-                     ,(icon #:type glyph
-                            #:icon-css '(text-base))))))
+                    `(,(if step 'a 'span)
+                      (@ (aria-label ,(G_ wording))
+                         (title ,(G_ wording))
+                         ,@(if step
+                             `((href ,(href step)))
+                             '((aria-disabled "true")))
+                         (class
+                          ,(mk-class
+                            (append '(wm-size-step
+                                      inline-flex items-center
+                                      justify-center
+                                      p-1
+                                      rounded-lg
+                                      select-none
+                                      transition-colors
+                                      duration-150)
+                                    (if step
+                                      '(cursor-pointer
+                                        text-onyx-300/70
+                                        dark:text-stone-300/70
+                                        hover:bg-stone-300/40
+                                        dark:hover:bg-onyx-500/40
+                                        hover:text-persia-pink-500
+                                        dark:hover:text-persia-pink-300
+                                        active:scale-95)
+                                      '(cursor-not-allowed
+                                        text-onyx-300/25
+                                        dark:text-stone-300/25))))))
+                      ,(icon #:type glyph
+                             #:icon-css '(text-base))))))
     `((div (@ (role "group")
               (aria-label ,(G_ "ascii size"))
               (class "wm-size-control"))
@@ -2062,10 +2062,10 @@ option's address carries the other two preferences (see
                                                #:size size
                                                #:paper paper
                                                #:face face))
-                                    ,@(if (equal? option selected)
-                                        '((selected ""))
-                                        '()))
-                             ,(G_ option)))
+                                      ,@(if (equal? option selected)
+                                          '((selected ""))
+                                          '()))
+                                   ,(G_ option)))
                         options)))))
 
 ;;; The search control, and where it takes the words it is given.
@@ -2122,10 +2122,10 @@ function addSearchQueryParam(form) {
                   (role "search")
                   (onsubmit "addSearchQueryParam(this)")
                   (class ,(mk-class (append '(wm-search flex flex-row
-                                                         flex-nowrap
-                                                         items-stretch
-                                                         w-full max-w-prose
-                                                         shadow-md)
+                                                        flex-nowrap
+                                                        items-stretch
+                                                        w-full max-w-prose
+                                                        shadow-md)
                                             (if centered?
                                               '(mx-auto)
                                               '())))))

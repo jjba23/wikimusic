@@ -22,9 +22,9 @@
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 format)
   #:export (tuning-presets tuning-families tuning-presets-in
-            tuning-preset-family
-            tuning-preset preset-id-named
-            midi-note-frequency midi-note-name))
+                           tuning-preset-family
+                           tuning-preset preset-id-named
+                           midi-note-frequency midi-note-name))
 
 ;;; The strings of each preset, as the notes of a piano keyboard: A4 -- the
 ;;; reference pitch a tuner is calibrated against -- is 69.
@@ -89,7 +89,7 @@
 PRESET is a symbol a link carried, so a name nothing offers answers the
 default guitar tuning rather than an empty instrument."
   (cddr (or (assq preset tuning-presets)
-            (assq default-preset tuning-presets))))
+          (assq default-preset tuning-presets))))
 
 (define (preset-id-named name)
   "Return the preset NAME names, or the default when no preset is called that.
@@ -99,9 +99,9 @@ when nothing was asked -- so it is compared against the presets that exist
 rather than turned into a symbol and looked up: a name nobody offers is a
 reader's guess at an address, not a new preset."
   (let ((offered (and (string? name)
-                      (find (lambda (preset)
-                              (string=? name (symbol->string (car preset))))
-                            tuning-presets))))
+                   (find (lambda (preset)
+                           (string=? name (symbol->string (car preset))))
+                         tuning-presets))))
     (if offered (car offered) default-preset)))
 
 ;;; The reference pitch.  A4 is 440 hertz by definition and every other note is

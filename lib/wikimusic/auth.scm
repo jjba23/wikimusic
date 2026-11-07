@@ -90,16 +90,16 @@ it is read -- asking a #f payload about its expiry would raise rather than
 refuse, which is how a bad cookie used to reach the error page instead of the
 sign-in page."
   (let ((payload (and (string? token)
-                      (not (string-null? token))
-                      (decrypt-token #:token token
-                                     #:encryption-key encryption-key
-                                     #:signing-key signing-key))))
+                   (not (string-null? token))
+                   (decrypt-token #:token token
+                                  #:encryption-key encryption-key
+                                  #:signing-key signing-key))))
     (and payload
-         (token-valid? #:token payload)
-         (has-needed-permissions? #:needed needed
-                                  #:present (assoc-ref payload
-                                                       'owner-permissions))
-         payload)))
+      (token-valid? #:token payload)
+      (has-needed-permissions? #:needed needed
+                               #:present (assoc-ref payload
+                                                    'owner-permissions))
+      payload)))
 
 (define* (bewaking-endpoint #:key token-name
                             needed-permissions
@@ -117,8 +117,8 @@ up by string."
                                                           token-name))
                                  #:needed needed-permissions)))
     (if who
-        (happy-flow)
-        (unhappy-flow rc))))
+      (happy-flow)
+      (unhappy-flow rc))))
 
 (define* (bewaking-api-endpoint #:key token-name
                                 needed-permissions
@@ -132,8 +132,8 @@ instead of a cookie, which suits clients that have no cookie jar."
                                                       token-name))
                                  #:needed needed-permissions)))
     (if who
-        (happy-flow)
-        (unhappy-flow rc))))
+      (happy-flow)
+      (unhappy-flow rc))))
 
 (define (unauthorized-api-message rc)
   (response-emit '((error . "You must be authenticated to use this API endpoint"))
@@ -158,14 +158,14 @@ instead of a cookie, which suits clients that have no cookie jar."
 (define (datum-second datum)
   "Return the second element of DATUM, or the empty list when there is none."
   (if (and (pair? datum)
-           (pair? (cdr datum)))
-      (cadr datum)
-      '()))
+        (pair? (cdr datum)))
+    (cadr datum)
+    '()))
 
 (define (datum-head datum)
   "Return the first element of DATUM, or #f when it does not have one."
   (if (pair? datum)
-      (car datum) #f))
+    (car datum) #f))
 
 (define* (permissions-from-column value)
   "Return the permission list held in the users' PERMISSIONS column VALUE, or
@@ -173,16 +173,16 @@ the empty list when the column is empty or cannot be read."
   (catch #t
          (lambda ()
            (if (or (not (string? value))
-                   (string-null? value))
-               '()
-               (let ((datum (read (open-input-string value))))
-                 (cond
-                   ((eq? (datum-head datum)
-                         'quasiquote)
-                    (datum-second datum))
-                   ((list? datum)
-                    datum)
-                   (else '())))))
+                 (string-null? value))
+             '()
+             (let ((datum (read (open-input-string value))))
+               (cond
+                 [(eq? (datum-head datum)
+                       'quasiquote)
+                  (datum-second datum)]
+                 [(list? datum)
+                  datum]
+                 [else '()]))))
          (lambda (key . args)
            '())))
 
@@ -208,8 +208,8 @@ the empty list when the column is empty or cannot be read."
   "Return the symbol naming the strongest password KDF this build can use:
 `argon2id' when libgcrypt provides Argon2, and `pbkdf2-sha256' otherwise."
   (if (argon2id-available?)
-      'argon2id
-      'pbkdf2-sha256))
+    'argon2id
+    'pbkdf2-sha256))
 
 (define (salt->hex salt)
   (bytes->base16 salt))
@@ -231,7 +231,7 @@ The salt is drawn fresh here, which is why the users table's own `salt' column
 is no longer read for anything but the legacy scheme."
   (let ((salt (random-bytes password-salt-length)))
     (case algorithm
-      ((argon2id)
+      [(argon2id)
        (format #f
                "argon2id$~a$~a$~a$~a$~a"
                argon2id-iterations
@@ -246,102 +246,102 @@ is no longer read for anything but the legacy scheme."
                                                #:iterations
                                                argon2id-iterations
                                                #:parallelism
-                                               argon2id-parallelism))))
-      ((pbkdf2-sha256)
+                                               argon2id-parallelism)))]
+      [(pbkdf2-sha256)
        (format #f "pbkdf2-sha256$~a$~a$~a" pbkdf2-iterations
                (salt->hex salt)
                (bytes->base16 (pbkdf2-sha256 password salt
                                              password-hash-length
-                                             #:iterations pbkdf2-iterations))))
-      (else (error "hash-password: unknown algorithm" algorithm)))))
+                                             #:iterations pbkdf2-iterations)))]
+      [else (error "hash-password: unknown algorithm" algorithm)])))
 
 (define (constant-time-string=? a b)
   "Return #t when strings A and B are equal, comparing every character either
 way so that the time taken does not say how much of a wrong value was right."
   (if (not (= (string-length a)
               (string-length b))) #f
-      (let loop
-        ((i 0)
-         (same? #t))
-        (if (= i
-               (string-length a)) same?
-            (loop (+ i 1)
-                  (and same?
-                       (char=? (string-ref a i)
-                               (string-ref b i))))))))
+    (let loop
+      ((i 0)
+       (same? #t))
+      (if (= i
+             (string-length a)) same?
+        (loop (+ i 1)
+              (and same?
+                (char=? (string-ref a i)
+                        (string-ref b i))))))))
 
 (define (hex-derived=? computed stored)
   "Return #t when the hexadecimal COMPUTED key equals the hexadecimal STORED
 one, in a way that does not leak where they first differ."
   (and (string? stored)
-       (constant-time-string=? computed stored)))
+    (constant-time-string=? computed stored)))
 
 (define (verify-argon2id password stored)
   (let ((parts (string-split stored #\$)))
     (if (not (= (length parts) 6)) #f
-        (let ((iterations (string->number (list-ref parts 1)))
-              (memory-kib (string->number (list-ref parts 2)))
-              (parallelism (string->number (list-ref parts 3)))
-              (salt (catch #t
-                           (lambda ()
-                             (hex->salt (list-ref parts 4)))
-                           (lambda (key . args)
-                             #f)))
-              (expected (list-ref parts 5)))
-          (if (or (not iterations)
-                  (not memory-kib)
-                  (not parallelism)
-                  (not salt)) #f
-              (catch #t
-                     (lambda ()
-                       (hex-derived=? (bytes->base16 (argon2id-derive password
-                                                      salt
-                                                      (/ (string-length
-                                                          expected) 2)
-                                                      #:memory-kib memory-kib
-                                                      #:iterations iterations
-                                                      #:parallelism
-                                                      parallelism)) expected))
-                     (lambda (key . args)
-                       #f)))))))
+      (let ((iterations (string->number (list-ref parts 1)))
+            (memory-kib (string->number (list-ref parts 2)))
+            (parallelism (string->number (list-ref parts 3)))
+            (salt (catch #t
+                         (lambda ()
+                           (hex->salt (list-ref parts 4)))
+                         (lambda (key . args)
+                           #f)))
+            (expected (list-ref parts 5)))
+        (if (or (not iterations)
+              (not memory-kib)
+              (not parallelism)
+              (not salt)) #f
+          (catch #t
+                 (lambda ()
+                   (hex-derived=? (bytes->base16 (argon2id-derive password
+                                                                  salt
+                                                                  (/ (string-length
+                                                                      expected) 2)
+                                                                  #:memory-kib memory-kib
+                                                                  #:iterations iterations
+                                                                  #:parallelism
+                                                                  parallelism)) expected))
+                 (lambda (key . args)
+                   #f)))))))
 
 (define (verify-pbkdf2 password stored)
   (let ((parts (string-split stored #\$)))
     (if (not (= (length parts) 4)) #f
-        (let ((iterations (string->number (list-ref parts 1)))
-              (salt (catch #t
-                           (lambda ()
-                             (hex->salt (list-ref parts 2)))
-                           (lambda (key . args)
-                             #f)))
-              (expected (list-ref parts 3)))
-          (if (or (not iterations)
-                  (not salt)) #f
-              (catch #t
-                     (lambda ()
-                       (hex-derived=? (bytes->base16 (pbkdf2-sha256 password
-                                                      salt
-                                                      (/ (string-length
-                                                          expected) 2)
-                                                      #:iterations iterations))
-                                      expected))
-                     (lambda (key . args)
-                       #f)))))))
+      (let ((iterations (string->number (list-ref parts 1)))
+            (salt (catch #t
+                         (lambda ()
+                           (hex->salt (list-ref parts 2)))
+                         (lambda (key . args)
+                           #f)))
+            (expected (list-ref parts 3)))
+        (if (or (not iterations)
+              (not salt)) #f
+          (catch #t
+                 (lambda ()
+                   (hex-derived=? (bytes->base16 (pbkdf2-sha256 password
+                                                                salt
+                                                                (/ (string-length
+                                                                    expected) 2)
+                                                                #:iterations iterations))
+                                  expected))
+                 (lambda (key . args)
+                   #f)))))))
 
 (define (verify-legacy-password password hash salt)
   "Verify PASSWORD the way wikimusic did before passwords were derived with a
 KDF: SHA-256 over the password followed by the salt kept beside it."
   (and (string? hash)
-       (string? salt)
-       (constant-time-string=? (string->sha-256 (string-append password salt))
-                               hash)))
+    (string? salt)
+    (constant-time-string=? (string->sha-256 (string-append password salt))
+                            hash)))
 
 (define (password-hash-legacy? hash)
   "Return #t when HASH was written by the old scheme, which `verify-password'
 still accepts and which a successful sign-in replaces."
   (and (string? hash)
-       (not (string-prefix? "argon2id$" hash))
-       (not (string-prefix? "pbkdf2-sha256$" hash))))
+    (not (string-prefix? "argon2id$" hash))
+    (not (string-prefix? "pbkdf2-sha256$" hash))))
 
 (define* (verify-password password
                           #:key hash salt)
@@ -351,10 +351,10 @@ HASH is the users table's `password' column and SALT its `salt' column: the
 current schemes carry their own salt, the legacy one needs the column, and a
 row whose hash is missing or unreadable is simply not a match."
   (cond
-    ((not (string? hash))
-     #f)
-    ((string-prefix? "argon2id$" hash)
-     (verify-argon2id password hash))
-    ((string-prefix? "pbkdf2-sha256$" hash)
-     (verify-pbkdf2 password hash))
-    (else (verify-legacy-password password hash salt))))
+    [(not (string? hash))
+     #f]
+    [(string-prefix? "argon2id$" hash)
+     (verify-argon2id password hash)]
+    [(string-prefix? "pbkdf2-sha256$" hash)
+     (verify-pbkdf2 password hash)]
+    [else (verify-legacy-password password hash salt)]))

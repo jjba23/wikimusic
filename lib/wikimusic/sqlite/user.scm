@@ -39,7 +39,7 @@
                                           #:where (list (cons 'email email))
                                           #:limit 1))))
       (if (nil? rows) #f
-          (car rows))))
+        (car rows))))
 
   (define (get-user-by-id id)
     (let ((rows (execute-read "get-user-by-id"
@@ -48,7 +48,7 @@
                                           #:where (list (cons 'identifier id))
                                           #:limit 1))))
       (if (nil? rows) #f
-          (car rows))))
+        (car rows))))
 
   (define (get-users)
     (execute-read "get-users"

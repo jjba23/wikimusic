@@ -32,38 +32,38 @@
                           pages
                           is-logged-in)
   (let* ((page (if (and limit
-                        (> limit 0))
-                   (+ 1
-                      (quotient offset limit)) 1))
+                     (> limit 0))
+                 (+ 1
+                    (quotient offset limit)) 1))
          (searching? (and (string? search-query)
-                          (not (string-null? search-query))))
+                       (not (string-null? search-query))))
          (list-title (if searching?
-                      (format #f "Genres matching “~a” | WikiMusic"
-                              search-query)
-                      "Genres: styles and traditions, with their songs and artists | WikiMusic"))
+                       (format #f "Genres matching “~a” | WikiMusic"
+                               search-query)
+                       "Genres: styles and traditions, with their songs and artists | WikiMusic"))
          (list-description (if searching?
-                            (format #f
-                             "Genres on WikiMusic matching “~a”, with their artists and songs."
-                             search-query)
-                            "Every musical genre on WikiMusic, with the artists and songs that belong to it, their keys and their tabs."))
+                             (format #f
+                                     "Genres on WikiMusic matching “~a”, with their artists and songs."
+                                     search-query)
+                             "Every musical genre on WikiMusic, with the artists and songs that belong to it, their keys and their tabs."))
          (page-buttons (if (and pages
-                                (> pages 1))
-                           (pagination #:current page
-                                       #:total pages
-                                       #:base-url (format #f
-                                                   "/genres?limit=~a&sort=~a~a&page="
-                                                   limit
-                                                   (or user-sort "")
-                                                   (if (and search-query
-                                                            (not (equal?
-                                                                  search-query
-                                                                  "")))
-                                                       (format #f "&search=~a"
-                                                               search-query)
-                                                       ""))
-                                       #:prev-label (G_ "previous")
-                                       #:next-label (G_ "next"))
-                           '()))
+                             (> pages 1))
+                         (pagination #:current page
+                                     #:total pages
+                                     #:base-url (format #f
+                                                        "/genres?limit=~a&sort=~a~a&page="
+                                                        limit
+                                                        (or user-sort "")
+                                                        (if (and search-query
+                                                              (not (equal?
+                                                                    search-query
+                                                                    "")))
+                                                          (format #f "&search=~a"
+                                                                  search-query)
+                                                          ""))
+                                     #:prev-label (G_ "previous")
+                                     #:next-label (G_ "next"))
+                         '()))
          (body `(div (@ (class ,(mk-class '(px-4 md:px-8
                                                  py-2
                                                  flex
@@ -77,50 +77,48 @@
                                                  justify-center
                                                  md:justify-between))))
                      (,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-title text-2xl text-onyx-300" `(span (@ (class ,(mk-class '(flex flex-row
-                                                             items-center
-                                                             items-center
-                                                             gap-1))))
-                                 ,(G_ "viewing genres:"))) (div (@ (class ,(mk-class '(flex
-                                                                              flex-wrap
-                                                                              flex-row
-                                                                              justify-center
-                                                                              gap-2))))
-                                                       (div (@ (class ,(mk-class '
-                                                                        (flex
-                                                                         flex-wrap
-                                                                         flex-row
-                                                                         justify-start
-                                                                         items-center))))
-                                                            ,(sort-select G_
-                                                              #:entity 'genre
-                                                              #:user-sort
-                                                              user-sort)
-                                                            ,(grid-size-select
-                                                              G_
-                                                              #:entity 'genre
-                                                              #:size grid-size
-                                                              #:search-query
-                                                              search-query))
-                                                       (div (@ (class ,(mk-class '
-                                                                        (flex
-                                                                         flex-wrap
-                                                                         flex-row
-                                                                         gap-3
-                                                                         justify-end
-                                                                         items-center))))
+                                                                                                                                                              items-center
+                                                                                                                                                              items-center
+                                                                                                                                                              gap-1))))
+                                                                                                                                  ,(G_ "viewing genres:"))) (div (@ (class ,(mk-class '(flex
+                                                                                                                                                                                        flex-wrap
+                                                                                                                                                                                        flex-row
+                                                                                                                                                                                        justify-center
+                                                                                                                                                                                        gap-2))))
+                                                                                                                                                                 (div (@ (class ,(mk-class '(flex
+                                                                                                                                                                                             flex-wrap
+                                                                                                                                                                                             flex-row
+                                                                                                                                                                                             justify-start
+                                                                                                                                                                                             items-center))))
+                                                                                                                                                                      ,(sort-select G_
+                                                                                                                                                                                    #:entity 'genre
+                                                                                                                                                                                    #:user-sort
+                                                                                                                                                                                    user-sort)
+                                                                                                                                                                      ,(grid-size-select
+                                                                                                                                                                        G_
+                                                                                                                                                                        #:entity 'genre
+                                                                                                                                                                        #:size grid-size
+                                                                                                                                                                        #:search-query
+                                                                                                                                                                        search-query))
+                                                                                                                                                                 (div (@ (class ,(mk-class '(flex
+                                                                                                                                                                                             flex-wrap
+                                                                                                                                                                                             flex-row
+                                                                                                                                                                                             gap-3
+                                                                                                                                                                                             justify-end
+                                                                                                                                                                                             items-center))))
 
-                                                            ,(search-box G_
-                                                              #:search-query
-                                                              search-query)))
+                                                                                                                                                                      ,(search-box G_
+                                                                                                                                                                                   #:search-query
+                                                                                                                                                                                   search-query)))
                       (div (div (@ (class ,(item-tile-grid-face #:size
                                                                 grid-size)))
                                 ,(map (lambda (x)
                                         `(div ,(item-tile G_
                                                           'genre x
                                                           (relevant-entities 'genre
-                                                           artworks x)
+                                                                             artworks x)
                                                           (relevant-entities 'genre
-                                                           comments x))))
+                                                                             comments x))))
                                       genres))
                            ,page-buttons
                            ,(hr)
@@ -133,13 +131,13 @@
                    #:title list-title
                    #:description list-description
                    #:path (if (and (= page 1)
-                                   (not searching?)) "/genres" #f)
+                                (not searching?)) "/genres" #f)
                    #:robots (if (or searching?
-                                    (> page 1)) "noindex, follow" #f)
+                                  (> page 1)) "noindex, follow" #f)
                    #:json-ld (list (page-json-ld #:type "CollectionPage"
                                                  #:url (if searching? #f
-                                                           (absolute-url
-                                                            "/genres"))
+                                                         (absolute-url
+                                                          "/genres"))
                                                  #:name list-title
                                                  #:description
                                                  list-description))
@@ -163,10 +161,10 @@
                              "~a — genres, artists, songs & tabs | WikiMusic"
                              genre-name))
          (page-description (summarize (string-append genre-name
-                                       " as a musical genre on WikiMusic: the artists and songs written under it, with their chords, keys and tabs. "
-                                       (let ((written (assq-ref genre
-                                                                'description)))
-                                         (if (string? written) written "")))
+                                                     " as a musical genre on WikiMusic: the artists and songs written under it, with their chords, keys and tabs. "
+                                                     (let ((written (assq-ref genre
+                                                                              'description)))
+                                                       (if (string? written) written "")))
                                       #:limit 300)))
     (html-template G_
                    #:is-logged-in is-logged-in
@@ -196,21 +194,21 @@
                                                                             (assq-ref
                                                                              genre
                                                                              'description))
-                                                                           (list
-                                                                            (cons
-                                                                             "description"
-                                                                             (summarize
-                                                                              (assq-ref
-                                                                               genre
-                                                                               'description)
-                                                                              #:limit
-                                                                              300)))
-                                                                           '()))))
+                                                                         (list
+                                                                          (cons
+                                                                           "description"
+                                                                           (summarize
+                                                                            (assq-ref
+                                                                             genre
+                                                                             'description)
+                                                                            #:limit
+                                                                            300)))
+                                                                         '()))))
                    #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
                                                              md:py-4))))
                                  ((div (@ (class ,(mk-class '(py-4))))
                                        ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display leading-10 md:text-10 text-3xl text-onyx-300" (assq-ref genre
-                                                      'display-name)))
+                                                                                                                                                                              'display-name)))
                                   (div (div ,(entity-details G_
                                                              #:entity 'genre
                                                              #:x genre

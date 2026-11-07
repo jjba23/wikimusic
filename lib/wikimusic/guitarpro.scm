@@ -79,19 +79,19 @@ the reader working on digits alone."
     ((chars (string->list text))
      (digits '()))
     (cond
-      ((null? chars)
-       (reverse digits))
-      ((char=? (car chars) #\=)
-       (reverse digits))
-      ((char-whitespace? (car chars))
-       (loop (cdr chars) digits))
-      ((base64-digit (car chars))
+      [(null? chars)
+       (reverse digits)]
+      [(char=? (car chars) #\=)
+       (reverse digits)]
+      [(char-whitespace? (car chars))
+       (loop (cdr chars) digits)]
+      [(base64-digit (car chars))
        =>
        (lambda (digit)
          (loop (cdr chars)
-               (cons digit digits))))
-      (else (error "base64-decode-string: not a base64 character"
-                   (car chars))))))
+               (cons digit digits)))]
+      [else (error "base64-decode-string: not a base64 character"
+                   (car chars))])))
 
 (define (base64-digits->bytes digits)
   "Return DIGITS -- six-bit values, most significant first -- as the bytes they
@@ -113,26 +113,26 @@ lone digit spells no byte at all and is an error."
     ((digits digits)
      (bytes '()))
     (cond
-      ((null? digits)
-       (reverse bytes))
-      ((null? (cdr digits))
-       (error "base64-decode-string: the text ends in a lone base64 character"))
-      (else (let* ((first (car digits))
+      [(null? digits)
+       (reverse bytes)]
+      [(null? (cdr digits))
+       (error "base64-decode-string: the text ends in a lone base64 character")]
+      [else (let* ((first (car digits))
                    (second (cadr digits))
                    (rest (cddr digits)))
               (if (null? rest)
-                  (reverse (cons (three-of first second) bytes))
-                  (let ((third (car rest))
-                        (rest (cdr rest)))
-                    (if (null? rest)
-                        (reverse (cons (two-of second third)
-                                       (cons (three-of first second) bytes)))
-                        (let ((fourth (car rest)))
-                          (loop (cdr rest)
-                                (cons (one-of third fourth)
-                                      (cons (two-of second third)
-                                            (cons (three-of first second)
-                                                  bytes)))))))))))))
+                (reverse (cons (three-of first second) bytes))
+                (let ((third (car rest))
+                      (rest (cdr rest)))
+                  (if (null? rest)
+                    (reverse (cons (two-of second third)
+                                   (cons (three-of first second) bytes)))
+                    (let ((fourth (car rest)))
+                      (loop (cdr rest)
+                            (cons (one-of third fourth)
+                                  (cons (two-of second third)
+                                        (cons (three-of first second)
+                                              bytes)))))))))])))
 
 (define (base64-decode-string text)
   "Return the bytes the base64 TEXT spells, as a bytevector.
@@ -145,8 +145,8 @@ decoded by handing over everything after its comma."
   "Return #t when URL is a data URL, and #f for anything else -- including for
 the empty string a version that carries no file holds."
   (and (string? url)
-       (string-prefix? "data:" url)
-       (string-index url #\,) #t))
+    (string-prefix? "data:" url)
+    (string-index url #\,) #t))
 
 (define (data-url-payload url)
   "Return the bytes the base64 data URL URL carries, or #f when URL is not a
@@ -155,16 +155,16 @@ base64 data URL or does not decode.
 The value comes from a form and is stored as it arrived, so it is read as
 untrusted: anything that is not a decodable data URL is answered with #f."
   (and (data-url? url)
-       (catch #t
-              (lambda ()
-                (let* ((comma (string-index url #\,))
-                       (head (substring url 0 comma))
-                       (payload (substring url
-                                           (+ comma 1))))
-                  (and (string-contains head ";base64")
-                       (base64-decode-string payload))))
-              (lambda (key . args)
-                #f))))
+    (catch #t
+           (lambda ()
+             (let* ((comma (string-index url #\,))
+                    (head (substring url 0 comma))
+                    (payload (substring url
+                                        (+ comma 1))))
+               (and (string-contains head ";base64")
+                 (base64-decode-string payload))))
+           (lambda (key . args)
+             #f))))
 
 ;;; ====== Walking the file ======
 
@@ -179,11 +179,11 @@ title."
     (let loop
       ((index 0))
       (if (= index count) slice
-          (begin
-            (bytevector-u8-set! slice index
-                                (bytevector-u8-ref bytes
-                                                   (+ start index)))
-            (loop (+ index 1)))))))
+        (begin
+          (bytevector-u8-set! slice index
+                              (bytevector-u8-ref bytes
+                                                 (+ start index)))
+          (loop (+ index 1)))))))
 
 ;; A reader is a bytevector with a position in it.  The position is the only
 ;; mutable thing in this module: a format that is a sequence of fields is read
@@ -210,8 +210,8 @@ the file is too short for is where the header ends."
     (throw 'gp5-header-unreadable
            'gp5-file
            (format #f
-            "the file ends after ~a bytes, where the header still needed ~a more"
-            (gp5-reader-position reader) count))))
+                   "the file ends after ~a bytes, where the header still needed ~a more"
+                   (gp5-reader-position reader) count))))
 
 (define (reader-bytes reader count)
   "Return the next COUNT bytes of READER as a bytevector, or raise when it
@@ -362,11 +362,11 @@ a file usually has none."
         ((remaining notice-count)
          (notices '()))
         (if (zero? remaining)
-            (append fields
-                    (list (cons 'notices
-                                (reverse notices))))
-            (loop (- remaining 1)
-                  (cons (reader-int-byte-size-string reader) notices)))))))
+          (append fields
+                  (list (cons 'notices
+                              (reverse notices))))
+          (loop (- remaining 1)
+                (cons (reader-int-byte-size-string reader) notices)))))))
 
 (define (reader-lyrics reader)
   "Read the lyrics block of READER and return its lines.
@@ -379,12 +379,12 @@ not read: the lines themselves are what a page can show."
     ((remaining 5)
      (lines '()))
     (if (zero? remaining)
-        (reverse (filter (lambda (line)
-                           (not (string-null? line))) lines))
-        (begin
-          (reader-s32 reader)
-          (loop (- remaining 1)
-                (cons (reader-int-size-string reader) lines))))))
+      (reverse (filter (lambda (line)
+                         (not (string-null? line))) lines))
+      (begin
+        (reader-s32 reader)
+        (loop (- remaining 1)
+              (cons (reader-int-size-string reader) lines))))))
 
 (define (reader-rse-master-effect! reader later-than-5.0?)
   "Read past the master effect of READER.
@@ -457,18 +457,18 @@ PRO v5.10\" -- as the list of its numbers."
 (define (version-after? version base)
   "Return #t when VERSION is a later release than BASE, both lists of numbers."
   (cond
-    ((null? version)
-     #f)
-    ((null? base)
-     #t)
-    ((< (car version)
+    [(null? version)
+     #f]
+    [(null? base)
+     #t]
+    [(< (car version)
         (car base))
-     #f)
-    ((> (car version)
+     #f]
+    [(> (car version)
         (car base))
-     #t)
-    (else (version-after? (cdr version)
-                          (cdr base)))))
+     #t]
+    [else (version-after? (cdr version)
+                          (cdr base))]))
 
 ;; A key signature is written as the number of accidentals it has, negative for
 ;; flats and positive for sharps, which is a count and not a name; a reader is
@@ -494,7 +494,7 @@ PRO v5.10\" -- as the list of its numbers."
 none of Guitar Pro's fifteen."
   (let ((named (assv key *gp5-keys*)))
     (and named
-         (cdr named))))
+      (cdr named))))
 
 ;;; ====== The whole header ======
 
@@ -543,54 +543,54 @@ earlier."
            (let* ((reader (%make-gp5-reader bytes 0))
                   (version-string (reader-byte-size-string reader 30)))
              (and (string-prefix? *gp5-fifth-generation* version-string)
-                  (let* ((version (gp5-version-number version-string))
-                         (later-than-5.0? (version-after? version
-                                                          '(5 0)))
-                         (information (reader-score-information reader))
-                         (lyrics (reader-lyrics reader)))
-                    (reader-rse-master-effect! reader later-than-5.0?)
-                    (reader-page-setup! reader)
-                    ;; The tempo has a name -- "Allegro" -- written before the
-                    ;; number itself, and the sheet's own tempo is the number.
-                    (reader-int-byte-size-string reader)
-                    (let* ((tempo (reader-s32 reader))
-                           ;; Releases after 5.0 write whether the sheet should show
-                           ;; the tempo at all; a page shows the song's tempo
-                           ;; whatever the sheet is set to display.
-                           (hidden-tempo (and later-than-5.0?
-                                              (reader-u8 reader)))
-                           (key (reader-s8 reader))
-                           (octave (reader-s32 reader)))
-                      (reader-midi-channels! reader)
-                      (reader-directions! reader)
-                      ;; The master reverb, the last field before the counts.
-                      (reader-s32 reader)
-                      (let ((measures (reader-s32 reader))
-                            (tracks (reader-s32 reader))
-                            (header-bytes (gp5-reader-position reader)))
-                        ;; A count out of a misread field is where a header that
-                        ;; has come out of step shows itself, and the shape it
-                        ;; takes is a number no score could have.
-                        (when (or (< measures 0)
-                                  (< tracks 0))
-                          (throw 'gp5-header-unreadable
-                                 'gp5-file
-                                 (format #f
-                                  "a file declares ~a measures and ~a tracks"
-                                  measures tracks)))
-                        (append information
-                                (list (cons 'lyrics lyrics)
-                                      (cons 'version version)
-                                      (cons 'version-string version-string)
-                                      (cons 'tempo tempo)
-                                      (cons 'hidden-tempo hidden-tempo)
-                                      (cons 'key key)
-                                      (cons 'key-name
-                                            (gp5-key-name key))
-                                      (cons 'octave octave)
-                                      (cons 'measures measures)
-                                      (cons 'tracks tracks)
-                                      (cons 'header-bytes header-bytes)))))))))
+               (let* ((version (gp5-version-number version-string))
+                      (later-than-5.0? (version-after? version
+                                                       '(5 0)))
+                      (information (reader-score-information reader))
+                      (lyrics (reader-lyrics reader)))
+                 (reader-rse-master-effect! reader later-than-5.0?)
+                 (reader-page-setup! reader)
+                 ;; The tempo has a name -- "Allegro" -- written before the
+                 ;; number itself, and the sheet's own tempo is the number.
+                 (reader-int-byte-size-string reader)
+                 (let* ((tempo (reader-s32 reader))
+                        ;; Releases after 5.0 write whether the sheet should show
+                        ;; the tempo at all; a page shows the song's tempo
+                        ;; whatever the sheet is set to display.
+                        (hidden-tempo (and later-than-5.0?
+                                        (reader-u8 reader)))
+                        (key (reader-s8 reader))
+                        (octave (reader-s32 reader)))
+                   (reader-midi-channels! reader)
+                   (reader-directions! reader)
+                   ;; The master reverb, the last field before the counts.
+                   (reader-s32 reader)
+                   (let ((measures (reader-s32 reader))
+                         (tracks (reader-s32 reader))
+                         (header-bytes (gp5-reader-position reader)))
+                     ;; A count out of a misread field is where a header that
+                     ;; has come out of step shows itself, and the shape it
+                     ;; takes is a number no score could have.
+                     (when (or (< measures 0)
+                             (< tracks 0))
+                       (throw 'gp5-header-unreadable
+                              'gp5-file
+                              (format #f
+                                      "a file declares ~a measures and ~a tracks"
+                                      measures tracks)))
+                     (append information
+                             (list (cons 'lyrics lyrics)
+                                   (cons 'version version)
+                                   (cons 'version-string version-string)
+                                   (cons 'tempo tempo)
+                                   (cons 'hidden-tempo hidden-tempo)
+                                   (cons 'key key)
+                                   (cons 'key-name
+                                         (gp5-key-name key))
+                                   (cons 'octave octave)
+                                   (cons 'measures measures)
+                                   (cons 'tracks tracks)
+                                   (cons 'header-bytes header-bytes)))))))))
          (lambda (key . args)
            #f)))
 
@@ -603,4 +603,4 @@ data URL the browser made of it, so a page that wants to say what the tab
 holds decodes it here and nowhere else."
   (let ((bytes (data-url-payload url)))
     (and bytes
-         (gp5-bytes-metadata bytes))))
+      (gp5-bytes-metadata bytes))))

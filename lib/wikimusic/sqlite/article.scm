@@ -43,7 +43,7 @@
                                           #:where (list (cons 'identifier id))
                                           #:limit 1))))
       (if (nil? rows) #f
-          (car rows))))
+        (car rows))))
 
   (define* (get-articles #:key (order-by '((created-at desc)))
                          (limit 20)
@@ -65,7 +65,7 @@
                                "SELECT COUNT(*) AS count FROM articles"
                                '()))))
       (if (nil? rows) 0
-          (or (assq-ref (car rows) 'count) 0))))
+        (or (assq-ref (car rows) 'count) 0))))
 
   (define (insert-article attrs)
     (execute-write "insert-article"

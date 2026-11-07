@@ -38,19 +38,19 @@
                     "Retrieves artists by their IDs from the given REPO.")
 
 (define-repo-method get-artists repo-get-artists
- "Retrieves a list of all active artists from the given REPO.")
+                    "Retrieves a list of all active artists from the given REPO.")
 
 (define-repo-method count-artists repo-count-artists
- "Counts the artists in the given REPO, optionally those a SEARCH matches.")
+                    "Counts the artists in the given REPO, optionally those a SEARCH matches.")
 
 (define-repo-method search-artists repo-search-artists
- "Retrieves a search list of all active artists from the given REPO.")
+                    "Retrieves a search list of all active artists from the given REPO.")
 
 (define-repo-method insert-artist repo-insert-artist
                     "Inserts a artist with ATTRS in the given REPO.")
 
 (define-repo-method update-artist-by-id repo-update-artist-by-id
- "Updates a artist identified by ID with ATTRS in the given REPO.")
+                    "Updates a artist identified by ID with ATTRS in the given REPO.")
 
 (define-repo-method delete-artist-by-id repo-delete-artist-by-id
                     "Deletes a artist identified by ID in the given REPO.")

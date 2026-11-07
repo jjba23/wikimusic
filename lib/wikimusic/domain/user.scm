@@ -31,22 +31,22 @@
 ;; --- eDSL: Embedded Domain Specific Language ---
 
 (define-repo-method get-id-to-username repo-get-id-to-username
- "Retrieves a mapping of user IDs to usernames from the given REPO.")
+                    "Retrieves a mapping of user IDs to usernames from the given REPO.")
 
 (define-repo-method get-user-by-email repo-get-user-by-email
- "Retrieves a user by their EMAIL string from the given REPO.")
+                    "Retrieves a user by their EMAIL string from the given REPO.")
 
 (define-repo-method get-user-by-id repo-get-user-by-id
                     "Retrieves a user by their ID from the given REPO.")
 
 (define-repo-method get-users repo-get-users
- "Retrieves a list of all active users from the given REPO.")
+                    "Retrieves a list of all active users from the given REPO.")
 
 (define-repo-method insert-user repo-insert-user
                     "Inserts a user with ATTRS in the given REPO.")
 
 (define-repo-method update-user-by-id repo-update-user-by-id
- "Updates a user identified by ID with ATTRS in the given REPO.")
+                    "Updates a user identified by ID with ATTRS in the given REPO.")
 
 (define-repo-method delete-user-by-id repo-delete-user-by-id
                     "Deletes a user identified by ID in the given REPO.")
