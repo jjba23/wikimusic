@@ -67,6 +67,33 @@
             song-version-has-pdf
             song-version-has-tablature
             song-version-created-at
+            <comment>
+            comment?
+            make-comment
+            validate-comment
+            comment-valid?
+            comment->jso
+            jso->comment
+            comment-apply-patch
+            comment-identifier
+            comment-parent-identifier
+            comment-contents
+            comment-created-by
+            comment-created-at
+            <external-source>
+            external-source?
+            make-external-source
+            validate-external-source
+            external-source-valid?
+            external-source->jso
+            jso->external-source
+            external-source-apply-patch
+            external-source-identifier
+            external-source-spotify-url
+            external-source-youtube-url
+            external-source-soundcloud-url
+            external-source-wikipedia-url
+            external-source-created-at
             <song-summary>
             song-summary?
             make-song-summary
@@ -82,6 +109,8 @@
             song-summary-music-tuning
             song-summary-album-name
             song-summary-views
+            song-summary-like-count
+            song-summary-dislike-count
             song-summary-artists
             song-summary-genres
             song-summary-created-at
@@ -102,10 +131,14 @@
             song-album-name
             song-album-info-link
             song-views
+            song-like-count
+            song-dislike-count
             song-artists
             song-genres
             song-versions
             song-artworks
+            song-comments
+            song-external-sources
             song-created-at
             <artist-summary>
             artist-summary?
@@ -119,6 +152,8 @@
             artist-summary-display-name
             artist-summary-description
             artist-summary-views
+            artist-summary-like-count
+            artist-summary-dislike-count
             artist-summary-created-at
             <artist>
             artist?
@@ -132,7 +167,11 @@
             artist-display-name
             artist-description
             artist-views
+            artist-like-count
+            artist-dislike-count
             artist-artworks
+            artist-comments
+            artist-external-sources
             artist-created-at
             <genre-summary>
             genre-summary?
@@ -146,6 +185,8 @@
             genre-summary-display-name
             genre-summary-description
             genre-summary-views
+            genre-summary-like-count
+            genre-summary-dislike-count
             genre-summary-created-at
             <genre>
             genre?
@@ -159,8 +200,107 @@
             genre-display-name
             genre-description
             genre-views
+            genre-like-count
+            genre-dislike-count
             genre-artworks
+            genre-comments
+            genre-external-sources
             genre-created-at
+            <article-summary>
+            article-summary?
+            make-article-summary
+            validate-article-summary
+            article-summary-valid?
+            article-summary->jso
+            jso->article-summary
+            article-summary-apply-patch
+            article-summary-identifier
+            article-summary-display-name
+            article-summary-kind
+            article-summary-video-url
+            article-summary-views
+            article-summary-created-at
+            article-summary-kind-values
+            article-summary-kind?
+            article-summary-kind->jso
+            jso->article-summary-kind
+            article-summary-kind-tutorial
+            article-summary-kind-video
+            article-summary-kind-chord-guide
+            article-summary-kind-theory
+            article-summary-kind-discussion
+            <article>
+            article?
+            make-article
+            validate-article
+            article-valid?
+            article->jso
+            jso->article
+            article-apply-patch
+            article-identifier
+            article-display-name
+            article-kind
+            article-video-url
+            article-contents
+            article-views
+            article-comments
+            article-created-at
+            article-kind-values
+            article-kind?
+            article-kind->jso
+            jso->article-kind
+            article-kind-tutorial
+            article-kind-video
+            article-kind-chord-guide
+            article-kind-theory
+            article-kind-discussion
+            <article-comment>
+            article-comment?
+            make-article-comment
+            validate-article-comment
+            article-comment-valid?
+            article-comment->jso
+            jso->article-comment
+            article-comment-apply-patch
+            article-comment-identifier
+            article-comment-parent-identifier
+            article-comment-author-name
+            article-comment-created-by
+            article-comment-contents
+            article-comment-created-at
+            <user>
+            user?
+            make-user
+            validate-user
+            user-valid?
+            user->jso
+            jso->user
+            user-apply-patch
+            user-identifier
+            user-username
+            user-email
+            user-permissions
+            <session>
+            session?
+            make-session
+            validate-session
+            session-valid?
+            session->jso
+            jso->session
+            session-apply-patch
+            session-token
+            session-expires-in
+            session-user
+            <login-request>
+            login-request?
+            make-login-request
+            validate-login-request
+            login-request-valid?
+            login-request->jso
+            jso->login-request
+            login-request-apply-patch
+            login-request-email
+            login-request-password
             <song-list>
             song-list?
             make-song-list
@@ -197,6 +337,30 @@
             genre-list-total
             genre-list-limit
             genre-list-offset
+            <article-list>
+            article-list?
+            make-article-list
+            validate-article-list
+            article-list-valid?
+            article-list->jso
+            jso->article-list
+            article-list-apply-patch
+            article-list-items
+            article-list-total
+            article-list-limit
+            article-list-offset
+            <user-list>
+            user-list?
+            make-user-list
+            validate-user-list
+            user-list-valid?
+            user-list->jso
+            jso->user-list
+            user-list-apply-patch
+            user-list-items
+            user-list-total
+            user-list-limit
+            user-list-offset
             <instance-counts>
             instance-counts?
             make-instance-counts
@@ -208,6 +372,7 @@
             instance-counts-songs
             instance-counts-artists
             instance-counts-genres
+            instance-counts-articles
             <instance>
             instance?
             make-instance
@@ -218,7 +383,246 @@
             instance-apply-patch
             instance-name
             instance-version
-            instance-counts))
+            instance-counts
+            <song-input>
+            song-input?
+            make-song-input
+            validate-song-input
+            song-input-valid?
+            song-input->jso
+            jso->song-input
+            song-input-apply-patch
+            song-input-display-name
+            song-input-description
+            song-input-music-key
+            song-input-music-tuning
+            song-input-music-creation-date
+            song-input-album-name
+            song-input-album-info-link
+            song-input-artist-ids
+            song-input-genre-ids
+            <song-patch>
+            song-patch?
+            make-song-patch
+            validate-song-patch
+            song-patch-valid?
+            song-patch->jso
+            jso->song-patch
+            song-patch-apply-patch
+            song-patch-display-name
+            song-patch-description
+            song-patch-music-key
+            song-patch-music-tuning
+            song-patch-music-creation-date
+            song-patch-album-name
+            song-patch-album-info-link
+            <artist-input>
+            artist-input?
+            make-artist-input
+            validate-artist-input
+            artist-input-valid?
+            artist-input->jso
+            jso->artist-input
+            artist-input-apply-patch
+            artist-input-display-name
+            artist-input-description
+            <artist-patch>
+            artist-patch?
+            make-artist-patch
+            validate-artist-patch
+            artist-patch-valid?
+            artist-patch->jso
+            jso->artist-patch
+            artist-patch-apply-patch
+            artist-patch-display-name
+            artist-patch-description
+            <genre-input>
+            genre-input?
+            make-genre-input
+            validate-genre-input
+            genre-input-valid?
+            genre-input->jso
+            jso->genre-input
+            genre-input-apply-patch
+            genre-input-display-name
+            genre-input-description
+            <genre-patch>
+            genre-patch?
+            make-genre-patch
+            validate-genre-patch
+            genre-patch-valid?
+            genre-patch->jso
+            jso->genre-patch
+            genre-patch-apply-patch
+            genre-patch-display-name
+            genre-patch-description
+            <song-version-input>
+            song-version-input?
+            make-song-version-input
+            validate-song-version-input
+            song-version-input-valid?
+            song-version-input->jso
+            jso->song-version-input
+            song-version-input-apply-patch
+            song-version-input-version-name
+            song-version-input-instrument-type
+            song-version-input-ascii-legend
+            song-version-input-ascii-contents
+            song-version-input-pdf-contents
+            song-version-input-tablature-contents
+            <song-version-patch>
+            song-version-patch?
+            make-song-version-patch
+            validate-song-version-patch
+            song-version-patch-valid?
+            song-version-patch->jso
+            jso->song-version-patch
+            song-version-patch-apply-patch
+            song-version-patch-version-name
+            song-version-patch-instrument-type
+            song-version-patch-ascii-legend
+            song-version-patch-ascii-contents
+            song-version-patch-pdf-contents
+            song-version-patch-tablature-contents
+            <artwork-input>
+            artwork-input?
+            make-artwork-input
+            validate-artwork-input
+            artwork-input-valid?
+            artwork-input->jso
+            jso->artwork-input
+            artwork-input-apply-patch
+            artwork-input-content-url
+            artwork-input-content-caption
+            artwork-input-order-value
+            <artwork-patch>
+            artwork-patch?
+            make-artwork-patch
+            validate-artwork-patch
+            artwork-patch-valid?
+            artwork-patch->jso
+            jso->artwork-patch
+            artwork-patch-apply-patch
+            artwork-patch-content-url
+            artwork-patch-content-caption
+            artwork-patch-order-value
+            <external-source-input>
+            external-source-input?
+            make-external-source-input
+            validate-external-source-input
+            external-source-input-valid?
+            external-source-input->jso
+            jso->external-source-input
+            external-source-input-apply-patch
+            external-source-input-spotify-url
+            external-source-input-youtube-url
+            external-source-input-soundcloud-url
+            external-source-input-wikipedia-url
+            <external-source-patch>
+            external-source-patch?
+            make-external-source-patch
+            validate-external-source-patch
+            external-source-patch-valid?
+            external-source-patch->jso
+            jso->external-source-patch
+            external-source-patch-apply-patch
+            external-source-patch-spotify-url
+            external-source-patch-youtube-url
+            external-source-patch-soundcloud-url
+            external-source-patch-wikipedia-url
+            <comment-input>
+            comment-input?
+            make-comment-input
+            validate-comment-input
+            comment-input-valid?
+            comment-input->jso
+            jso->comment-input
+            comment-input-apply-patch
+            comment-input-contents
+            comment-input-parent-identifier
+            <comment-patch>
+            comment-patch?
+            make-comment-patch
+            validate-comment-patch
+            comment-patch-valid?
+            comment-patch->jso
+            jso->comment-patch
+            comment-patch-apply-patch
+            comment-patch-contents
+            <artist-relation-input>
+            artist-relation-input?
+            make-artist-relation-input
+            validate-artist-relation-input
+            artist-relation-input-valid?
+            artist-relation-input->jso
+            jso->artist-relation-input
+            artist-relation-input-apply-patch
+            artist-relation-input-artist-id
+            <genre-relation-input>
+            genre-relation-input?
+            make-genre-relation-input
+            validate-genre-relation-input
+            genre-relation-input-valid?
+            genre-relation-input->jso
+            jso->genre-relation-input
+            genre-relation-input-apply-patch
+            genre-relation-input-genre-id
+            <article-input>
+            article-input?
+            make-article-input
+            validate-article-input
+            article-input-valid?
+            article-input->jso
+            jso->article-input
+            article-input-apply-patch
+            article-input-display-name
+            article-input-kind
+            article-input-video-url
+            article-input-contents
+            article-input-kind-values
+            article-input-kind?
+            article-input-kind->jso
+            jso->article-input-kind
+            article-input-kind-tutorial
+            article-input-kind-video
+            article-input-kind-chord-guide
+            article-input-kind-theory
+            article-input-kind-discussion
+            <article-comment-input>
+            article-comment-input?
+            make-article-comment-input
+            validate-article-comment-input
+            article-comment-input-valid?
+            article-comment-input->jso
+            jso->article-comment-input
+            article-comment-input-apply-patch
+            article-comment-input-contents
+            article-comment-input-parent-identifier
+            article-comment-input-author-name
+            <user-input>
+            user-input?
+            make-user-input
+            validate-user-input
+            user-input-valid?
+            user-input->jso
+            jso->user-input
+            user-input-apply-patch
+            user-input-username
+            user-input-email
+            user-input-permissions
+            user-input-password
+            <user-patch>
+            user-patch?
+            make-user-patch
+            validate-user-patch
+            user-patch-valid?
+            user-patch->jso
+            jso->user-patch
+            user-patch-apply-patch
+            user-patch-username
+            user-patch-email
+            user-patch-permissions
+            user-patch-password))
 
 (define-record-type <error>
   (%make-error code message)
@@ -259,9 +663,30 @@
   (has-tablature song-version-has-tablature)
   (created-at song-version-created-at))
 
+(define-record-type <comment>
+  (%make-comment identifier parent-identifier contents created-by created-at)
+  comment?
+  (identifier comment-identifier)
+  (parent-identifier comment-parent-identifier)
+  (contents comment-contents)
+  (created-by comment-created-by)
+  (created-at comment-created-at))
+
+(define-record-type <external-source>
+  (%make-external-source identifier spotify-url youtube-url soundcloud-url
+                         wikipedia-url created-at)
+  external-source?
+  (identifier external-source-identifier)
+  (spotify-url external-source-spotify-url)
+  (youtube-url external-source-youtube-url)
+  (soundcloud-url external-source-soundcloud-url)
+  (wikipedia-url external-source-wikipedia-url)
+  (created-at external-source-created-at))
+
 (define-record-type <song-summary>
   (%make-song-summary identifier display-name description music-key
-                      music-tuning album-name views artists genres created-at)
+                      music-tuning album-name views like-count dislike-count
+                      artists genres created-at)
   song-summary?
   (identifier song-summary-identifier)
   (display-name song-summary-display-name)
@@ -270,14 +695,17 @@
   (music-tuning song-summary-music-tuning)
   (album-name song-summary-album-name)
   (views song-summary-views)
+  (like-count song-summary-like-count)
+  (dislike-count song-summary-dislike-count)
   (artists song-summary-artists)
   (genres song-summary-genres)
   (created-at song-summary-created-at))
 
 (define-record-type <song>
   (%make-song identifier display-name description music-key music-tuning
-              music-creation-date album-name album-info-link views artists
-              genres versions artworks created-at)
+              music-creation-date album-name album-info-link views like-count
+              dislike-count artists genres versions artworks comments
+              external-sources created-at)
   song?
   (identifier song-identifier)
   (display-name song-display-name)
@@ -288,49 +716,125 @@
   (album-name song-album-name)
   (album-info-link song-album-info-link)
   (views song-views)
+  (like-count song-like-count)
+  (dislike-count song-dislike-count)
   (artists song-artists)
   (genres song-genres)
   (versions song-versions)
   (artworks song-artworks)
+  (comments song-comments)
+  (external-sources song-external-sources)
   (created-at song-created-at))
 
 (define-record-type <artist-summary>
-  (%make-artist-summary identifier display-name description views created-at)
+  (%make-artist-summary identifier display-name description views like-count
+                        dislike-count created-at)
   artist-summary?
   (identifier artist-summary-identifier)
   (display-name artist-summary-display-name)
   (description artist-summary-description)
   (views artist-summary-views)
+  (like-count artist-summary-like-count)
+  (dislike-count artist-summary-dislike-count)
   (created-at artist-summary-created-at))
 
 (define-record-type <artist>
-  (%make-artist identifier display-name description views artworks created-at)
+  (%make-artist identifier display-name description views like-count
+                dislike-count artworks comments external-sources created-at)
   artist?
   (identifier artist-identifier)
   (display-name artist-display-name)
   (description artist-description)
   (views artist-views)
+  (like-count artist-like-count)
+  (dislike-count artist-dislike-count)
   (artworks artist-artworks)
+  (comments artist-comments)
+  (external-sources artist-external-sources)
   (created-at artist-created-at))
 
 (define-record-type <genre-summary>
-  (%make-genre-summary identifier display-name description views created-at)
+  (%make-genre-summary identifier display-name description views like-count
+                       dislike-count created-at)
   genre-summary?
   (identifier genre-summary-identifier)
   (display-name genre-summary-display-name)
   (description genre-summary-description)
   (views genre-summary-views)
+  (like-count genre-summary-like-count)
+  (dislike-count genre-summary-dislike-count)
   (created-at genre-summary-created-at))
 
 (define-record-type <genre>
-  (%make-genre identifier display-name description views artworks created-at)
+  (%make-genre identifier display-name description views like-count
+               dislike-count artworks comments external-sources created-at)
   genre?
   (identifier genre-identifier)
   (display-name genre-display-name)
   (description genre-description)
   (views genre-views)
+  (like-count genre-like-count)
+  (dislike-count genre-dislike-count)
   (artworks genre-artworks)
+  (comments genre-comments)
+  (external-sources genre-external-sources)
   (created-at genre-created-at))
+
+(define-record-type <article-summary>
+  (%make-article-summary identifier display-name kind video-url views
+                         created-at)
+  article-summary?
+  (identifier article-summary-identifier)
+  (display-name article-summary-display-name)
+  (kind article-summary-kind)
+  (video-url article-summary-video-url)
+  (views article-summary-views)
+  (created-at article-summary-created-at))
+
+(define-record-type <article>
+  (%make-article identifier display-name kind video-url contents views
+                 comments created-at)
+  article?
+  (identifier article-identifier)
+  (display-name article-display-name)
+  (kind article-kind)
+  (video-url article-video-url)
+  (contents article-contents)
+  (views article-views)
+  (comments article-comments)
+  (created-at article-created-at))
+
+(define-record-type <article-comment>
+  (%make-article-comment identifier parent-identifier author-name created-by
+                         contents created-at)
+  article-comment?
+  (identifier article-comment-identifier)
+  (parent-identifier article-comment-parent-identifier)
+  (author-name article-comment-author-name)
+  (created-by article-comment-created-by)
+  (contents article-comment-contents)
+  (created-at article-comment-created-at))
+
+(define-record-type <user>
+  (%make-user identifier username email permissions)
+  user?
+  (identifier user-identifier)
+  (username user-username)
+  (email user-email)
+  (permissions user-permissions))
+
+(define-record-type <session>
+  (%make-session token expires-in user)
+  session?
+  (token session-token)
+  (expires-in session-expires-in)
+  (user session-user))
+
+(define-record-type <login-request>
+  (%make-login-request email password)
+  login-request?
+  (email login-request-email)
+  (password login-request-password))
 
 (define-record-type <song-list>
   (%make-song-list items total limit offset)
@@ -356,12 +860,29 @@
   (limit genre-list-limit)
   (offset genre-list-offset))
 
+(define-record-type <article-list>
+  (%make-article-list items total limit offset)
+  article-list?
+  (items article-list-items)
+  (total article-list-total)
+  (limit article-list-limit)
+  (offset article-list-offset))
+
+(define-record-type <user-list>
+  (%make-user-list items total limit offset)
+  user-list?
+  (items user-list-items)
+  (total user-list-total)
+  (limit user-list-limit)
+  (offset user-list-offset))
+
 (define-record-type <instance-counts>
-  (%make-instance-counts songs artists genres)
+  (%make-instance-counts songs artists genres articles)
   instance-counts?
   (songs instance-counts-songs)
   (artists instance-counts-artists)
-  (genres instance-counts-genres))
+  (genres instance-counts-genres)
+  (articles instance-counts-articles))
 
 (define-record-type <instance>
   (%make-instance name version counts)
@@ -369,6 +890,163 @@
   (name instance-name)
   (version instance-version)
   (counts instance-counts))
+
+(define-record-type <song-input>
+  (%make-song-input display-name description music-key music-tuning
+                    music-creation-date album-name album-info-link artist-ids
+                    genre-ids)
+  song-input?
+  (display-name song-input-display-name)
+  (description song-input-description)
+  (music-key song-input-music-key)
+  (music-tuning song-input-music-tuning)
+  (music-creation-date song-input-music-creation-date)
+  (album-name song-input-album-name)
+  (album-info-link song-input-album-info-link)
+  (artist-ids song-input-artist-ids)
+  (genre-ids song-input-genre-ids))
+
+(define-record-type <song-patch>
+  (%make-song-patch display-name description music-key music-tuning
+                    music-creation-date album-name album-info-link)
+  song-patch?
+  (display-name song-patch-display-name)
+  (description song-patch-description)
+  (music-key song-patch-music-key)
+  (music-tuning song-patch-music-tuning)
+  (music-creation-date song-patch-music-creation-date)
+  (album-name song-patch-album-name)
+  (album-info-link song-patch-album-info-link))
+
+(define-record-type <artist-input>
+  (%make-artist-input display-name description)
+  artist-input?
+  (display-name artist-input-display-name)
+  (description artist-input-description))
+
+(define-record-type <artist-patch>
+  (%make-artist-patch display-name description)
+  artist-patch?
+  (display-name artist-patch-display-name)
+  (description artist-patch-description))
+
+(define-record-type <genre-input>
+  (%make-genre-input display-name description)
+  genre-input?
+  (display-name genre-input-display-name)
+  (description genre-input-description))
+
+(define-record-type <genre-patch>
+  (%make-genre-patch display-name description)
+  genre-patch?
+  (display-name genre-patch-display-name)
+  (description genre-patch-description))
+
+(define-record-type <song-version-input>
+  (%make-song-version-input version-name instrument-type ascii-legend
+                            ascii-contents pdf-contents tablature-contents)
+  song-version-input?
+  (version-name song-version-input-version-name)
+  (instrument-type song-version-input-instrument-type)
+  (ascii-legend song-version-input-ascii-legend)
+  (ascii-contents song-version-input-ascii-contents)
+  (pdf-contents song-version-input-pdf-contents)
+  (tablature-contents song-version-input-tablature-contents))
+
+(define-record-type <song-version-patch>
+  (%make-song-version-patch version-name instrument-type ascii-legend
+                            ascii-contents pdf-contents tablature-contents)
+  song-version-patch?
+  (version-name song-version-patch-version-name)
+  (instrument-type song-version-patch-instrument-type)
+  (ascii-legend song-version-patch-ascii-legend)
+  (ascii-contents song-version-patch-ascii-contents)
+  (pdf-contents song-version-patch-pdf-contents)
+  (tablature-contents song-version-patch-tablature-contents))
+
+(define-record-type <artwork-input>
+  (%make-artwork-input content-url content-caption order-value)
+  artwork-input?
+  (content-url artwork-input-content-url)
+  (content-caption artwork-input-content-caption)
+  (order-value artwork-input-order-value))
+
+(define-record-type <artwork-patch>
+  (%make-artwork-patch content-url content-caption order-value)
+  artwork-patch?
+  (content-url artwork-patch-content-url)
+  (content-caption artwork-patch-content-caption)
+  (order-value artwork-patch-order-value))
+
+(define-record-type <external-source-input>
+  (%make-external-source-input spotify-url youtube-url soundcloud-url
+                               wikipedia-url)
+  external-source-input?
+  (spotify-url external-source-input-spotify-url)
+  (youtube-url external-source-input-youtube-url)
+  (soundcloud-url external-source-input-soundcloud-url)
+  (wikipedia-url external-source-input-wikipedia-url))
+
+(define-record-type <external-source-patch>
+  (%make-external-source-patch spotify-url youtube-url soundcloud-url
+                               wikipedia-url)
+  external-source-patch?
+  (spotify-url external-source-patch-spotify-url)
+  (youtube-url external-source-patch-youtube-url)
+  (soundcloud-url external-source-patch-soundcloud-url)
+  (wikipedia-url external-source-patch-wikipedia-url))
+
+(define-record-type <comment-input>
+  (%make-comment-input contents parent-identifier)
+  comment-input?
+  (contents comment-input-contents)
+  (parent-identifier comment-input-parent-identifier))
+
+(define-record-type <comment-patch>
+  (%make-comment-patch contents)
+  comment-patch?
+  (contents comment-patch-contents))
+
+(define-record-type <artist-relation-input>
+  (%make-artist-relation-input artist-id)
+  artist-relation-input?
+  (artist-id artist-relation-input-artist-id))
+
+(define-record-type <genre-relation-input>
+  (%make-genre-relation-input genre-id)
+  genre-relation-input?
+  (genre-id genre-relation-input-genre-id))
+
+(define-record-type <article-input>
+  (%make-article-input display-name kind video-url contents)
+  article-input?
+  (display-name article-input-display-name)
+  (kind article-input-kind)
+  (video-url article-input-video-url)
+  (contents article-input-contents))
+
+(define-record-type <article-comment-input>
+  (%make-article-comment-input contents parent-identifier author-name)
+  article-comment-input?
+  (contents article-comment-input-contents)
+  (parent-identifier article-comment-input-parent-identifier)
+  (author-name article-comment-input-author-name))
+
+(define-record-type <user-input>
+  (%make-user-input username email permissions password)
+  user-input?
+  (username user-input-username)
+  (email user-input-email)
+  (permissions user-input-permissions)
+  (password user-input-password))
+
+(define-record-type <user-patch>
+  (%make-user-patch username email permissions password)
+  user-patch?
+  (username user-patch-username)
+  (email user-patch-email)
+  (permissions user-patch-permissions)
+  (password user-patch-password))
 
 (define* (make-error #:key (code #f) (message #f))
   "Create a Error.
@@ -772,6 +1450,235 @@ Members of PATCH set to null are removed, and the result is validated
 like any other SongVersion, so a patch that would leave the record invalid raises."
   (jso->song-version (json-merge-patch (song-version->jso value) patch)))
 
+(define* (make-comment #:key
+                       (identifier #f)
+                       (parent-identifier #f)
+                       (contents #f)
+                       (created-by #f)
+                       (created-at #f))
+  "Create a Comment.
+
+A comment a reader wrote about an entity.
+
+Fields: identifier (string, required), parentIdentifier (string), contents (string, required), createdBy (string), createdAt (string).
+
+@example
+(make-comment #:identifier <string> #:parent-identifier <string> #:contents <string> #:created-by <string> #:created-at <string>)
+@end example"
+  (let ((value
+         (%make-comment identifier parent-identifier contents created-by
+                        created-at)))
+    (validate-comment value)
+    value))
+
+(define (validate-comment value)
+  "Check VALUE against the constraints the specification declares for Comment.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("comment") value comment? "Comment")
+  (check-required '("comment" "identifier") (comment-identifier value))
+  (check-type '("comment" "identifier") (comment-identifier value) 'string)
+  (check-format '("comment" "identifier") (comment-identifier value) 'uuid)
+  (when (comment-parent-identifier value)
+    (check-type '("comment" "parentIdentifier")
+                (comment-parent-identifier value) 'string)
+    (check-format '("comment" "parentIdentifier")
+                  (comment-parent-identifier value) 'uuid))
+  (check-required '("comment" "contents") (comment-contents value))
+  (check-type '("comment" "contents") (comment-contents value) 'string)
+  (when (comment-created-by value)
+    (check-type '("comment" "createdBy") (comment-created-by value) 'string)
+    (check-format '("comment" "createdBy") (comment-created-by value) 'uuid))
+  (when (comment-created-at value)
+    (check-type '("comment" "createdAt") (comment-created-at value) 'string))
+  #t)
+
+(define (comment-valid? value)
+  "Return #t when VALUE is a valid Comment."
+  (valid? (lambda () (validate-comment value))))
+
+(define (comment->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("comment") value comment? "Comment")
+  (append (list (cons "identifier" (comment-identifier value)))
+          (if (eq? (comment-parent-identifier value) #f)
+            '()
+            (list
+             (cons "parentIdentifier" (comment-parent-identifier value))))
+          (list (cons "contents" (comment-contents value)))
+          (if (eq? (comment-created-by value) #f)
+            '()
+            (list (cons "createdBy" (comment-created-by value))))
+          (if (eq? (comment-created-at value) #f)
+            '()
+            (list (cons "createdAt" (comment-created-at value))))))
+
+(define (jso->comment node)
+  "Build a Comment from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-comment
+     #:identifier
+     (let ((value (jso-ref node "identifier")))
+       (if (json-null? value)
+         #f
+         value))
+     #:parent-identifier
+     (let ((value (jso-ref node "parentIdentifier")))
+       (if (json-null? value)
+         #f
+         value))
+     #:contents
+     (let ((value (jso-ref node "contents")))
+       (if (json-null? value)
+         #f
+         value))
+     #:created-by
+     (let ((value (jso-ref node "createdBy")))
+       (if (json-null? value)
+         #f
+         value))
+     #:created-at
+     (let ((value (jso-ref node "createdAt")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (comment-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other Comment, so a patch that would leave the record invalid raises."
+  (jso->comment (json-merge-patch (comment->jso value) patch)))
+
+(define* (make-external-source #:key
+                               (identifier #f)
+                               (spotify-url #f)
+                               (youtube-url #f)
+                               (soundcloud-url #f)
+                               (wikipedia-url #f)
+                               (created-at #f))
+  "Create a ExternalSource.
+
+The addresses where an entity may be heard or read about.
+
+Fields: identifier (string, required), spotifyUrl (string), youtubeUrl (string), soundcloudUrl (string), wikipediaUrl (string), createdAt (string).
+
+@example
+(make-external-source #:identifier <string> #:spotify-url <string> #:youtube-url <string> #:soundcloud-url <string> #:wikipedia-url <string> #:created-at <string>)
+@end example"
+  (let ((value
+         (%make-external-source identifier spotify-url youtube-url
+                                soundcloud-url wikipedia-url created-at)))
+    (validate-external-source value)
+    value))
+
+(define (validate-external-source value)
+  "Check VALUE against the constraints the specification declares for ExternalSource.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("external-source") value external-source?
+                   "ExternalSource")
+  (check-required '("external-source" "identifier")
+                  (external-source-identifier value))
+  (check-type '("external-source" "identifier")
+              (external-source-identifier value) 'string)
+  (check-format '("external-source" "identifier")
+                (external-source-identifier value) 'uuid)
+  (when (external-source-spotify-url value)
+    (check-type '("external-source" "spotifyUrl")
+                (external-source-spotify-url value) 'string)
+    (check-format '("external-source" "spotifyUrl")
+                  (external-source-spotify-url value) 'uri))
+  (when (external-source-youtube-url value)
+    (check-type '("external-source" "youtubeUrl")
+                (external-source-youtube-url value) 'string)
+    (check-format '("external-source" "youtubeUrl")
+                  (external-source-youtube-url value) 'uri))
+  (when (external-source-soundcloud-url value)
+    (check-type '("external-source" "soundcloudUrl")
+                (external-source-soundcloud-url value) 'string)
+    (check-format '("external-source" "soundcloudUrl")
+                  (external-source-soundcloud-url value) 'uri))
+  (when (external-source-wikipedia-url value)
+    (check-type '("external-source" "wikipediaUrl")
+                (external-source-wikipedia-url value) 'string)
+    (check-format '("external-source" "wikipediaUrl")
+                  (external-source-wikipedia-url value) 'uri))
+  (when (external-source-created-at value)
+    (check-type '("external-source" "createdAt")
+                (external-source-created-at value) 'string))
+  #t)
+
+(define (external-source-valid? value)
+  "Return #t when VALUE is a valid ExternalSource."
+  (valid? (lambda () (validate-external-source value))))
+
+(define (external-source->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("external-source") value external-source?
+                   "ExternalSource")
+  (append (list (cons "identifier" (external-source-identifier value)))
+          (if (eq? (external-source-spotify-url value) #f)
+            '()
+            (list (cons "spotifyUrl" (external-source-spotify-url value))))
+          (if (eq? (external-source-youtube-url value) #f)
+            '()
+            (list (cons "youtubeUrl" (external-source-youtube-url value))))
+          (if (eq? (external-source-soundcloud-url value) #f)
+            '()
+            (list
+             (cons "soundcloudUrl"
+                   (external-source-soundcloud-url value))))
+          (if (eq? (external-source-wikipedia-url value) #f)
+            '()
+            (list
+             (cons "wikipediaUrl" (external-source-wikipedia-url value))))
+          (if (eq? (external-source-created-at value) #f)
+            '()
+            (list (cons "createdAt" (external-source-created-at value))))))
+
+(define (jso->external-source node)
+  "Build a ExternalSource from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-external-source
+     #:identifier
+     (let ((value (jso-ref node "identifier")))
+       (if (json-null? value)
+         #f
+         value))
+     #:spotify-url
+     (let ((value (jso-ref node "spotifyUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:youtube-url
+     (let ((value (jso-ref node "youtubeUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:soundcloud-url
+     (let ((value (jso-ref node "soundcloudUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:wikipedia-url
+     (let ((value (jso-ref node "wikipediaUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:created-at
+     (let ((value (jso-ref node "createdAt")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (external-source-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ExternalSource, so a patch that would leave the record invalid raises."
+  (jso->external-source (json-merge-patch (external-source->jso value) patch)))
+
 (define* (make-song-summary #:key
                             (identifier #f)
                             (display-name #f)
@@ -780,6 +1687,8 @@ like any other SongVersion, so a patch that would leave the record invalid raise
                             (music-tuning #f)
                             (album-name #f)
                             (views #f)
+                            (like-count #f)
+                            (dislike-count #f)
                             (artists #f)
                             (genres #f)
                             (created-at #f))
@@ -787,15 +1696,15 @@ like any other SongVersion, so a patch that would leave the record invalid raise
 
 A song as a list shows it.
 
-Fields: identifier (string, required), displayName (string, required), description (string), musicKey (string), musicTuning (string), albumName (string), views (integer, required), artists (list of ArtistRef, required), genres (list of GenreRef, required), createdAt (string).
+Fields: identifier (string, required), displayName (string, required), description (string), musicKey (string), musicTuning (string), albumName (string), views (integer, required), likeCount (integer), dislikeCount (integer), artists (list of ArtistRef, required), genres (list of GenreRef, required), createdAt (string).
 
 @example
-(make-song-summary #:identifier <string> #:display-name <string> #:description <string> #:music-key <string> #:music-tuning <string> #:album-name <string> #:views <integer> #:artists <list of ArtistRef> #:genres <list of GenreRef> #:created-at <string>)
+(make-song-summary #:identifier <string> #:display-name <string> #:description <string> #:music-key <string> #:music-tuning <string> #:album-name <string> #:views <integer> #:like-count <integer> #:dislike-count <integer> #:artists <list of ArtistRef> #:genres <list of GenreRef> #:created-at <string>)
 @end example"
   (let ((value
          (%make-song-summary identifier display-name description music-key
-                             music-tuning album-name views artists genres
-                             created-at)))
+                             music-tuning album-name views like-count
+                             dislike-count artists genres created-at)))
     (validate-song-summary value)
     value))
 
@@ -829,6 +1738,16 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
   (check-required '("song-summary" "views") (song-summary-views value))
   (check-type '("song-summary" "views") (song-summary-views value) 'integer)
   (check-minimum '("song-summary" "views") (song-summary-views value) 0)
+  (when (song-summary-like-count value)
+    (check-type '("song-summary" "likeCount") (song-summary-like-count value)
+                'integer)
+    (check-minimum '("song-summary" "likeCount")
+                   (song-summary-like-count value) 0))
+  (when (song-summary-dislike-count value)
+    (check-type '("song-summary" "dislikeCount")
+                (song-summary-dislike-count value) 'integer)
+    (check-minimum '("song-summary" "dislikeCount")
+                   (song-summary-dislike-count value) 0))
   (check-required '("song-summary" "artists") (song-summary-artists value))
   (check-type '("song-summary" "artists") (song-summary-artists value) 'list)
   (check-list '("song-summary" "artists") (song-summary-artists value)
@@ -864,6 +1783,12 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
             '()
             (list (cons "albumName" (song-summary-album-name value))))
           (list (cons "views" (song-summary-views value)))
+          (if (eq? (song-summary-like-count value) #f)
+            '()
+            (list (cons "likeCount" (song-summary-like-count value))))
+          (if (eq? (song-summary-dislike-count value) #f)
+            '()
+            (list (cons "dislikeCount" (song-summary-dislike-count value))))
           (list
            (cons "artists"
                  (list->vector
@@ -922,6 +1847,16 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
        (if (json-null? value)
          #f
          value))
+     #:like-count
+     (let ((value (jso-ref node "likeCount")))
+       (if (json-null? value)
+         #f
+         value))
+     #:dislike-count
+     (let ((value (jso-ref node "dislikeCount")))
+       (if (json-null? value)
+         #f
+         value))
      #:artists
      (let ((value (jso-ref node "artists")))
        (if (or (eq? value #f) (json-null? value))
@@ -960,24 +1895,29 @@ like any other SongSummary, so a patch that would leave the record invalid raise
                     (album-name #f)
                     (album-info-link #f)
                     (views #f)
+                    (like-count #f)
+                    (dislike-count #f)
                     (artists #f)
                     (genres #f)
                     (versions #f)
                     (artworks #f)
+                    (comments '())
+                    (external-sources '())
                     (created-at #f))
   "Create a Song.
 
 One song, with everything the API says about it.
 
-Fields: identifier (string, required), displayName (string, required), description (string), musicKey (string), musicTuning (string), musicCreationDate (string), albumName (string), albumInfoLink (string), views (integer, required), artists (list of ArtistRef, required), genres (list of GenreRef, required), versions (list of SongVersion, required), artworks (list of Artwork, required), createdAt (string).
+Fields: identifier (string, required), displayName (string, required), description (string), musicKey (string), musicTuning (string), musicCreationDate (string), albumName (string), albumInfoLink (string), views (integer, required), likeCount (integer), dislikeCount (integer), artists (list of ArtistRef, required), genres (list of GenreRef, required), versions (list of SongVersion, required), artworks (list of Artwork, required), comments (list of Comment), externalSources (list of ExternalSource), createdAt (string).
 
 @example
-(make-song #:identifier <string> #:display-name <string> #:description <string> #:music-key <string> #:music-tuning <string> #:music-creation-date <string> #:album-name <string> #:album-info-link <string> #:views <integer> #:artists <list of ArtistRef> #:genres <list of GenreRef> #:versions <list of SongVersion> #:artworks <list of Artwork> #:created-at <string>)
+(make-song #:identifier <string> #:display-name <string> #:description <string> #:music-key <string> #:music-tuning <string> #:music-creation-date <string> #:album-name <string> #:album-info-link <string> #:views <integer> #:like-count <integer> #:dislike-count <integer> #:artists <list of ArtistRef> #:genres <list of GenreRef> #:versions <list of SongVersion> #:artworks <list of Artwork> #:comments <list of Comment> #:external-sources <list of ExternalSource> #:created-at <string>)
 @end example"
   (let ((value
          (%make-song identifier display-name description music-key
                      music-tuning music-creation-date album-name
-                     album-info-link views artists genres versions artworks
+                     album-info-link views like-count dislike-count artists
+                     genres versions artworks comments external-sources
                      created-at)))
     (validate-song value)
     value))
@@ -1009,6 +1949,12 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
   (check-required '("song" "views") (song-views value))
   (check-type '("song" "views") (song-views value) 'integer)
   (check-minimum '("song" "views") (song-views value) 0)
+  (when (song-like-count value)
+    (check-type '("song" "likeCount") (song-like-count value) 'integer)
+    (check-minimum '("song" "likeCount") (song-like-count value) 0))
+  (when (song-dislike-count value)
+    (check-type '("song" "dislikeCount") (song-dislike-count value) 'integer)
+    (check-minimum '("song" "dislikeCount") (song-dislike-count value) 0))
   (check-required '("song" "artists") (song-artists value))
   (check-type '("song" "artists") (song-artists value) 'list)
   (check-list '("song" "artists") (song-artists value) artist-ref? "ArtistRef")
@@ -1022,6 +1968,14 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
   (check-required '("song" "artworks") (song-artworks value))
   (check-type '("song" "artworks") (song-artworks value) 'list)
   (check-list '("song" "artworks") (song-artworks value) artwork? "Artwork")
+  (when (song-comments value)
+    (check-type '("song" "comments") (song-comments value) 'list)
+    (check-list '("song" "comments") (song-comments value) comment? "Comment"))
+  (when (song-external-sources value)
+    (check-type '("song" "externalSources") (song-external-sources value)
+                'list)
+    (check-list '("song" "externalSources") (song-external-sources value)
+                external-source? "ExternalSource"))
   (when (song-created-at value)
     (check-type '("song" "createdAt") (song-created-at value) 'string))
   #t)
@@ -1055,6 +2009,12 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
             '()
             (list (cons "albumInfoLink" (song-album-info-link value))))
           (list (cons "views" (song-views value)))
+          (if (eq? (song-like-count value) #f)
+            '()
+            (list (cons "likeCount" (song-like-count value))))
+          (if (eq? (song-dislike-count value) #f)
+            '()
+            (list (cons "dislikeCount" (song-dislike-count value))))
           (list
            (cons "artists"
                  (list->vector
@@ -1083,6 +2043,24 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
                    (lambda (element)
                      (artwork->jso element))
                    (song-artworks value)))))
+          (if (eq? (song-comments value) #f)
+            '()
+            (list
+             (cons "comments"
+                   (list->vector
+                    (map
+                     (lambda (element)
+                       (comment->jso element))
+                     (song-comments value))))))
+          (if (eq? (song-external-sources value) #f)
+            '()
+            (list
+             (cons "externalSources"
+                   (list->vector
+                    (map
+                     (lambda (element)
+                       (external-source->jso element))
+                     (song-external-sources value))))))
           (if (eq? (song-created-at value) #f)
             '()
             (list (cons "createdAt" (song-created-at value))))))
@@ -1137,6 +2115,16 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
        (if (json-null? value)
          #f
          value))
+     #:like-count
+     (let ((value (jso-ref node "likeCount")))
+       (if (json-null? value)
+         #f
+         value))
+     #:dislike-count
+     (let ((value (jso-ref node "dislikeCount")))
+       (if (json-null? value)
+         #f
+         value))
      #:artists
      (let ((value (jso-ref node "artists")))
        (if (or (eq? value #f) (json-null? value))
@@ -1161,6 +2149,18 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
          #f
          (map (lambda (element) (jso->artwork element))
               (jso-array->list value))))
+     #:comments
+     (let ((value (jso-ref node "comments")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map (lambda (element) (jso->comment element))
+              (jso-array->list value))))
+     #:external-sources
+     (let ((value (jso-ref node "externalSources")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map (lambda (element) (jso->external-source element))
+              (jso-array->list value))))
      #:created-at
      (let ((value (jso-ref node "createdAt")))
        (if (json-null? value)
@@ -1178,19 +2178,21 @@ like any other Song, so a patch that would leave the record invalid raises."
                               (display-name #f)
                               (description #f)
                               (views #f)
+                              (like-count #f)
+                              (dislike-count #f)
                               (created-at #f))
   "Create a ArtistSummary.
 
 An artist as a list shows them.
 
-Fields: identifier (string, required), displayName (string, required), description (string), views (integer, required), createdAt (string).
+Fields: identifier (string, required), displayName (string, required), description (string), views (integer, required), likeCount (integer), dislikeCount (integer), createdAt (string).
 
 @example
-(make-artist-summary #:identifier <string> #:display-name <string> #:description <string> #:views <integer> #:created-at <string>)
+(make-artist-summary #:identifier <string> #:display-name <string> #:description <string> #:views <integer> #:like-count <integer> #:dislike-count <integer> #:created-at <string>)
 @end example"
   (let ((value
          (%make-artist-summary identifier display-name description views
-                               created-at)))
+                               like-count dislike-count created-at)))
     (validate-artist-summary value)
     value))
 
@@ -1216,6 +2218,16 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
   (check-type '("artist-summary" "views") (artist-summary-views value)
               'integer)
   (check-minimum '("artist-summary" "views") (artist-summary-views value) 0)
+  (when (artist-summary-like-count value)
+    (check-type '("artist-summary" "likeCount")
+                (artist-summary-like-count value) 'integer)
+    (check-minimum '("artist-summary" "likeCount")
+                   (artist-summary-like-count value) 0))
+  (when (artist-summary-dislike-count value)
+    (check-type '("artist-summary" "dislikeCount")
+                (artist-summary-dislike-count value) 'integer)
+    (check-minimum '("artist-summary" "dislikeCount")
+                   (artist-summary-dislike-count value) 0))
   (when (artist-summary-created-at value)
     (check-type '("artist-summary" "createdAt")
                 (artist-summary-created-at value) 'string))
@@ -1234,6 +2246,12 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
             '()
             (list (cons "description" (artist-summary-description value))))
           (list (cons "views" (artist-summary-views value)))
+          (if (eq? (artist-summary-like-count value) #f)
+            '()
+            (list (cons "likeCount" (artist-summary-like-count value))))
+          (if (eq? (artist-summary-dislike-count value) #f)
+            '()
+            (list (cons "dislikeCount" (artist-summary-dislike-count value))))
           (if (eq? (artist-summary-created-at value) #f)
             '()
             (list (cons "createdAt" (artist-summary-created-at value))))))
@@ -1263,6 +2281,16 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
        (if (json-null? value)
          #f
          value))
+     #:like-count
+     (let ((value (jso-ref node "likeCount")))
+       (if (json-null? value)
+         #f
+         value))
+     #:dislike-count
+     (let ((value (jso-ref node "dislikeCount")))
+       (if (json-null? value)
+         #f
+         value))
      #:created-at
      (let ((value (jso-ref node "createdAt")))
        (if (json-null? value)
@@ -1280,19 +2308,24 @@ like any other ArtistSummary, so a patch that would leave the record invalid rai
                       (display-name #f)
                       (description #f)
                       (views #f)
+                      (like-count #f)
+                      (dislike-count #f)
                       (artworks #f)
+                      (comments '())
+                      (external-sources '())
                       (created-at #f))
   "Create a Artist.
 
 One artist, with everything the API says about them.
 
-Fields: identifier (string, required), displayName (string, required), description (string), views (integer, required), artworks (list of Artwork, required), createdAt (string).
+Fields: identifier (string, required), displayName (string, required), description (string), views (integer, required), likeCount (integer), dislikeCount (integer), artworks (list of Artwork, required), comments (list of Comment), externalSources (list of ExternalSource), createdAt (string).
 
 @example
-(make-artist #:identifier <string> #:display-name <string> #:description <string> #:views <integer> #:artworks <list of Artwork> #:created-at <string>)
+(make-artist #:identifier <string> #:display-name <string> #:description <string> #:views <integer> #:like-count <integer> #:dislike-count <integer> #:artworks <list of Artwork> #:comments <list of Comment> #:external-sources <list of ExternalSource> #:created-at <string>)
 @end example"
   (let ((value
-         (%make-artist identifier display-name description views artworks
+         (%make-artist identifier display-name description views like-count
+                       dislike-count artworks comments external-sources
                        created-at)))
     (validate-artist value)
     value))
@@ -1312,10 +2345,26 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
   (check-required '("artist" "views") (artist-views value))
   (check-type '("artist" "views") (artist-views value) 'integer)
   (check-minimum '("artist" "views") (artist-views value) 0)
+  (when (artist-like-count value)
+    (check-type '("artist" "likeCount") (artist-like-count value) 'integer)
+    (check-minimum '("artist" "likeCount") (artist-like-count value) 0))
+  (when (artist-dislike-count value)
+    (check-type '("artist" "dislikeCount") (artist-dislike-count value)
+                'integer)
+    (check-minimum '("artist" "dislikeCount") (artist-dislike-count value) 0))
   (check-required '("artist" "artworks") (artist-artworks value))
   (check-type '("artist" "artworks") (artist-artworks value) 'list)
   (check-list '("artist" "artworks") (artist-artworks value) artwork?
               "Artwork")
+  (when (artist-comments value)
+    (check-type '("artist" "comments") (artist-comments value) 'list)
+    (check-list '("artist" "comments") (artist-comments value) comment?
+                "Comment"))
+  (when (artist-external-sources value)
+    (check-type '("artist" "externalSources") (artist-external-sources value)
+                'list)
+    (check-list '("artist" "externalSources") (artist-external-sources value)
+                external-source? "ExternalSource"))
   (when (artist-created-at value)
     (check-type '("artist" "createdAt") (artist-created-at value) 'string))
   #t)
@@ -1333,6 +2382,12 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
             '()
             (list (cons "description" (artist-description value))))
           (list (cons "views" (artist-views value)))
+          (if (eq? (artist-like-count value) #f)
+            '()
+            (list (cons "likeCount" (artist-like-count value))))
+          (if (eq? (artist-dislike-count value) #f)
+            '()
+            (list (cons "dislikeCount" (artist-dislike-count value))))
           (list
            (cons "artworks"
                  (list->vector
@@ -1340,6 +2395,24 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
                    (lambda (element)
                      (artwork->jso element))
                    (artist-artworks value)))))
+          (if (eq? (artist-comments value) #f)
+            '()
+            (list
+             (cons "comments"
+                   (list->vector
+                    (map
+                     (lambda (element)
+                       (comment->jso element))
+                     (artist-comments value))))))
+          (if (eq? (artist-external-sources value) #f)
+            '()
+            (list
+             (cons "externalSources"
+                   (list->vector
+                    (map
+                     (lambda (element)
+                       (external-source->jso element))
+                     (artist-external-sources value))))))
           (if (eq? (artist-created-at value) #f)
             '()
             (list (cons "createdAt" (artist-created-at value))))))
@@ -1369,12 +2442,36 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
        (if (json-null? value)
          #f
          value))
+     #:like-count
+     (let ((value (jso-ref node "likeCount")))
+       (if (json-null? value)
+         #f
+         value))
+     #:dislike-count
+     (let ((value (jso-ref node "dislikeCount")))
+       (if (json-null? value)
+         #f
+         value))
      #:artworks
      (let ((value (jso-ref node "artworks")))
        (if (or (eq? value #f) (json-null? value))
          #f
          (map (lambda (element) (jso->artwork element))
               (jso-array->list value))))
+     #:comments
+     (let ((value (jso-ref node "comments")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map (lambda (element) (jso->comment element))
+              (jso-array->list value))))
+     #:external-sources
+     (let ((value (jso-ref node "externalSources")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map
+          (lambda (element)
+            (jso->external-source element))
+          (jso-array->list value))))
      #:created-at
      (let ((value (jso-ref node "createdAt")))
        (if (json-null? value)
@@ -1392,19 +2489,21 @@ like any other Artist, so a patch that would leave the record invalid raises."
                              (display-name #f)
                              (description #f)
                              (views #f)
+                             (like-count #f)
+                             (dislike-count #f)
                              (created-at #f))
   "Create a GenreSummary.
 
 A genre as a list shows it.
 
-Fields: identifier (string, required), displayName (string, required), description (string), views (integer, required), createdAt (string).
+Fields: identifier (string, required), displayName (string, required), description (string), views (integer, required), likeCount (integer), dislikeCount (integer), createdAt (string).
 
 @example
-(make-genre-summary #:identifier <string> #:display-name <string> #:description <string> #:views <integer> #:created-at <string>)
+(make-genre-summary #:identifier <string> #:display-name <string> #:description <string> #:views <integer> #:like-count <integer> #:dislike-count <integer> #:created-at <string>)
 @end example"
   (let ((value
          (%make-genre-summary identifier display-name description views
-                              created-at)))
+                              like-count dislike-count created-at)))
     (validate-genre-summary value)
     value))
 
@@ -1429,6 +2528,16 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
   (check-required '("genre-summary" "views") (genre-summary-views value))
   (check-type '("genre-summary" "views") (genre-summary-views value) 'integer)
   (check-minimum '("genre-summary" "views") (genre-summary-views value) 0)
+  (when (genre-summary-like-count value)
+    (check-type '("genre-summary" "likeCount")
+                (genre-summary-like-count value) 'integer)
+    (check-minimum '("genre-summary" "likeCount")
+                   (genre-summary-like-count value) 0))
+  (when (genre-summary-dislike-count value)
+    (check-type '("genre-summary" "dislikeCount")
+                (genre-summary-dislike-count value) 'integer)
+    (check-minimum '("genre-summary" "dislikeCount")
+                   (genre-summary-dislike-count value) 0))
   (when (genre-summary-created-at value)
     (check-type '("genre-summary" "createdAt")
                 (genre-summary-created-at value) 'string))
@@ -1447,6 +2556,12 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
             '()
             (list (cons "description" (genre-summary-description value))))
           (list (cons "views" (genre-summary-views value)))
+          (if (eq? (genre-summary-like-count value) #f)
+            '()
+            (list (cons "likeCount" (genre-summary-like-count value))))
+          (if (eq? (genre-summary-dislike-count value) #f)
+            '()
+            (list (cons "dislikeCount" (genre-summary-dislike-count value))))
           (if (eq? (genre-summary-created-at value) #f)
             '()
             (list (cons "createdAt" (genre-summary-created-at value))))))
@@ -1476,6 +2591,16 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
        (if (json-null? value)
          #f
          value))
+     #:like-count
+     (let ((value (jso-ref node "likeCount")))
+       (if (json-null? value)
+         #f
+         value))
+     #:dislike-count
+     (let ((value (jso-ref node "dislikeCount")))
+       (if (json-null? value)
+         #f
+         value))
      #:created-at
      (let ((value (jso-ref node "createdAt")))
        (if (json-null? value)
@@ -1493,19 +2618,24 @@ like any other GenreSummary, so a patch that would leave the record invalid rais
                      (display-name #f)
                      (description #f)
                      (views #f)
+                     (like-count #f)
+                     (dislike-count #f)
                      (artworks #f)
+                     (comments '())
+                     (external-sources '())
                      (created-at #f))
   "Create a Genre.
 
 One genre, with everything the API says about it.
 
-Fields: identifier (string, required), displayName (string, required), description (string), views (integer, required), artworks (list of Artwork, required), createdAt (string).
+Fields: identifier (string, required), displayName (string, required), description (string), views (integer, required), likeCount (integer), dislikeCount (integer), artworks (list of Artwork, required), comments (list of Comment), externalSources (list of ExternalSource), createdAt (string).
 
 @example
-(make-genre #:identifier <string> #:display-name <string> #:description <string> #:views <integer> #:artworks <list of Artwork> #:created-at <string>)
+(make-genre #:identifier <string> #:display-name <string> #:description <string> #:views <integer> #:like-count <integer> #:dislike-count <integer> #:artworks <list of Artwork> #:comments <list of Comment> #:external-sources <list of ExternalSource> #:created-at <string>)
 @end example"
   (let ((value
-         (%make-genre identifier display-name description views artworks
+         (%make-genre identifier display-name description views like-count
+                      dislike-count artworks comments external-sources
                       created-at)))
     (validate-genre value)
     value))
@@ -1525,9 +2655,24 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
   (check-required '("genre" "views") (genre-views value))
   (check-type '("genre" "views") (genre-views value) 'integer)
   (check-minimum '("genre" "views") (genre-views value) 0)
+  (when (genre-like-count value)
+    (check-type '("genre" "likeCount") (genre-like-count value) 'integer)
+    (check-minimum '("genre" "likeCount") (genre-like-count value) 0))
+  (when (genre-dislike-count value)
+    (check-type '("genre" "dislikeCount") (genre-dislike-count value) 'integer)
+    (check-minimum '("genre" "dislikeCount") (genre-dislike-count value) 0))
   (check-required '("genre" "artworks") (genre-artworks value))
   (check-type '("genre" "artworks") (genre-artworks value) 'list)
   (check-list '("genre" "artworks") (genre-artworks value) artwork? "Artwork")
+  (when (genre-comments value)
+    (check-type '("genre" "comments") (genre-comments value) 'list)
+    (check-list '("genre" "comments") (genre-comments value) comment?
+                "Comment"))
+  (when (genre-external-sources value)
+    (check-type '("genre" "externalSources") (genre-external-sources value)
+                'list)
+    (check-list '("genre" "externalSources") (genre-external-sources value)
+                external-source? "ExternalSource"))
   (when (genre-created-at value)
     (check-type '("genre" "createdAt") (genre-created-at value) 'string))
   #t)
@@ -1545,6 +2690,12 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
             '()
             (list (cons "description" (genre-description value))))
           (list (cons "views" (genre-views value)))
+          (if (eq? (genre-like-count value) #f)
+            '()
+            (list (cons "likeCount" (genre-like-count value))))
+          (if (eq? (genre-dislike-count value) #f)
+            '()
+            (list (cons "dislikeCount" (genre-dislike-count value))))
           (list
            (cons "artworks"
                  (list->vector
@@ -1552,6 +2703,24 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
                    (lambda (element)
                      (artwork->jso element))
                    (genre-artworks value)))))
+          (if (eq? (genre-comments value) #f)
+            '()
+            (list
+             (cons "comments"
+                   (list->vector
+                    (map
+                     (lambda (element)
+                       (comment->jso element))
+                     (genre-comments value))))))
+          (if (eq? (genre-external-sources value) #f)
+            '()
+            (list
+             (cons "externalSources"
+                   (list->vector
+                    (map
+                     (lambda (element)
+                       (external-source->jso element))
+                     (genre-external-sources value))))))
           (if (eq? (genre-created-at value) #f)
             '()
             (list (cons "createdAt" (genre-created-at value))))))
@@ -1581,11 +2750,33 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
        (if (json-null? value)
          #f
          value))
+     #:like-count
+     (let ((value (jso-ref node "likeCount")))
+       (if (json-null? value)
+         #f
+         value))
+     #:dislike-count
+     (let ((value (jso-ref node "dislikeCount")))
+       (if (json-null? value)
+         #f
+         value))
      #:artworks
      (let ((value (jso-ref node "artworks")))
        (if (or (eq? value #f) (json-null? value))
          #f
          (map (lambda (element) (jso->artwork element))
+              (jso-array->list value))))
+     #:comments
+     (let ((value (jso-ref node "comments")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map (lambda (element) (jso->comment element))
+              (jso-array->list value))))
+     #:external-sources
+     (let ((value (jso-ref node "externalSources")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map (lambda (element) (jso->external-source element))
               (jso-array->list value))))
      #:created-at
      (let ((value (jso-ref node "createdAt")))
@@ -1598,6 +2789,658 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
 Members of PATCH set to null are removed, and the result is validated
 like any other Genre, so a patch that would leave the record invalid raises."
   (jso->genre (json-merge-patch (genre->jso value) patch)))
+
+(define* (make-article-summary #:key
+                               (identifier #f)
+                               (display-name #f)
+                               (kind #f)
+                               (video-url #f)
+                               (views #f)
+                               (created-at #f))
+  "Create a ArticleSummary.
+
+An article as a list shows it.
+
+Fields: identifier (string, required), displayName (string, required), kind (article-summary-kind, required), videoUrl (string), views (integer, required), createdAt (string).
+
+@example
+(make-article-summary #:identifier <string> #:display-name <string> #:kind <article-summary-kind> #:video-url <string> #:views <integer> #:created-at <string>)
+@end example"
+  (let ((value
+         (%make-article-summary identifier display-name kind video-url views
+                                created-at)))
+    (validate-article-summary value)
+    value))
+
+(define (validate-article-summary value)
+  "Check VALUE against the constraints the specification declares for ArticleSummary.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("article-summary") value article-summary?
+                   "ArticleSummary")
+  (check-required '("article-summary" "identifier")
+                  (article-summary-identifier value))
+  (check-type '("article-summary" "identifier")
+              (article-summary-identifier value) 'string)
+  (check-format '("article-summary" "identifier")
+                (article-summary-identifier value) 'uuid)
+  (check-required '("article-summary" "displayName")
+                  (article-summary-display-name value))
+  (check-type '("article-summary" "displayName")
+              (article-summary-display-name value) 'string)
+  (check-required '("article-summary" "kind") (article-summary-kind value))
+  (check-type '("article-summary" "kind") (article-summary-kind value) 'string)
+  (check-enum '("article-summary" "kind") (article-summary-kind value)
+              article-summary-kind-values)
+  (when (article-summary-video-url value)
+    (check-type '("article-summary" "videoUrl")
+                (article-summary-video-url value) 'string)
+    (check-format '("article-summary" "videoUrl")
+                  (article-summary-video-url value) 'uri))
+  (check-required '("article-summary" "views") (article-summary-views value))
+  (check-type '("article-summary" "views") (article-summary-views value)
+              'integer)
+  (check-minimum '("article-summary" "views") (article-summary-views value) 0)
+  (when (article-summary-created-at value)
+    (check-type '("article-summary" "createdAt")
+                (article-summary-created-at value) 'string))
+  #t)
+
+(define (article-summary-valid? value)
+  "Return #t when VALUE is a valid ArticleSummary."
+  (valid? (lambda () (validate-article-summary value))))
+
+(define (article-summary->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("article-summary") value article-summary?
+                   "ArticleSummary")
+  (append (list (cons "identifier" (article-summary-identifier value)))
+          (list (cons "displayName" (article-summary-display-name value)))
+          (list
+           (cons "kind"
+                 (article-summary-kind->jso (article-summary-kind value))))
+          (if (eq? (article-summary-video-url value) #f)
+            '()
+            (list (cons "videoUrl" (article-summary-video-url value))))
+          (list (cons "views" (article-summary-views value)))
+          (if (eq? (article-summary-created-at value) #f)
+            '()
+            (list (cons "createdAt" (article-summary-created-at value))))))
+
+(define (jso->article-summary node)
+  "Build a ArticleSummary from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-article-summary
+     #:identifier
+     (let ((value (jso-ref node "identifier")))
+       (if (json-null? value)
+         #f
+         value))
+     #:display-name
+     (let ((value (jso-ref node "displayName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:kind
+     (jso->article-summary-kind (jso-ref node "kind"))
+     #:video-url
+     (let ((value (jso-ref node "videoUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:views
+     (let ((value (jso-ref node "views")))
+       (if (json-null? value)
+         #f
+         value))
+     #:created-at
+     (let ((value (jso-ref node "createdAt")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (article-summary-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ArticleSummary, so a patch that would leave the record invalid raises."
+  (jso->article-summary (json-merge-patch (article-summary->jso value) patch)))
+
+(define article-summary-kind-values
+  (list "tutorial" "video" "chord-guide" "theory" "discussion"))
+
+(define article-summary-kind-tutorial
+  "tutorial")
+
+(define article-summary-kind-video
+  "video")
+
+(define article-summary-kind-chord-guide
+  "chord-guide")
+
+(define article-summary-kind-theory
+  "theory")
+
+(define article-summary-kind-discussion
+  "discussion")
+
+(define (article-summary-kind? value)
+  "Return #t when VALUE is one of the article-summary.kind values."
+  (and (string? value) (if (member value article-summary-kind-values) #t #f)))
+
+(define (article-summary-kind->jso value)
+  "Return VALUE as a jso scalar, after checking it."
+  (if (article-summary-kind? value)
+    value
+    (validation-failure '("article-summary-kind")
+                        "must be one of article-summary-kind-values, got ~s"
+                        value)))
+
+(define (jso->article-summary-kind node)
+  "Read a article-summary.kind from the jso scalar NODE."
+  (if (json-null? node)
+    #f
+    node))
+
+(define* (make-article #:key
+                       (identifier #f)
+                       (display-name #f)
+                       (kind #f)
+                       (video-url #f)
+                       (contents #f)
+                       (views #f)
+                       (comments '())
+                       (created-at #f))
+  "Create a Article.
+
+One article, with everything the API says about it.
+
+Fields: identifier (string, required), displayName (string, required), kind (article-kind, required), videoUrl (string), contents (string, required), views (integer, required), comments (list of ArticleComment), createdAt (string).
+
+@example
+(make-article #:identifier <string> #:display-name <string> #:kind <article-kind> #:video-url <string> #:contents <string> #:views <integer> #:comments <list of ArticleComment> #:created-at <string>)
+@end example"
+  (let ((value
+         (%make-article identifier display-name kind video-url contents views
+                        comments created-at)))
+    (validate-article value)
+    value))
+
+(define (validate-article value)
+  "Check VALUE against the constraints the specification declares for Article.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("article") value article? "Article")
+  (check-required '("article" "identifier") (article-identifier value))
+  (check-type '("article" "identifier") (article-identifier value) 'string)
+  (check-format '("article" "identifier") (article-identifier value) 'uuid)
+  (check-required '("article" "displayName") (article-display-name value))
+  (check-type '("article" "displayName") (article-display-name value) 'string)
+  (check-required '("article" "kind") (article-kind value))
+  (check-type '("article" "kind") (article-kind value) 'string)
+  (check-enum '("article" "kind") (article-kind value) article-kind-values)
+  (when (article-video-url value)
+    (check-type '("article" "videoUrl") (article-video-url value) 'string)
+    (check-format '("article" "videoUrl") (article-video-url value) 'uri))
+  (check-required '("article" "contents") (article-contents value))
+  (check-type '("article" "contents") (article-contents value) 'string)
+  (check-required '("article" "views") (article-views value))
+  (check-type '("article" "views") (article-views value) 'integer)
+  (check-minimum '("article" "views") (article-views value) 0)
+  (when (article-comments value)
+    (check-type '("article" "comments") (article-comments value) 'list)
+    (check-list '("article" "comments") (article-comments value)
+                article-comment? "ArticleComment"))
+  (when (article-created-at value)
+    (check-type '("article" "createdAt") (article-created-at value) 'string))
+  #t)
+
+(define (article-valid? value)
+  "Return #t when VALUE is a valid Article."
+  (valid? (lambda () (validate-article value))))
+
+(define (article->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("article") value article? "Article")
+  (append (list (cons "identifier" (article-identifier value)))
+          (list (cons "displayName" (article-display-name value)))
+          (list (cons "kind" (article-kind->jso (article-kind value))))
+          (if (eq? (article-video-url value) #f)
+            '()
+            (list (cons "videoUrl" (article-video-url value))))
+          (list (cons "contents" (article-contents value)))
+          (list (cons "views" (article-views value)))
+          (if (eq? (article-comments value) #f)
+            '()
+            (list
+             (cons "comments"
+                   (list->vector
+                    (map
+                     (lambda (element)
+                       (article-comment->jso element))
+                     (article-comments value))))))
+          (if (eq? (article-created-at value) #f)
+            '()
+            (list (cons "createdAt" (article-created-at value))))))
+
+(define (jso->article node)
+  "Build a Article from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-article
+     #:identifier
+     (let ((value (jso-ref node "identifier")))
+       (if (json-null? value)
+         #f
+         value))
+     #:display-name
+     (let ((value (jso-ref node "displayName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:kind (jso->article-kind (jso-ref node "kind"))
+     #:video-url
+     (let ((value (jso-ref node "videoUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:contents
+     (let ((value (jso-ref node "contents")))
+       (if (json-null? value)
+         #f
+         value))
+     #:views
+     (let ((value (jso-ref node "views")))
+       (if (json-null? value)
+         #f
+         value))
+     #:comments
+     (let ((value (jso-ref node "comments")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map
+          (lambda (element)
+            (jso->article-comment element))
+          (jso-array->list value))))
+     #:created-at
+     (let ((value (jso-ref node "createdAt")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (article-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other Article, so a patch that would leave the record invalid raises."
+  (jso->article (json-merge-patch (article->jso value) patch)))
+
+(define article-kind-values
+  (list "tutorial" "video" "chord-guide" "theory" "discussion"))
+
+(define article-kind-tutorial
+  "tutorial")
+
+(define article-kind-video
+  "video")
+
+(define article-kind-chord-guide
+  "chord-guide")
+
+(define article-kind-theory
+  "theory")
+
+(define article-kind-discussion
+  "discussion")
+
+(define (article-kind? value)
+  "Return #t when VALUE is one of the article.kind values."
+  (and (string? value) (if (member value article-kind-values) #t #f)))
+
+(define (article-kind->jso value)
+  "Return VALUE as a jso scalar, after checking it."
+  (if (article-kind? value)
+    value
+    (validation-failure '("article-kind")
+                        "must be one of article-kind-values, got ~s" value)))
+
+(define (jso->article-kind node)
+  "Read a article.kind from the jso scalar NODE."
+  (if (json-null? node)
+    #f
+    node))
+
+(define* (make-article-comment #:key
+                               (identifier #f)
+                               (parent-identifier #f)
+                               (author-name #f)
+                               (created-by #f)
+                               (contents #f)
+                               (created-at #f))
+  "Create a ArticleComment.
+
+A comment an article carries.
+
+Fields: identifier (string, required), parentIdentifier (string), authorName (string), createdBy (string), contents (string, required), createdAt (string).
+
+@example
+(make-article-comment #:identifier <string> #:parent-identifier <string> #:author-name <string> #:created-by <string> #:contents <string> #:created-at <string>)
+@end example"
+  (let ((value
+         (%make-article-comment identifier parent-identifier author-name
+                                created-by contents created-at)))
+    (validate-article-comment value)
+    value))
+
+(define (validate-article-comment value)
+  "Check VALUE against the constraints the specification declares for ArticleComment.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("article-comment") value article-comment?
+                   "ArticleComment")
+  (check-required '("article-comment" "identifier")
+                  (article-comment-identifier value))
+  (check-type '("article-comment" "identifier")
+              (article-comment-identifier value) 'string)
+  (check-format '("article-comment" "identifier")
+                (article-comment-identifier value) 'uuid)
+  (when (article-comment-parent-identifier value)
+    (check-type '("article-comment" "parentIdentifier")
+                (article-comment-parent-identifier value) 'string)
+    (check-format '("article-comment" "parentIdentifier")
+                  (article-comment-parent-identifier value) 'uuid))
+  (when (article-comment-author-name value)
+    (check-type '("article-comment" "authorName")
+                (article-comment-author-name value) 'string))
+  (when (article-comment-created-by value)
+    (check-type '("article-comment" "createdBy")
+                (article-comment-created-by value) 'string)
+    (check-format '("article-comment" "createdBy")
+                  (article-comment-created-by value) 'uuid))
+  (check-required '("article-comment" "contents")
+                  (article-comment-contents value))
+  (check-type '("article-comment" "contents") (article-comment-contents value)
+              'string)
+  (when (article-comment-created-at value)
+    (check-type '("article-comment" "createdAt")
+                (article-comment-created-at value) 'string))
+  #t)
+
+(define (article-comment-valid? value)
+  "Return #t when VALUE is a valid ArticleComment."
+  (valid? (lambda () (validate-article-comment value))))
+
+(define (article-comment->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("article-comment") value article-comment?
+                   "ArticleComment")
+  (append (list (cons "identifier" (article-comment-identifier value)))
+          (if (eq? (article-comment-parent-identifier value) #f)
+            '()
+            (list
+             (cons "parentIdentifier"
+                   (article-comment-parent-identifier value))))
+          (if (eq? (article-comment-author-name value) #f)
+            '()
+            (list (cons "authorName" (article-comment-author-name value))))
+          (if (eq? (article-comment-created-by value) #f)
+            '()
+            (list (cons "createdBy" (article-comment-created-by value))))
+          (list (cons "contents" (article-comment-contents value)))
+          (if (eq? (article-comment-created-at value) #f)
+            '()
+            (list (cons "createdAt" (article-comment-created-at value))))))
+
+(define (jso->article-comment node)
+  "Build a ArticleComment from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-article-comment
+     #:identifier
+     (let ((value (jso-ref node "identifier")))
+       (if (json-null? value)
+         #f
+         value))
+     #:parent-identifier
+     (let ((value (jso-ref node "parentIdentifier")))
+       (if (json-null? value)
+         #f
+         value))
+     #:author-name
+     (let ((value (jso-ref node "authorName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:created-by
+     (let ((value (jso-ref node "createdBy")))
+       (if (json-null? value)
+         #f
+         value))
+     #:contents
+     (let ((value (jso-ref node "contents")))
+       (if (json-null? value)
+         #f
+         value))
+     #:created-at
+     (let ((value (jso-ref node "createdAt")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (article-comment-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ArticleComment, so a patch that would leave the record invalid raises."
+  (jso->article-comment (json-merge-patch (article-comment->jso value) patch)))
+
+(define* (make-user #:key
+                    (identifier #f)
+                    (username #f)
+                    (email #f)
+                    (permissions #f))
+  "Create a User.
+
+An account of this instance.  A password is never returned.
+
+Fields: identifier (string, required), username (string, required), email (string, required), permissions (list of string, required).
+
+@example
+(make-user #:identifier <string> #:username <string> #:email <string> #:permissions <list of string>)
+@end example"
+  (let ((value (%make-user identifier username email permissions)))
+    (validate-user value)
+    value))
+
+(define (validate-user value)
+  "Check VALUE against the constraints the specification declares for User.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("user") value user? "User")
+  (check-required '("user" "identifier") (user-identifier value))
+  (check-type '("user" "identifier") (user-identifier value) 'string)
+  (check-format '("user" "identifier") (user-identifier value) 'uuid)
+  (check-required '("user" "username") (user-username value))
+  (check-type '("user" "username") (user-username value) 'string)
+  (check-required '("user" "email") (user-email value))
+  (check-type '("user" "email") (user-email value) 'string)
+  (check-format '("user" "email") (user-email value) 'email)
+  (check-required '("user" "permissions") (user-permissions value))
+  (check-type '("user" "permissions") (user-permissions value) 'list)
+  (check-list '("user" "permissions") (user-permissions value) string?
+              "string")
+  #t)
+
+(define (user-valid? value)
+  "Return #t when VALUE is a valid User."
+  (valid? (lambda () (validate-user value))))
+
+(define (user->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("user") value user? "User")
+  (append (list (cons "identifier" (user-identifier value)))
+          (list (cons "username" (user-username value)))
+          (list (cons "email" (user-email value)))
+          (list
+           (cons "permissions"
+                 (list->vector
+                  (map (lambda (element) element)
+                       (user-permissions value)))))))
+
+(define (jso->user node)
+  "Build a User from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-user
+     #:identifier
+     (let ((value (jso-ref node "identifier")))
+       (if (json-null? value)
+         #f
+         value))
+     #:username
+     (let ((value (jso-ref node "username")))
+       (if (json-null? value)
+         #f
+         value))
+     #:email
+     (let ((value (jso-ref node "email")))
+       (if (json-null? value)
+         #f
+         value))
+     #:permissions
+     (let ((value (jso-ref node "permissions")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map
+          (lambda (element)
+            (let ((value element))
+              (if (json-null? value)
+                #f
+                value))) (jso-array->list value)))))))
+
+(define* (user-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other User, so a patch that would leave the record invalid raises."
+  (jso->user (json-merge-patch (user->jso value) patch)))
+
+(define* (make-session #:key (token #f) (expires-in #f) (user #f))
+  "Create a Session.
+
+The session a successful sign-in opened.
+
+Fields: token (string, required), expiresIn (integer, required), user (User, required).
+
+@example
+(make-session #:token <string> #:expires-in <integer> #:user <User>)
+@end example"
+  (let ((value (%make-session token expires-in user)))
+    (validate-session value)
+    value))
+
+(define (validate-session value)
+  "Check VALUE against the constraints the specification declares for Session.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("session") value session? "Session")
+  (check-required '("session" "token") (session-token value))
+  (check-type '("session" "token") (session-token value) 'string)
+  (check-required '("session" "expiresIn") (session-expires-in value))
+  (check-type '("session" "expiresIn") (session-expires-in value) 'integer)
+  (check-required '("session" "user") (session-user value))
+  (check-predicate '("session" "user") (session-user value) user? "User")
+  #t)
+
+(define (session-valid? value)
+  "Return #t when VALUE is a valid Session."
+  (valid? (lambda () (validate-session value))))
+
+(define (session->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("session") value session? "Session")
+  (append (list (cons "token" (session-token value)))
+          (list (cons "expiresIn" (session-expires-in value)))
+          (list (cons "user" (user->jso (session-user value))))))
+
+(define (jso->session node)
+  "Build a Session from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-session
+     #:token
+     (let ((value (jso-ref node "token")))
+       (if (json-null? value)
+         #f
+         value))
+     #:expires-in
+     (let ((value (jso-ref node "expiresIn")))
+       (if (json-null? value)
+         #f
+         value))
+     #:user (jso->user (jso-ref node "user")))))
+
+(define* (session-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other Session, so a patch that would leave the record invalid raises."
+  (jso->session (json-merge-patch (session->jso value) patch)))
+
+(define* (make-login-request #:key (email #f) (password #f))
+  "Create a LoginRequest.
+
+The credentials a client signs in with.
+
+Fields: email (string, required), password (string, required).
+
+@example
+(make-login-request #:email <string> #:password <string>)
+@end example"
+  (let ((value (%make-login-request email password)))
+    (validate-login-request value)
+    value))
+
+(define (validate-login-request value)
+  "Check VALUE against the constraints the specification declares for LoginRequest.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("login-request") value login-request? "LoginRequest")
+  (check-required '("login-request" "email") (login-request-email value))
+  (check-type '("login-request" "email") (login-request-email value) 'string)
+  (check-format '("login-request" "email") (login-request-email value) 'email)
+  (check-required '("login-request" "password") (login-request-password value))
+  (check-type '("login-request" "password") (login-request-password value)
+              'string)
+  #t)
+
+(define (login-request-valid? value)
+  "Return #t when VALUE is a valid LoginRequest."
+  (valid? (lambda () (validate-login-request value))))
+
+(define (login-request->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("login-request") value login-request? "LoginRequest")
+  (append (list (cons "email" (login-request-email value)))
+          (list (cons "password" (login-request-password value)))))
+
+(define (jso->login-request node)
+  "Build a LoginRequest from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-login-request
+     #:email
+     (let ((value (jso-ref node "email")))
+       (if (json-null? value)
+         #f
+         value))
+     #:password
+     (let ((value (jso-ref node "password")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (login-request-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other LoginRequest, so a patch that would leave the record invalid raises."
+  (jso->login-request (json-merge-patch (login-request->jso value) patch)))
 
 (define* (make-song-list #:key (items #f) (total #f) (limit #f) (offset #f))
   "Create a SongList.
@@ -1863,17 +3706,198 @@ Members of PATCH set to null are removed, and the result is validated
 like any other GenreList, so a patch that would leave the record invalid raises."
   (jso->genre-list (json-merge-patch (genre-list->jso value) patch)))
 
-(define* (make-instance-counts #:key (songs #f) (artists #f) (genres #f))
+(define* (make-article-list #:key
+                            (items #f)
+                            (total #f)
+                            (limit #f)
+                            (offset #f))
+  "Create a ArticleList.
+
+One page of articles and the count of every match.
+
+Fields: items (list of ArticleSummary, required), total (integer, required), limit (integer, required), offset (integer, required).
+
+@example
+(make-article-list #:items <list of ArticleSummary> #:total <integer> #:limit <integer> #:offset <integer>)
+@end example"
+  (let ((value (%make-article-list items total limit offset)))
+    (validate-article-list value)
+    value))
+
+(define (validate-article-list value)
+  "Check VALUE against the constraints the specification declares for ArticleList.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("article-list") value article-list? "ArticleList")
+  (check-required '("article-list" "items") (article-list-items value))
+  (check-type '("article-list" "items") (article-list-items value) 'list)
+  (check-list '("article-list" "items") (article-list-items value)
+              article-summary? "ArticleSummary")
+  (check-required '("article-list" "total") (article-list-total value))
+  (check-type '("article-list" "total") (article-list-total value) 'integer)
+  (check-minimum '("article-list" "total") (article-list-total value) 0)
+  (check-required '("article-list" "limit") (article-list-limit value))
+  (check-type '("article-list" "limit") (article-list-limit value) 'integer)
+  (check-minimum '("article-list" "limit") (article-list-limit value) 1)
+  (check-required '("article-list" "offset") (article-list-offset value))
+  (check-type '("article-list" "offset") (article-list-offset value) 'integer)
+  (check-minimum '("article-list" "offset") (article-list-offset value) 0)
+  #t)
+
+(define (article-list-valid? value)
+  "Return #t when VALUE is a valid ArticleList."
+  (valid? (lambda () (validate-article-list value))))
+
+(define (article-list->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("article-list") value article-list? "ArticleList")
+  (append
+   (list
+    (cons "items"
+          (list->vector
+           (map
+            (lambda (element)
+              (article-summary->jso element))
+            (article-list-items value)))))
+   (list (cons "total" (article-list-total value)))
+   (list (cons "limit" (article-list-limit value)))
+   (list (cons "offset" (article-list-offset value)))))
+
+(define (jso->article-list node)
+  "Build a ArticleList from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-article-list
+     #:items
+     (let ((value (jso-ref node "items")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map
+          (lambda (element)
+            (jso->article-summary element))
+          (jso-array->list value))))
+     #:total
+     (let ((value (jso-ref node "total")))
+       (if (json-null? value)
+         #f
+         value))
+     #:limit
+     (let ((value (jso-ref node "limit")))
+       (if (json-null? value)
+         #f
+         value))
+     #:offset
+     (let ((value (jso-ref node "offset")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (article-list-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ArticleList, so a patch that would leave the record invalid raises."
+  (jso->article-list (json-merge-patch (article-list->jso value) patch)))
+
+(define* (make-user-list #:key (items #f) (total #f) (limit #f) (offset #f))
+  "Create a UserList.
+
+One page of users and the count of every match.
+
+Fields: items (list of User, required), total (integer, required), limit (integer, required), offset (integer, required).
+
+@example
+(make-user-list #:items <list of User> #:total <integer> #:limit <integer> #:offset <integer>)
+@end example"
+  (let ((value (%make-user-list items total limit offset)))
+    (validate-user-list value)
+    value))
+
+(define (validate-user-list value)
+  "Check VALUE against the constraints the specification declares for UserList.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("user-list") value user-list? "UserList")
+  (check-required '("user-list" "items") (user-list-items value))
+  (check-type '("user-list" "items") (user-list-items value) 'list)
+  (check-list '("user-list" "items") (user-list-items value) user? "User")
+  (check-required '("user-list" "total") (user-list-total value))
+  (check-type '("user-list" "total") (user-list-total value) 'integer)
+  (check-minimum '("user-list" "total") (user-list-total value) 0)
+  (check-required '("user-list" "limit") (user-list-limit value))
+  (check-type '("user-list" "limit") (user-list-limit value) 'integer)
+  (check-minimum '("user-list" "limit") (user-list-limit value) 1)
+  (check-required '("user-list" "offset") (user-list-offset value))
+  (check-type '("user-list" "offset") (user-list-offset value) 'integer)
+  (check-minimum '("user-list" "offset") (user-list-offset value) 0)
+  #t)
+
+(define (user-list-valid? value)
+  "Return #t when VALUE is a valid UserList."
+  (valid? (lambda () (validate-user-list value))))
+
+(define (user-list->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("user-list") value user-list? "UserList")
+  (append
+   (list
+    (cons "items"
+          (list->vector
+           (map
+            (lambda (element)
+              (user->jso element))
+            (user-list-items value)))))
+   (list (cons "total" (user-list-total value)))
+   (list (cons "limit" (user-list-limit value)))
+   (list (cons "offset" (user-list-offset value)))))
+
+(define (jso->user-list node)
+  "Build a UserList from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-user-list
+     #:items
+     (let ((value (jso-ref node "items")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map (lambda (element) (jso->user element))
+              (jso-array->list value))))
+     #:total
+     (let ((value (jso-ref node "total")))
+       (if (json-null? value)
+         #f
+         value))
+     #:limit
+     (let ((value (jso-ref node "limit")))
+       (if (json-null? value)
+         #f
+         value))
+     #:offset
+     (let ((value (jso-ref node "offset")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (user-list-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other UserList, so a patch that would leave the record invalid raises."
+  (jso->user-list (json-merge-patch (user-list->jso value) patch)))
+
+(define* (make-instance-counts #:key
+                               (songs #f)
+                               (artists #f)
+                               (genres #f)
+                               (articles #f))
   "Create a InstanceCounts.
 
 How much of the encyclopaedia this instance holds.
 
-Fields: songs (integer, required), artists (integer, required), genres (integer, required).
+Fields: songs (integer, required), artists (integer, required), genres (integer, required), articles (integer, required).
 
 @example
-(make-instance-counts #:songs <integer> #:artists <integer> #:genres <integer>)
+(make-instance-counts #:songs <integer> #:artists <integer> #:genres <integer> #:articles <integer>)
 @end example"
-  (let ((value (%make-instance-counts songs artists genres)))
+  (let ((value (%make-instance-counts songs artists genres articles)))
     (validate-instance-counts value)
     value))
 
@@ -1898,6 +3922,12 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
               'integer)
   (check-minimum '("instance-counts" "genres") (instance-counts-genres value)
                  0)
+  (check-required '("instance-counts" "articles")
+                  (instance-counts-articles value))
+  (check-type '("instance-counts" "articles") (instance-counts-articles value)
+              'integer)
+  (check-minimum '("instance-counts" "articles")
+                 (instance-counts-articles value) 0)
   #t)
 
 (define (instance-counts-valid? value)
@@ -1910,7 +3940,8 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
                    "InstanceCounts")
   (append (list (cons "songs" (instance-counts-songs value)))
           (list (cons "artists" (instance-counts-artists value)))
-          (list (cons "genres" (instance-counts-genres value)))))
+          (list (cons "genres" (instance-counts-genres value)))
+          (list (cons "articles" (instance-counts-articles value)))))
 
 (define (jso->instance-counts node)
   "Build a InstanceCounts from NODE, a jso object."
@@ -1929,6 +3960,11 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
          value))
      #:genres
      (let ((value (jso-ref node "genres")))
+       (if (json-null? value)
+         #f
+         value))
+     #:articles
+     (let ((value (jso-ref node "articles")))
        (if (json-null? value)
          #f
          value)))))
@@ -2000,3 +4036,1869 @@ Returns #t, or throws 'openapi-validation-error naming the field at fault."
 Members of PATCH set to null are removed, and the result is validated
 like any other Instance, so a patch that would leave the record invalid raises."
   (jso->instance (json-merge-patch (instance->jso value) patch)))
+
+(define* (make-song-input #:key
+                          (display-name #f)
+                          (description #f)
+                          (music-key #f)
+                          (music-tuning #f)
+                          (music-creation-date #f)
+                          (album-name #f)
+                          (album-info-link #f)
+                          (artist-ids '())
+                          (genre-ids '()))
+  "Create a SongInput.
+
+The fields a new song is written from.
+
+Fields: displayName (string), description (string), musicKey (string), musicTuning (string), musicCreationDate (string), albumName (string), albumInfoLink (string), artistIds (list of string), genreIds (list of string).
+
+@example
+(make-song-input #:display-name <string> #:description <string> #:music-key <string> #:music-tuning <string> #:music-creation-date <string> #:album-name <string> #:album-info-link <string> #:artist-ids <list of string> #:genre-ids <list of string>)
+@end example"
+  (let ((value
+         (%make-song-input display-name description music-key music-tuning
+                           music-creation-date album-name album-info-link
+                           artist-ids genre-ids)))
+    (validate-song-input value)
+    value))
+
+(define (validate-song-input value)
+  "Check VALUE against the constraints the specification declares for SongInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("song-input") value song-input? "SongInput")
+  (when (song-input-display-name value)
+    (check-type '("song-input" "displayName") (song-input-display-name value)
+                'string))
+  (when (song-input-description value)
+    (check-type '("song-input" "description") (song-input-description value)
+                'string))
+  (when (song-input-music-key value)
+    (check-type '("song-input" "musicKey") (song-input-music-key value)
+                'string))
+  (when (song-input-music-tuning value)
+    (check-type '("song-input" "musicTuning") (song-input-music-tuning value)
+                'string))
+  (when (song-input-music-creation-date value)
+    (check-type '("song-input" "musicCreationDate")
+                (song-input-music-creation-date value) 'string))
+  (when (song-input-album-name value)
+    (check-type '("song-input" "albumName") (song-input-album-name value)
+                'string))
+  (when (song-input-album-info-link value)
+    (check-type '("song-input" "albumInfoLink")
+                (song-input-album-info-link value) 'string)
+    (check-format '("song-input" "albumInfoLink")
+                  (song-input-album-info-link value) 'uri))
+  (when (song-input-artist-ids value)
+    (check-type '("song-input" "artistIds") (song-input-artist-ids value)
+                'list)
+    (check-list '("song-input" "artistIds") (song-input-artist-ids value)
+                string? "string"))
+  (when (song-input-genre-ids value)
+    (check-type '("song-input" "genreIds") (song-input-genre-ids value) 'list)
+    (check-list '("song-input" "genreIds") (song-input-genre-ids value)
+                string? "string"))
+  #t)
+
+(define (song-input-valid? value)
+  "Return #t when VALUE is a valid SongInput."
+  (valid? (lambda () (validate-song-input value))))
+
+(define (song-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("song-input") value song-input? "SongInput")
+  (append
+   (if (eq? (song-input-display-name value) #f)
+     '()
+     (list (cons "displayName" (song-input-display-name value))))
+   (if (eq? (song-input-description value) #f)
+     '()
+     (list (cons "description" (song-input-description value))))
+   (if (eq? (song-input-music-key value) #f)
+     '()
+     (list (cons "musicKey" (song-input-music-key value))))
+   (if (eq? (song-input-music-tuning value) #f)
+     '()
+     (list (cons "musicTuning" (song-input-music-tuning value))))
+   (if (eq? (song-input-music-creation-date value) #f)
+     '()
+     (list
+      (cons "musicCreationDate"
+            (song-input-music-creation-date value))))
+   (if (eq? (song-input-album-name value) #f)
+     '()
+     (list (cons "albumName" (song-input-album-name value))))
+   (if (eq? (song-input-album-info-link value) #f)
+     '()
+     (list (cons "albumInfoLink" (song-input-album-info-link value))))
+   (if (eq? (song-input-artist-ids value) #f)
+     '()
+     (list
+      (cons "artistIds"
+            (list->vector
+             (map (lambda (element) element)
+                  (song-input-artist-ids value))))))
+   (if (eq? (song-input-genre-ids value) #f)
+     '()
+     (list
+      (cons "genreIds"
+            (list->vector
+             (map (lambda (element) element)
+                  (song-input-genre-ids value))))))))
+
+(define (jso->song-input node)
+  "Build a SongInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-song-input
+     #:display-name
+     (let ((value (jso-ref node "displayName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:description
+     (let ((value (jso-ref node "description")))
+       (if (json-null? value)
+         #f
+         value))
+     #:music-key
+     (let ((value (jso-ref node "musicKey")))
+       (if (json-null? value)
+         #f
+         value))
+     #:music-tuning
+     (let ((value (jso-ref node "musicTuning")))
+       (if (json-null? value)
+         #f
+         value))
+     #:music-creation-date
+     (let ((value (jso-ref node "musicCreationDate")))
+       (if (json-null? value)
+         #f
+         value))
+     #:album-name
+     (let ((value (jso-ref node "albumName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:album-info-link
+     (let ((value (jso-ref node "albumInfoLink")))
+       (if (json-null? value)
+         #f
+         value))
+     #:artist-ids
+     (let ((value (jso-ref node "artistIds")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map
+          (lambda (element)
+            (let ((value element))
+              (if (json-null? value)
+                #f
+                value))) (jso-array->list value))))
+     #:genre-ids
+     (let ((value (jso-ref node "genreIds")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map
+          (lambda (element)
+            (let ((value element))
+              (if (json-null? value)
+                #f
+                value))) (jso-array->list value)))))))
+
+(define* (song-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other SongInput, so a patch that would leave the record invalid raises."
+  (jso->song-input (json-merge-patch (song-input->jso value) patch)))
+
+(define* (make-song-patch #:key
+                          (display-name #f)
+                          (description #f)
+                          (music-key #f)
+                          (music-tuning #f)
+                          (music-creation-date #f)
+                          (album-name #f)
+                          (album-info-link #f))
+  "Create a SongPatch.
+
+The fields of a song a client may rewrite.
+
+Fields: displayName (string), description (string), musicKey (string), musicTuning (string), musicCreationDate (string), albumName (string), albumInfoLink (string).
+
+@example
+(make-song-patch #:display-name <string> #:description <string> #:music-key <string> #:music-tuning <string> #:music-creation-date <string> #:album-name <string> #:album-info-link <string>)
+@end example"
+  (let ((value
+         (%make-song-patch display-name description music-key music-tuning
+                           music-creation-date album-name album-info-link)))
+    (validate-song-patch value)
+    value))
+
+(define (validate-song-patch value)
+  "Check VALUE against the constraints the specification declares for SongPatch.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("song-patch") value song-patch? "SongPatch")
+  (when (song-patch-display-name value)
+    (check-type '("song-patch" "displayName") (song-patch-display-name value)
+                'string))
+  (when (song-patch-description value)
+    (check-type '("song-patch" "description") (song-patch-description value)
+                'string))
+  (when (song-patch-music-key value)
+    (check-type '("song-patch" "musicKey") (song-patch-music-key value)
+                'string))
+  (when (song-patch-music-tuning value)
+    (check-type '("song-patch" "musicTuning") (song-patch-music-tuning value)
+                'string))
+  (when (song-patch-music-creation-date value)
+    (check-type '("song-patch" "musicCreationDate")
+                (song-patch-music-creation-date value) 'string))
+  (when (song-patch-album-name value)
+    (check-type '("song-patch" "albumName") (song-patch-album-name value)
+                'string))
+  (when (song-patch-album-info-link value)
+    (check-type '("song-patch" "albumInfoLink")
+                (song-patch-album-info-link value) 'string)
+    (check-format '("song-patch" "albumInfoLink")
+                  (song-patch-album-info-link value) 'uri))
+  #t)
+
+(define (song-patch-valid? value)
+  "Return #t when VALUE is a valid SongPatch."
+  (valid? (lambda () (validate-song-patch value))))
+
+(define (song-patch->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("song-patch") value song-patch? "SongPatch")
+  (append
+   (if (eq? (song-patch-display-name value) #f)
+     '()
+     (list (cons "displayName" (song-patch-display-name value))))
+   (if (eq? (song-patch-description value) #f)
+     '()
+     (list (cons "description" (song-patch-description value))))
+   (if (eq? (song-patch-music-key value) #f)
+     '()
+     (list (cons "musicKey" (song-patch-music-key value))))
+   (if (eq? (song-patch-music-tuning value) #f)
+     '()
+     (list (cons "musicTuning" (song-patch-music-tuning value))))
+   (if (eq? (song-patch-music-creation-date value) #f)
+     '()
+     (list
+      (cons "musicCreationDate"
+            (song-patch-music-creation-date value))))
+   (if (eq? (song-patch-album-name value) #f)
+     '()
+     (list (cons "albumName" (song-patch-album-name value))))
+   (if (eq? (song-patch-album-info-link value) #f)
+     '()
+     (list (cons "albumInfoLink" (song-patch-album-info-link value))))))
+
+(define (jso->song-patch node)
+  "Build a SongPatch from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-song-patch
+     #:display-name
+     (let ((value (jso-ref node "displayName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:description
+     (let ((value (jso-ref node "description")))
+       (if (json-null? value)
+         #f
+         value))
+     #:music-key
+     (let ((value (jso-ref node "musicKey")))
+       (if (json-null? value)
+         #f
+         value))
+     #:music-tuning
+     (let ((value (jso-ref node "musicTuning")))
+       (if (json-null? value)
+         #f
+         value))
+     #:music-creation-date
+     (let ((value (jso-ref node "musicCreationDate")))
+       (if (json-null? value)
+         #f
+         value))
+     #:album-name
+     (let ((value (jso-ref node "albumName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:album-info-link
+     (let ((value (jso-ref node "albumInfoLink")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (song-patch-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other SongPatch, so a patch that would leave the record invalid raises."
+  (jso->song-patch (json-merge-patch (song-patch->jso value) patch)))
+
+(define* (make-artist-input #:key (display-name #f) (description #f))
+  "Create a ArtistInput.
+
+The fields a new artist is written from.
+
+Fields: displayName (string), description (string).
+
+@example
+(make-artist-input #:display-name <string> #:description <string>)
+@end example"
+  (let ((value (%make-artist-input display-name description)))
+    (validate-artist-input value)
+    value))
+
+(define (validate-artist-input value)
+  "Check VALUE against the constraints the specification declares for ArtistInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("artist-input") value artist-input? "ArtistInput")
+  (when (artist-input-display-name value)
+    (check-type '("artist-input" "displayName")
+                (artist-input-display-name value) 'string))
+  (when (artist-input-description value)
+    (check-type '("artist-input" "description")
+                (artist-input-description value) 'string))
+  #t)
+
+(define (artist-input-valid? value)
+  "Return #t when VALUE is a valid ArtistInput."
+  (valid? (lambda () (validate-artist-input value))))
+
+(define (artist-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("artist-input") value artist-input? "ArtistInput")
+  (append
+   (if (eq? (artist-input-display-name value) #f)
+     '()
+     (list (cons "displayName" (artist-input-display-name value))))
+   (if (eq? (artist-input-description value) #f)
+     '()
+     (list (cons "description" (artist-input-description value))))))
+
+(define (jso->artist-input node)
+  "Build a ArtistInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-artist-input
+     #:display-name
+     (let ((value (jso-ref node "displayName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:description
+     (let ((value (jso-ref node "description")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (artist-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ArtistInput, so a patch that would leave the record invalid raises."
+  (jso->artist-input (json-merge-patch (artist-input->jso value) patch)))
+
+(define* (make-artist-patch #:key (display-name #f) (description #f))
+  "Create a ArtistPatch.
+
+The fields of an artist a client may rewrite.
+
+Fields: displayName (string), description (string).
+
+@example
+(make-artist-patch #:display-name <string> #:description <string>)
+@end example"
+  (let ((value (%make-artist-patch display-name description)))
+    (validate-artist-patch value)
+    value))
+
+(define (validate-artist-patch value)
+  "Check VALUE against the constraints the specification declares for ArtistPatch.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("artist-patch") value artist-patch? "ArtistPatch")
+  (when (artist-patch-display-name value)
+    (check-type '("artist-patch" "displayName")
+                (artist-patch-display-name value) 'string))
+  (when (artist-patch-description value)
+    (check-type '("artist-patch" "description")
+                (artist-patch-description value) 'string))
+  #t)
+
+(define (artist-patch-valid? value)
+  "Return #t when VALUE is a valid ArtistPatch."
+  (valid? (lambda () (validate-artist-patch value))))
+
+(define (artist-patch->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("artist-patch") value artist-patch? "ArtistPatch")
+  (append
+   (if (eq? (artist-patch-display-name value) #f)
+     '()
+     (list (cons "displayName" (artist-patch-display-name value))))
+   (if (eq? (artist-patch-description value) #f)
+     '()
+     (list (cons "description" (artist-patch-description value))))))
+
+(define (jso->artist-patch node)
+  "Build a ArtistPatch from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-artist-patch
+     #:display-name
+     (let ((value (jso-ref node "displayName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:description
+     (let ((value (jso-ref node "description")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (artist-patch-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ArtistPatch, so a patch that would leave the record invalid raises."
+  (jso->artist-patch (json-merge-patch (artist-patch->jso value) patch)))
+
+(define* (make-genre-input #:key (display-name #f) (description #f))
+  "Create a GenreInput.
+
+The fields a new genre is written from.
+
+Fields: displayName (string), description (string).
+
+@example
+(make-genre-input #:display-name <string> #:description <string>)
+@end example"
+  (let ((value (%make-genre-input display-name description)))
+    (validate-genre-input value)
+    value))
+
+(define (validate-genre-input value)
+  "Check VALUE against the constraints the specification declares for GenreInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("genre-input") value genre-input? "GenreInput")
+  (when (genre-input-display-name value)
+    (check-type '("genre-input" "displayName")
+                (genre-input-display-name value) 'string))
+  (when (genre-input-description value)
+    (check-type '("genre-input" "description") (genre-input-description value)
+                'string))
+  #t)
+
+(define (genre-input-valid? value)
+  "Return #t when VALUE is a valid GenreInput."
+  (valid? (lambda () (validate-genre-input value))))
+
+(define (genre-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("genre-input") value genre-input? "GenreInput")
+  (append
+   (if (eq? (genre-input-display-name value) #f)
+     '()
+     (list (cons "displayName" (genre-input-display-name value))))
+   (if (eq? (genre-input-description value) #f)
+     '()
+     (list (cons "description" (genre-input-description value))))))
+
+(define (jso->genre-input node)
+  "Build a GenreInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-genre-input
+     #:display-name
+     (let ((value (jso-ref node "displayName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:description
+     (let ((value (jso-ref node "description")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (genre-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other GenreInput, so a patch that would leave the record invalid raises."
+  (jso->genre-input (json-merge-patch (genre-input->jso value) patch)))
+
+(define* (make-genre-patch #:key (display-name #f) (description #f))
+  "Create a GenrePatch.
+
+The fields of a genre a client may rewrite.
+
+Fields: displayName (string), description (string).
+
+@example
+(make-genre-patch #:display-name <string> #:description <string>)
+@end example"
+  (let ((value (%make-genre-patch display-name description)))
+    (validate-genre-patch value)
+    value))
+
+(define (validate-genre-patch value)
+  "Check VALUE against the constraints the specification declares for GenrePatch.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("genre-patch") value genre-patch? "GenrePatch")
+  (when (genre-patch-display-name value)
+    (check-type '("genre-patch" "displayName")
+                (genre-patch-display-name value) 'string))
+  (when (genre-patch-description value)
+    (check-type '("genre-patch" "description") (genre-patch-description value)
+                'string))
+  #t)
+
+(define (genre-patch-valid? value)
+  "Return #t when VALUE is a valid GenrePatch."
+  (valid? (lambda () (validate-genre-patch value))))
+
+(define (genre-patch->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("genre-patch") value genre-patch? "GenrePatch")
+  (append
+   (if (eq? (genre-patch-display-name value) #f)
+     '()
+     (list (cons "displayName" (genre-patch-display-name value))))
+   (if (eq? (genre-patch-description value) #f)
+     '()
+     (list (cons "description" (genre-patch-description value))))))
+
+(define (jso->genre-patch node)
+  "Build a GenrePatch from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-genre-patch
+     #:display-name
+     (let ((value (jso-ref node "displayName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:description
+     (let ((value (jso-ref node "description")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (genre-patch-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other GenrePatch, so a patch that would leave the record invalid raises."
+  (jso->genre-patch (json-merge-patch (genre-patch->jso value) patch)))
+
+(define* (make-song-version-input #:key
+                                  (version-name #f)
+                                  (instrument-type #f)
+                                  (ascii-legend #f)
+                                  (ascii-contents #f)
+                                  (pdf-contents #f)
+                                  (tablature-contents #f))
+  "Create a SongVersionInput.
+
+The fields a new tablature version is written from.
+
+Fields: versionName (string), instrumentType (string), asciiLegend (string), asciiContents (string), pdfContents (string), tablatureContents (string).
+
+@example
+(make-song-version-input #:version-name <string> #:instrument-type <string> #:ascii-legend <string> #:ascii-contents <string> #:pdf-contents <string> #:tablature-contents <string>)
+@end example"
+  (let ((value
+         (%make-song-version-input version-name instrument-type ascii-legend
+                                   ascii-contents pdf-contents
+                                   tablature-contents)))
+    (validate-song-version-input value)
+    value))
+
+(define (validate-song-version-input value)
+  "Check VALUE against the constraints the specification declares for SongVersionInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("song-version-input") value song-version-input?
+                   "SongVersionInput")
+  (when (song-version-input-version-name value)
+    (check-type '("song-version-input" "versionName")
+                (song-version-input-version-name value) 'string))
+  (when (song-version-input-instrument-type value)
+    (check-type '("song-version-input" "instrumentType")
+                (song-version-input-instrument-type value) 'string))
+  (when (song-version-input-ascii-legend value)
+    (check-type '("song-version-input" "asciiLegend")
+                (song-version-input-ascii-legend value) 'string))
+  (when (song-version-input-ascii-contents value)
+    (check-type '("song-version-input" "asciiContents")
+                (song-version-input-ascii-contents value) 'string))
+  (when (song-version-input-pdf-contents value)
+    (check-type '("song-version-input" "pdfContents")
+                (song-version-input-pdf-contents value) 'string))
+  (when (song-version-input-tablature-contents value)
+    (check-type '("song-version-input" "tablatureContents")
+                (song-version-input-tablature-contents value) 'string))
+  #t)
+
+(define (song-version-input-valid? value)
+  "Return #t when VALUE is a valid SongVersionInput."
+  (valid? (lambda () (validate-song-version-input value))))
+
+(define (song-version-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("song-version-input") value song-version-input?
+                   "SongVersionInput")
+  (append
+   (if (eq? (song-version-input-version-name value) #f)
+     '()
+     (list
+      (cons "versionName"
+            (song-version-input-version-name value))))
+   (if (eq? (song-version-input-instrument-type value) #f)
+     '()
+     (list
+      (cons "instrumentType"
+            (song-version-input-instrument-type value))))
+   (if (eq? (song-version-input-ascii-legend value) #f)
+     '()
+     (list
+      (cons "asciiLegend"
+            (song-version-input-ascii-legend value))))
+   (if (eq? (song-version-input-ascii-contents value) #f)
+     '()
+     (list
+      (cons "asciiContents"
+            (song-version-input-ascii-contents value))))
+   (if (eq? (song-version-input-pdf-contents value) #f)
+     '()
+     (list
+      (cons "pdfContents"
+            (song-version-input-pdf-contents value))))
+   (if (eq? (song-version-input-tablature-contents value) #f)
+     '()
+     (list
+      (cons "tablatureContents"
+            (song-version-input-tablature-contents value))))))
+
+(define (jso->song-version-input node)
+  "Build a SongVersionInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-song-version-input
+     #:version-name
+     (let ((value (jso-ref node "versionName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:instrument-type
+     (let ((value (jso-ref node "instrumentType")))
+       (if (json-null? value)
+         #f
+         value))
+     #:ascii-legend
+     (let ((value (jso-ref node "asciiLegend")))
+       (if (json-null? value)
+         #f
+         value))
+     #:ascii-contents
+     (let ((value (jso-ref node "asciiContents")))
+       (if (json-null? value)
+         #f
+         value))
+     #:pdf-contents
+     (let ((value (jso-ref node "pdfContents")))
+       (if (json-null? value)
+         #f
+         value))
+     #:tablature-contents
+     (let ((value
+            (jso-ref node "tablatureContents")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (song-version-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other SongVersionInput, so a patch that would leave the record invalid raises."
+  (jso->song-version-input
+   (json-merge-patch (song-version-input->jso value)
+                     patch)))
+
+(define* (make-song-version-patch #:key
+                                  (version-name #f)
+                                  (instrument-type #f)
+                                  (ascii-legend #f)
+                                  (ascii-contents #f)
+                                  (pdf-contents #f)
+                                  (tablature-contents #f))
+  "Create a SongVersionPatch.
+
+The fields of a tablature version a client may rewrite.
+
+Fields: versionName (string), instrumentType (string), asciiLegend (string), asciiContents (string), pdfContents (string), tablatureContents (string).
+
+@example
+(make-song-version-patch #:version-name <string> #:instrument-type <string> #:ascii-legend <string> #:ascii-contents <string> #:pdf-contents <string> #:tablature-contents <string>)
+@end example"
+  (let ((value
+         (%make-song-version-patch version-name instrument-type ascii-legend
+                                   ascii-contents pdf-contents
+                                   tablature-contents)))
+    (validate-song-version-patch value)
+    value))
+
+(define (validate-song-version-patch value)
+  "Check VALUE against the constraints the specification declares for SongVersionPatch.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("song-version-patch") value song-version-patch?
+                   "SongVersionPatch")
+  (when (song-version-patch-version-name value)
+    (check-type '("song-version-patch" "versionName")
+                (song-version-patch-version-name value) 'string))
+  (when (song-version-patch-instrument-type value)
+    (check-type '("song-version-patch" "instrumentType")
+                (song-version-patch-instrument-type value) 'string))
+  (when (song-version-patch-ascii-legend value)
+    (check-type '("song-version-patch" "asciiLegend")
+                (song-version-patch-ascii-legend value) 'string))
+  (when (song-version-patch-ascii-contents value)
+    (check-type '("song-version-patch" "asciiContents")
+                (song-version-patch-ascii-contents value) 'string))
+  (when (song-version-patch-pdf-contents value)
+    (check-type '("song-version-patch" "pdfContents")
+                (song-version-patch-pdf-contents value) 'string))
+  (when (song-version-patch-tablature-contents value)
+    (check-type '("song-version-patch" "tablatureContents")
+                (song-version-patch-tablature-contents value) 'string))
+  #t)
+
+(define (song-version-patch-valid? value)
+  "Return #t when VALUE is a valid SongVersionPatch."
+  (valid? (lambda () (validate-song-version-patch value))))
+
+(define (song-version-patch->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("song-version-patch") value song-version-patch?
+                   "SongVersionPatch")
+  (append
+   (if (eq? (song-version-patch-version-name value) #f)
+     '()
+     (list
+      (cons "versionName"
+            (song-version-patch-version-name value))))
+   (if (eq? (song-version-patch-instrument-type value) #f)
+     '()
+     (list
+      (cons "instrumentType"
+            (song-version-patch-instrument-type value))))
+   (if (eq? (song-version-patch-ascii-legend value) #f)
+     '()
+     (list
+      (cons "asciiLegend"
+            (song-version-patch-ascii-legend value))))
+   (if (eq? (song-version-patch-ascii-contents value) #f)
+     '()
+     (list
+      (cons "asciiContents"
+            (song-version-patch-ascii-contents value))))
+   (if (eq? (song-version-patch-pdf-contents value) #f)
+     '()
+     (list
+      (cons "pdfContents"
+            (song-version-patch-pdf-contents value))))
+   (if (eq? (song-version-patch-tablature-contents value) #f)
+     '()
+     (list
+      (cons "tablatureContents"
+            (song-version-patch-tablature-contents value))))))
+
+(define (jso->song-version-patch node)
+  "Build a SongVersionPatch from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-song-version-patch
+     #:version-name
+     (let ((value (jso-ref node "versionName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:instrument-type
+     (let ((value (jso-ref node "instrumentType")))
+       (if (json-null? value)
+         #f
+         value))
+     #:ascii-legend
+     (let ((value (jso-ref node "asciiLegend")))
+       (if (json-null? value)
+         #f
+         value))
+     #:ascii-contents
+     (let ((value (jso-ref node "asciiContents")))
+       (if (json-null? value)
+         #f
+         value))
+     #:pdf-contents
+     (let ((value (jso-ref node "pdfContents")))
+       (if (json-null? value)
+         #f
+         value))
+     #:tablature-contents
+     (let ((value
+            (jso-ref node "tablatureContents")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (song-version-patch-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other SongVersionPatch, so a patch that would leave the record invalid raises."
+  (jso->song-version-patch
+   (json-merge-patch (song-version-patch->jso value)
+                     patch)))
+
+(define* (make-artwork-input #:key
+                             (content-url #f)
+                             (content-caption #f)
+                             (order-value #f))
+  "Create a ArtworkInput.
+
+The fields a new artwork is written from.
+
+Fields: contentUrl (string, required), contentCaption (string), orderValue (integer).
+
+@example
+(make-artwork-input #:content-url <string> #:content-caption <string> #:order-value <integer>)
+@end example"
+  (let ((value (%make-artwork-input content-url content-caption order-value)))
+    (validate-artwork-input value)
+    value))
+
+(define (validate-artwork-input value)
+  "Check VALUE against the constraints the specification declares for ArtworkInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("artwork-input") value artwork-input? "ArtworkInput")
+  (check-required '("artwork-input" "contentUrl")
+                  (artwork-input-content-url value))
+  (check-type '("artwork-input" "contentUrl")
+              (artwork-input-content-url value) 'string)
+  (check-format '("artwork-input" "contentUrl")
+                (artwork-input-content-url value) 'uri)
+  (when (artwork-input-content-caption value)
+    (check-type '("artwork-input" "contentCaption")
+                (artwork-input-content-caption value) 'string))
+  (when (artwork-input-order-value value)
+    (check-type '("artwork-input" "orderValue")
+                (artwork-input-order-value value) 'integer))
+  #t)
+
+(define (artwork-input-valid? value)
+  "Return #t when VALUE is a valid ArtworkInput."
+  (valid? (lambda () (validate-artwork-input value))))
+
+(define (artwork-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("artwork-input") value artwork-input? "ArtworkInput")
+  (append (list (cons "contentUrl" (artwork-input-content-url value)))
+          (if (eq? (artwork-input-content-caption value) #f)
+            '()
+            (list
+             (cons "contentCaption"
+                   (artwork-input-content-caption value))))
+          (if (eq? (artwork-input-order-value value) #f)
+            '()
+            (list (cons "orderValue" (artwork-input-order-value value))))))
+
+(define (jso->artwork-input node)
+  "Build a ArtworkInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-artwork-input
+     #:content-url
+     (let ((value (jso-ref node "contentUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:content-caption
+     (let ((value (jso-ref node "contentCaption")))
+       (if (json-null? value)
+         #f
+         value))
+     #:order-value
+     (let ((value (jso-ref node "orderValue")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (artwork-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ArtworkInput, so a patch that would leave the record invalid raises."
+  (jso->artwork-input (json-merge-patch (artwork-input->jso value) patch)))
+
+(define* (make-artwork-patch #:key
+                             (content-url #f)
+                             (content-caption #f)
+                             (order-value #f))
+  "Create a ArtworkPatch.
+
+The fields of an artwork a client may rewrite.
+
+Fields: contentUrl (string), contentCaption (string), orderValue (integer).
+
+@example
+(make-artwork-patch #:content-url <string> #:content-caption <string> #:order-value <integer>)
+@end example"
+  (let ((value (%make-artwork-patch content-url content-caption order-value)))
+    (validate-artwork-patch value)
+    value))
+
+(define (validate-artwork-patch value)
+  "Check VALUE against the constraints the specification declares for ArtworkPatch.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("artwork-patch") value artwork-patch? "ArtworkPatch")
+  (when (artwork-patch-content-url value)
+    (check-type '("artwork-patch" "contentUrl")
+                (artwork-patch-content-url value) 'string)
+    (check-format '("artwork-patch" "contentUrl")
+                  (artwork-patch-content-url value) 'uri))
+  (when (artwork-patch-content-caption value)
+    (check-type '("artwork-patch" "contentCaption")
+                (artwork-patch-content-caption value) 'string))
+  (when (artwork-patch-order-value value)
+    (check-type '("artwork-patch" "orderValue")
+                (artwork-patch-order-value value) 'integer))
+  #t)
+
+(define (artwork-patch-valid? value)
+  "Return #t when VALUE is a valid ArtworkPatch."
+  (valid? (lambda () (validate-artwork-patch value))))
+
+(define (artwork-patch->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("artwork-patch") value artwork-patch? "ArtworkPatch")
+  (append
+   (if (eq? (artwork-patch-content-url value) #f)
+     '()
+     (list (cons "contentUrl" (artwork-patch-content-url value))))
+   (if (eq? (artwork-patch-content-caption value) #f)
+     '()
+     (list
+      (cons "contentCaption"
+            (artwork-patch-content-caption value))))
+   (if (eq? (artwork-patch-order-value value) #f)
+     '()
+     (list (cons "orderValue" (artwork-patch-order-value value))))))
+
+(define (jso->artwork-patch node)
+  "Build a ArtworkPatch from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-artwork-patch
+     #:content-url
+     (let ((value (jso-ref node "contentUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:content-caption
+     (let ((value (jso-ref node "contentCaption")))
+       (if (json-null? value)
+         #f
+         value))
+     #:order-value
+     (let ((value (jso-ref node "orderValue")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (artwork-patch-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ArtworkPatch, so a patch that would leave the record invalid raises."
+  (jso->artwork-patch (json-merge-patch (artwork-patch->jso value) patch)))
+
+(define* (make-external-source-input #:key
+                                     (spotify-url #f)
+                                     (youtube-url #f)
+                                     (soundcloud-url #f)
+                                     (wikipedia-url #f))
+  "Create a ExternalSourceInput.
+
+The addresses where an entity may be heard or read about.
+
+Fields: spotifyUrl (string), youtubeUrl (string), soundcloudUrl (string), wikipediaUrl (string).
+
+@example
+(make-external-source-input #:spotify-url <string> #:youtube-url <string> #:soundcloud-url <string> #:wikipedia-url <string>)
+@end example"
+  (let ((value
+         (%make-external-source-input spotify-url youtube-url soundcloud-url
+                                      wikipedia-url)))
+    (validate-external-source-input value)
+    value))
+
+(define (validate-external-source-input value)
+  "Check VALUE against the constraints the specification declares for ExternalSourceInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("external-source-input") value external-source-input?
+                   "ExternalSourceInput")
+  (when (external-source-input-spotify-url value)
+    (check-type '("external-source-input" "spotifyUrl")
+                (external-source-input-spotify-url value) 'string)
+    (check-format '("external-source-input" "spotifyUrl")
+                  (external-source-input-spotify-url value) 'uri))
+  (when (external-source-input-youtube-url value)
+    (check-type '("external-source-input" "youtubeUrl")
+                (external-source-input-youtube-url value) 'string)
+    (check-format '("external-source-input" "youtubeUrl")
+                  (external-source-input-youtube-url value) 'uri))
+  (when (external-source-input-soundcloud-url value)
+    (check-type '("external-source-input" "soundcloudUrl")
+                (external-source-input-soundcloud-url value) 'string)
+    (check-format '("external-source-input" "soundcloudUrl")
+                  (external-source-input-soundcloud-url value) 'uri))
+  (when (external-source-input-wikipedia-url value)
+    (check-type '("external-source-input" "wikipediaUrl")
+                (external-source-input-wikipedia-url value) 'string)
+    (check-format '("external-source-input" "wikipediaUrl")
+                  (external-source-input-wikipedia-url value) 'uri))
+  #t)
+
+(define (external-source-input-valid? value)
+  "Return #t when VALUE is a valid ExternalSourceInput."
+  (valid? (lambda () (validate-external-source-input value))))
+
+(define (external-source-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("external-source-input") value external-source-input?
+                   "ExternalSourceInput")
+  (append
+   (if (eq? (external-source-input-spotify-url value) #f)
+     '()
+     (list
+      (cons "spotifyUrl"
+            (external-source-input-spotify-url value))))
+   (if (eq? (external-source-input-youtube-url value) #f)
+     '()
+     (list
+      (cons "youtubeUrl"
+            (external-source-input-youtube-url value))))
+   (if (eq? (external-source-input-soundcloud-url value) #f)
+     '()
+     (list
+      (cons "soundcloudUrl"
+            (external-source-input-soundcloud-url value))))
+   (if (eq? (external-source-input-wikipedia-url value) #f)
+     '()
+     (list
+      (cons "wikipediaUrl"
+            (external-source-input-wikipedia-url value))))))
+
+(define (jso->external-source-input node)
+  "Build a ExternalSourceInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-external-source-input
+     #:spotify-url
+     (let ((value (jso-ref node "spotifyUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:youtube-url
+     (let ((value (jso-ref node "youtubeUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:soundcloud-url
+     (let ((value (jso-ref node "soundcloudUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:wikipedia-url
+     (let ((value (jso-ref node "wikipediaUrl")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (external-source-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ExternalSourceInput, so a patch that would leave the record invalid raises."
+  (jso->external-source-input
+   (json-merge-patch
+    (external-source-input->jso
+     value)
+    patch)))
+
+(define* (make-external-source-patch #:key
+                                     (spotify-url #f)
+                                     (youtube-url #f)
+                                     (soundcloud-url #f)
+                                     (wikipedia-url #f))
+  "Create a ExternalSourcePatch.
+
+The addresses of an entity a client may rewrite.
+
+Fields: spotifyUrl (string), youtubeUrl (string), soundcloudUrl (string), wikipediaUrl (string).
+
+@example
+(make-external-source-patch #:spotify-url <string> #:youtube-url <string> #:soundcloud-url <string> #:wikipedia-url <string>)
+@end example"
+  (let ((value
+         (%make-external-source-patch spotify-url youtube-url soundcloud-url
+                                      wikipedia-url)))
+    (validate-external-source-patch value)
+    value))
+
+(define (validate-external-source-patch value)
+  "Check VALUE against the constraints the specification declares for ExternalSourcePatch.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("external-source-patch") value external-source-patch?
+                   "ExternalSourcePatch")
+  (when (external-source-patch-spotify-url value)
+    (check-type '("external-source-patch" "spotifyUrl")
+                (external-source-patch-spotify-url value) 'string)
+    (check-format '("external-source-patch" "spotifyUrl")
+                  (external-source-patch-spotify-url value) 'uri))
+  (when (external-source-patch-youtube-url value)
+    (check-type '("external-source-patch" "youtubeUrl")
+                (external-source-patch-youtube-url value) 'string)
+    (check-format '("external-source-patch" "youtubeUrl")
+                  (external-source-patch-youtube-url value) 'uri))
+  (when (external-source-patch-soundcloud-url value)
+    (check-type '("external-source-patch" "soundcloudUrl")
+                (external-source-patch-soundcloud-url value) 'string)
+    (check-format '("external-source-patch" "soundcloudUrl")
+                  (external-source-patch-soundcloud-url value) 'uri))
+  (when (external-source-patch-wikipedia-url value)
+    (check-type '("external-source-patch" "wikipediaUrl")
+                (external-source-patch-wikipedia-url value) 'string)
+    (check-format '("external-source-patch" "wikipediaUrl")
+                  (external-source-patch-wikipedia-url value) 'uri))
+  #t)
+
+(define (external-source-patch-valid? value)
+  "Return #t when VALUE is a valid ExternalSourcePatch."
+  (valid? (lambda () (validate-external-source-patch value))))
+
+(define (external-source-patch->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("external-source-patch") value external-source-patch?
+                   "ExternalSourcePatch")
+  (append
+   (if (eq? (external-source-patch-spotify-url value) #f)
+     '()
+     (list
+      (cons "spotifyUrl"
+            (external-source-patch-spotify-url value))))
+   (if (eq? (external-source-patch-youtube-url value) #f)
+     '()
+     (list
+      (cons "youtubeUrl"
+            (external-source-patch-youtube-url value))))
+   (if (eq? (external-source-patch-soundcloud-url value) #f)
+     '()
+     (list
+      (cons "soundcloudUrl"
+            (external-source-patch-soundcloud-url value))))
+   (if (eq? (external-source-patch-wikipedia-url value) #f)
+     '()
+     (list
+      (cons "wikipediaUrl"
+            (external-source-patch-wikipedia-url value))))))
+
+(define (jso->external-source-patch node)
+  "Build a ExternalSourcePatch from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-external-source-patch
+     #:spotify-url
+     (let ((value (jso-ref node "spotifyUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:youtube-url
+     (let ((value (jso-ref node "youtubeUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:soundcloud-url
+     (let ((value (jso-ref node "soundcloudUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:wikipedia-url
+     (let ((value (jso-ref node "wikipediaUrl")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (external-source-patch-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ExternalSourcePatch, so a patch that would leave the record invalid raises."
+  (jso->external-source-patch
+   (json-merge-patch
+    (external-source-patch->jso
+     value)
+    patch)))
+
+(define* (make-comment-input #:key (contents #f) (parent-identifier #f))
+  "Create a CommentInput.
+
+A comment to write about an entity.
+
+Fields: contents (string, required), parentIdentifier (string).
+
+@example
+(make-comment-input #:contents <string> #:parent-identifier <string>)
+@end example"
+  (let ((value (%make-comment-input contents parent-identifier)))
+    (validate-comment-input value)
+    value))
+
+(define (validate-comment-input value)
+  "Check VALUE against the constraints the specification declares for CommentInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("comment-input") value comment-input? "CommentInput")
+  (check-required '("comment-input" "contents") (comment-input-contents value))
+  (check-type '("comment-input" "contents") (comment-input-contents value)
+              'string)
+  (when (comment-input-parent-identifier value)
+    (check-type '("comment-input" "parentIdentifier")
+                (comment-input-parent-identifier value) 'string)
+    (check-format '("comment-input" "parentIdentifier")
+                  (comment-input-parent-identifier value) 'uuid))
+  #t)
+
+(define (comment-input-valid? value)
+  "Return #t when VALUE is a valid CommentInput."
+  (valid? (lambda () (validate-comment-input value))))
+
+(define (comment-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("comment-input") value comment-input? "CommentInput")
+  (append (list (cons "contents" (comment-input-contents value)))
+          (if (eq? (comment-input-parent-identifier value) #f)
+            '()
+            (list
+             (cons "parentIdentifier"
+                   (comment-input-parent-identifier value))))))
+
+(define (jso->comment-input node)
+  "Build a CommentInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-comment-input
+     #:contents
+     (let ((value (jso-ref node "contents")))
+       (if (json-null? value)
+         #f
+         value))
+     #:parent-identifier
+     (let ((value (jso-ref node "parentIdentifier")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (comment-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other CommentInput, so a patch that would leave the record invalid raises."
+  (jso->comment-input (json-merge-patch (comment-input->jso value) patch)))
+
+(define* (make-comment-patch #:key (contents #f))
+  "Create a CommentPatch.
+
+A comment to rewrite.
+
+Fields: contents (string, required).
+
+@example
+(make-comment-patch #:contents <string>)
+@end example"
+  (let ((value (%make-comment-patch contents)))
+    (validate-comment-patch value)
+    value))
+
+(define (validate-comment-patch value)
+  "Check VALUE against the constraints the specification declares for CommentPatch.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("comment-patch") value comment-patch? "CommentPatch")
+  (check-required '("comment-patch" "contents") (comment-patch-contents value))
+  (check-type '("comment-patch" "contents") (comment-patch-contents value)
+              'string)
+  #t)
+
+(define (comment-patch-valid? value)
+  "Return #t when VALUE is a valid CommentPatch."
+  (valid? (lambda () (validate-comment-patch value))))
+
+(define (comment-patch->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("comment-patch") value comment-patch? "CommentPatch")
+  (append (list (cons "contents" (comment-patch-contents value)))))
+
+(define (jso->comment-patch node)
+  "Build a CommentPatch from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-comment-patch
+     #:contents
+     (let ((value (jso-ref node "contents")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (comment-patch-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other CommentPatch, so a patch that would leave the record invalid raises."
+  (jso->comment-patch (json-merge-patch (comment-patch->jso value) patch)))
+
+(define* (make-artist-relation-input #:key (artist-id #f))
+  "Create a ArtistRelationInput.
+
+The artist to credit on a song.
+
+Fields: artistId (string, required).
+
+@example
+(make-artist-relation-input #:artist-id <string>)
+@end example"
+  (let ((value (%make-artist-relation-input artist-id)))
+    (validate-artist-relation-input value)
+    value))
+
+(define (validate-artist-relation-input value)
+  "Check VALUE against the constraints the specification declares for ArtistRelationInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("artist-relation-input") value artist-relation-input?
+                   "ArtistRelationInput")
+  (check-required '("artist-relation-input" "artistId")
+                  (artist-relation-input-artist-id value))
+  (check-type '("artist-relation-input" "artistId")
+              (artist-relation-input-artist-id value) 'string)
+  (check-format '("artist-relation-input" "artistId")
+                (artist-relation-input-artist-id value) 'uuid)
+  #t)
+
+(define (artist-relation-input-valid? value)
+  "Return #t when VALUE is a valid ArtistRelationInput."
+  (valid? (lambda () (validate-artist-relation-input value))))
+
+(define (artist-relation-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("artist-relation-input") value artist-relation-input?
+                   "ArtistRelationInput")
+  (append (list (cons "artistId" (artist-relation-input-artist-id value)))))
+
+(define (jso->artist-relation-input node)
+  "Build a ArtistRelationInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-artist-relation-input
+     #:artist-id
+     (let ((value (jso-ref node "artistId")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (artist-relation-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ArtistRelationInput, so a patch that would leave the record invalid raises."
+  (jso->artist-relation-input
+   (json-merge-patch
+    (artist-relation-input->jso
+     value)
+    patch)))
+
+(define* (make-genre-relation-input #:key (genre-id #f))
+  "Create a GenreRelationInput.
+
+The genre to put a song in.
+
+Fields: genreId (string, required).
+
+@example
+(make-genre-relation-input #:genre-id <string>)
+@end example"
+  (let ((value (%make-genre-relation-input genre-id)))
+    (validate-genre-relation-input value)
+    value))
+
+(define (validate-genre-relation-input value)
+  "Check VALUE against the constraints the specification declares for GenreRelationInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("genre-relation-input") value genre-relation-input?
+                   "GenreRelationInput")
+  (check-required '("genre-relation-input" "genreId")
+                  (genre-relation-input-genre-id value))
+  (check-type '("genre-relation-input" "genreId")
+              (genre-relation-input-genre-id value) 'string)
+  (check-format '("genre-relation-input" "genreId")
+                (genre-relation-input-genre-id value) 'uuid)
+  #t)
+
+(define (genre-relation-input-valid? value)
+  "Return #t when VALUE is a valid GenreRelationInput."
+  (valid? (lambda () (validate-genre-relation-input value))))
+
+(define (genre-relation-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("genre-relation-input") value genre-relation-input?
+                   "GenreRelationInput")
+  (append (list (cons "genreId" (genre-relation-input-genre-id value)))))
+
+(define (jso->genre-relation-input node)
+  "Build a GenreRelationInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-genre-relation-input
+     #:genre-id
+     (let ((value (jso-ref node "genreId")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (genre-relation-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other GenreRelationInput, so a patch that would leave the record invalid raises."
+  (jso->genre-relation-input
+   (json-merge-patch
+    (genre-relation-input->jso
+     value)
+    patch)))
+
+(define* (make-article-input #:key
+                             (display-name #f)
+                             (kind "tutorial")
+                             (video-url #f)
+                             (contents #f))
+  "Create a ArticleInput.
+
+The fields a new article is written from.
+
+Fields: displayName (string, required), kind (article-input-kind), videoUrl (string), contents (string).
+
+@example
+(make-article-input #:display-name <string> #:kind <article-input-kind> #:video-url <string> #:contents <string>)
+@end example"
+  (let ((value (%make-article-input display-name kind video-url contents)))
+    (validate-article-input value)
+    value))
+
+(define (validate-article-input value)
+  "Check VALUE against the constraints the specification declares for ArticleInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("article-input") value article-input? "ArticleInput")
+  (check-required '("article-input" "displayName")
+                  (article-input-display-name value))
+  (check-type '("article-input" "displayName")
+              (article-input-display-name value) 'string)
+  (when (article-input-kind value)
+    (check-type '("article-input" "kind") (article-input-kind value) 'string)
+    (check-enum '("article-input" "kind") (article-input-kind value)
+                article-input-kind-values))
+  (when (article-input-video-url value)
+    (check-type '("article-input" "videoUrl") (article-input-video-url value)
+                'string)
+    (check-format '("article-input" "videoUrl")
+                  (article-input-video-url value) 'uri))
+  (when (article-input-contents value)
+    (check-type '("article-input" "contents") (article-input-contents value)
+                'string))
+  #t)
+
+(define (article-input-valid? value)
+  "Return #t when VALUE is a valid ArticleInput."
+  (valid? (lambda () (validate-article-input value))))
+
+(define (article-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("article-input") value article-input? "ArticleInput")
+  (append (list (cons "displayName" (article-input-display-name value)))
+          (if (eq? (article-input-kind value) #f)
+            '()
+            (list
+             (cons "kind"
+                   (article-input-kind->jso (article-input-kind value)))))
+          (if (eq? (article-input-video-url value) #f)
+            '()
+            (list (cons "videoUrl" (article-input-video-url value))))
+          (if (eq? (article-input-contents value) #f)
+            '()
+            (list (cons "contents" (article-input-contents value))))))
+
+(define (jso->article-input node)
+  "Build a ArticleInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-article-input
+     #:display-name
+     (let ((value (jso-ref node "displayName")))
+       (if (json-null? value)
+         #f
+         value))
+     #:kind
+     (jso->article-input-kind (jso-ref node "kind"))
+     #:video-url
+     (let ((value (jso-ref node "videoUrl")))
+       (if (json-null? value)
+         #f
+         value))
+     #:contents
+     (let ((value (jso-ref node "contents")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (article-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ArticleInput, so a patch that would leave the record invalid raises."
+  (jso->article-input (json-merge-patch (article-input->jso value) patch)))
+
+(define article-input-kind-values
+  (list "tutorial" "video" "chord-guide" "theory" "discussion"))
+
+(define article-input-kind-tutorial
+  "tutorial")
+
+(define article-input-kind-video
+  "video")
+
+(define article-input-kind-chord-guide
+  "chord-guide")
+
+(define article-input-kind-theory
+  "theory")
+
+(define article-input-kind-discussion
+  "discussion")
+
+(define (article-input-kind? value)
+  "Return #t when VALUE is one of the article-input.kind values."
+  (and (string? value) (if (member value article-input-kind-values) #t #f)))
+
+(define (article-input-kind->jso value)
+  "Return VALUE as a jso scalar, after checking it."
+  (if (article-input-kind? value)
+    value
+    (validation-failure '("article-input-kind")
+                        "must be one of article-input-kind-values, got ~s"
+                        value)))
+
+(define (jso->article-input-kind node)
+  "Read a article-input.kind from the jso scalar NODE."
+  (if (json-null? node)
+    #f
+    node))
+
+(define* (make-article-comment-input #:key
+                                     (contents #f)
+                                     (parent-identifier #f)
+                                     (author-name #f))
+  "Create a ArticleCommentInput.
+
+A comment to write about an article.
+
+Fields: contents (string, required), parentIdentifier (string), authorName (string).
+
+@example
+(make-article-comment-input #:contents <string> #:parent-identifier <string> #:author-name <string>)
+@end example"
+  (let ((value
+         (%make-article-comment-input contents parent-identifier author-name)))
+    (validate-article-comment-input value)
+    value))
+
+(define (validate-article-comment-input value)
+  "Check VALUE against the constraints the specification declares for ArticleCommentInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("article-comment-input") value article-comment-input?
+                   "ArticleCommentInput")
+  (check-required '("article-comment-input" "contents")
+                  (article-comment-input-contents value))
+  (check-type '("article-comment-input" "contents")
+              (article-comment-input-contents value) 'string)
+  (when (article-comment-input-parent-identifier value)
+    (check-type '("article-comment-input" "parentIdentifier")
+                (article-comment-input-parent-identifier value) 'string)
+    (check-format '("article-comment-input" "parentIdentifier")
+                  (article-comment-input-parent-identifier value) 'uuid))
+  (when (article-comment-input-author-name value)
+    (check-type '("article-comment-input" "authorName")
+                (article-comment-input-author-name value) 'string))
+  #t)
+
+(define (article-comment-input-valid? value)
+  "Return #t when VALUE is a valid ArticleCommentInput."
+  (valid? (lambda () (validate-article-comment-input value))))
+
+(define (article-comment-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("article-comment-input") value article-comment-input?
+                   "ArticleCommentInput")
+  (append (list (cons "contents" (article-comment-input-contents value)))
+          (if (eq? (article-comment-input-parent-identifier value) #f)
+            '()
+            (list
+             (cons "parentIdentifier"
+                   (article-comment-input-parent-identifier value))))
+          (if (eq? (article-comment-input-author-name value) #f)
+            '()
+            (list
+             (cons "authorName"
+                   (article-comment-input-author-name value))))))
+
+(define (jso->article-comment-input node)
+  "Build a ArticleCommentInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-article-comment-input
+     #:contents
+     (let ((value (jso-ref node "contents")))
+       (if (json-null? value)
+         #f
+         value))
+     #:parent-identifier
+     (let ((value
+            (jso-ref node "parentIdentifier")))
+       (if (json-null? value)
+         #f
+         value))
+     #:author-name
+     (let ((value (jso-ref node "authorName")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (article-comment-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other ArticleCommentInput, so a patch that would leave the record invalid raises."
+  (jso->article-comment-input
+   (json-merge-patch
+    (article-comment-input->jso
+     value)
+    patch)))
+
+(define* (make-user-input #:key
+                          (username #f)
+                          (email #f)
+                          (permissions '())
+                          (password #f))
+  "Create a UserInput.
+
+The fields a new account is written from.
+
+Fields: username (string, required), email (string, required), permissions (list of string), password (string).
+
+@example
+(make-user-input #:username <string> #:email <string> #:permissions <list of string> #:password <string>)
+@end example"
+  (let ((value (%make-user-input username email permissions password)))
+    (validate-user-input value)
+    value))
+
+(define (validate-user-input value)
+  "Check VALUE against the constraints the specification declares for UserInput.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("user-input") value user-input? "UserInput")
+  (check-required '("user-input" "username") (user-input-username value))
+  (check-type '("user-input" "username") (user-input-username value) 'string)
+  (check-required '("user-input" "email") (user-input-email value))
+  (check-type '("user-input" "email") (user-input-email value) 'string)
+  (check-format '("user-input" "email") (user-input-email value) 'email)
+  (when (user-input-permissions value)
+    (check-type '("user-input" "permissions") (user-input-permissions value)
+                'list)
+    (check-list '("user-input" "permissions") (user-input-permissions value)
+                string? "string"))
+  (when (user-input-password value)
+    (check-type '("user-input" "password") (user-input-password value) 'string))
+  #t)
+
+(define (user-input-valid? value)
+  "Return #t when VALUE is a valid UserInput."
+  (valid? (lambda () (validate-user-input value))))
+
+(define (user-input->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("user-input") value user-input? "UserInput")
+  (append (list (cons "username" (user-input-username value)))
+          (list (cons "email" (user-input-email value)))
+          (if (eq? (user-input-permissions value) #f)
+            '()
+            (list
+             (cons "permissions"
+                   (list->vector
+                    (map (lambda (element) element)
+                         (user-input-permissions value))))))
+          (if (eq? (user-input-password value) #f)
+            '()
+            (list (cons "password" (user-input-password value))))))
+
+(define (jso->user-input node)
+  "Build a UserInput from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-user-input
+     #:username
+     (let ((value (jso-ref node "username")))
+       (if (json-null? value)
+         #f
+         value))
+     #:email
+     (let ((value (jso-ref node "email")))
+       (if (json-null? value)
+         #f
+         value))
+     #:permissions
+     (let ((value (jso-ref node "permissions")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map
+          (lambda (element)
+            (let ((value element))
+              (if (json-null? value)
+                #f
+                value))) (jso-array->list value))))
+     #:password
+     (let ((value (jso-ref node "password")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (user-input-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other UserInput, so a patch that would leave the record invalid raises."
+  (jso->user-input (json-merge-patch (user-input->jso value) patch)))
+
+(define* (make-user-patch #:key
+                          (username #f)
+                          (email #f)
+                          (permissions '())
+                          (password #f))
+  "Create a UserPatch.
+
+The fields of an account a client may rewrite.
+
+Fields: username (string), email (string), permissions (list of string), password (string).
+
+@example
+(make-user-patch #:username <string> #:email <string> #:permissions <list of string> #:password <string>)
+@end example"
+  (let ((value (%make-user-patch username email permissions password)))
+    (validate-user-patch value)
+    value))
+
+(define (validate-user-patch value)
+  "Check VALUE against the constraints the specification declares for UserPatch.
+
+Returns #t, or throws 'openapi-validation-error naming the field at fault."
+  (check-predicate '("user-patch") value user-patch? "UserPatch")
+  (when (user-patch-username value)
+    (check-type '("user-patch" "username") (user-patch-username value) 'string))
+  (when (user-patch-email value)
+    (check-type '("user-patch" "email") (user-patch-email value) 'string)
+    (check-format '("user-patch" "email") (user-patch-email value) 'email))
+  (when (user-patch-permissions value)
+    (check-type '("user-patch" "permissions") (user-patch-permissions value)
+                'list)
+    (check-list '("user-patch" "permissions") (user-patch-permissions value)
+                string? "string"))
+  (when (user-patch-password value)
+    (check-type '("user-patch" "password") (user-patch-password value) 'string))
+  #t)
+
+(define (user-patch-valid? value)
+  "Return #t when VALUE is a valid UserPatch."
+  (valid? (lambda () (validate-user-patch value))))
+
+(define (user-patch->jso value)
+  "Return VALUE as a jso object, ready for JSON serialisation."
+  (check-predicate '("user-patch") value user-patch? "UserPatch")
+  (append
+   (if (eq? (user-patch-username value) #f)
+     '()
+     (list (cons "username" (user-patch-username value))))
+   (if (eq? (user-patch-email value) #f)
+     '()
+     (list (cons "email" (user-patch-email value))))
+   (if (eq? (user-patch-permissions value) #f)
+     '()
+     (list
+      (cons "permissions"
+            (list->vector
+             (map (lambda (element) element)
+                  (user-patch-permissions value))))))
+   (if (eq? (user-patch-password value) #f)
+     '()
+     (list (cons "password" (user-patch-password value))))))
+
+(define (jso->user-patch node)
+  "Build a UserPatch from NODE, a jso object."
+  (if (or (json-null? node) (not (jso-object? node)))
+    #f
+    (make-user-patch
+     #:username
+     (let ((value (jso-ref node "username")))
+       (if (json-null? value)
+         #f
+         value))
+     #:email
+     (let ((value (jso-ref node "email")))
+       (if (json-null? value)
+         #f
+         value))
+     #:permissions
+     (let ((value (jso-ref node "permissions")))
+       (if (or (eq? value #f) (json-null? value))
+         #f
+         (map
+          (lambda (element)
+            (let ((value element))
+              (if (json-null? value)
+                #f
+                value))) (jso-array->list value))))
+     #:password
+     (let ((value (jso-ref node "password")))
+       (if (json-null? value)
+         #f
+         value)))))
+
+(define* (user-patch-apply-patch value patch)
+  "Return VALUE with the RFC 7386 JSON merge patch PATCH applied.
+Members of PATCH set to null are removed, and the result is validated
+like any other UserPatch, so a patch that would leave the record invalid raises."
+  (jso->user-patch (json-merge-patch (user-patch->jso value) patch)))

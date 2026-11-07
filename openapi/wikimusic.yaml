@@ -1,15 +1,15 @@
 openapi: 3.0.3
 info:
   title: Wikimusic
-  version: 1.0.0
+  version: 1.1.0
   description: |
-    The public read API of a Wikimusic instance, the free music knowledge
-    encyclopaedia.
+    The API of a Wikimusic instance, the free music knowledge encyclopaedia.
 
-    Every entity is identified by a UUID, and only content the instance has
-    approved is returned.  Version 1 is read-only: the site's own forms are how
-    a person adds or edits a song, an artist or a genre, so no operation here
-    needs a credential.
+    Every entity is identified by a UUID.  Reading is public; writing needs a
+    session.  `POST /api/v1/login` exchanges an email and a password for a
+    token, which a client sends as `Authorization: Bearer <token>`.  A route
+    also enforces ownership: a row may be changed by the user who created it,
+    or by a holder of the `wikimusic:modify-permissions` grant.
 
     Lists are paginated with `limit` and `offset`.  `total` counts every match
     before the page is cut, so a client can walk a whole collection a page at a
@@ -24,11 +24,15 @@ servers:
     description: A local development instance
 tags:
   - name: Songs
-    description: Songs, their tablature versions and their credits
+    description: Songs, their tablature versions, artwork, comments and credits
   - name: Artists
     description: The people and groups a song is credited to
   - name: Genres
     description: The styles and traditions a song belongs to
+  - name: Articles
+    description: Tutorials, videos, chord guides, theory and discussions
+  - name: Accounts
+    description: Signing in and managing the instance's users
   - name: Instance
     description: What this instance holds
 paths:
@@ -77,6 +81,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-song
+      tags:
+        - Songs
+      summary: Add a song
+      description: |
+        Add a song to this instance.  The caller must hold
+        `wikimusic:song-create`.  `artistIds` and `genreIds` credit the song
+        in the same request.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SongInput'
+      responses:
+        '201':
+          description: The song that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Song'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/v1/songs/{songId}:
     get:
       operationId: get-song
@@ -84,9 +130,10 @@ paths:
         - Songs
       summary: Read one song
       description: |
-        One song with its tablature versions, its artwork and its credits.  The
-        versions are where a song's ASCII tablature lives; the PDF and Guitar
-        Pro files are reported by their presence, not by their bytes.
+        One song with its tablature versions, its artwork, comments, external
+        sources and credits.  The versions are where a song's ASCII tablature
+        lives; the PDF and Guitar Pro files are reported by their presence,
+        not by their bytes.
       parameters:
         - name: songId
           in: path
@@ -108,6 +155,102 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    patch:
+      operationId: update-song
+      tags:
+        - Songs
+      summary: Edit a song
+      description: |
+        Rewrite the fields of a song.  The caller must hold
+        `wikimusic:song-create` and must have created the song, unless they
+        hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SongPatch'
+      responses:
+        '200':
+          description: The song as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Song'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-song
+      tags:
+        - Songs
+      summary: Remove a song
+      description: |
+        Remove a song and its credits.  The caller must hold
+        `wikimusic:song-delete` and must have created the song, unless they
+        hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The song was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/v1/songs/{songId}/versions:
     get:
       operationId: list-song-versions
@@ -116,8 +259,7 @@ paths:
       summary: List a song's versions
       description: |
         The tablature versions of one song, oldest first, with the ASCII
-        contents of each.  A version is identified separately from its song so
-        that a client can fetch one and cache it by its own identifier.
+        contents of each.
       parameters:
         - name: songId
           in: path
@@ -135,6 +277,952 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SongVersion'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-song-version
+      tags:
+        - Songs
+      summary: Add a tablature version
+      description: |
+        Add a version to a song.  The caller must hold
+        `wikimusic:song-create`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SongVersionInput'
+      responses:
+        '201':
+          description: The version that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongVersion'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/versions/{versionId}:
+    get:
+      operationId: get-song-version
+      tags:
+        - Songs
+      summary: Read one tablature version
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: versionId
+          in: path
+          required: true
+          description: The version's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: One version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongVersion'
+        '404':
+          description: No such version of that song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      operationId: update-song-version
+      tags:
+        - Songs
+      summary: Edit a tablature version
+      description: |
+        Rewrite a version.  The caller must hold `wikimusic:song-create` and
+        must have created the version, unless they hold
+        `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: versionId
+          in: path
+          required: true
+          description: The version's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SongVersionPatch'
+      responses:
+        '200':
+          description: The version as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongVersion'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such version of that song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-song-version
+      tags:
+        - Songs
+      summary: Remove a tablature version
+      description: |
+        Remove a version.  The caller must hold `wikimusic:song-delete` and
+        must have created the version, unless they hold
+        `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: versionId
+          in: path
+          required: true
+          description: The version's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The version was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this version.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such version of that song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/comments:
+    get:
+      operationId: list-song-comments
+      tags:
+        - Songs
+      summary: List a song's comments
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The song's comments, newest first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-song-comment
+      tags:
+        - Songs
+      summary: Comment on a song
+      description: Any signed-in reader may comment.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentInput'
+      responses:
+        '201':
+          description: The comment that was written.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/comments/{commentId}:
+    patch:
+      operationId: update-song-comment
+      tags:
+        - Songs
+      summary: Edit a comment on a song
+      description: Only the comment's author, or a super grant, may edit it.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: commentId
+          in: path
+          required: true
+          description: The comment's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentPatch'
+      responses:
+        '200':
+          description: The comment as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-song-comment
+      tags:
+        - Songs
+      summary: Remove a comment on a song
+      description: Only the comment's author, or a super grant, may remove it.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: commentId
+          in: path
+          required: true
+          description: The comment's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The comment was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/artworks:
+    post:
+      operationId: create-song-artwork
+      tags:
+        - Songs
+      summary: Add artwork to a song
+      description: The caller must hold `wikimusic:song-create`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtworkInput'
+      responses:
+        '201':
+          description: The artwork that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artwork'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/artworks/{artworkId}:
+    patch:
+      operationId: update-song-artwork
+      tags:
+        - Songs
+      summary: Edit artwork of a song
+      description: |
+        The caller must hold `wikimusic:song-create` and must have created the
+        artwork, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: artworkId
+          in: path
+          required: true
+          description: The artwork's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtworkPatch'
+      responses:
+        '200':
+          description: The artwork as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artwork'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-song-artwork
+      tags:
+        - Songs
+      summary: Remove artwork from a song
+      description: |
+        The caller must hold `wikimusic:song-delete` and must have created the
+        artwork, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: artworkId
+          in: path
+          required: true
+          description: The artwork's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The artwork was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/artists:
+    post:
+      operationId: add-song-artist
+      tags:
+        - Songs
+      summary: Credit an artist on a song
+      description: The caller must hold `wikimusic:song-create`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtistRelationInput'
+      responses:
+        '204':
+          description: The artist is credited.
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such song or artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/artists/{artistId}:
+    delete:
+      operationId: remove-song-artist
+      tags:
+        - Songs
+      summary: Remove a song's credit of an artist
+      description: |
+        The caller must hold `wikimusic:song-delete` and must have created the
+        credit, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The credit was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this credit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such credit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/genres:
+    post:
+      operationId: add-song-genre
+      tags:
+        - Songs
+      summary: Put a song in a genre
+      description: The caller must hold `wikimusic:song-create`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenreRelationInput'
+      responses:
+        '204':
+          description: The song belongs to the genre.
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such song or genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/genres/{genreId}:
+    delete:
+      operationId: remove-song-genre
+      tags:
+        - Songs
+      summary: Remove a song from a genre
+      description: |
+        The caller must hold `wikimusic:song-delete` and must have created the
+        link, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The song no longer belongs to the genre.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this link.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such link.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/external-sources:
+    get:
+      operationId: list-song-external-sources
+      tags:
+        - Songs
+      summary: List a song's external sources
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The song's external sources.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExternalSource'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-song-external-source
+      tags:
+        - Songs
+      summary: Add external sources to a song
+      description: The caller must hold `wikimusic:song-create`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalSourceInput'
+      responses:
+        '201':
+          description: The source that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSource'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/external-sources/{sourceId}:
+    patch:
+      operationId: update-song-external-source
+      tags:
+        - Songs
+      summary: Edit a song's external sources
+      description: |
+        The caller must hold `wikimusic:song-create` and must have created the
+        source, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: sourceId
+          in: path
+          required: true
+          description: The source's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalSourcePatch'
+      responses:
+        '200':
+          description: The source as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSource'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this source.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such source.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/like:
+    post:
+      operationId: like-song
+      tags:
+        - Songs
+      summary: Like a song
+      description: Any signed-in reader may like a song; a previous opinion is replaced.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The song is liked.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such song.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/songs/{songId}/dislike:
+    post:
+      operationId: dislike-song
+      tags:
+        - Songs
+      summary: Dislike a song
+      description: Any signed-in reader may dislike a song; a previous opinion is replaced.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: songId
+          in: path
+          required: true
+          description: The song's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The song is disliked.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: No such song.
           content:
@@ -182,6 +1270,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-artist
+      tags:
+        - Artists
+      summary: Add an artist
+      description: The caller must hold `wikimusic:artist-create`.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtistInput'
+      responses:
+        '201':
+          description: The artist that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artist'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/v1/artists/{artistId}:
     get:
       operationId: get-artist
@@ -203,6 +1330,100 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Artist'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      operationId: update-artist
+      tags:
+        - Artists
+      summary: Edit an artist
+      description: |
+        The caller must hold `wikimusic:artist-create` and must have created
+        the artist, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtistPatch'
+      responses:
+        '200':
+          description: The artist as they now read.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artist'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-artist
+      tags:
+        - Artists
+      summary: Remove an artist
+      description: |
+        The caller must hold `wikimusic:artist-delete` and must have created
+        the artist, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The artist was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: No such artist.
           content:
@@ -251,6 +1472,559 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/v1/artists/{artistId}/comments:
+    get:
+      operationId: list-artist-comments
+      tags:
+        - Artists
+      summary: List an artist's comments
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The artist's comments, newest first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-artist-comment
+      tags:
+        - Artists
+      summary: Comment on an artist
+      description: Any signed-in reader may comment.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentInput'
+      responses:
+        '201':
+          description: The comment that was written.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/artists/{artistId}/comments/{commentId}:
+    patch:
+      operationId: update-artist-comment
+      tags:
+        - Artists
+      summary: Edit a comment on an artist
+      description: Only the comment's author, or a super grant, may edit it.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: commentId
+          in: path
+          required: true
+          description: The comment's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentPatch'
+      responses:
+        '200':
+          description: The comment as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-artist-comment
+      tags:
+        - Artists
+      summary: Remove a comment on an artist
+      description: Only the comment's author, or a super grant, may remove it.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: commentId
+          in: path
+          required: true
+          description: The comment's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The comment was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/artists/{artistId}/artworks:
+    post:
+      operationId: create-artist-artwork
+      tags:
+        - Artists
+      summary: Add artwork to an artist
+      description: The caller must hold `wikimusic:artist-create`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtworkInput'
+      responses:
+        '201':
+          description: The artwork that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artwork'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/artists/{artistId}/artworks/{artworkId}:
+    patch:
+      operationId: update-artist-artwork
+      tags:
+        - Artists
+      summary: Edit artwork of an artist
+      description: |
+        The caller must hold `wikimusic:artist-create` and must have created
+        the artwork, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: artworkId
+          in: path
+          required: true
+          description: The artwork's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtworkPatch'
+      responses:
+        '200':
+          description: The artwork as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artwork'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-artist-artwork
+      tags:
+        - Artists
+      summary: Remove artwork from an artist
+      description: |
+        The caller must hold `wikimusic:artist-delete` and must have created
+        the artwork, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: artworkId
+          in: path
+          required: true
+          description: The artwork's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The artwork was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/artists/{artistId}/external-sources:
+    get:
+      operationId: list-artist-external-sources
+      tags:
+        - Artists
+      summary: List an artist's external sources
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The artist's external sources.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExternalSource'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-artist-external-source
+      tags:
+        - Artists
+      summary: Add external sources to an artist
+      description: The caller must hold `wikimusic:artist-create`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalSourceInput'
+      responses:
+        '201':
+          description: The source that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSource'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/artists/{artistId}/external-sources/{sourceId}:
+    patch:
+      operationId: update-artist-external-source
+      tags:
+        - Artists
+      summary: Edit an artist's external sources
+      description: |
+        The caller must hold `wikimusic:artist-create` and must have created
+        the source, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: sourceId
+          in: path
+          required: true
+          description: The source's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalSourcePatch'
+      responses:
+        '200':
+          description: The source as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSource'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this source.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such source.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/artists/{artistId}/like:
+    post:
+      operationId: like-artist
+      tags:
+        - Artists
+      summary: Like an artist
+      description: Any signed-in reader may like an artist; a previous opinion is replaced.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The artist is liked.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/artists/{artistId}/dislike:
+    post:
+      operationId: dislike-artist
+      tags:
+        - Artists
+      summary: Dislike an artist
+      description: Any signed-in reader may dislike an artist; a previous opinion is replaced.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          description: The artist's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The artist is disliked.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/v1/genres:
     get:
       operationId: list-genres
@@ -293,6 +2067,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-genre
+      tags:
+        - Genres
+      summary: Add a genre
+      description: The caller must hold `wikimusic:genre-create`.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenreInput'
+      responses:
+        '201':
+          description: The genre that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Genre'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/v1/genres/{genreId}:
     get:
       operationId: get-genre
@@ -314,6 +2127,100 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Genre'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      operationId: update-genre
+      tags:
+        - Genres
+      summary: Edit a genre
+      description: |
+        The caller must hold `wikimusic:genre-create` and must have created
+        the genre, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenrePatch'
+      responses:
+        '200':
+          description: The genre as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Genre'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-genre
+      tags:
+        - Genres
+      summary: Remove a genre
+      description: |
+        The caller must hold `wikimusic:genre-delete` and must have created
+        the genre, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The genre was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: No such genre.
           content:
@@ -362,6 +2269,981 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/v1/genres/{genreId}/comments:
+    get:
+      operationId: list-genre-comments
+      tags:
+        - Genres
+      summary: List a genre's comments
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The genre's comments, newest first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-genre-comment
+      tags:
+        - Genres
+      summary: Comment on a genre
+      description: Any signed-in reader may comment.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentInput'
+      responses:
+        '201':
+          description: The comment that was written.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/genres/{genreId}/comments/{commentId}:
+    patch:
+      operationId: update-genre-comment
+      tags:
+        - Genres
+      summary: Edit a comment on a genre
+      description: Only the comment's author, or a super grant, may edit it.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: commentId
+          in: path
+          required: true
+          description: The comment's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentPatch'
+      responses:
+        '200':
+          description: The comment as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-genre-comment
+      tags:
+        - Genres
+      summary: Remove a comment on a genre
+      description: Only the comment's author, or a super grant, may remove it.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: commentId
+          in: path
+          required: true
+          description: The comment's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The comment was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/genres/{genreId}/artworks:
+    post:
+      operationId: create-genre-artwork
+      tags:
+        - Genres
+      summary: Add artwork to a genre
+      description: The caller must hold `wikimusic:genre-create`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtworkInput'
+      responses:
+        '201':
+          description: The artwork that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artwork'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/genres/{genreId}/artworks/{artworkId}:
+    patch:
+      operationId: update-genre-artwork
+      tags:
+        - Genres
+      summary: Edit artwork of a genre
+      description: |
+        The caller must hold `wikimusic:genre-create` and must have created the
+        artwork, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: artworkId
+          in: path
+          required: true
+          description: The artwork's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtworkPatch'
+      responses:
+        '200':
+          description: The artwork as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artwork'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-genre-artwork
+      tags:
+        - Genres
+      summary: Remove artwork from a genre
+      description: |
+        The caller must hold `wikimusic:genre-delete` and must have created the
+        artwork, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: artworkId
+          in: path
+          required: true
+          description: The artwork's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The artwork was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not remove this artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such artwork.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/genres/{genreId}/external-sources:
+    get:
+      operationId: list-genre-external-sources
+      tags:
+        - Genres
+      summary: List a genre's external sources
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The genre's external sources.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExternalSource'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-genre-external-source
+      tags:
+        - Genres
+      summary: Add external sources to a genre
+      description: The caller must hold `wikimusic:genre-create`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalSourceInput'
+      responses:
+        '201':
+          description: The source that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSource'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/genres/{genreId}/external-sources/{sourceId}:
+    patch:
+      operationId: update-genre-external-source
+      tags:
+        - Genres
+      summary: Edit a genre's external sources
+      description: |
+        The caller must hold `wikimusic:genre-create` and must have created the
+        source, unless they hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+        - name: sourceId
+          in: path
+          required: true
+          description: The source's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalSourcePatch'
+      responses:
+        '200':
+          description: The source as it now reads.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalSource'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session may not change this source.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such source.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/genres/{genreId}/like:
+    post:
+      operationId: like-genre
+      tags:
+        - Genres
+      summary: Like a genre
+      description: Any signed-in reader may like a genre; a previous opinion is replaced.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The genre is liked.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/genres/{genreId}/dislike:
+    post:
+      operationId: dislike-genre
+      tags:
+        - Genres
+      summary: Dislike a genre
+      description: Any signed-in reader may dislike a genre; a previous opinion is replaced.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          description: The genre's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The genre is disliked.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such genre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/articles:
+    get:
+      operationId: list-articles
+      tags:
+        - Articles
+      summary: List articles
+      parameters:
+        - name: limit
+          in: query
+          description: The page size.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: How many matches to skip before the page starts.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: A page of articles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleList'
+        '400':
+          description: A query parameter is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-article
+      tags:
+        - Articles
+      summary: Write an article
+      description: Any signed-in reader may write an article.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticleInput'
+      responses:
+        '201':
+          description: The article that was written.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/articles/{articleId}:
+    get:
+      operationId: get-article
+      tags:
+        - Articles
+      summary: Read one article
+      parameters:
+        - name: articleId
+          in: path
+          required: true
+          description: The article's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: One article, with its comments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '404':
+          description: No such article.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/articles/{articleId}/comments:
+    get:
+      operationId: list-article-comments
+      tags:
+        - Articles
+      summary: List an article's comments
+      parameters:
+        - name: articleId
+          in: path
+          required: true
+          description: The article's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The article's comments, oldest first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArticleComment'
+        '404':
+          description: No such article.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-article-comment
+      tags:
+        - Articles
+      summary: Comment on an article
+      description: |
+        Anyone may comment on an article, signed in or not.  A signed-in
+        reader is recorded by identifier; anyone else may give an author name.
+      parameters:
+        - name: articleId
+          in: path
+          required: true
+          description: The article's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticleCommentInput'
+      responses:
+        '201':
+          description: The comment that was written.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleComment'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such article.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/login:
+    post:
+      operationId: login
+      tags:
+        - Accounts
+      summary: Sign in
+      description: |
+        Exchange an email and a password for a bearer token.  The same token
+        is also set as the session cookie, so a browser may reuse it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: The session that was opened.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: The email and password do not match an account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/logout:
+    post:
+      operationId: logout
+      tags:
+        - Accounts
+      summary: Sign out
+      description: |
+        Discard a bearer token on the client.  A session cookie, if one was
+        set, is cleared.
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: The session was closed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/me:
+    get:
+      operationId: get-me
+      tags:
+        - Accounts
+      summary: Read the signed-in user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: The user the session belongs to.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/users:
+    get:
+      operationId: list-users
+      tags:
+        - Accounts
+      summary: List users
+      description: The caller must hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: The page size.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: How many matches to skip before the page starts.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: A page of users.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create-user
+      tags:
+        - Accounts
+      summary: Add a user
+      description: |
+        The caller must hold `wikimusic:user-create`.  A password is optional:
+        without one the account has no way in until a password is chosen.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: The user that was added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: An account already uses that email.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/users/{userId}:
+    patch:
+      operationId: update-user
+      tags:
+        - Accounts
+      summary: Edit a user
+      description: The caller must hold `wikimusic:modify-permissions`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The user's identifier.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPatch'
+      responses:
+        '200':
+          description: The user as they now read.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: The request body is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: delete-user
+      tags:
+        - Accounts
+      summary: Remove a user
+      description: The caller must hold `wikimusic:user-delete`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The user's identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: The user was removed.
+        '401':
+          description: No valid session was sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: The session lacks the permission the route asks for.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No such user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/v1/instance:
     get:
       operationId: get-instance
@@ -369,9 +3251,9 @@ paths:
         - Instance
       summary: Read what this instance holds
       description: |
-        The instance's name and the number of songs, artists and genres it
-        serves.  A client uses this to tell one instance from another and to
-        show how much there is to read.
+        The instance's name and the number of songs, artists, genres and
+        articles it serves.  A client uses this to tell one instance from
+        another and to show how much there is to read.
       responses:
         '200':
           description: This instance.
@@ -380,6 +3262,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Instance'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
   schemas:
     Error:
       type: object
@@ -476,6 +3363,51 @@ components:
         createdAt:
           type: string
           description: When the version was contributed, as an ISO 8601 timestamp.
+    Comment:
+      type: object
+      description: A comment a reader wrote about an entity.
+      required:
+        - identifier
+        - contents
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        parentIdentifier:
+          type: string
+          format: uuid
+          description: The comment this one replies to, when it is a reply.
+        contents:
+          type: string
+        createdBy:
+          type: string
+          format: uuid
+          description: The user who wrote the comment.
+        createdAt:
+          type: string
+    ExternalSource:
+      type: object
+      description: The addresses where an entity may be heard or read about.
+      required:
+        - identifier
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        spotifyUrl:
+          type: string
+          format: uri
+        youtubeUrl:
+          type: string
+          format: uri
+        soundcloudUrl:
+          type: string
+          format: uri
+        wikipediaUrl:
+          type: string
+          format: uri
+        createdAt:
+          type: string
     SongSummary:
       type: object
       description: A song as a list shows it.
@@ -504,6 +3436,12 @@ components:
         albumName:
           type: string
         views:
+          type: integer
+          minimum: 0
+        likeCount:
+          type: integer
+          minimum: 0
+        dislikeCount:
           type: integer
           minimum: 0
         artists:
@@ -552,6 +3490,12 @@ components:
         views:
           type: integer
           minimum: 0
+        likeCount:
+          type: integer
+          minimum: 0
+        dislikeCount:
+          type: integer
+          minimum: 0
         artists:
           type: array
           items:
@@ -568,6 +3512,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Artwork'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        externalSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalSource'
         createdAt:
           type: string
     ArtistSummary:
@@ -586,6 +3538,12 @@ components:
         description:
           type: string
         views:
+          type: integer
+          minimum: 0
+        likeCount:
+          type: integer
+          minimum: 0
+        dislikeCount:
           type: integer
           minimum: 0
         createdAt:
@@ -609,10 +3567,24 @@ components:
         views:
           type: integer
           minimum: 0
+        likeCount:
+          type: integer
+          minimum: 0
+        dislikeCount:
+          type: integer
+          minimum: 0
         artworks:
           type: array
           items:
             $ref: '#/components/schemas/Artwork'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        externalSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalSource'
         createdAt:
           type: string
     GenreSummary:
@@ -631,6 +3603,12 @@ components:
         description:
           type: string
         views:
+          type: integer
+          minimum: 0
+        likeCount:
+          type: integer
+          minimum: 0
+        dislikeCount:
           type: integer
           minimum: 0
         createdAt:
@@ -654,11 +3632,164 @@ components:
         views:
           type: integer
           minimum: 0
+        likeCount:
+          type: integer
+          minimum: 0
+        dislikeCount:
+          type: integer
+          minimum: 0
         artworks:
           type: array
           items:
             $ref: '#/components/schemas/Artwork'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        externalSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalSource'
         createdAt:
+          type: string
+    ArticleSummary:
+      type: object
+      description: An article as a list shows it.
+      required:
+        - identifier
+        - displayName
+        - kind
+        - views
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        kind:
+          type: string
+          enum:
+            - tutorial
+            - video
+            - chord-guide
+            - theory
+            - discussion
+        videoUrl:
+          type: string
+          format: uri
+        views:
+          type: integer
+          minimum: 0
+        createdAt:
+          type: string
+    Article:
+      type: object
+      description: One article, with everything the API says about it.
+      required:
+        - identifier
+        - displayName
+        - kind
+        - contents
+        - views
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        kind:
+          type: string
+          enum:
+            - tutorial
+            - video
+            - chord-guide
+            - theory
+            - discussion
+        videoUrl:
+          type: string
+          format: uri
+        contents:
+          type: string
+        views:
+          type: integer
+          minimum: 0
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArticleComment'
+        createdAt:
+          type: string
+    ArticleComment:
+      type: object
+      description: A comment an article carries.
+      required:
+        - identifier
+        - contents
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        parentIdentifier:
+          type: string
+          format: uuid
+        authorName:
+          type: string
+          description: The name a reader who was not signed in typed.
+        createdBy:
+          type: string
+          format: uuid
+        contents:
+          type: string
+        createdAt:
+          type: string
+    User:
+      type: object
+      description: An account of this instance.  A password is never returned.
+      required:
+        - identifier
+        - username
+        - email
+        - permissions
+      properties:
+        identifier:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        permissions:
+          type: array
+          items:
+            type: string
+    Session:
+      type: object
+      description: The session a successful sign-in opened.
+      required:
+        - token
+        - expiresIn
+        - user
+      properties:
+        token:
+          type: string
+          description: Send this as `Authorization: Bearer <token>`.
+        expiresIn:
+          type: integer
+          description: How long the token is good for, in seconds.
+        user:
+          $ref: '#/components/schemas/User'
+    LoginRequest:
+      type: object
+      description: The credentials a client signs in with.
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
           type: string
     SongList:
       type: object
@@ -727,6 +3858,50 @@ components:
         offset:
           type: integer
           minimum: 0
+    ArticleList:
+      type: object
+      description: One page of articles and the count of every match.
+      required:
+        - items
+        - total
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArticleSummary'
+        total:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+    UserList:
+      type: object
+      description: One page of users and the count of every match.
+      required:
+        - items
+        - total
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        total:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
     InstanceCounts:
       type: object
       description: How much of the encyclopaedia this instance holds.
@@ -734,6 +3909,7 @@ components:
         - songs
         - artists
         - genres
+        - articles
       properties:
         songs:
           type: integer
@@ -742,6 +3918,9 @@ components:
           type: integer
           minimum: 0
         genres:
+          type: integer
+          minimum: 0
+        articles:
           type: integer
           minimum: 0
     Instance:
@@ -758,6 +3937,283 @@ components:
         version:
           type: string
           description: The API version this instance serves.
-          example: 1.0.0
+          example: 1.1.0
         counts:
           $ref: '#/components/schemas/InstanceCounts'
+    SongInput:
+      type: object
+      description: The fields a new song is written from.
+      properties:
+        displayName:
+          type: string
+        description:
+          type: string
+        musicKey:
+          type: string
+        musicTuning:
+          type: string
+        musicCreationDate:
+          type: string
+        albumName:
+          type: string
+        albumInfoLink:
+          type: string
+          format: uri
+        artistIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        genreIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    SongPatch:
+      type: object
+      description: The fields of a song a client may rewrite.
+      properties:
+        displayName:
+          type: string
+        description:
+          type: string
+        musicKey:
+          type: string
+        musicTuning:
+          type: string
+        musicCreationDate:
+          type: string
+        albumName:
+          type: string
+        albumInfoLink:
+          type: string
+          format: uri
+    ArtistInput:
+      type: object
+      description: The fields a new artist is written from.
+      properties:
+        displayName:
+          type: string
+        description:
+          type: string
+    ArtistPatch:
+      type: object
+      description: The fields of an artist a client may rewrite.
+      properties:
+        displayName:
+          type: string
+        description:
+          type: string
+    GenreInput:
+      type: object
+      description: The fields a new genre is written from.
+      properties:
+        displayName:
+          type: string
+        description:
+          type: string
+    GenrePatch:
+      type: object
+      description: The fields of a genre a client may rewrite.
+      properties:
+        displayName:
+          type: string
+        description:
+          type: string
+    SongVersionInput:
+      type: object
+      description: The fields a new tablature version is written from.
+      properties:
+        versionName:
+          type: string
+        instrumentType:
+          type: string
+        asciiLegend:
+          type: string
+        asciiContents:
+          type: string
+        pdfContents:
+          type: string
+          description: A PDF of the tablature, as the data URL the form posts.
+        tablatureContents:
+          type: string
+          description: A Guitar Pro 5 file, as the data URL the form posts.
+    SongVersionPatch:
+      type: object
+      description: The fields of a tablature version a client may rewrite.
+      properties:
+        versionName:
+          type: string
+        instrumentType:
+          type: string
+        asciiLegend:
+          type: string
+        asciiContents:
+          type: string
+        pdfContents:
+          type: string
+        tablatureContents:
+          type: string
+    ArtworkInput:
+      type: object
+      description: The fields a new artwork is written from.
+      required:
+        - contentUrl
+      properties:
+        contentUrl:
+          type: string
+          format: uri
+        contentCaption:
+          type: string
+        orderValue:
+          type: integer
+    ArtworkPatch:
+      type: object
+      description: The fields of an artwork a client may rewrite.
+      properties:
+        contentUrl:
+          type: string
+          format: uri
+        contentCaption:
+          type: string
+        orderValue:
+          type: integer
+    ExternalSourceInput:
+      type: object
+      description: The addresses where an entity may be heard or read about.
+      properties:
+        spotifyUrl:
+          type: string
+          format: uri
+        youtubeUrl:
+          type: string
+          format: uri
+        soundcloudUrl:
+          type: string
+          format: uri
+        wikipediaUrl:
+          type: string
+          format: uri
+    ExternalSourcePatch:
+      type: object
+      description: The addresses of an entity a client may rewrite.
+      properties:
+        spotifyUrl:
+          type: string
+          format: uri
+        youtubeUrl:
+          type: string
+          format: uri
+        soundcloudUrl:
+          type: string
+          format: uri
+        wikipediaUrl:
+          type: string
+          format: uri
+    CommentInput:
+      type: object
+      description: A comment to write about an entity.
+      required:
+        - contents
+      properties:
+        contents:
+          type: string
+        parentIdentifier:
+          type: string
+          format: uuid
+    CommentPatch:
+      type: object
+      description: A comment to rewrite.
+      required:
+        - contents
+      properties:
+        contents:
+          type: string
+    ArtistRelationInput:
+      type: object
+      description: The artist to credit on a song.
+      required:
+        - artistId
+      properties:
+        artistId:
+          type: string
+          format: uuid
+    GenreRelationInput:
+      type: object
+      description: The genre to put a song in.
+      required:
+        - genreId
+      properties:
+        genreId:
+          type: string
+          format: uuid
+    ArticleInput:
+      type: object
+      description: The fields a new article is written from.
+      required:
+        - displayName
+      properties:
+        displayName:
+          type: string
+        kind:
+          type: string
+          enum:
+            - tutorial
+            - video
+            - chord-guide
+            - theory
+            - discussion
+          default: tutorial
+        videoUrl:
+          type: string
+          format: uri
+        contents:
+          type: string
+    ArticleCommentInput:
+      type: object
+      description: A comment to write about an article.
+      required:
+        - contents
+      properties:
+        contents:
+          type: string
+        parentIdentifier:
+          type: string
+          format: uuid
+        authorName:
+          type: string
+          description: The name to show when the reader is not signed in.
+    UserInput:
+      type: object
+      description: The fields a new account is written from.
+      required:
+        - username
+        - email
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        permissions:
+          type: array
+          items:
+            type: string
+        password:
+          type: string
+          description: Optional; without one the account cannot sign in yet.
+    UserPatch:
+      type: object
+      description: The fields of an account a client may rewrite.
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        permissions:
+          type: array
+          items:
+            type: string
+        password:
+          type: string

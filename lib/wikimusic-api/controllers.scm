@@ -34,14 +34,79 @@
             guile-handler
             routes
             list-songs
+            create-song
             get-song
+            update-song
+            delete-song
             list-song-versions
+            create-song-version
+            get-song-version
+            update-song-version
+            delete-song-version
+            list-song-comments
+            create-song-comment
+            update-song-comment
+            delete-song-comment
+            create-song-artwork
+            update-song-artwork
+            delete-song-artwork
+            add-song-artist
+            remove-song-artist
+            add-song-genre
+            remove-song-genre
+            list-song-external-sources
+            create-song-external-source
+            update-song-external-source
+            like-song
+            dislike-song
             list-artists
+            create-artist
             get-artist
+            update-artist
+            delete-artist
             list-artist-songs
+            list-artist-comments
+            create-artist-comment
+            update-artist-comment
+            delete-artist-comment
+            create-artist-artwork
+            update-artist-artwork
+            delete-artist-artwork
+            list-artist-external-sources
+            create-artist-external-source
+            update-artist-external-source
+            like-artist
+            dislike-artist
             list-genres
+            create-genre
             get-genre
+            update-genre
+            delete-genre
             list-genre-songs
+            list-genre-comments
+            create-genre-comment
+            update-genre-comment
+            delete-genre-comment
+            create-genre-artwork
+            update-genre-artwork
+            delete-genre-artwork
+            list-genre-external-sources
+            create-genre-external-source
+            update-genre-external-source
+            like-genre
+            dislike-genre
+            list-articles
+            create-article
+            get-article
+            list-article-comments
+            create-article-comment
+            login
+            logout
+            get-me
+            list-users
+            create-user
+            update-user
+            delete-user
             get-instance))
 
 (define-record-type <route>
@@ -56,14 +121,79 @@
 (define routes
   (list
    (make-route 'GET (make-regexp "^/api/v1/songs/?$") '() 'list-songs)
+   (make-route 'POST (make-regexp "^/api/v1/songs/?$") '() 'create-song)
    (make-route 'GET (make-regexp "^/api/v1/songs/([^/]+)/?$") '("songId") 'get-song)
+   (make-route 'PATCH (make-regexp "^/api/v1/songs/([^/]+)/?$") '("songId") 'update-song)
+   (make-route 'DELETE (make-regexp "^/api/v1/songs/([^/]+)/?$") '("songId") 'delete-song)
    (make-route 'GET (make-regexp "^/api/v1/songs/([^/]+)/versions/?$") '("songId") 'list-song-versions)
+   (make-route 'POST (make-regexp "^/api/v1/songs/([^/]+)/versions/?$") '("songId") 'create-song-version)
+   (make-route 'GET (make-regexp "^/api/v1/songs/([^/]+)/versions/([^/]+)/?$") '("songId" "versionId") 'get-song-version)
+   (make-route 'PATCH (make-regexp "^/api/v1/songs/([^/]+)/versions/([^/]+)/?$") '("songId" "versionId") 'update-song-version)
+   (make-route 'DELETE (make-regexp "^/api/v1/songs/([^/]+)/versions/([^/]+)/?$") '("songId" "versionId") 'delete-song-version)
+   (make-route 'GET (make-regexp "^/api/v1/songs/([^/]+)/comments/?$") '("songId") 'list-song-comments)
+   (make-route 'POST (make-regexp "^/api/v1/songs/([^/]+)/comments/?$") '("songId") 'create-song-comment)
+   (make-route 'PATCH (make-regexp "^/api/v1/songs/([^/]+)/comments/([^/]+)/?$") '("songId" "commentId") 'update-song-comment)
+   (make-route 'DELETE (make-regexp "^/api/v1/songs/([^/]+)/comments/([^/]+)/?$") '("songId" "commentId") 'delete-song-comment)
+   (make-route 'POST (make-regexp "^/api/v1/songs/([^/]+)/artworks/?$") '("songId") 'create-song-artwork)
+   (make-route 'PATCH (make-regexp "^/api/v1/songs/([^/]+)/artworks/([^/]+)/?$") '("songId" "artworkId") 'update-song-artwork)
+   (make-route 'DELETE (make-regexp "^/api/v1/songs/([^/]+)/artworks/([^/]+)/?$") '("songId" "artworkId") 'delete-song-artwork)
+   (make-route 'POST (make-regexp "^/api/v1/songs/([^/]+)/artists/?$") '("songId") 'add-song-artist)
+   (make-route 'DELETE (make-regexp "^/api/v1/songs/([^/]+)/artists/([^/]+)/?$") '("songId" "artistId") 'remove-song-artist)
+   (make-route 'POST (make-regexp "^/api/v1/songs/([^/]+)/genres/?$") '("songId") 'add-song-genre)
+   (make-route 'DELETE (make-regexp "^/api/v1/songs/([^/]+)/genres/([^/]+)/?$") '("songId" "genreId") 'remove-song-genre)
+   (make-route 'GET (make-regexp "^/api/v1/songs/([^/]+)/external-sources/?$") '("songId") 'list-song-external-sources)
+   (make-route 'POST (make-regexp "^/api/v1/songs/([^/]+)/external-sources/?$") '("songId") 'create-song-external-source)
+   (make-route 'PATCH (make-regexp "^/api/v1/songs/([^/]+)/external-sources/([^/]+)/?$") '("songId" "sourceId") 'update-song-external-source)
+   (make-route 'POST (make-regexp "^/api/v1/songs/([^/]+)/like/?$") '("songId") 'like-song)
+   (make-route 'POST (make-regexp "^/api/v1/songs/([^/]+)/dislike/?$") '("songId") 'dislike-song)
    (make-route 'GET (make-regexp "^/api/v1/artists/?$") '() 'list-artists)
+   (make-route 'POST (make-regexp "^/api/v1/artists/?$") '() 'create-artist)
    (make-route 'GET (make-regexp "^/api/v1/artists/([^/]+)/?$") '("artistId") 'get-artist)
+   (make-route 'PATCH (make-regexp "^/api/v1/artists/([^/]+)/?$") '("artistId") 'update-artist)
+   (make-route 'DELETE (make-regexp "^/api/v1/artists/([^/]+)/?$") '("artistId") 'delete-artist)
    (make-route 'GET (make-regexp "^/api/v1/artists/([^/]+)/songs/?$") '("artistId") 'list-artist-songs)
+   (make-route 'GET (make-regexp "^/api/v1/artists/([^/]+)/comments/?$") '("artistId") 'list-artist-comments)
+   (make-route 'POST (make-regexp "^/api/v1/artists/([^/]+)/comments/?$") '("artistId") 'create-artist-comment)
+   (make-route 'PATCH (make-regexp "^/api/v1/artists/([^/]+)/comments/([^/]+)/?$") '("artistId" "commentId") 'update-artist-comment)
+   (make-route 'DELETE (make-regexp "^/api/v1/artists/([^/]+)/comments/([^/]+)/?$") '("artistId" "commentId") 'delete-artist-comment)
+   (make-route 'POST (make-regexp "^/api/v1/artists/([^/]+)/artworks/?$") '("artistId") 'create-artist-artwork)
+   (make-route 'PATCH (make-regexp "^/api/v1/artists/([^/]+)/artworks/([^/]+)/?$") '("artistId" "artworkId") 'update-artist-artwork)
+   (make-route 'DELETE (make-regexp "^/api/v1/artists/([^/]+)/artworks/([^/]+)/?$") '("artistId" "artworkId") 'delete-artist-artwork)
+   (make-route 'GET (make-regexp "^/api/v1/artists/([^/]+)/external-sources/?$") '("artistId") 'list-artist-external-sources)
+   (make-route 'POST (make-regexp "^/api/v1/artists/([^/]+)/external-sources/?$") '("artistId") 'create-artist-external-source)
+   (make-route 'PATCH (make-regexp "^/api/v1/artists/([^/]+)/external-sources/([^/]+)/?$") '("artistId" "sourceId") 'update-artist-external-source)
+   (make-route 'POST (make-regexp "^/api/v1/artists/([^/]+)/like/?$") '("artistId") 'like-artist)
+   (make-route 'POST (make-regexp "^/api/v1/artists/([^/]+)/dislike/?$") '("artistId") 'dislike-artist)
    (make-route 'GET (make-regexp "^/api/v1/genres/?$") '() 'list-genres)
+   (make-route 'POST (make-regexp "^/api/v1/genres/?$") '() 'create-genre)
    (make-route 'GET (make-regexp "^/api/v1/genres/([^/]+)/?$") '("genreId") 'get-genre)
+   (make-route 'PATCH (make-regexp "^/api/v1/genres/([^/]+)/?$") '("genreId") 'update-genre)
+   (make-route 'DELETE (make-regexp "^/api/v1/genres/([^/]+)/?$") '("genreId") 'delete-genre)
    (make-route 'GET (make-regexp "^/api/v1/genres/([^/]+)/songs/?$") '("genreId") 'list-genre-songs)
+   (make-route 'GET (make-regexp "^/api/v1/genres/([^/]+)/comments/?$") '("genreId") 'list-genre-comments)
+   (make-route 'POST (make-regexp "^/api/v1/genres/([^/]+)/comments/?$") '("genreId") 'create-genre-comment)
+   (make-route 'PATCH (make-regexp "^/api/v1/genres/([^/]+)/comments/([^/]+)/?$") '("genreId" "commentId") 'update-genre-comment)
+   (make-route 'DELETE (make-regexp "^/api/v1/genres/([^/]+)/comments/([^/]+)/?$") '("genreId" "commentId") 'delete-genre-comment)
+   (make-route 'POST (make-regexp "^/api/v1/genres/([^/]+)/artworks/?$") '("genreId") 'create-genre-artwork)
+   (make-route 'PATCH (make-regexp "^/api/v1/genres/([^/]+)/artworks/([^/]+)/?$") '("genreId" "artworkId") 'update-genre-artwork)
+   (make-route 'DELETE (make-regexp "^/api/v1/genres/([^/]+)/artworks/([^/]+)/?$") '("genreId" "artworkId") 'delete-genre-artwork)
+   (make-route 'GET (make-regexp "^/api/v1/genres/([^/]+)/external-sources/?$") '("genreId") 'list-genre-external-sources)
+   (make-route 'POST (make-regexp "^/api/v1/genres/([^/]+)/external-sources/?$") '("genreId") 'create-genre-external-source)
+   (make-route 'PATCH (make-regexp "^/api/v1/genres/([^/]+)/external-sources/([^/]+)/?$") '("genreId" "sourceId") 'update-genre-external-source)
+   (make-route 'POST (make-regexp "^/api/v1/genres/([^/]+)/like/?$") '("genreId") 'like-genre)
+   (make-route 'POST (make-regexp "^/api/v1/genres/([^/]+)/dislike/?$") '("genreId") 'dislike-genre)
+   (make-route 'GET (make-regexp "^/api/v1/articles/?$") '() 'list-articles)
+   (make-route 'POST (make-regexp "^/api/v1/articles/?$") '() 'create-article)
+   (make-route 'GET (make-regexp "^/api/v1/articles/([^/]+)/?$") '("articleId") 'get-article)
+   (make-route 'GET (make-regexp "^/api/v1/articles/([^/]+)/comments/?$") '("articleId") 'list-article-comments)
+   (make-route 'POST (make-regexp "^/api/v1/articles/([^/]+)/comments/?$") '("articleId") 'create-article-comment)
+   (make-route 'POST (make-regexp "^/api/v1/login/?$") '() 'login)
+   (make-route 'POST (make-regexp "^/api/v1/logout/?$") '() 'logout)
+   (make-route 'GET (make-regexp "^/api/v1/me/?$") '() 'get-me)
+   (make-route 'GET (make-regexp "^/api/v1/users/?$") '() 'list-users)
+   (make-route 'POST (make-regexp "^/api/v1/users/?$") '() 'create-user)
+   (make-route 'PATCH (make-regexp "^/api/v1/users/([^/]+)/?$") '("userId") 'update-user)
+   (make-route 'DELETE (make-regexp "^/api/v1/users/([^/]+)/?$") '("userId") 'delete-user)
    (make-route 'GET (make-regexp "^/api/v1/instance/?$") '() 'get-instance)))
 
 ;; An alist of operation name to handler procedure.
@@ -103,14 +233,79 @@ a server can install its handlers once at start up."
          (path-arguments (map cons (route-parameters route) captured)))
     (case [route-operation route]
       [(list-songs) (list-songs request path-arguments)]
+      [(create-song) (create-song request path-arguments)]
       [(get-song) (get-song request path-arguments)]
+      [(update-song) (update-song request path-arguments)]
+      [(delete-song) (delete-song request path-arguments)]
       [(list-song-versions) (list-song-versions request path-arguments)]
+      [(create-song-version) (create-song-version request path-arguments)]
+      [(get-song-version) (get-song-version request path-arguments)]
+      [(update-song-version) (update-song-version request path-arguments)]
+      [(delete-song-version) (delete-song-version request path-arguments)]
+      [(list-song-comments) (list-song-comments request path-arguments)]
+      [(create-song-comment) (create-song-comment request path-arguments)]
+      [(update-song-comment) (update-song-comment request path-arguments)]
+      [(delete-song-comment) (delete-song-comment request path-arguments)]
+      [(create-song-artwork) (create-song-artwork request path-arguments)]
+      [(update-song-artwork) (update-song-artwork request path-arguments)]
+      [(delete-song-artwork) (delete-song-artwork request path-arguments)]
+      [(add-song-artist) (add-song-artist request path-arguments)]
+      [(remove-song-artist) (remove-song-artist request path-arguments)]
+      [(add-song-genre) (add-song-genre request path-arguments)]
+      [(remove-song-genre) (remove-song-genre request path-arguments)]
+      [(list-song-external-sources) (list-song-external-sources request path-arguments)]
+      [(create-song-external-source) (create-song-external-source request path-arguments)]
+      [(update-song-external-source) (update-song-external-source request path-arguments)]
+      [(like-song) (like-song request path-arguments)]
+      [(dislike-song) (dislike-song request path-arguments)]
       [(list-artists) (list-artists request path-arguments)]
+      [(create-artist) (create-artist request path-arguments)]
       [(get-artist) (get-artist request path-arguments)]
+      [(update-artist) (update-artist request path-arguments)]
+      [(delete-artist) (delete-artist request path-arguments)]
       [(list-artist-songs) (list-artist-songs request path-arguments)]
+      [(list-artist-comments) (list-artist-comments request path-arguments)]
+      [(create-artist-comment) (create-artist-comment request path-arguments)]
+      [(update-artist-comment) (update-artist-comment request path-arguments)]
+      [(delete-artist-comment) (delete-artist-comment request path-arguments)]
+      [(create-artist-artwork) (create-artist-artwork request path-arguments)]
+      [(update-artist-artwork) (update-artist-artwork request path-arguments)]
+      [(delete-artist-artwork) (delete-artist-artwork request path-arguments)]
+      [(list-artist-external-sources) (list-artist-external-sources request path-arguments)]
+      [(create-artist-external-source) (create-artist-external-source request path-arguments)]
+      [(update-artist-external-source) (update-artist-external-source request path-arguments)]
+      [(like-artist) (like-artist request path-arguments)]
+      [(dislike-artist) (dislike-artist request path-arguments)]
       [(list-genres) (list-genres request path-arguments)]
+      [(create-genre) (create-genre request path-arguments)]
       [(get-genre) (get-genre request path-arguments)]
+      [(update-genre) (update-genre request path-arguments)]
+      [(delete-genre) (delete-genre request path-arguments)]
       [(list-genre-songs) (list-genre-songs request path-arguments)]
+      [(list-genre-comments) (list-genre-comments request path-arguments)]
+      [(create-genre-comment) (create-genre-comment request path-arguments)]
+      [(update-genre-comment) (update-genre-comment request path-arguments)]
+      [(delete-genre-comment) (delete-genre-comment request path-arguments)]
+      [(create-genre-artwork) (create-genre-artwork request path-arguments)]
+      [(update-genre-artwork) (update-genre-artwork request path-arguments)]
+      [(delete-genre-artwork) (delete-genre-artwork request path-arguments)]
+      [(list-genre-external-sources) (list-genre-external-sources request path-arguments)]
+      [(create-genre-external-source) (create-genre-external-source request path-arguments)]
+      [(update-genre-external-source) (update-genre-external-source request path-arguments)]
+      [(like-genre) (like-genre request path-arguments)]
+      [(dislike-genre) (dislike-genre request path-arguments)]
+      [(list-articles) (list-articles request path-arguments)]
+      [(create-article) (create-article request path-arguments)]
+      [(get-article) (get-article request path-arguments)]
+      [(list-article-comments) (list-article-comments request path-arguments)]
+      [(create-article-comment) (create-article-comment request path-arguments)]
+      [(login) (login request path-arguments)]
+      [(logout) (logout request path-arguments)]
+      [(get-me) (get-me request path-arguments)]
+      [(list-users) (list-users request path-arguments)]
+      [(create-user) (create-user request path-arguments)]
+      [(update-user) (update-user request path-arguments)]
+      [(delete-user) (delete-user request path-arguments)]
       [(get-instance) (get-instance request path-arguments)]
       [else (unimplemented-operation (route-operation route) request)])))
 
@@ -229,12 +424,28 @@ installed in api-handlers for this operation."
                    (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
                    (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
+(define (create-song request path-arguments)
+  "POST /api/v1/songs
+
+Add a song to this instance.  The caller must hold
+`wikimusic:song-create`.  `artistIds` and `genreIds` credit the song
+in the same request.
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-song request
+                  (list
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->song-input node)))))))
+
 (define (get-song request path-arguments)
   "GET /api/v1/songs/{songId}
 
-One song with its tablature versions, its artwork and its credits.  The
-versions are where a song's ASCII tablature lives; the PDF and Guitar
-Pro files are reported by their presence, not by their bytes.
+One song with its tablature versions, its artwork, comments, external
+sources and credits.  The versions are where a song's ASCII tablature
+lives; the PDF and Guitar Pro files are reported by their presence,
+not by their bytes.
 
 Parameters:
   - songId (string, required, path)
@@ -245,12 +456,46 @@ installed in api-handlers for this operation."
                   (list
                    (cons 'song-id (assoc-ref path-arguments "songId")))))
 
+(define (update-song request path-arguments)
+  "PATCH /api/v1/songs/{songId}
+
+Rewrite the fields of a song.  The caller must hold
+`wikimusic:song-create` and must have created the song, unless they
+hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-song request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->song-patch node)))))))
+
+(define (delete-song request path-arguments)
+  "DELETE /api/v1/songs/{songId}
+
+Remove a song and its credits.  The caller must hold
+`wikimusic:song-delete` and must have created the song, unless they
+hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-song request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId")))))
+
 (define (list-song-versions request path-arguments)
   "GET /api/v1/songs/{songId}/versions
 
 The tablature versions of one song, oldest first, with the ASCII
-contents of each.  A version is identified separately from its song so
-that a client can fetch one and cache it by its own identifier.
+contents of each.
 
 Parameters:
   - songId (string, required, path)
@@ -258,6 +503,346 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'list-song-versions request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId")))))
+
+(define (create-song-version request path-arguments)
+  "POST /api/v1/songs/{songId}/versions
+
+Add a version to a song.  The caller must hold
+`wikimusic:song-create`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-song-version request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->song-version-input node)))))))
+
+(define (get-song-version request path-arguments)
+  "GET /api/v1/songs/{songId}/versions/{versionId}
+
+Read one tablature version
+
+Parameters:
+  - songId (string, required, path)
+  - versionId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'get-song-version request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'version-id (assoc-ref path-arguments "versionId")))))
+
+(define (update-song-version request path-arguments)
+  "PATCH /api/v1/songs/{songId}/versions/{versionId}
+
+Rewrite a version.  The caller must hold `wikimusic:song-create` and
+must have created the version, unless they hold
+`wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - versionId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-song-version request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'version-id (assoc-ref path-arguments "versionId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->song-version-patch node)))))))
+
+(define (delete-song-version request path-arguments)
+  "DELETE /api/v1/songs/{songId}/versions/{versionId}
+
+Remove a version.  The caller must hold `wikimusic:song-delete` and
+must have created the version, unless they hold
+`wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - versionId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-song-version request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'version-id (assoc-ref path-arguments "versionId")))))
+
+(define (list-song-comments request path-arguments)
+  "GET /api/v1/songs/{songId}/comments
+
+List a song's comments
+
+Parameters:
+  - songId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'list-song-comments request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId")))))
+
+(define (create-song-comment request path-arguments)
+  "POST /api/v1/songs/{songId}/comments
+
+Any signed-in reader may comment.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-song-comment request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->comment-input node)))))))
+
+(define (update-song-comment request path-arguments)
+  "PATCH /api/v1/songs/{songId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may edit it.
+
+Parameters:
+  - songId (string, required, path)
+  - commentId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-song-comment request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'comment-id (assoc-ref path-arguments "commentId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->comment-patch node)))))))
+
+(define (delete-song-comment request path-arguments)
+  "DELETE /api/v1/songs/{songId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may remove it.
+
+Parameters:
+  - songId (string, required, path)
+  - commentId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-song-comment request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'comment-id (assoc-ref path-arguments "commentId")))))
+
+(define (create-song-artwork request path-arguments)
+  "POST /api/v1/songs/{songId}/artworks
+
+The caller must hold `wikimusic:song-create`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-song-artwork request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->artwork-input node)))))))
+
+(define (update-song-artwork request path-arguments)
+  "PATCH /api/v1/songs/{songId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:song-create` and must have created the
+artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - artworkId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-song-artwork request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'artwork-id (assoc-ref path-arguments "artworkId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->artwork-patch node)))))))
+
+(define (delete-song-artwork request path-arguments)
+  "DELETE /api/v1/songs/{songId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:song-delete` and must have created the
+artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - artworkId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-song-artwork request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'artwork-id (assoc-ref path-arguments "artworkId")))))
+
+(define (add-song-artist request path-arguments)
+  "POST /api/v1/songs/{songId}/artists
+
+The caller must hold `wikimusic:song-create`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'add-song-artist request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->artist-relation-input node)))))))
+
+(define (remove-song-artist request path-arguments)
+  "DELETE /api/v1/songs/{songId}/artists/{artistId}
+
+The caller must hold `wikimusic:song-delete` and must have created the
+credit, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - artistId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'remove-song-artist request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'artist-id (assoc-ref path-arguments "artistId")))))
+
+(define (add-song-genre request path-arguments)
+  "POST /api/v1/songs/{songId}/genres
+
+The caller must hold `wikimusic:song-create`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'add-song-genre request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->genre-relation-input node)))))))
+
+(define (remove-song-genre request path-arguments)
+  "DELETE /api/v1/songs/{songId}/genres/{genreId}
+
+The caller must hold `wikimusic:song-delete` and must have created the
+link, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - genreId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'remove-song-genre request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'genre-id (assoc-ref path-arguments "genreId")))))
+
+(define (list-song-external-sources request path-arguments)
+  "GET /api/v1/songs/{songId}/external-sources
+
+List a song's external sources
+
+Parameters:
+  - songId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'list-song-external-sources request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId")))))
+
+(define (create-song-external-source request path-arguments)
+  "POST /api/v1/songs/{songId}/external-sources
+
+The caller must hold `wikimusic:song-create`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-song-external-source request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->external-source-input node)))))))
+
+(define (update-song-external-source request path-arguments)
+  "PATCH /api/v1/songs/{songId}/external-sources/{sourceId}
+
+The caller must hold `wikimusic:song-create` and must have created the
+source, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - sourceId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-song-external-source request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId"))
+                   (cons 'source-id (assoc-ref path-arguments "sourceId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->external-source-patch node)))))))
+
+(define (like-song request path-arguments)
+  "POST /api/v1/songs/{songId}/like
+
+Any signed-in reader may like a song; a previous opinion is replaced.
+
+Parameters:
+  - songId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'like-song request
+                  (list
+                   (cons 'song-id (assoc-ref path-arguments "songId")))))
+
+(define (dislike-song request path-arguments)
+  "POST /api/v1/songs/{songId}/dislike
+
+Any signed-in reader may dislike a song; a previous opinion is replaced.
+
+Parameters:
+  - songId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'dislike-song request
                   (list
                    (cons 'song-id (assoc-ref path-arguments "songId")))))
 
@@ -279,6 +864,19 @@ installed in api-handlers for this operation."
                    (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
                    (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
+(define (create-artist request path-arguments)
+  "POST /api/v1/artists
+
+The caller must hold `wikimusic:artist-create`.
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-artist request
+                  (list
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->artist-input node)))))))
+
 (define (get-artist request path-arguments)
   "GET /api/v1/artists/{artistId}
 
@@ -290,6 +888,39 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'get-artist request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId")))))
+
+(define (update-artist request path-arguments)
+  "PATCH /api/v1/artists/{artistId}
+
+The caller must hold `wikimusic:artist-create` and must have created
+the artist, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - artistId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-artist request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->artist-patch node)))))))
+
+(define (delete-artist request path-arguments)
+  "DELETE /api/v1/artists/{artistId}
+
+The caller must hold `wikimusic:artist-delete` and must have created
+the artist, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - artistId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-artist request
                   (list
                    (cons 'artist-id (assoc-ref path-arguments "artistId")))))
 
@@ -311,6 +942,205 @@ installed in api-handlers for this operation."
                    (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
                    (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
+(define (list-artist-comments request path-arguments)
+  "GET /api/v1/artists/{artistId}/comments
+
+List an artist's comments
+
+Parameters:
+  - artistId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'list-artist-comments request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId")))))
+
+(define (create-artist-comment request path-arguments)
+  "POST /api/v1/artists/{artistId}/comments
+
+Any signed-in reader may comment.
+
+Parameters:
+  - artistId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-artist-comment request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->comment-input node)))))))
+
+(define (update-artist-comment request path-arguments)
+  "PATCH /api/v1/artists/{artistId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may edit it.
+
+Parameters:
+  - artistId (string, required, path)
+  - commentId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-artist-comment request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId"))
+                   (cons 'comment-id (assoc-ref path-arguments "commentId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->comment-patch node)))))))
+
+(define (delete-artist-comment request path-arguments)
+  "DELETE /api/v1/artists/{artistId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may remove it.
+
+Parameters:
+  - artistId (string, required, path)
+  - commentId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-artist-comment request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId"))
+                   (cons 'comment-id (assoc-ref path-arguments "commentId")))))
+
+(define (create-artist-artwork request path-arguments)
+  "POST /api/v1/artists/{artistId}/artworks
+
+The caller must hold `wikimusic:artist-create`.
+
+Parameters:
+  - artistId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-artist-artwork request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->artwork-input node)))))))
+
+(define (update-artist-artwork request path-arguments)
+  "PATCH /api/v1/artists/{artistId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:artist-create` and must have created
+the artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - artistId (string, required, path)
+  - artworkId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-artist-artwork request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId"))
+                   (cons 'artwork-id (assoc-ref path-arguments "artworkId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->artwork-patch node)))))))
+
+(define (delete-artist-artwork request path-arguments)
+  "DELETE /api/v1/artists/{artistId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:artist-delete` and must have created
+the artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - artistId (string, required, path)
+  - artworkId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-artist-artwork request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId"))
+                   (cons 'artwork-id (assoc-ref path-arguments "artworkId")))))
+
+(define (list-artist-external-sources request path-arguments)
+  "GET /api/v1/artists/{artistId}/external-sources
+
+List an artist's external sources
+
+Parameters:
+  - artistId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'list-artist-external-sources request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId")))))
+
+(define (create-artist-external-source request path-arguments)
+  "POST /api/v1/artists/{artistId}/external-sources
+
+The caller must hold `wikimusic:artist-create`.
+
+Parameters:
+  - artistId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-artist-external-source request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->external-source-input node)))))))
+
+(define (update-artist-external-source request path-arguments)
+  "PATCH /api/v1/artists/{artistId}/external-sources/{sourceId}
+
+The caller must hold `wikimusic:artist-create` and must have created
+the source, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - artistId (string, required, path)
+  - sourceId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-artist-external-source request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId"))
+                   (cons 'source-id (assoc-ref path-arguments "sourceId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->external-source-patch node)))))))
+
+(define (like-artist request path-arguments)
+  "POST /api/v1/artists/{artistId}/like
+
+Any signed-in reader may like an artist; a previous opinion is replaced.
+
+Parameters:
+  - artistId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'like-artist request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId")))))
+
+(define (dislike-artist request path-arguments)
+  "POST /api/v1/artists/{artistId}/dislike
+
+Any signed-in reader may dislike an artist; a previous opinion is replaced.
+
+Parameters:
+  - artistId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'dislike-artist request
+                  (list
+                   (cons 'artist-id (assoc-ref path-arguments "artistId")))))
+
 (define (list-genres request path-arguments)
   "GET /api/v1/genres
 
@@ -329,6 +1159,19 @@ installed in api-handlers for this operation."
                    (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
                    (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
+(define (create-genre request path-arguments)
+  "POST /api/v1/genres
+
+The caller must hold `wikimusic:genre-create`.
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-genre request
+                  (list
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->genre-input node)))))))
+
 (define (get-genre request path-arguments)
   "GET /api/v1/genres/{genreId}
 
@@ -340,6 +1183,39 @@ Parameters:
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."
   (invoke-handler 'get-genre request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId")))))
+
+(define (update-genre request path-arguments)
+  "PATCH /api/v1/genres/{genreId}
+
+The caller must hold `wikimusic:genre-create` and must have created
+the genre, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - genreId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-genre request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->genre-patch node)))))))
+
+(define (delete-genre request path-arguments)
+  "DELETE /api/v1/genres/{genreId}
+
+The caller must hold `wikimusic:genre-delete` and must have created
+the genre, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - genreId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-genre request
                   (list
                    (cons 'genre-id (assoc-ref path-arguments "genreId")))))
 
@@ -361,12 +1237,380 @@ installed in api-handlers for this operation."
                    (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
                    (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
 
+(define (list-genre-comments request path-arguments)
+  "GET /api/v1/genres/{genreId}/comments
+
+List a genre's comments
+
+Parameters:
+  - genreId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'list-genre-comments request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId")))))
+
+(define (create-genre-comment request path-arguments)
+  "POST /api/v1/genres/{genreId}/comments
+
+Any signed-in reader may comment.
+
+Parameters:
+  - genreId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-genre-comment request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->comment-input node)))))))
+
+(define (update-genre-comment request path-arguments)
+  "PATCH /api/v1/genres/{genreId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may edit it.
+
+Parameters:
+  - genreId (string, required, path)
+  - commentId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-genre-comment request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId"))
+                   (cons 'comment-id (assoc-ref path-arguments "commentId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->comment-patch node)))))))
+
+(define (delete-genre-comment request path-arguments)
+  "DELETE /api/v1/genres/{genreId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may remove it.
+
+Parameters:
+  - genreId (string, required, path)
+  - commentId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-genre-comment request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId"))
+                   (cons 'comment-id (assoc-ref path-arguments "commentId")))))
+
+(define (create-genre-artwork request path-arguments)
+  "POST /api/v1/genres/{genreId}/artworks
+
+The caller must hold `wikimusic:genre-create`.
+
+Parameters:
+  - genreId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-genre-artwork request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->artwork-input node)))))))
+
+(define (update-genre-artwork request path-arguments)
+  "PATCH /api/v1/genres/{genreId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:genre-create` and must have created the
+artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - genreId (string, required, path)
+  - artworkId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-genre-artwork request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId"))
+                   (cons 'artwork-id (assoc-ref path-arguments "artworkId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->artwork-patch node)))))))
+
+(define (delete-genre-artwork request path-arguments)
+  "DELETE /api/v1/genres/{genreId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:genre-delete` and must have created the
+artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - genreId (string, required, path)
+  - artworkId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-genre-artwork request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId"))
+                   (cons 'artwork-id (assoc-ref path-arguments "artworkId")))))
+
+(define (list-genre-external-sources request path-arguments)
+  "GET /api/v1/genres/{genreId}/external-sources
+
+List a genre's external sources
+
+Parameters:
+  - genreId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'list-genre-external-sources request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId")))))
+
+(define (create-genre-external-source request path-arguments)
+  "POST /api/v1/genres/{genreId}/external-sources
+
+The caller must hold `wikimusic:genre-create`.
+
+Parameters:
+  - genreId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-genre-external-source request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->external-source-input node)))))))
+
+(define (update-genre-external-source request path-arguments)
+  "PATCH /api/v1/genres/{genreId}/external-sources/{sourceId}
+
+The caller must hold `wikimusic:genre-create` and must have created the
+source, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - genreId (string, required, path)
+  - sourceId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-genre-external-source request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId"))
+                   (cons 'source-id (assoc-ref path-arguments "sourceId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->external-source-patch node)))))))
+
+(define (like-genre request path-arguments)
+  "POST /api/v1/genres/{genreId}/like
+
+Any signed-in reader may like a genre; a previous opinion is replaced.
+
+Parameters:
+  - genreId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'like-genre request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId")))))
+
+(define (dislike-genre request path-arguments)
+  "POST /api/v1/genres/{genreId}/dislike
+
+Any signed-in reader may dislike a genre; a previous opinion is replaced.
+
+Parameters:
+  - genreId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'dislike-genre request
+                  (list
+                   (cons 'genre-id (assoc-ref path-arguments "genreId")))))
+
+(define (list-articles request path-arguments)
+  "GET /api/v1/articles
+
+List articles
+
+Parameters:
+  - limit (integer, query)
+  - offset (integer, query)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'list-articles request
+                  (list
+                   (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
+                   (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
+
+(define (create-article request path-arguments)
+  "POST /api/v1/articles
+
+Any signed-in reader may write an article.
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-article request
+                  (list
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->article-input node)))))))
+
+(define (get-article request path-arguments)
+  "GET /api/v1/articles/{articleId}
+
+Read one article
+
+Parameters:
+  - articleId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'get-article request
+                  (list
+                   (cons 'article-id (assoc-ref path-arguments "articleId")))))
+
+(define (list-article-comments request path-arguments)
+  "GET /api/v1/articles/{articleId}/comments
+
+List an article's comments
+
+Parameters:
+  - articleId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'list-article-comments request
+                  (list
+                   (cons 'article-id (assoc-ref path-arguments "articleId")))))
+
+(define (create-article-comment request path-arguments)
+  "POST /api/v1/articles/{articleId}/comments
+
+Anyone may comment on an article, signed in or not.  A signed-in
+reader is recorded by identifier; anyone else may give an author name.
+
+Parameters:
+  - articleId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-article-comment request
+                  (list
+                   (cons 'article-id (assoc-ref path-arguments "articleId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->article-comment-input node)))))))
+
+(define (login request path-arguments)
+  "POST /api/v1/login
+
+Exchange an email and a password for a bearer token.  The same token
+is also set as the session cookie, so a browser may reuse it.
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'login request
+                  (list
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->login-request node)))))))
+
+(define (logout request path-arguments)
+  "POST /api/v1/logout
+
+Discard a bearer token on the client.  A session cookie, if one was
+set, is cleared.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'logout request '()))
+
+(define (get-me request path-arguments)
+  "GET /api/v1/me
+
+Read the signed-in user
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'get-me request '()))
+
+(define (list-users request path-arguments)
+  "GET /api/v1/users
+
+The caller must hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - limit (integer, query)
+  - offset (integer, query)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'list-users request
+                  (list
+                   (cons 'limit (let ((raw (http-request-query-ref request "limit"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f)))
+                   (cons 'offset (let ((raw (http-request-query-ref request "offset"))) (if raw (let ((number (string->number raw))) (if number number raw)) #f))))))
+
+(define (create-user request path-arguments)
+  "POST /api/v1/users
+
+The caller must hold `wikimusic:user-create`.  A password is optional:
+without one the account has no way in until a password is chosen.
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'create-user request
+                  (list
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->user-input node)))))))
+
+(define (update-user request path-arguments)
+  "PATCH /api/v1/users/{userId}
+
+The caller must hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - userId (string, required, path)
+
+The request body is decoded from application/json.
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'update-user request
+                  (list
+                   (cons 'user-id (assoc-ref path-arguments "userId"))
+                   (cons 'body (let ((node (let ((raw (http-request-body request))) (cond [(string? raw) (json-string->jso raw)] [(jso-object? raw) raw] [else #f])))) (if (eq? node #f) #f (jso->user-patch node)))))))
+
+(define (delete-user request path-arguments)
+  "DELETE /api/v1/users/{userId}
+
+The caller must hold `wikimusic:user-delete`.
+
+Parameters:
+  - userId (string, required, path)
+
+The arguments are collected into an alist and passed to the handler
+installed in api-handlers for this operation."
+  (invoke-handler 'delete-user request
+                  (list
+                   (cons 'user-id (assoc-ref path-arguments "userId")))))
+
 (define (get-instance request path-arguments)
   "GET /api/v1/instance
 
-The instance's name and the number of songs, artists and genres it
-serves.  A client uses this to tell one instance from another and to
-show how much there is to read.
+The instance's name and the number of songs, artists, genres and
+articles it serves.  A client uses this to tell one instance from
+another and to show how much there is to read.
 
 The arguments are collected into an alist and passed to the handler
 installed in api-handlers for this operation."

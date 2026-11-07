@@ -26,19 +26,87 @@
             client-url
             client-send
             list-songs
+            create-song
             get-song
+            update-song
+            delete-song
             list-song-versions
+            create-song-version
+            get-song-version
+            update-song-version
+            delete-song-version
+            list-song-comments
+            create-song-comment
+            update-song-comment
+            delete-song-comment
+            create-song-artwork
+            update-song-artwork
+            delete-song-artwork
+            add-song-artist
+            remove-song-artist
+            add-song-genre
+            remove-song-genre
+            list-song-external-sources
+            create-song-external-source
+            update-song-external-source
+            like-song
+            dislike-song
             list-artists
+            create-artist
             get-artist
+            update-artist
+            delete-artist
             list-artist-songs
+            list-artist-comments
+            create-artist-comment
+            update-artist-comment
+            delete-artist-comment
+            create-artist-artwork
+            update-artist-artwork
+            delete-artist-artwork
+            list-artist-external-sources
+            create-artist-external-source
+            update-artist-external-source
+            like-artist
+            dislike-artist
             list-genres
+            create-genre
             get-genre
+            update-genre
+            delete-genre
             list-genre-songs
+            list-genre-comments
+            create-genre-comment
+            update-genre-comment
+            delete-genre-comment
+            create-genre-artwork
+            update-genre-artwork
+            delete-genre-artwork
+            list-genre-external-sources
+            create-genre-external-source
+            update-genre-external-source
+            like-genre
+            dislike-genre
+            list-articles
+            create-article
+            get-article
+            list-article-comments
+            create-article-comment
+            login
+            logout
+            get-me
+            list-users
+            create-user
+            update-user
+            delete-user
             get-instance))
 
 ;; The security schemes of the specification, as authenticate wants them.
 (define api-security-schemes
-  '())
+  '(("bearerAuth"
+     ("type" . "http")
+     ("scheme" . "bearer")
+     ("bearerFormat" . "opaque"))))
 
 (define-record-type <api-client>
   (%make-api-client base-url auth headers timeout)
@@ -255,12 +323,40 @@ Credentials come from AUTH, which defaults to the client's."
                (expect-status response '(200))
                (values (jso->song-list (http-response-body response)) response)))))
 
+(define* (create-song client #:key body (auth (api-client-auth client)))
+  "POST /api/v1/songs
+
+Add a song to this instance.  The caller must hold
+`wikimusic:song-create`.  `artistIds` and `genreIds` credit the song
+in the same request.
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Song) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path "/api/v1/songs"))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (song-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->song (http-response-body response)) response)))))
+
 (define* (get-song client #:key song-id (auth (api-client-auth client)))
   "GET /api/v1/songs/{songId}
 
-One song with its tablature versions, its artwork and its credits.  The
-versions are where a song's ASCII tablature lives; the PDF and Guitar
-Pro files are reported by their presence, not by their bytes.
+One song with its tablature versions, its artwork, comments, external
+sources and credits.  The versions are where a song's ASCII tablature
+lives; the PDF and Guitar Pro files are reported by their presence,
+not by their bytes.
 
 Parameters:
   - songId (string, required, path)
@@ -282,6 +378,70 @@ Credentials come from AUTH, which defaults to the client's."
                (expect-status response '(200))
                (values (jso->song (http-response-body response)) response)))))
 
+(define* (update-song
+          client
+          #:key
+          song-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/songs/{songId}
+
+Rewrite the fields of a song.  The caller must hold
+`wikimusic:song-create` and must have created the song, unless they
+hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Song) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (song-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->song (http-response-body response)) response)))))
+
+(define* (delete-song client #:key song-id (auth (api-client-auth client)))
+  "DELETE /api/v1/songs/{songId}
+
+Remove a song and its credits.  The caller must hold
+`wikimusic:song-delete` and must have created the song, unless they
+hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
 (define* (list-song-versions
           client
           #:key
@@ -290,8 +450,7 @@ Credentials come from AUTH, which defaults to the client's."
   "GET /api/v1/songs/{songId}/versions
 
 The tablature versions of one song, oldest first, with the ASCII
-contents of each.  A version is identified separately from its song so
-that a client can fetch one and cache it by its own identifier.
+contents of each.
 
 Parameters:
   - songId (string, required, path)
@@ -317,6 +476,688 @@ Credentials come from AUTH, which defaults to the client's."
                     #f
                     (map (lambda (element) (jso->song-version element))
                          (jso-array->list value)))) response)))))
+
+(define* (create-song-version
+          client
+          #:key
+          song-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/songs/{songId}/versions
+
+Add a version to a song.  The caller must hold
+`wikimusic:song-create`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a SongVersion) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/versions"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (song-version-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->song-version (http-response-body response)) response)))))
+
+(define* (get-song-version
+          client
+          #:key
+          song-id
+          version-id
+          (auth (api-client-auth client)))
+  "GET /api/v1/songs/{songId}/versions/{versionId}
+
+Read one tablature version
+
+Parameters:
+  - songId (string, required, path)
+  - versionId (string, required, path)
+
+Returns two values: the decoded body (a SongVersion) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/versions/{versionId}"
+                                (list (cons "songId" song-id)
+                                      (cons "versionId" version-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->song-version (http-response-body response)) response)))))
+
+(define* (update-song-version
+          client
+          #:key
+          song-id
+          version-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/songs/{songId}/versions/{versionId}
+
+Rewrite a version.  The caller must hold `wikimusic:song-create` and
+must have created the version, unless they hold
+`wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - versionId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a SongVersion) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/versions/{versionId}"
+                                (list (cons "songId" song-id)
+                                      (cons "versionId" version-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (song-version-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->song-version (http-response-body response)) response)))))
+
+(define* (delete-song-version
+          client
+          #:key
+          song-id
+          version-id
+          (auth (api-client-auth client)))
+  "DELETE /api/v1/songs/{songId}/versions/{versionId}
+
+Remove a version.  The caller must hold `wikimusic:song-delete` and
+must have created the version, unless they hold
+`wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - versionId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/versions/{versionId}"
+                                (list (cons "songId" song-id)
+                                      (cons "versionId" version-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (list-song-comments
+          client
+          #:key
+          song-id
+          (auth (api-client-auth client)))
+  "GET /api/v1/songs/{songId}/comments
+
+List a song's comments
+
+Parameters:
+  - songId (string, required, path)
+
+Returns two values: the decoded body (a list of Comment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/comments"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values
+                (let ((value (http-response-body response)))
+                  (if (or (eq? value #f) (json-null? value))
+                    #f
+                    (map (lambda (element) (jso->comment element))
+                         (jso-array->list value)))) response)))))
+
+(define* (create-song-comment
+          client
+          #:key
+          song-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/songs/{songId}/comments
+
+Any signed-in reader may comment.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Comment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/comments"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (comment-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->comment (http-response-body response)) response)))))
+
+(define* (update-song-comment
+          client
+          #:key
+          song-id
+          comment-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/songs/{songId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may edit it.
+
+Parameters:
+  - songId (string, required, path)
+  - commentId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Comment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/comments/{commentId}"
+                                (list (cons "songId" song-id)
+                                      (cons "commentId" comment-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (comment-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->comment (http-response-body response)) response)))))
+
+(define* (delete-song-comment
+          client
+          #:key
+          song-id
+          comment-id
+          (auth (api-client-auth client)))
+  "DELETE /api/v1/songs/{songId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may remove it.
+
+Parameters:
+  - songId (string, required, path)
+  - commentId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/comments/{commentId}"
+                                (list (cons "songId" song-id)
+                                      (cons "commentId" comment-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (create-song-artwork
+          client
+          #:key
+          song-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/songs/{songId}/artworks
+
+The caller must hold `wikimusic:song-create`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Artwork) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/artworks"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (artwork-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->artwork (http-response-body response)) response)))))
+
+(define* (update-song-artwork
+          client
+          #:key
+          song-id
+          artwork-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/songs/{songId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:song-create` and must have created the
+artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - artworkId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Artwork) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/artworks/{artworkId}"
+                                (list (cons "songId" song-id)
+                                      (cons "artworkId" artwork-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (artwork-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->artwork (http-response-body response)) response)))))
+
+(define* (delete-song-artwork
+          client
+          #:key
+          song-id
+          artwork-id
+          (auth (api-client-auth client)))
+  "DELETE /api/v1/songs/{songId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:song-delete` and must have created the
+artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - artworkId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/artworks/{artworkId}"
+                                (list (cons "songId" song-id)
+                                      (cons "artworkId" artwork-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (add-song-artist
+          client
+          #:key
+          song-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/songs/{songId}/artists
+
+The caller must hold `wikimusic:song-create`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/artists"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (artist-relation-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (remove-song-artist
+          client
+          #:key
+          song-id
+          artist-id
+          (auth (api-client-auth client)))
+  "DELETE /api/v1/songs/{songId}/artists/{artistId}
+
+The caller must hold `wikimusic:song-delete` and must have created the
+credit, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - artistId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/artists/{artistId}"
+                                (list (cons "songId" song-id)
+                                      (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (add-song-genre
+          client
+          #:key
+          song-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/songs/{songId}/genres
+
+The caller must hold `wikimusic:song-create`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/genres"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (genre-relation-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (remove-song-genre
+          client
+          #:key
+          song-id
+          genre-id
+          (auth (api-client-auth client)))
+  "DELETE /api/v1/songs/{songId}/genres/{genreId}
+
+The caller must hold `wikimusic:song-delete` and must have created the
+link, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - genreId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/genres/{genreId}"
+                                (list (cons "songId" song-id)
+                                      (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (list-song-external-sources
+          client
+          #:key
+          song-id
+          (auth (api-client-auth client)))
+  "GET /api/v1/songs/{songId}/external-sources
+
+List a song's external sources
+
+Parameters:
+  - songId (string, required, path)
+
+Returns two values: the decoded body (a list of ExternalSource) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/external-sources"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values
+                (let ((value (http-response-body response)))
+                  (if (or (eq? value #f) (json-null? value))
+                    #f
+                    (map (lambda (element) (jso->external-source element))
+                         (jso-array->list value)))) response)))))
+
+(define* (create-song-external-source
+          client
+          #:key
+          song-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/songs/{songId}/external-sources
+
+The caller must hold `wikimusic:song-create`.
+
+Parameters:
+  - songId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a ExternalSource) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/external-sources"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (external-source-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->external-source (http-response-body response)) response)))))
+
+(define* (update-song-external-source
+          client
+          #:key
+          song-id
+          source-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/songs/{songId}/external-sources/{sourceId}
+
+The caller must hold `wikimusic:song-create` and must have created the
+source, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - songId (string, required, path)
+  - sourceId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a ExternalSource) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/external-sources/{sourceId}"
+                                (list (cons "songId" song-id)
+                                      (cons "sourceId" source-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (external-source-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->external-source (http-response-body response)) response)))))
+
+(define* (like-song client #:key song-id (auth (api-client-auth client)))
+  "POST /api/v1/songs/{songId}/like
+
+Any signed-in reader may like a song; a previous opinion is replaced.
+
+Parameters:
+  - songId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/like"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (dislike-song client #:key song-id (auth (api-client-auth client)))
+  "POST /api/v1/songs/{songId}/dislike
+
+Any signed-in reader may dislike a song; a previous opinion is replaced.
+
+Parameters:
+  - songId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/songs/{songId}/dislike"
+                                (list (cons "songId" song-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
 
 (define* (list-artists
           client
@@ -352,6 +1193,31 @@ Credentials come from AUTH, which defaults to the client's."
                (expect-status response '(200))
                (values (jso->artist-list (http-response-body response)) response)))))
 
+(define* (create-artist client #:key body (auth (api-client-auth client)))
+  "POST /api/v1/artists
+
+The caller must hold `wikimusic:artist-create`.
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Artist) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path "/api/v1/artists"))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (artist-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->artist (http-response-body response)) response)))))
+
 (define* (get-artist client #:key artist-id (auth (api-client-auth client)))
   "GET /api/v1/artists/{artistId}
 
@@ -376,6 +1242,72 @@ Credentials come from AUTH, which defaults to the client's."
                                  #:response-encoding 'json)))
                (expect-status response '(200))
                (values (jso->artist (http-response-body response)) response)))))
+
+(define* (update-artist
+          client
+          #:key
+          artist-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/artists/{artistId}
+
+The caller must hold `wikimusic:artist-create` and must have created
+the artist, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - artistId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Artist) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (artist-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->artist (http-response-body response)) response)))))
+
+(define* (delete-artist
+          client
+          #:key
+          artist-id
+          (auth (api-client-auth client)))
+  "DELETE /api/v1/artists/{artistId}
+
+The caller must hold `wikimusic:artist-delete` and must have created
+the artist, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - artistId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
 
 (define* (list-artist-songs
           client
@@ -412,6 +1344,415 @@ Credentials come from AUTH, which defaults to the client's."
                (expect-status response '(200))
                (values (jso->song-list (http-response-body response)) response)))))
 
+(define* (list-artist-comments
+          client
+          #:key
+          artist-id
+          (auth (api-client-auth client)))
+  "GET /api/v1/artists/{artistId}/comments
+
+List an artist's comments
+
+Parameters:
+  - artistId (string, required, path)
+
+Returns two values: the decoded body (a list of Comment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/comments"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values
+                (let ((value (http-response-body response)))
+                  (if (or (eq? value #f) (json-null? value))
+                    #f
+                    (map (lambda (element) (jso->comment element))
+                         (jso-array->list value)))) response)))))
+
+(define* (create-artist-comment
+          client
+          #:key
+          artist-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/artists/{artistId}/comments
+
+Any signed-in reader may comment.
+
+Parameters:
+  - artistId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Comment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/comments"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (comment-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->comment (http-response-body response)) response)))))
+
+(define* (update-artist-comment
+          client
+          #:key
+          artist-id
+          comment-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/artists/{artistId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may edit it.
+
+Parameters:
+  - artistId (string, required, path)
+  - commentId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Comment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/comments/{commentId}"
+                                (list (cons "artistId" artist-id)
+                                      (cons "commentId" comment-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (comment-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->comment (http-response-body response)) response)))))
+
+(define* (delete-artist-comment
+          client
+          #:key
+          artist-id
+          comment-id
+          (auth (api-client-auth client)))
+  "DELETE /api/v1/artists/{artistId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may remove it.
+
+Parameters:
+  - artistId (string, required, path)
+  - commentId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/comments/{commentId}"
+                                (list (cons "artistId" artist-id)
+                                      (cons "commentId" comment-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (create-artist-artwork
+          client
+          #:key
+          artist-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/artists/{artistId}/artworks
+
+The caller must hold `wikimusic:artist-create`.
+
+Parameters:
+  - artistId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Artwork) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/artworks"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (artwork-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->artwork (http-response-body response)) response)))))
+
+(define* (update-artist-artwork
+          client
+          #:key
+          artist-id
+          artwork-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/artists/{artistId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:artist-create` and must have created
+the artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - artistId (string, required, path)
+  - artworkId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Artwork) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/artworks/{artworkId}"
+                                (list (cons "artistId" artist-id)
+                                      (cons "artworkId" artwork-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (artwork-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->artwork (http-response-body response)) response)))))
+
+(define* (delete-artist-artwork
+          client
+          #:key
+          artist-id
+          artwork-id
+          (auth (api-client-auth client)))
+  "DELETE /api/v1/artists/{artistId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:artist-delete` and must have created
+the artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - artistId (string, required, path)
+  - artworkId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/artworks/{artworkId}"
+                                (list (cons "artistId" artist-id)
+                                      (cons "artworkId" artwork-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (list-artist-external-sources
+          client
+          #:key
+          artist-id
+          (auth (api-client-auth client)))
+  "GET /api/v1/artists/{artistId}/external-sources
+
+List an artist's external sources
+
+Parameters:
+  - artistId (string, required, path)
+
+Returns two values: the decoded body (a list of ExternalSource) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/external-sources"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values
+                (let ((value (http-response-body response)))
+                  (if (or (eq? value #f) (json-null? value))
+                    #f
+                    (map (lambda (element) (jso->external-source element))
+                         (jso-array->list value)))) response)))))
+
+(define* (create-artist-external-source
+          client
+          #:key
+          artist-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/artists/{artistId}/external-sources
+
+The caller must hold `wikimusic:artist-create`.
+
+Parameters:
+  - artistId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a ExternalSource) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/external-sources"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (external-source-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->external-source (http-response-body response)) response)))))
+
+(define* (update-artist-external-source
+          client
+          #:key
+          artist-id
+          source-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/artists/{artistId}/external-sources/{sourceId}
+
+The caller must hold `wikimusic:artist-create` and must have created
+the source, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - artistId (string, required, path)
+  - sourceId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a ExternalSource) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path
+                   "/api/v1/artists/{artistId}/external-sources/{sourceId}"
+                   (list (cons "artistId" artist-id)
+                         (cons "sourceId" source-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (external-source-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->external-source (http-response-body response)) response)))))
+
+(define* (like-artist client #:key artist-id (auth (api-client-auth client)))
+  "POST /api/v1/artists/{artistId}/like
+
+Any signed-in reader may like an artist; a previous opinion is replaced.
+
+Parameters:
+  - artistId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/like"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (dislike-artist
+          client
+          #:key
+          artist-id
+          (auth (api-client-auth client)))
+  "POST /api/v1/artists/{artistId}/dislike
+
+Any signed-in reader may dislike an artist; a previous opinion is replaced.
+
+Parameters:
+  - artistId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/artists/{artistId}/dislike"
+                                (list (cons "artistId" artist-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
 (define* (list-genres
           client
           #:key
@@ -446,6 +1787,31 @@ Credentials come from AUTH, which defaults to the client's."
                (expect-status response '(200))
                (values (jso->genre-list (http-response-body response)) response)))))
 
+(define* (create-genre client #:key body (auth (api-client-auth client)))
+  "POST /api/v1/genres
+
+The caller must hold `wikimusic:genre-create`.
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Genre) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path "/api/v1/genres"))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (genre-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->genre (http-response-body response)) response)))))
+
 (define* (get-genre client #:key genre-id (auth (api-client-auth client)))
   "GET /api/v1/genres/{genreId}
 
@@ -470,6 +1836,68 @@ Credentials come from AUTH, which defaults to the client's."
                                  #:response-encoding 'json)))
                (expect-status response '(200))
                (values (jso->genre (http-response-body response)) response)))))
+
+(define* (update-genre
+          client
+          #:key
+          genre-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/genres/{genreId}
+
+The caller must hold `wikimusic:genre-create` and must have created
+the genre, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - genreId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Genre) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (genre-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->genre (http-response-body response)) response)))))
+
+(define* (delete-genre client #:key genre-id (auth (api-client-auth client)))
+  "DELETE /api/v1/genres/{genreId}
+
+The caller must hold `wikimusic:genre-delete` and must have created
+the genre, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - genreId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
 
 (define* (list-genre-songs
           client
@@ -506,12 +1934,752 @@ Credentials come from AUTH, which defaults to the client's."
                (expect-status response '(200))
                (values (jso->song-list (http-response-body response)) response)))))
 
+(define* (list-genre-comments
+          client
+          #:key
+          genre-id
+          (auth (api-client-auth client)))
+  "GET /api/v1/genres/{genreId}/comments
+
+List a genre's comments
+
+Parameters:
+  - genreId (string, required, path)
+
+Returns two values: the decoded body (a list of Comment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/comments"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values
+                (let ((value (http-response-body response)))
+                  (if (or (eq? value #f) (json-null? value))
+                    #f
+                    (map (lambda (element) (jso->comment element))
+                         (jso-array->list value)))) response)))))
+
+(define* (create-genre-comment
+          client
+          #:key
+          genre-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/genres/{genreId}/comments
+
+Any signed-in reader may comment.
+
+Parameters:
+  - genreId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Comment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/comments"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (comment-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->comment (http-response-body response)) response)))))
+
+(define* (update-genre-comment
+          client
+          #:key
+          genre-id
+          comment-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/genres/{genreId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may edit it.
+
+Parameters:
+  - genreId (string, required, path)
+  - commentId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Comment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/comments/{commentId}"
+                                (list (cons "genreId" genre-id)
+                                      (cons "commentId" comment-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (comment-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->comment (http-response-body response)) response)))))
+
+(define* (delete-genre-comment
+          client
+          #:key
+          genre-id
+          comment-id
+          (auth (api-client-auth client)))
+  "DELETE /api/v1/genres/{genreId}/comments/{commentId}
+
+Only the comment's author, or a super grant, may remove it.
+
+Parameters:
+  - genreId (string, required, path)
+  - commentId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/comments/{commentId}"
+                                (list (cons "genreId" genre-id)
+                                      (cons "commentId" comment-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (create-genre-artwork
+          client
+          #:key
+          genre-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/genres/{genreId}/artworks
+
+The caller must hold `wikimusic:genre-create`.
+
+Parameters:
+  - genreId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Artwork) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/artworks"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (artwork-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->artwork (http-response-body response)) response)))))
+
+(define* (update-genre-artwork
+          client
+          #:key
+          genre-id
+          artwork-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/genres/{genreId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:genre-create` and must have created the
+artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - genreId (string, required, path)
+  - artworkId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Artwork) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/artworks/{artworkId}"
+                                (list (cons "genreId" genre-id)
+                                      (cons "artworkId" artwork-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (artwork-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->artwork (http-response-body response)) response)))))
+
+(define* (delete-genre-artwork
+          client
+          #:key
+          genre-id
+          artwork-id
+          (auth (api-client-auth client)))
+  "DELETE /api/v1/genres/{genreId}/artworks/{artworkId}
+
+The caller must hold `wikimusic:genre-delete` and must have created the
+artwork, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - genreId (string, required, path)
+  - artworkId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/artworks/{artworkId}"
+                                (list (cons "genreId" genre-id)
+                                      (cons "artworkId" artwork-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (list-genre-external-sources
+          client
+          #:key
+          genre-id
+          (auth (api-client-auth client)))
+  "GET /api/v1/genres/{genreId}/external-sources
+
+List a genre's external sources
+
+Parameters:
+  - genreId (string, required, path)
+
+Returns two values: the decoded body (a list of ExternalSource) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/external-sources"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values
+                (let ((value (http-response-body response)))
+                  (if (or (eq? value #f) (json-null? value))
+                    #f
+                    (map (lambda (element) (jso->external-source element))
+                         (jso-array->list value)))) response)))))
+
+(define* (create-genre-external-source
+          client
+          #:key
+          genre-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/genres/{genreId}/external-sources
+
+The caller must hold `wikimusic:genre-create`.
+
+Parameters:
+  - genreId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a ExternalSource) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/external-sources"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (external-source-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->external-source (http-response-body response)) response)))))
+
+(define* (update-genre-external-source
+          client
+          #:key
+          genre-id
+          source-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/genres/{genreId}/external-sources/{sourceId}
+
+The caller must hold `wikimusic:genre-create` and must have created the
+source, unless they hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - genreId (string, required, path)
+  - sourceId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a ExternalSource) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path
+                   "/api/v1/genres/{genreId}/external-sources/{sourceId}"
+                   (list (cons "genreId" genre-id)
+                         (cons "sourceId" source-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (external-source-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->external-source (http-response-body response)) response)))))
+
+(define* (like-genre client #:key genre-id (auth (api-client-auth client)))
+  "POST /api/v1/genres/{genreId}/like
+
+Any signed-in reader may like a genre; a previous opinion is replaced.
+
+Parameters:
+  - genreId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/like"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (dislike-genre client #:key genre-id (auth (api-client-auth client)))
+  "POST /api/v1/genres/{genreId}/dislike
+
+Any signed-in reader may dislike a genre; a previous opinion is replaced.
+
+Parameters:
+  - genreId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/genres/{genreId}/dislike"
+                                (list (cons "genreId" genre-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (list-articles
+          client
+          #:key
+          (limit #f)
+          (offset #f)
+          (auth (api-client-auth client)))
+  "GET /api/v1/articles
+
+List articles
+
+Parameters:
+  - limit (integer, query)
+  - offset (integer, query)
+
+Returns two values: the decoded body (a ArticleList) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path "/api/v1/articles"))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query
+                                 (append (list (cons "limit" limit))
+                                         (list (cons "offset" offset)) auth-query)
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->article-list (http-response-body response)) response)))))
+
+(define* (create-article client #:key body (auth (api-client-auth client)))
+  "POST /api/v1/articles
+
+Any signed-in reader may write an article.
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Article) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path "/api/v1/articles"))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (article-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->article (http-response-body response)) response)))))
+
+(define* (get-article client #:key article-id (auth (api-client-auth client)))
+  "GET /api/v1/articles/{articleId}
+
+Read one article
+
+Parameters:
+  - articleId (string, required, path)
+
+Returns two values: the decoded body (a Article) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/articles/{articleId}"
+                                (list (cons "articleId" article-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->article (http-response-body response)) response)))))
+
+(define* (list-article-comments
+          client
+          #:key
+          article-id
+          (auth (api-client-auth client)))
+  "GET /api/v1/articles/{articleId}/comments
+
+List an article's comments
+
+Parameters:
+  - articleId (string, required, path)
+
+Returns two values: the decoded body (a list of ArticleComment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/articles/{articleId}/comments"
+                                (list (cons "articleId" article-id)))))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values
+                (let ((value (http-response-body response)))
+                  (if (or (eq? value #f) (json-null? value))
+                    #f
+                    (map (lambda (element) (jso->article-comment element))
+                         (jso-array->list value)))) response)))))
+
+(define* (create-article-comment
+          client
+          #:key
+          article-id
+          body
+          (auth (api-client-auth client)))
+  "POST /api/v1/articles/{articleId}/comments
+
+Anyone may comment on an article, signed in or not.  A signed-in
+reader is recorded by identifier; anyone else may give an author name.
+
+Parameters:
+  - articleId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a ArticleComment) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path
+                  (params->path "/api/v1/articles/{articleId}/comments"
+                                (list (cons "articleId" article-id)))))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (article-comment-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->article-comment (http-response-body response)) response)))))
+
+(define* (login client #:key body (auth (api-client-auth client)))
+  "POST /api/v1/login
+
+Exchange an email and a password for a bearer token.  The same token
+is also set as the session cookie, so a browser may reuse it.
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a Session) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '())
+           (let ((path "/api/v1/login"))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (login-request->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->session (http-response-body response)) response)))))
+
+(define* (logout client #:key (auth (api-client-auth client)))
+  "POST /api/v1/logout
+
+Discard a bearer token on the client.  A session cookie, if one was
+set, is cleared.
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path "/api/v1/logout"))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
+(define* (get-me client #:key (auth (api-client-auth client)))
+  "GET /api/v1/me
+
+Read the signed-in user
+
+Returns two values: the decoded body (a User) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path "/api/v1/me"))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->user (http-response-body response)) response)))))
+
+(define* (list-users
+          client
+          #:key
+          (limit #f)
+          (offset #f)
+          (auth (api-client-auth client)))
+  "GET /api/v1/users
+
+The caller must hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - limit (integer, query)
+  - offset (integer, query)
+
+Returns two values: the decoded body (a UserList) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path "/api/v1/users"))
+             (let ((response
+                    (client-send client 'GET path
+                                 #:query
+                                 (append (list (cons "limit" limit))
+                                         (list (cons "offset" offset)) auth-query)
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(200))
+               (values (jso->user-list (http-response-body response)) response)))))
+
+(define* (create-user client #:key body (auth (api-client-auth client)))
+  "POST /api/v1/users
+
+The caller must hold `wikimusic:user-create`.  A password is optional:
+without one the account has no way in until a password is chosen.
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a User) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path "/api/v1/users"))
+             (let ((response
+                    (client-send client 'POST path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (user-input->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(201))
+               (values (jso->user (http-response-body response)) response)))))
+
+(define* (update-user
+          client
+          #:key
+          user-id
+          body
+          (auth (api-client-auth client)))
+  "PATCH /api/v1/users/{userId}
+
+The caller must hold `wikimusic:modify-permissions`.
+
+Parameters:
+  - userId (string, required, path)
+
+The request body is encoded as application/json.
+
+Returns two values: the decoded body (a User) and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/users/{userId}"
+                                (list (cons "userId" user-id)))))
+             (let ((response
+                    (client-send client 'PATCH path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json
+                                 #:body (user-patch->jso body)
+                                 #:body-encoding 'json
+                                 #:content-type "application/json")))
+               (expect-status response '(200))
+               (values (jso->user (http-response-body response)) response)))))
+
+(define* (delete-user client #:key user-id (auth (api-client-auth client)))
+  "DELETE /api/v1/users/{userId}
+
+The caller must hold `wikimusic:user-delete`.
+
+Parameters:
+  - userId (string, required, path)
+
+Returns two values: the decoded body and the <http-response>.
+
+Credentials come from AUTH, which defaults to the client's."
+  (receive (auth-headers auth-query)
+           (authenticate auth api-security-schemes '((("bearerAuth"))))
+           (let ((path
+                  (params->path "/api/v1/users/{userId}"
+                                (list (cons "userId" user-id)))))
+             (let ((response
+                    (client-send client 'DELETE path
+                                 #:query auth-query
+                                 #:headers auth-headers
+                                 #:accept "application/json"
+                                 #:response-encoding 'json)))
+               (expect-status response '(204))
+               (values (http-response-body response) response)))))
+
 (define* (get-instance client #:key (auth (api-client-auth client)))
   "GET /api/v1/instance
 
-The instance's name and the number of songs, artists and genres it
-serves.  A client uses this to tell one instance from another and to
-show how much there is to read.
+The instance's name and the number of songs, artists, genres and
+articles it serves.  A client uses this to tell one instance from
+another and to show how much there is to read.
 
 Returns two values: the decoded body (a Instance) and the <http-response>.
 
