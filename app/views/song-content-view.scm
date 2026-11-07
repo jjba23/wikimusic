@@ -756,11 +756,11 @@ more than one tab has no ambiguity about which it is addressing."
                                                                             #:face face))
                                                     (assq-ref version
                                                               'ascii-contents)))
-         (cleaned-pdf-data (if (equal? (assq-ref version
-                                                 'pdf-contents)
-                                       "data:application/octet-stream;base64,") ""
-                             (assq-ref version
-                                       'pdf-contents)))
+         (cleaned-pdf-data (let ((pdf-contents (assq-ref version
+                                                          'pdf-contents)))
+                             (if (data-url-with-payload? pdf-contents)
+                               pdf-contents
+                               "")))
          (render-pdf-content (lambda (pdf-contents)
                                `((details (@ (open true)
                                              (class ,(mk-class '(wm-disclosure

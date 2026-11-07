@@ -26,7 +26,6 @@
   #:use-module (ice-9 iconv)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-13)
-  #:use-module (srfi srfi-19)
   #:use-module (rnrs bytevectors)
   #:use-module (web request)
   #:use-module (web uri)
@@ -41,6 +40,7 @@
                                              session-cookie-name))
   #:use-module ((wikimusic controller) #:select (may-mutate?))
   #:use-module (wikimusic env)
+  #:use-module (wikimusic guitarpro)
   #:use-module (wikimusic sqlite util)
   #:use-module (wikimusic domain song)
   #:use-module (wikimusic domain artist)
@@ -68,9 +68,18 @@
   #:use-module (wikimusic-api json)
   #:use-module (wikimusic-api models)
   #:use-module ((wikimusic-api runtime) #:hide (uri-encode))
-  #:export (serve-api emit-api-response))
+  #:export (serve-api emit-api-response protected-handler version-record
+            api-timestamp))
 
 (define api-version "1.1.0")
+
+(define (api-timestamp)
+  "Return the current time as the epoch seconds text a page can read.
+
+An API write records the same kind of timestamp the forms do.  Guile's SRFI 19
+`current-time' is a time object, and a row written with one made every page
+that showed its date fail to parse it."
+  (number->string (current-time)))
 
 ;; The name an instance gives itself.  The pages read it from the same place
 ;; the rest of the site does; an instance that renames itself will pass it in.
@@ -203,8 +212,8 @@ not two per song."
    #:instrument-type (column row 'instrument-type)
    #:ascii-legend (text (column row 'ascii-legend))
    #:ascii-contents (text (column row 'ascii-contents))
-   #:has-pdf (if (text (column row 'pdf-contents)) #t #f)
-   #:has-tablature (if (text (column row 'guitarpro-contents)) #t #f)
+   #:has-pdf (data-url-with-payload? (column row 'pdf-contents))
+   #:has-tablature (data-url-with-payload? (column row 'guitarpro-contents))
    #:created-at (text (column row 'created-at))))
 
 (define (comment-record row)
@@ -354,6 +363,18 @@ permission is a 403, so a client can tell the two apart."
                               "The session lacks a required permission"))]
       [else (values session #f)])))
 
+(define (protected-handler session-thunk handler)
+  "Return the handler the dispatcher calls for a protected operation.
+
+The generated dispatcher calls every handler with the request and the path
+arguments, while an operation that changes a row first needs the session the
+request carries.  SESSION-THUNK returns that session and an error response;
+HANDLER then receives the session and the arguments.  A one-argument closure
+here answered every write with a 500."
+  (lambda (request args)
+    (receive (session error) (session-thunk)
+      (if error error (handler session args)))))
+
 (define (require-body args)
   "Return ARGS' decoded body and #f, or #f and a 400 response."
   (let ((body (assq-ref args 'body)))
@@ -441,9 +462,7 @@ permission is a 403, so a client can tell the two apart."
       (lambda (request args) (handler args)))
 
     (define (protected needed handler)
-      (lambda (args)
-        (receive (session error) (require-session rc needed)
-                 (if error error (handler session args)))))
+      (protected-handler (lambda () (require-session rc needed)) handler))
 
     (define (row-by-id table columns id)
       (let ((rows (sql-rows rc
@@ -847,7 +866,7 @@ permission is a 403, so a client can tell the two apart."
                                       (cons 'song-identifier song-id)
                                       (cons related-column related-id)
                                       (cons 'created-by owner)
-                                      (cons 'created-at (current-time))))
+                                      (cons 'created-at (api-timestamp))))
                     #:name "api-insert-relation"))
 
     (define (delete-relation table related-column song-id related-id)
@@ -872,7 +891,7 @@ permission is a 403, so a client can tell the two apart."
                                            (cons 'created-by owner)
                                            (cons 'visibility-status 0)
                                            (cons 'views 0)
-                                           (cons 'created-at (current-time)))
+                                           (cons 'created-at (api-timestamp)))
                                      (text-attr 'description
                                                 (song-input-description body))
                                      (text-attr 'music-key
@@ -934,7 +953,7 @@ permission is a 403, so a client can tell the two apart."
                                  (update-song-by-id song-repo id
                                                     (append attrs
                                                             (list (cons 'last-edited-at
-                                                                        (current-time))))))
+                                                                        (api-timestamp))))))
                                (song-detail id))))))]))))
 
     (define (delete-song session args)
@@ -962,7 +981,7 @@ permission is a 403, so a client can tell the two apart."
                                                    (assoc-ref session 'owner-id))
                                              (cons 'visibility-status 0)
                                              (cons 'views 0)
-                                             (cons 'created-at (current-time)))
+                                             (cons 'created-at (api-timestamp)))
                                        (text-attr 'description
                                                   (artist-input-description body))))
                        (artist-detail id)))))))
@@ -989,7 +1008,7 @@ permission is a 403, so a client can tell the two apart."
                                  (update-artist-by-id artist-repo id
                                                       (append attrs
                                                               (list (cons 'last-edited-at
-                                                                          (current-time))))))
+                                                                          (api-timestamp))))))
                                (artist-detail id))))))]))))
 
     (define (delete-artist session args)
@@ -1017,7 +1036,7 @@ permission is a 403, so a client can tell the two apart."
                                                   (assoc-ref session 'owner-id))
                                             (cons 'visibility-status 0)
                                             (cons 'views 0)
-                                            (cons 'created-at (current-time)))
+                                            (cons 'created-at (api-timestamp)))
                                       (text-attr 'description
                                                  (genre-input-description body))))
                        (genre-detail id)))))))
@@ -1044,7 +1063,7 @@ permission is a 403, so a client can tell the two apart."
                                  (update-genre-by-id genre-repo id
                                                      (append attrs
                                                              (list (cons 'last-edited-at
-                                                                         (current-time))))))
+                                                                         (api-timestamp))))))
                                (genre-detail id))))))]))))
 
     (define (delete-genre session args)
@@ -1084,7 +1103,7 @@ permission is a 403, so a client can tell the two apart."
                                    (cons 'version-name (html-escape version-name))
                                    (cons 'instrument-type
                                          (html-escape instrument-type))
-                                   (cons 'created-at (current-time)))
+                                   (cons 'created-at (api-timestamp)))
                              (text-attr 'ascii-legend
                                         (song-version-input-ascii-legend body))
                              (text-attr 'ascii-contents
@@ -1139,7 +1158,7 @@ permission is a 403, so a client can tell the two apart."
                            (update-song-content-by-id
                             content-repo version-id
                             (append attrs
-                                    (list (cons 'last-edited-at (current-time))))))
+                                    (list (cons 'last-edited-at (api-timestamp))))))
                          (let ((updated (version-row song-id version-id)))
                            (if updated
                              (ok (song-version->jso (version-record updated)))
@@ -1176,7 +1195,7 @@ permission is a 403, so a client can tell the two apart."
                                (cons 'created-by owner)
                                (cons 'visibility-status 0)
                                (cons 'contents (html-escape contents))
-                               (cons 'created-at (current-time)))
+                               (cons 'created-at (api-timestamp)))
                          (if (non-empty-string? parent)
                            (list (cons 'parent-identifier (html-escape parent)))
                            '())))
@@ -1205,7 +1224,7 @@ permission is a 403, so a client can tell the two apart."
                                (update-comment-by-id
                                 comment-repo entity comment-id
                                 (list (cons 'contents (html-escape contents))
-                                      (cons 'last-edited-at (current-time))))
+                                      (cons 'last-edited-at (api-timestamp))))
                                (ok (comment->jso
                                     (comment-record
                                      (get-comment-by-id comment-repo entity
@@ -1278,7 +1297,7 @@ permission is a 403, so a client can tell the two apart."
                                    (uri-encode (artwork-input-content-url body)))
                              (cons 'order-value
                                    (or (artwork-input-order-value body) 0))
-                             (cons 'created-at (current-time)))
+                             (cons 'created-at (api-timestamp)))
                        (text-attr 'content-caption
                                   (artwork-input-content-caption body))))
                      (let ((row (artwork-row entity entity-id id)))
@@ -1310,7 +1329,7 @@ permission is a 403, so a client can tell the two apart."
                                             (entity-table entity "artworks")
                                             (append attrs
                                                     (list (cons 'last-edited-at
-                                                                (current-time))))
+                                                                (api-timestamp))))
                                             #:where (list (cons 'identifier artwork-id)
                                                           (cons (entity-column entity)
                                                                 entity-id)))
@@ -1438,7 +1457,7 @@ permission is a 403, so a client can tell the two apart."
                        (list (cons 'identifier id)
                              (cons (entity-column entity) entity-id)
                              (cons 'created-by (assoc-ref session 'owner-id))
-                             (cons 'created-at (current-time)))
+                             (cons 'created-at (api-timestamp)))
                        (url-attr 'spotify-url
                                  (external-source-input-spotify-url body))
                        (url-attr 'youtube-url
@@ -1478,7 +1497,7 @@ permission is a 403, so a client can tell the two apart."
                                             (entity-table entity "external_sources")
                                             (append attrs
                                                     (list (cons 'last-edited-at
-                                                                (current-time))))
+                                                                (api-timestamp))))
                                             #:where (list (cons 'identifier source-id)
                                                           (cons (entity-column entity)
                                                                 entity-id)))
@@ -1535,7 +1554,7 @@ permission is a 403, so a client can tell the two apart."
                  (cons 'created-by owner)
                  (cons 'is-like is-like)
                  (cons 'is-dislike is-dislike)
-                 (cons 'created-at (current-time))))
+                 (cons 'created-at (api-timestamp))))
           (no-content))))
 
     (define (like-song session args)
@@ -1589,7 +1608,7 @@ permission is a 403, so a client can tell the two apart."
                                      (html-escape (or (article-input-contents body) "")))
                                (cons 'created-by (assoc-ref session 'owner-id))
                                (cons 'visibility-status 0)
-                               (cons 'created-at (current-time))
+                               (cons 'created-at (api-timestamp))
                                (cons 'views 0))
                          (if (string? (article-input-video-url body))
                            (list (cons 'video-url (article-input-video-url body)))
@@ -1602,7 +1621,7 @@ permission is a 403, so a client can tell the two apart."
              (cons 'article-identifier article-id)
              (cons 'visibility-status 0)
              (cons 'contents (article-comment-input-contents body))
-             (cons 'created-at (current-time)))
+             (cons 'created-at (api-timestamp)))
        (if created-by
          (list (cons 'created-by created-by))
          '())

@@ -47,8 +47,9 @@
   #:use-module (srfi srfi-13)
   #:use-module (rnrs bytevectors)
   #:use-module (ice-9 format)
-  #:export (base64-decode-string data-url? data-url-payload gp5-bytes-metadata
-                                 gp5-metadata-of-data-url gp5-key-name))
+  #:export (base64-decode-string data-url? data-url-with-payload?
+            data-url-payload gp5-bytes-metadata
+            gp5-metadata-of-data-url gp5-key-name))
 
 ;;; ====== The base64 a data URL carries ======
 ;;;
@@ -147,6 +148,16 @@ the empty string a version that carries no file holds."
   (and (string? url)
     (string-prefix? "data:" url)
     (string-index url #\,) #t))
+
+(define (data-url-with-payload? url)
+  "Return #t when URL is a data URL that carries bytes.
+
+A file input a reader leaves untouched reaches the server as @code{#f}, as an
+empty string, or as the data URL of an empty file.  None of those is a file,
+and a page that treated one as a PDF offered a reader an empty frame."
+  (and (data-url? url)
+    (let ((comma (string-index url #\,)))
+      (< (+ comma 1) (string-length url)))))
 
 (define (data-url-payload url)
   "Return the bytes the base64 data URL URL carries, or #f when URL is not a

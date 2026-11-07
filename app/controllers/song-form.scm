@@ -8,6 +8,7 @@
 (import (wikimusic html)
   (wikimusic domain)
   (wikimusic controller)
+  (wikimusic guitarpro)
   (web uri)
   (ice-9 string-fun)
   (wikimusic auth)
@@ -132,41 +133,44 @@
                                #:table 'song_contents
                                #:where `((identifier unquote
                                                      (params rc "version-uuid"))))
-            (sql-execute! rc
-                          (sql-update 'song_contents
-                                      `((instrument-type unquote
-                                                         (html-escape (assoc-ref
-                                                                       body
-                                                                       "instrument-type")))
-                                        (version-name unquote
-                                                      (html-escape (assoc-ref
-                                                                    body
-                                                                    "version-name")))
-                                        (ascii-legend unquote
-                                                      (html-escape (assoc-ref
-                                                                    body
-                                                                    "ascii-legend")))
-                                        (ascii-contents unquote
-                                                        (html-escape (assoc-ref
-                                                                      body
-                                                                      "ascii-contents")))
-                                        (pdf-contents unquote
-                                                      (assoc-ref body
-                                                                 "pdf-contents"))
-                                        (guitarpro-contents unquote
-                                                            (assoc-ref body
-                                                                       "guitarpro-contents"))
-                                        (last-edited-at unquote
-                                                        (current-time)))
-                                      #:where `((identifier unquote
-                                                            (params rc
-                                                                    "version-uuid"))))
-                          #:name "edit-song-contents")
-            (redirect-to rc
-                         (string->uri (format #f "~a/songs/uuid/~a"
-                                              (current-myhost)
-                                              (params rc "uuid")))
-                         #:status 302)))
+            (let ((pdf-contents (assoc-ref body "pdf-contents"))
+                  (guitarpro-contents (assoc-ref body "guitarpro-contents")))
+              (sql-execute! rc
+                            (sql-update 'song_contents
+                                        (append
+                                         `((instrument-type unquote
+                                                            (html-escape (assoc-ref body
+                                                                                    "instrument-type")))
+                                           (version-name unquote
+                                                         (html-escape (assoc-ref body
+                                                                                 "version-name")))
+                                           (ascii-legend unquote
+                                                         (html-escape (assoc-ref body
+                                                                                 "ascii-legend")))
+                                           (ascii-contents unquote
+                                                           (html-escape (assoc-ref body
+                                                                                   "ascii-contents")))
+                                           (last-edited-at unquote
+                                                           (current-time)))
+                                         ;; An untouched file input posts
+                                         ;; nothing, so the file a version
+                                         ;; already holds stays.
+                                         (if (data-url-with-payload? pdf-contents)
+                                           `((pdf-contents unquote pdf-contents))
+                                           '())
+                                         (if (data-url-with-payload?
+                                              guitarpro-contents)
+                                           `((guitarpro-contents unquote
+                                                                 guitarpro-contents))
+                                           '()))
+                                        #:where `((identifier unquote
+                                                              (params rc "version-uuid"))))
+                            #:name "edit-song-contents")
+              (redirect-to rc
+                           (string->uri (format #f "~a/songs/uuid/~a"
+                                                (current-myhost)
+                                                (params rc "uuid")))
+                           #:status 302))))
 
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:song-create)
@@ -236,8 +240,14 @@
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
-            ($song_contents 'set
-                            #:identifier new-uuid
+            (let ((pdf-contents (assoc-ref body "pdf-contents"))
+                  (guitarpro-contents (assoc-ref body "guitarpro-contents")))
+              ;; An absent or empty file is no column at all: storing the #f
+              ;; the form parser answers would make the API report a PDF that
+              ;; does not exist.
+              (apply $song_contents 'set
+                     (append
+                      (list #:identifier new-uuid
                             #:song_identifier (params rc "uuid")
                             #:created_by user-identifier
                             #:visibility_status 0
@@ -249,10 +259,13 @@
                                                                    "ascii-legend"))
                             #:ascii_contents (html-escape (assoc-ref body
                                                                      "ascii-contents"))
-                            #:pdf_contents (assoc-ref body "pdf-contents")
-                            #:guitarpro_contents (assoc-ref body
-                                                            "guitarpro-contents")
                             #:created_at (current-time))
+                      (if (data-url-with-payload? pdf-contents)
+                        (list #:pdf_contents pdf-contents)
+                        '())
+                      (if (data-url-with-payload? guitarpro-contents)
+                        (list #:guitarpro_contents guitarpro-contents)
+                        '()))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a"
