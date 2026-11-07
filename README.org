@@ -1235,6 +1235,17 @@ split at 600.
 
 No proprietary font is vendored, served or named anywhere in this tree.
 
+** On populating automatically
+
+It can be useful to have agents populate and gather info for WikiMusic. For that it's also handy to run it with ~contrib/populate-wikimusic.md~ .
+
+#+begin_src shell
+export WIKIMUSIC_BASE_URL='https://your-instance'
+export WIKIMUSIC_EMAIL='you@example.org'
+read -rsp 'WikiMusic password: ' WIKIMUSIC_PASSWORD; echo
+export WIKIMUSIC_PASSWORD
+#+end_src
+
 -------
 
 * On Reproducibility: Why GNU Guix?
