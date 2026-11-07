@@ -69,7 +69,7 @@
   #:use-module (wikimusic-api models)
   #:use-module ((wikimusic-api runtime) #:hide (uri-encode))
   #:export (serve-api emit-api-response protected-handler version-record
-            external-source-record api-timestamp))
+            artwork-records external-source-record api-timestamp))
 
 (define api-version "1.1.0")
 
@@ -109,12 +109,22 @@ numbers to every caller, so the conversion is made once, here."
     [(string? value) (or (string->number value) 0)]
     [else 0]))
 
+(define (encoded-scheme? url)
+  "Return #t when URL starts with an encoded http or https scheme."
+  (or (string-prefix-ci? "http%3A" url)
+      (string-prefix-ci? "https%3A" url)))
+
 (define (decoded-url value)
   "Return VALUE, a stored URL, as the URI a client sent.
 
-The forms store a URI-encoded URL; the generated record validates the URI, so
-the encoding is undone here before the record is built."
-  (and (string? value) (uri-decode value)))
+The forms store a URI-encoded URL, and a URL that passed through an encoded
+POST twice needs both layers removed.  Empty text is absence, not an empty URI."
+  (and (string? value)
+       (not (string-null? (string-trim-both value)))
+       (let loop ((url (uri-decode value)) (remaining 3))
+         (if (and (positive? remaining) (encoded-scheme? url))
+           (loop (uri-decode url) (- remaining 1))
+           (and (not (encoded-scheme? url)) url)))))
 
 (define (non-empty-string? value)
   "Return #t when VALUE is a string with something besides whitespace in it."
@@ -206,11 +216,17 @@ not two per song."
    #:created-at (text (column row 'created-at))))
 
 (define (artwork-record row)
-  (make-artwork
-   #:identifier (column row 'identifier)
-   #:content-url (uri-decode (column row 'content-url))
-   #:content-caption (text (column row 'content-caption))
-   #:order-value (integer (column row 'order-value))))
+  (let ((url (decoded-url (column row 'content-url))))
+    (and url
+         (make-artwork
+          #:identifier (column row 'identifier)
+          #:content-url url
+          #:content-caption (text (column row 'content-caption))
+          #:order-value (integer (column row 'order-value))))))
+
+(define (artwork-records rows)
+  "Return ROWS, dropping artwork rows whose image URL is unusable."
+  (filter-map artwork-record rows))
 
 (define (version-record row)
   (make-song-version
@@ -580,7 +596,7 @@ here answered every write with a 500."
                                          (get-song-contents-by-song-ids
                                           content-repo (list id)))
                                     #:artworks
-                                    (map artwork-record
+                                    (artwork-records
                                          (get-artworks-by-entity-ids
                                           artwork-repo 'song (list id)))
                                     #:comments
@@ -645,7 +661,7 @@ here answered every write with a 500."
                            #:like-count likes
                            #:dislike-count dislikes
                            #:artworks
-                           (map artwork-record
+                           (artwork-records
                                 (get-artworks-by-entity-ids
                                  artwork-repo 'artist (list id)))
                            #:comments
@@ -716,7 +732,7 @@ here answered every write with a 500."
                            #:like-count likes
                            #:dislike-count dislikes
                            #:artworks
-                           (map artwork-record
+                           (artwork-records
                                 (get-artworks-by-entity-ids
                                  artwork-repo 'genre (list id)))
                            #:comments

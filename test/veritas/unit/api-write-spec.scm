@@ -40,6 +40,13 @@
         (cons 'guitarpro-contents guitarpro)
         (cons 'created-at "2026-11-07T00:00:00Z")))
 
+(define (artwork-row content-url)
+  "Return an artwork row whose image is CONTENT-URL."
+  (list (cons 'identifier "00000000-0000-4000-8000-000000000003")
+        (cons 'content-url content-url)
+        (cons 'content-caption "A caption")
+        (cons 'order-value 0)))
+
 (define (external-source-row wikipedia-url)
   "Return an external-source row whose only link is WIKIPEDIA-URL."
   (list (cons 'identifier "00000000-0000-4000-8000-000000000002")
@@ -94,8 +101,31 @@
         (assert-true (song-version-has-tablature version)
           #:name "the Guitar Pro file is reported")))))
 
+(define artwork-url-suite
+  (suite "An artwork row"
+    (test "an empty URL is not an artwork"
+      (assert-equal #:name "only the usable artwork is kept"
+        #:expect 1
+        #:got (length (artwork-records
+                        (list (artwork-row "")
+                              (artwork-row
+                               "https%253A%252F%252Fexample.org%252Fcover.jpg"))))))
+
+    (test "a twice-encoded URL is decoded to the original"
+      (let ((artwork (car (artwork-records
+                            (list (artwork-row
+                                   "https%253A%252F%252Fexample.org%252Fcover.jpg"))))))
+        (assert-equal #:name "the URL is decoded twice"
+          #:expect "https://example.org/cover.jpg"
+          #:got (artwork-content-url artwork))))))
+
 (define external-source-suite
   (suite "An external source"
+    (test "an absent link is not an invalid URI"
+      (let ((source (external-source-record (external-source-row ""))))
+        (assert-false (external-source-wikipedia-url source)
+          #:name "the empty link is absent")))
+
     (test "a stored encoded link is read back as the URI the client sent"
       (let ((source (external-source-record
                       (external-source-row
@@ -115,4 +145,4 @@
 
 (define (spec)
   (veritas-run protected-handler-suite version-presence-suite
-               external-source-suite timestamp-suite))
+               artwork-url-suite external-source-suite timestamp-suite))
