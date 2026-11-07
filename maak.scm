@@ -234,15 +234,15 @@ which is where a reader of the site is sent."
 (define (server)
   "Target to start the wikimusic server with the default configuration."
   (kill-server)
-  (api-check)
-  (api)
+  ;; (api-check)
+  ;; (api)
   (time-machine-manifest-shell (list "art" "work")))
 
 (define (production-server)
   "Target to start the wikimusic server with the production configuration."
   (kill-server)
-  (api-check)
-  (api)
+  ;; (api-check)
+  ;; (api)
   (time-machine-manifest-shell (list "art" "work"
                                      "-c" "conf/production.conf")))
 
