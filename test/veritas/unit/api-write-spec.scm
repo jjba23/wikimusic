@@ -134,6 +134,15 @@
           #:expect "https://en.wikipedia.org/wiki/Amazing_Grace"
           #:got (external-source-wikipedia-url source))))))
 
+(define song-album-link-suite
+  (suite "A song album link"
+    (test "a stored encoded link is read back as the URI the client sent"
+      (assert-equal #:name "the album link is decoded"
+        #:expect "https://en.wikipedia.org/wiki/Alice_in_Hell"
+        #:got (song-album-link
+               (list (cons 'album-info-link
+                           "https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FAlice_in_Hell")))))))
+
 (define timestamp-suite
   (suite "The timestamp a write records"
     (test "it is epoch seconds a page can read"
@@ -145,4 +154,5 @@
 
 (define (spec)
   (veritas-run protected-handler-suite version-presence-suite
-               artwork-url-suite external-source-suite timestamp-suite))
+               artwork-url-suite external-source-suite song-album-link-suite
+               timestamp-suite))

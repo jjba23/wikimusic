@@ -69,7 +69,7 @@
   #:use-module (wikimusic-api models)
   #:use-module ((wikimusic-api runtime) #:hide (uri-encode))
   #:export (serve-api emit-api-response protected-handler version-record
-            artwork-records external-source-record api-timestamp))
+            artwork-records external-source-record song-album-link api-timestamp))
 
 (define api-version "1.1.0")
 
@@ -125,6 +125,10 @@ POST twice needs both layers removed.  Empty text is absence, not an empty URI."
          (if (and (positive? remaining) (encoded-scheme? url))
            (loop (uri-decode url) (- remaining 1))
            (and (not (encoded-scheme? url)) url)))))
+
+(define (song-album-link row)
+  "Return ROW's album link as the URI a client sent."
+  (decoded-url (column row 'album-info-link)))
 
 (define (non-empty-string? value)
   "Return #t when VALUE is a string with something besides whitespace in it."
@@ -585,7 +589,7 @@ here answered every write with a 500."
                                     (text (column row 'music-creation-date))
                                     #:album-name (song-summary-album-name summary)
                                     #:album-info-link
-                                    (text (column row 'album-info-link))
+                                    (song-album-link row)
                                     #:views (song-summary-views summary)
                                     #:like-count likes
                                     #:dislike-count dislikes
