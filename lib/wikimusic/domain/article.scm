@@ -24,7 +24,8 @@
   #:use-module (wikimusic domain repo)
   #:export (article-kinds article-kind-named
                           honeypot-field-name honeypot-tripped?
-                          get-articles get-article-by-id count-articles insert-article))
+                          get-articles get-article-by-id count-articles insert-article
+                          update-article-by-id delete-article-by-id))
 
 ;; --- Record definition ---
 
@@ -34,7 +35,9 @@
                        (get-articles-proc repo-get-articles)
                        (get-article-by-id-proc repo-get-article-by-id)
                        (count-articles-proc repo-count-articles)
-                       (insert-article-proc repo-insert-article))
+                       (insert-article-proc repo-insert-article)
+                       (update-article-by-id-proc repo-update-article-by-id)
+                       (delete-article-by-id-proc repo-delete-article-by-id))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
@@ -49,6 +52,12 @@
 
 (define-repo-method insert-article repo-insert-article
                     "Inserts the article ATTRS describes into REPO.")
+
+(define-repo-method update-article-by-id repo-update-article-by-id
+                    "Updates the article ID with ATTRS in the given REPO.")
+
+(define-repo-method delete-article-by-id repo-delete-article-by-id
+                    "Deletes the article ID in the given REPO.")
 
 ;;; ====== What an article is ======
 

@@ -619,7 +619,7 @@ classes it carries, so the element name is about what the bar *is*."
                            'article "articles")
 
                 ;; Login / profile
-                ,(unless is-logged-in `(a (@ (href "/login")
+                ,(if (not is-logged-in) `(a (@ (href "/login")
                                              (class ,(mk-class '(shrink-0 no-underline))))
                                           ,(icon-button #:icon 'sign-in
                                                         #:content (G_ "login")

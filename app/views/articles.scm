@@ -32,7 +32,7 @@
   #:use-module (ice-9 format)
   #:use-module (ice-9 string-fun)
   #:export (article-kind-word articles-list-page article-page
-                              article-new-page article-comment-form))
+                              article-new-page article-edit-page article-comment-form))
 
 ;; The column every page here stands in, the same frame the rest of the site is
 ;; drawn in.
@@ -78,7 +78,7 @@ to translate and `G_' only translates a literal."
   (let* ((flat (string-join (string-split (string-map (lambda (ch)
                                                         (if (char-whitespace? ch)
                                                           #\space ch))
-                                                      (or contents ""))
+                                                      (html-unescape (or contents "")))
                                           #\space)
                             " "))
          (trimmed (string-trim-both flat)))
@@ -199,8 +199,9 @@ That is what its reader typed, the name of the account it was written from, or
                                                              font-semibold
                                                              text-onyx-900
                                                              dark:text-stone-100))))
-                                      ,(or (assq-ref article 'display-name)
-                                         ""))
+                                      ,(html-unescape
+                                        (or (assq-ref article 'display-name)
+                                            "")))
                                    (p (@ (class ,(mk-class '(text-md
                                                              text-onyx-500
                                                              dark:text-stone-300))))
@@ -225,7 +226,15 @@ That is what its reader typed, the name of the account it was written from, or
                                                  #:name title
                                                  #:description description))
                    #:body `((div (@ (class ,(mk-class articles-column-classes)))
-                                 ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "articles"))
+                                 (div (@ (class ,(mk-class '(flex flex-row
+                                                               flex-wrap
+                                                               items-center
+                                                               justify-between
+                                                               gap-2))))
+                                      ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "articles"))
+                                      (a (@ (href "/articles/new")
+                                            (class ,(mk-class '(no-underline))))
+                                         ,(button (G_ "write an article"))))
                                  (p (@ (class ,(mk-class '(max-w-prose
                                                            text-md
                                                            text-onyx-500
@@ -250,12 +259,13 @@ That is what its reader typed, the name of the account it was written from, or
                                          ,(button (G_ "write an article")))))))))
 
 (define* (article-page G_
-                       #:key article comments user-alist is-logged-in)
+                       #:key article comments user-alist is-logged-in
+                       (can-edit? #f))
   ;; The page's optional parts are built before the markup for one reason: a
   ;; video and a thread are both sometimes there, and a list of one fragment --
   ;; or of none -- splices into the page below without the markup asking.
   (let* ((identifier (assq-ref article 'identifier))
-         (display-name (or (assq-ref article 'display-name) ""))
+         (display-name (html-unescape (or (assq-ref article 'display-name) "")))
          (kind-word (article-kind-word G_ (assq-ref article 'kind)))
          (page-title (format #f "~a — ~a | WikiMusic" display-name kind-word))
          (page-description (article-excerpt (assq-ref article 'contents)))
@@ -278,7 +288,24 @@ That is what its reader typed, the name of the account it was written from, or
                    (render-article-comment G_
                                            comment
                                            #:user-alist user-alist))
-                 comments))))
+                 comments)))
+         (actions
+          (if can-edit?
+            (list
+             `(div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2 my-2))))
+                   (a (@ (href ,(format #f "/articles/uuid/~a/edit" identifier))
+                         (class ,(mk-class '(no-underline))))
+                      ,(button (G_ "edit article")))
+                   (form (@ (method POST)
+                            (action ,(format #f "/articles/uuid/~a/delete" identifier)))
+                         ,(button (G_ "delete article")
+                                  #:type 'submit
+                                  #:on-click "return confirm('delete this article?')"
+                                  #:background '(bg-redwood-700)
+                                  #:color '(text-stone-100)
+                                  #:hover-background '(hover:bg-redwood-900
+                                                       dark:hover:bg-redwood-500)))))
+            '())))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:title page-title
@@ -306,11 +333,13 @@ That is what its reader typed, the name of the account it was written from, or
                                             ,(or (assq-ref article 'created-at)
                                                "")))
                                  ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" display-name)
+                                 ,@actions
                                  ,@video-fragment
                                  (div (@ (class ,(mk-class '(max-w-prose))))
-                                      ,(org2html (or (assq-ref article
-                                                               'contents)
-                                                   "")))
+                                      ,(org2html (html-unescape
+                                                  (or (assq-ref article
+                                                                'contents)
+                                                      ""))))
                                  (div (@ (id "comments")
                                          (class ,(mk-class '(flex
                                                              flex-col
@@ -327,46 +356,104 @@ That is what its reader typed, the name of the account it was written from, or
                                         #:is-logged-in
                                         is-logged-in)))))))
 
+(define* (article-form G_ #:key (article #f))
+  "Return the form an article is written or edited in."
+  (let* ((identifier (and article (assq-ref article 'identifier)))
+         (display-name (html-unescape
+                        (or (and article (assq-ref article 'display-name)) "")))
+         (kind (and article (kind-string (assq-ref article 'kind))))
+         (video-url (or (and article (assq-ref article 'video-url)) ""))
+         (contents (html-unescape
+                    (or (and article (assq-ref article 'contents)) ""))))
+    `(form (@ (method POST)
+              (action ,(if identifier
+                         (format #f "/articles/uuid/~a/edit" identifier)
+                         "/articles/new"))
+              (enctype "application/x-www-form-urlencoded")
+              (class ,(mk-class '(flex flex-col gap-3))))
+           (fieldset (@ (class "wm-editor-group"))
+                     (legend (@ (class "wm-editor-legend"))
+                             ,(G_ "the article"))
+                     ,(input #:label (G_ "title")
+                             #:name "display-name"
+                             #:value display-name
+                             #:required #t)
+                     ,(input #:label (G_ "a video address, if it is one")
+                             #:name "video-url"
+                             #:value video-url)
+                     (div (@ (class ,(mk-class '(flex flex-col gap-1 max-w-prose))))
+                          (span (@ (class ,(mk-class '(text-sm
+                                                       font-semibold
+                                                       text-onyx-700
+                                                       dark:text-stone-300))))
+                                ,(G_ "what it is"))
+                          (select (@ (name "kind")
+                                     (id "kind")
+                                     (class "p-2 rounded-xl border-2 border-stone-700 dark:border-onyx-100 dark:text-stone-300 dark:bg-onyx-700/75 bg-stone-300/75 w-full"))
+                                  ,@(map
+                                     (lambda (offered)
+                                       `(option (@ (value ,(kind-string offered))
+                                                   ,@(if (equal? (kind-string offered) kind)
+                                                     '((selected ""))
+                                                     '()))
+                                                ,(article-kind-word G_ offered)))
+                                     article-kinds))))
+           (fieldset (@ (class "wm-editor-group"))
+                     (legend (@ (class "wm-editor-legend"))
+                             ,(G_ "the words"))
+                     ,(textarea #:label (G_ "the article itself, in Org")
+                                #:name "contents"
+                                #:value contents
+                                #:required #t
+                                #:help-text (G_ "headings, lists, links and example blocks are written in Org mode syntax")))
+           (div (@ (class "wm-editor-actions"))
+                ,(submit-button (if identifier
+                                  (G_ "save article")
+                                  (G_ "post article")))
+                (a (@ (href ,(if identifier
+                                 (format #f "/articles/uuid/~a" identifier)
+                                 "/articles"))
+                      (class ,(mk-class '(no-underline))))
+                   ,(button (G_ "cancel")))))))
+
 (define* (article-new-page G_ #:key is-logged-in)
-  (let* ((write-form
-          `(form (@ (method POST)
-                    (action "/articles/new")
-                    (class ,(mk-class '(flex flex-col gap-2))))
-                 ,(input #:label (G_ "title")
-                         #:name "display-name")
-                 ,(input #:label (G_ "a video address, if it is one")
-                         #:name "video-url")
-                 (div (@ (class "flex flex-col gap-1 max-w-prose"))
-                      (span (@ (class ,(mk-class '(text-sm
-                                                   font-semibold
-                                                   text-onyx-700
-                                                   dark:text-stone-300))))
-                            ,(G_ "what it is"))
-                      (select (@ (name "kind")
-                                 (id "kind")
-                                 (class "p-2 rounded-xl border-2 border-stone-700 dark:border-onyx-100 dark:text-stone-300 dark:bg-onyx-700/75 bg-stone-300/75 w-full"))
-                              ,@(map (lambda (kind)
-                                       `(option (@ (value ,(kind-string kind)))
-                                                ,(article-kind-word G_ kind)))
-                                     article-kinds)))
-                 ,(textarea #:label (G_ "the article itself, in Org")
-                            #:name "contents"
-                            #:required #t)
-                 (div (@ (class "flex flex-row gap-2"))
-                      ,(button (G_ "post it")
-                               #:type 'submit))))
-         (body `((div (@ (class ,(mk-class articles-column-classes)))
-                      ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "write an article"))
-                      ,@(if is-logged-in
-                          (list write-form)
-                          (list (list 'p
-                                      (list '@ (list 'class
-                                                     "max-w-prose text-md text-onyx-500 dark:text-stone-300"))
-                                      (G_ "an account is needed to write; anyone may comment"))))))))
+  (html-template G_
+                 #:is-logged-in is-logged-in
+                 #:title "Write an article | WikiMusic"
+                 #:description "Write a tutorial, a chord guide, a piece of music theory or a discussion for the readers of WikiMusic."
+                 #:path "/articles/new"
+                 #:robots "noindex, nofollow"
+                 #:body `((div (@ (class ,(mk-class articles-column-classes)))
+                               (a (@ (href "/articles")
+                                     (class ,(mk-class '(no-underline))))
+                                  ,(button (G_ "back to articles")))
+                               ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "write an article"))
+                               ,@(if is-logged-in
+                                   (list (article-form G_))
+                                   (list
+                                    `(div (@ (class ,(mk-class '(max-w-prose
+                                                                flex flex-col
+                                                                gap-3))))
+                                         (p (@ (class ,(mk-class '(text-md
+                                                                   text-onyx-500
+                                                                   dark:text-stone-300))))
+                                            ,(G_ "an account is needed to write; anyone may comment"))
+                                         (a (@ (href "/login")
+                                               (class ,(mk-class '(no-underline))))
+                                            ,(button (G_ "log in to write"))))))))))
+
+(define* (article-edit-page G_ #:key article is-logged-in)
+  (let* ((identifier (assq-ref article 'identifier))
+         (display-name (html-unescape (or (assq-ref article 'display-name) ""))))
     (html-template G_
                    #:is-logged-in is-logged-in
-                   #:title "Write an article | WikiMusic"
-                   #:description "Write a tutorial, a chord guide, a piece of music theory or a discussion for the readers of WikiMusic."
-                   #:path "/articles/new"
-                   #:robots "noindex, follow"
-                   #:body body)))
+                   #:title (format #f "Edit ~a | WikiMusic" display-name)
+                   #:description "Edit an article for the readers of WikiMusic."
+                   #:path (format #f "/articles/uuid/~a/edit" identifier)
+                   #:robots "noindex, nofollow"
+                   #:body `((div (@ (class ,(mk-class articles-column-classes)))
+                                 (a (@ (href ,(format #f "/articles/uuid/~a" identifier))
+                                       (class ,(mk-class '(no-underline))))
+                                    ,(button (G_ "back to article")))
+                                 ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "edit article"))
+                                 ,(article-form G_ #:article article))))))

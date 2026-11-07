@@ -51,7 +51,15 @@
                    (sql-insert 'article_comments
                                (attrs->row attrs columns))))
 
+  (define (delete-article-comments-for-article article-id)
+    (execute-write "delete-article-comments-for-article"
+                   (sql-delete 'article_comments
+                               #:where (list (cons 'article-identifier
+                                                   article-id)))))
+
   (mk-article-comment-repository #:get-article-comments-proc
                                  get-article-comments
                                  #:insert-article-comment-proc
-                                 insert-article-comment))
+                                 insert-article-comment
+                                 #:delete-article-comments-for-article-proc
+                                 delete-article-comments-for-article))

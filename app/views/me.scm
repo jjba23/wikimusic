@@ -20,7 +20,7 @@
                   #:key is-logged-in token user)
 
   (let* ((user-details `((div (@ (class ,(mk-class '(py-8 px-4 max-w-prose))))
-                              ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a &lt;~a&gt;"
+                              ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a <~a>"
                                                                                                                                              (assoc-ref user "username")
                                                                                                                                              (assoc-ref user "email")))
                               (div (@ (class ,(mk-class '(flex flex-row
@@ -85,6 +85,9 @@
                                                             #:content (G_
                                                                        "go to user management"))))
                                          '())
+                                      (a (@ (href "/articles/new"))
+                                         ,(icon-button #:icon 'article
+                                                       #:content (G_ "write an article")))
                                       (a (@ (href "/logout"))
                                          ,(icon-button #:icon 'sign-out
                                                        #:content (G_ "logout")))
@@ -154,6 +157,9 @@
                  #:robots "noindex, nofollow"
                  #:is-logged-in #t
                  #:body `((div (@ (class ,(mk-class '())))
+                               (a (@ (href "/me"))
+                                  ,(icon-button #:icon 'user-circle
+                                                #:content (G_ "back to me")))
                                ,(h2 (G_ "User management"))
                                (div (@ (class ,(mk-class '(my-6))))
                                     (a (@ (href "/users/new"))
@@ -177,48 +183,49 @@
                  #:name (format #f "~a" p)))))
 
 (define* (new-user-page G_)
-  (html-template G_
-                 #:title "Your account · WikiMusic"
-                 #:robots "noindex, nofollow"
-                 #:is-logged-in #t
-                 #:body `((div (@ (class ,(mk-class '())))
-                               (div ,(h2 (G_ "New User")))
-                               (div (@ (class ,(mk-class '(flex flex-col
-                                                                gap-4
-                                                                my-8
-                                                                py-8
-                                                                px-4
-                                                                rounded-xl
-                                                                bg-stone-300
-                                                                dark:bg-stone-900))))
-                                    (form (@ (method POST)
-                                             (action "/users/new"))
-                                          (div ,(input #:label (G_ "username")
-                                                       #:name 'username
-                                                       #:required #t))
-                                          (div ,(input #:label (G_ "email")
-                                                       #:name 'email
-                                                       #:type 'email
-                                                       #:required #t))
-                                          (div (@ (class ,(mk-class '(my-6))))
-                                               ,(sub-h4 (G_ "user permissions"))
-                                               (div (@ (class ,(mk-class '(flex
-                                                                           flex-col
-                                                                           gap-1))))
-
-                                                    ,(map
-                                                      make-permission-checkbox
-                                                      '(wikimusic:song-create
-                                                        wikimusic:song-delete
-                                                        wikimusic:artist-create
-                                                        wikimusic:artist-delete
-                                                        wikimusic:genre-create
-                                                        wikimusic:genre-delete
-                                                        wikimusic:user-create
-                                                        wikimusic:user-delete
-                                                        wikimusic:modify-permissions)))
-                                               (div ,(submit-button (G_
-                                                                     "create"))))))))))
+  (let* ((body
+          `((div (@ (class ,(mk-class '())))
+                 (a (@ (href "/users/manage"))
+                    ,(icon-button #:icon 'user-switch
+                                  #:content (G_ "back to user management")))
+                 (div ,(h2 (G_ "New User")))
+                 (div (@ (class ,(mk-class '(flex flex-col
+                                                  gap-4
+                                                  my-8
+                                                  py-8
+                                                  px-4
+                                                  rounded-xl
+                                                  bg-stone-300
+                                                  dark:bg-stone-900))))
+                      (form (@ (method POST)
+                               (action "/users/new"))
+                            (div ,(input #:label (G_ "username")
+                                         #:name 'username
+                                         #:required #t))
+                            (div ,(input #:label (G_ "email")
+                                         #:name 'email
+                                         #:type 'email
+                                         #:required #t))
+                            (div (@ (class ,(mk-class '(my-6))))
+                                 ,(sub-h4 (G_ "user permissions"))
+                                 (div (@ (class ,(mk-class '(flex flex-col gap-1))))
+                                      ,(map
+                                        make-permission-checkbox
+                                        '(wikimusic:song-create
+                                          wikimusic:song-delete
+                                          wikimusic:artist-create
+                                          wikimusic:artist-delete
+                                          wikimusic:genre-create
+                                          wikimusic:genre-delete
+                                          wikimusic:user-create
+                                          wikimusic:user-delete
+                                          wikimusic:modify-permissions)))
+                                 (div ,(submit-button (G_ "create"))))))))))
+    (html-template G_
+                   #:title "Your account · WikiMusic"
+                   #:robots "noindex, nofollow"
+                   #:is-logged-in #t
+                   #:body body)))
 
 (define* (make-edit-permission-checkbox p
                                         #:key label
@@ -257,6 +264,9 @@
                  #:robots "noindex, nofollow"
                  #:is-logged-in #t
                  #:body `((div (@ (class ,(mk-class '())))
+                               (a (@ (href "/users/manage"))
+                                  ,(icon-button #:icon 'user-switch
+                                                #:content (G_ "back to user management")))
                                (div ,(h2 (G_ "Edit User")))
                                (div (@ (class ,(mk-class '(flex flex-col
                                                                 gap-4
@@ -287,25 +297,21 @@
                                                        #:required #t))
                                           (div (@ (class ,(mk-class '(my-6))))
                                                ,(sub-h4 (G_ "user permissions"))
-                                               (div (@ (class ,(mk-class '(flex
-                                                                           flex-col
-                                                                           gap-1))))
-
+                                               (div (@ (class ,(mk-class '(flex flex-col
+                                                                                 gap-1))))
                                                     ,(map (lambda (p)
                                                             (make-edit-permission-checkbox
                                                              p
-                                                             #:label (symbol->string
-                                                                      p)
+                                                             #:label (symbol->string p)
                                                              #:name p
-                                                             #:checked (not (nil?
-                                                                             (member
-                                                                              p
-
-
-                                                                              (eval-string
-                                                                               (assoc-ref
-                                                                                u
-                                                                                "permissions")))))))
+                                                             #:checked
+                                                             (not (nil?
+                                                                   (member
+                                                                    p
+                                                                    (eval-string
+                                                                     (assoc-ref
+                                                                      u
+                                                                      "permissions")))))))
                                                           '(wikimusic:song-create
                                                             wikimusic:song-delete
                                                             wikimusic:artist-create

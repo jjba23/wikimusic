@@ -72,7 +72,20 @@
                    (sql-insert 'articles
                                (attrs->row attrs columns))))
 
+  (define (update-article-by-id id attrs)
+    (execute-write "update-article-by-id"
+                   (sql-update 'articles
+                               (attrs->row attrs columns)
+                               #:where (list (cons 'identifier id)))))
+
+  (define (delete-article-by-id id)
+    (execute-write "delete-article-by-id"
+                   (sql-delete 'articles
+                               #:where (list (cons 'identifier id)))))
+
   (mk-article-repository #:get-articles-proc get-articles
                          #:get-article-by-id-proc get-article-by-id
                          #:count-articles-proc count-articles
-                         #:insert-article-proc insert-article))
+                         #:insert-article-proc insert-article
+                         #:update-article-by-id-proc update-article-by-id
+                         #:delete-article-by-id-proc delete-article-by-id))

@@ -258,6 +258,22 @@
         (assert-true (and (string-contains html "<main") #t)
           #:name "and it stands inside the document")))
 
+    (test "a signed-in reader is offered the account page"
+      (let ((html (render (html-template G_
+                                         #:is-logged-in #t
+                                         #:body '((p "x"))))))
+        (assert-true (and (string-contains html "href=\"/me\"") #t)
+          #:name "the me link")))
+
+    (test "a signed-out reader is offered sign-in instead"
+      (let ((html (render (html-template G_
+                                         #:is-logged-in #f
+                                         #:body '((p "x"))))))
+        (assert-true (and (string-contains html "href=\"/login\"") #t)
+          #:name "the login link")
+        (assert-true (not (string-contains html "href=\"/me\""))
+          #:name "and no account link")))
+
     (test "no non-void element is closed as a self-closed tag"
       (let ((html (render (html-template G_
                                          #:body '((p "x")))))

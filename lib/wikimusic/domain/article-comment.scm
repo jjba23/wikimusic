@@ -16,7 +16,8 @@
   #:declarative? #t
   #:use-module (srfi srfi-1)
   #:use-module (wikimusic domain repo)
-  #:export (get-article-comments insert-article-comment))
+  #:export (get-article-comments insert-article-comment
+                          delete-article-comments-for-article))
 
 ;; --- Record definition ---
 
@@ -27,7 +28,9 @@
                        (get-article-comments-proc
                         repo-get-article-comments)
                        (insert-article-comment-proc
-                        repo-insert-article-comment))
+                        repo-insert-article-comment)
+                       (delete-article-comments-for-article-proc
+                        repo-delete-article-comments-for-article))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
@@ -36,3 +39,7 @@
 
 (define-repo-method insert-article-comment repo-insert-article-comment
                     "Inserts the comment ATTRS describes into REPO.")
+
+(define-repo-method delete-article-comments-for-article
+                    repo-delete-article-comments-for-article
+                    "Deletes every comment on the article ARTICLE-ID from REPO.")

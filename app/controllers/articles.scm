@@ -42,6 +42,13 @@
 (define articles-per-page
   20)
 
+(define (article-can-edit? rc article)
+  "Return #t when the request in RC may edit ARTICLE."
+  (let ((session (session-payload rc)))
+    (and session
+      (may-mutate? #:session session
+                   #:created-by (assq-ref article 'created-by)))))
+
 (get "/articles"
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -103,8 +110,7 @@
             [(string-null? (string-trim-both display-name)) (forbidden rc)]
             [else (let ((identifier (generate-string-uuid)))
                     (insert-article (make-sqlite-article-repository rc)
-                                    (list (cons 'identifier
-                                                (generate-string-uuid))
+                                    (list (cons 'identifier identifier)
                                           (cons 'display-name display-name)
                                           (cons 'kind
                                                 (symbol->string
@@ -131,6 +137,7 @@
               (article (entity-or-404 (get-article-by-id article-repo
                                                          article-id)
                                       "article" article-id))
+              (can-edit? (article-can-edit? rc article))
               (comments (get-article-comments comment-repo
                                               (list article-id)))
               (user-alist (map (lambda (identifier)
@@ -145,9 +152,89 @@
                                              #:article article
                                              #:comments comments
                                              #:user-alist user-alist
+                                             #:can-edit? can-edit?
                                              #:is-logged-in (:cookies-value
                                                              rc
                                                              "x-bewaking-wikimusic")))))))
+
+(get "/articles/uuid/:uuid/edit"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     #:cookies '(names x-bewaking-wikimusic)
+     (lambda (rc)
+       (let* ((article-id (params rc "uuid"))
+              (article (entity-or-404
+                        (get-article-by-id
+                         (make-sqlite-article-repository rc)
+                         article-id)
+                        "article" article-id)))
+         (when (guard-owner #:rc rc
+                            #:created-by (assq-ref article 'created-by))
+           (response-emit (:mime rc
+                                 (article-edit-page
+                                  (:i18n rc)
+                                  #:article article
+                                  #:is-logged-in (:cookies-value
+                                                  rc
+                                                  "x-bewaking-wikimusic"))))))))
+
+(post "/articles/uuid/:uuid/edit"
+      #:mime 'xml
+      #:i18n '(cookie "lang")
+      #:cookies '(names x-bewaking-wikimusic)
+      (lambda (rc)
+        (let* ((article-id (params rc "uuid"))
+               (article (entity-or-404
+                         (get-article-by-id
+                          (make-sqlite-article-repository rc)
+                          article-id)
+                         "article" article-id))
+               (body (body-alist rc)))
+          (when (guard-owner #:rc rc
+                             #:created-by (assq-ref article 'created-by))
+            (let ((display-name (html-escape
+                                 (or (assoc-ref body "display-name") "")))
+                  (contents (html-escape
+                             (or (assoc-ref body "contents") ""))))
+              (if (string-null? (string-trim-both display-name))
+                (forbidden rc)
+                (begin
+                  (update-article-by-id
+                   (make-sqlite-article-repository rc)
+                   article-id
+                   (list (cons 'display-name display-name)
+                         (cons 'kind
+                               (symbol->string
+                                (article-kind-named
+                                 (assoc-ref body "kind"))))
+                         (cons 'video-url (or (assoc-ref body "video-url")
+                                              ""))
+                         (cons 'contents contents)
+                         (cons 'last-edited-at (current-time))))
+                  (redirect-to rc
+                               (format #f "/articles/uuid/~a" article-id)
+                               #:status 302))))))))
+
+(post "/articles/uuid/:uuid/delete"
+      #:mime 'xml
+      #:i18n '(cookie "lang")
+      #:cookies '(names x-bewaking-wikimusic)
+      (lambda (rc)
+        (let* ((article-id (params rc "uuid"))
+               (article (entity-or-404
+                         (get-article-by-id
+                          (make-sqlite-article-repository rc)
+                          article-id)
+                         "article" article-id)))
+          (when (guard-owner #:rc rc
+                             #:created-by (assq-ref article 'created-by))
+            (delete-article-comments-for-article
+             (make-sqlite-article-comment-repository rc)
+             article-id)
+            (delete-article-by-id
+             (make-sqlite-article-repository rc)
+             article-id)
+            (redirect-to rc "/articles" #:status 302)))))
 
 ;; The one write on this site a reader needs no account for.
 ;;

@@ -136,6 +136,79 @@
                               "chord guide")
         #:name "and the word for its kind"))
 
+    (test "an owner is offered edit and delete controls"
+      (let ((page (html (article-page G_
+                                     #:article (article-row)
+                                     #:comments '()
+                                     #:is-logged-in #t
+                                     #:can-edit? #t))))
+        (assert-true (contains? page "/articles/uuid/article-1/edit")
+          #:name "the edit link")
+        (assert-true (contains? page "/articles/uuid/article-1/delete")
+          #:name "the delete form")))
+
+    (test "a reader is not offered controls they cannot use"
+      (let ((page (html (article-page G_
+                                     #:article (article-row)
+                                     #:comments '()
+                                     #:is-logged-in #f))))
+        (assert-false (contains? page "/articles/uuid/article-1/edit")
+          #:name "no edit link")
+        (assert-false (contains? page "/articles/uuid/article-1/delete")
+          #:name "no delete form")))
+
+    (test "the edit form is filled in and posts to the article"
+      (let ((page (html (article-edit-page G_
+                                           #:article (article-row
+                                                      #:contents "Start&apos;s here")
+                                           #:is-logged-in #t))))
+        (assert-true (contains? page "/articles/uuid/article-1/edit")
+          #:name "the form action")
+        (assert-true (contains? page "Barre chords without pain")
+          #:name "the current title")
+        (assert-true (contains? page "Start's here")
+          #:name "the current body")))
+
+    (test "stored entities are decoded before the article is rendered"
+      (let ((page (html (article-page G_
+                                     #:article (article-row
+                                                #:contents "It&apos;s &ldquo;fine&rdquo; &mdash; caf&eacute;")
+                                     #:comments '()
+                                     #:is-logged-in #f))))
+        (assert-true (contains? page "It's “fine” — café")
+          #:name "apostrophes, quotation marks and accents are shown as characters")
+        (assert-true (not (contains? page "&amp;apos;"))
+          #:name "not as escaped text")))
+
+    (test "a title stored with entities is decoded before it is shown"
+      (let ((page (html (article-page G_
+                                     #:article (article-row
+                                                #:display-name "Don&apos;t fear barre chords")
+                                     #:comments '()
+                                     #:is-logged-in #f))))
+        (assert-true (contains? page "Don't fear barre chords")
+          #:name "the apostrophe is a character")
+        (assert-true (not (contains? page "&amp;apos;"))
+          #:name "not escaped text")))
+
+    (test "the list preview decodes the stored entities too"
+      (let ((page (html (articles-list-page G_
+                                           #:articles (list
+                                                       (article-row
+                                                        #:display-name "Don&apos;t fear barre chords"
+                                                        #:contents "It&apos;s &ldquo;fine&rdquo; &mdash; caf&eacute;"))
+                                           #:pages 1
+                                           #:page 1
+                                           #:is-logged-in #f))))
+        (assert-true (contains? page "Don't fear barre chords")
+          #:name "the title shows its apostrophe")
+        (assert-true (contains? page "/articles/new")
+          #:name "the write link")
+        (assert-true (contains? page "It's “fine” — café")
+          #:name "the preview shows characters")
+        (assert-true (not (contains? page "&amp;apos;"))
+          #:name "not escaped text")))
+
     (test "a signed-out reader is asked for a name and no account"
       (assert-true (contains? (comment-form-html)
                               "name=\"author-name\"")
