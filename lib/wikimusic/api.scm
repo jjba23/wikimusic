@@ -69,7 +69,7 @@
   #:use-module (wikimusic-api models)
   #:use-module ((wikimusic-api runtime) #:hide (uri-encode))
   #:export (serve-api emit-api-response protected-handler version-record
-            api-timestamp))
+            external-source-record api-timestamp))
 
 (define api-version "1.1.0")
 
@@ -108,6 +108,13 @@ numbers to every caller, so the conversion is made once, here."
     [(number? value) (inexact->exact value)]
     [(string? value) (or (string->number value) 0)]
     [else 0]))
+
+(define (decoded-url value)
+  "Return VALUE, a stored URL, as the URI a client sent.
+
+The forms store a URI-encoded URL; the generated record validates the URI, so
+the encoding is undone here before the record is built."
+  (and (string? value) (uri-decode value)))
 
 (define (non-empty-string? value)
   "Return #t when VALUE is a string with something besides whitespace in it."
@@ -227,10 +234,10 @@ not two per song."
 (define (external-source-record row)
   (make-external-source
    #:identifier (column row 'identifier)
-   #:spotify-url (text (column row 'spotify-url))
-   #:youtube-url (text (column row 'youtube-url))
-   #:soundcloud-url (text (column row 'soundcloud-url))
-   #:wikipedia-url (text (column row 'wikipedia-url))
+   #:spotify-url (decoded-url (column row 'spotify-url))
+   #:youtube-url (decoded-url (column row 'youtube-url))
+   #:soundcloud-url (decoded-url (column row 'soundcloud-url))
+   #:wikipedia-url (decoded-url (column row 'wikipedia-url))
    #:created-at (text (column row 'created-at))))
 
 (define (article-summary-record row)

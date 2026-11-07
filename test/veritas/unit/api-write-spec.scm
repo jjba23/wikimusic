@@ -40,6 +40,15 @@
         (cons 'guitarpro-contents guitarpro)
         (cons 'created-at "2026-11-07T00:00:00Z")))
 
+(define (external-source-row wikipedia-url)
+  "Return an external-source row whose only link is WIKIPEDIA-URL."
+  (list (cons 'identifier "00000000-0000-4000-8000-000000000002")
+        (cons 'spotify-url #f)
+        (cons 'youtube-url #f)
+        (cons 'soundcloud-url #f)
+        (cons 'wikipedia-url wikipedia-url)
+        (cons 'created-at "1794045174")))
+
 (define protected-handler-suite
   (suite "A protected API handler"
     (test "it takes the dispatcher's request and path arguments"
@@ -85,6 +94,16 @@
         (assert-true (song-version-has-tablature version)
           #:name "the Guitar Pro file is reported")))))
 
+(define external-source-suite
+  (suite "An external source"
+    (test "a stored encoded link is read back as the URI the client sent"
+      (let ((source (external-source-record
+                      (external-source-row
+                       "https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FAmazing_Grace"))))
+        (assert-equal #:name "the link is decoded"
+          #:expect "https://en.wikipedia.org/wiki/Amazing_Grace"
+          #:got (external-source-wikipedia-url source))))))
+
 (define timestamp-suite
   (suite "The timestamp a write records"
     (test "it is epoch seconds a page can read"
@@ -96,4 +115,4 @@
 
 (define (spec)
   (veritas-run protected-handler-suite version-presence-suite
-               timestamp-suite))
+               external-source-suite timestamp-suite))
