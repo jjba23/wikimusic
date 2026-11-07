@@ -515,6 +515,12 @@ Here follows an example of a Guix (Shepherd service):
 
 #+end_src
 
+=conf/production.conf= sets =server.timeout= to 120 seconds because the
+reverse proxy's generated upstream pool keeps idle connections for 60 seconds.
+Artanis must outlive that pool: a shorter timeout closes an idle connection
+with a 408 just as nginx reuses it, and the reader gets the timeout page.  If
+the proxy's =keepalive_timeout= changes, keep this value above it.
+
 --------
 
 * Accounts, permissions and ownership
