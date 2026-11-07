@@ -3773,7 +3773,7 @@ components:
       properties:
         token:
           type: string
-          description: Send this as `Authorization: Bearer <token>`.
+          description: 'Send this as `Authorization: Bearer <token>`.'
         expiresIn:
           type: integer
           description: How long the token is good for, in seconds.
