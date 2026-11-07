@@ -183,8 +183,7 @@ Args: update? represents whether we should update a template or create a new one
    (list "guile" "-L" "./lib" "-L" "."
          "-c"
          "'((@ (openapi-generator cli) main!) (list \"generate\" \"--config\" \"openapi/openapi-generator.yaml\" \"--check\"))'")
-   #:verbose? #t)
-  (fmt))
+   #:verbose? #t))
 
 (define (deploy)
   "Deploy the project's documentation.
