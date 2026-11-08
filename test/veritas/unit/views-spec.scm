@@ -35,6 +35,7 @@
   #:use-module (wikimusic config)
   #:use-module (wikimusic html)
   #:use-module (app views song-content-view)
+  #:use-module (app views song-view)
   #:export (spec))
 
 (define (G_ key)
@@ -158,6 +159,31 @@
         (assert-true (and (string-contains html ">language<") #t)
           #:name "and says what it is")))))
 
+(define (song-page-html)
+  "Return a song page as HTML, which is the sheet a phone reads it on.
+
+The page is asked about its own gutter rather than about its music, so the song
+is the smallest one that renders: an identifier, a name and the three columns
+the details block counts with."
+  (render (song-detail-page G_
+                            #:song `((identifier . "one")
+                                     (display-name . "one")
+                                     (description . "a song")
+                                     (views . 0)
+                                     (created-at . "1700000000")
+                                     (created-by . "someone"))
+                            #:artworks '()
+                            #:song-contents '()
+                            #:song-artists '()
+                            #:artists '()
+                            #:song-genres '()
+                            #:genres '()
+                            #:opinions '()
+                            #:comments '()
+                            #:user-alist '()
+                            #:external-sources '()
+                            #:is-logged-in #f)))
+
 (define reading-suite
   (suite "A page a reader is reading"
     (test "the navigation is pinned while browsing"
@@ -196,7 +222,14 @@
         (assert-false (member "sticky" reading)
           #:name "but nothing pins it")
         (assert-true (and (member "sticky" browsing) #t)
-          #:name "and every other page keeps it")))))
+          #:name "and every other page keeps it")))
+
+    (test "a song page leaves the width to the music"
+      (let ((tokens (class-tokens (song-page-html) "md:px-6")))
+        (assert-true (and (member "px-0" tokens) #t)
+          #:name "the page adds no gutter on top of the shell's")
+        (assert-false (member "px-3" tokens)
+          #:name "which is a column of the tab it would cost")))))
 
 ;; The footer is read through a procedure, and every assertion asks for it
 ;; itself.  That is not tidiness: a suite takes its children as arguments and a

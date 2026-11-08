@@ -470,7 +470,11 @@
                    ;; navigation is left to scroll away here and gives the
                    ;; viewport back to the music.
                    #:reading? #t
-                   #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
+                   ;; A phone's gutter is the shell's own: a second one on top
+                   ;; of it is the width of a tab's first column, and a song
+                   ;; page is read rather than skimmed.  From the medium
+                   ;; breakpoint up there is room for both.
+                   #:body `((div (@ (class ,(mk-class '(px-0 py-2 md:px-6
                                                              md:py-4))))
                                  ((div (@ (class ,(mk-class '(flex flex-col
                                                                    gap-4))))

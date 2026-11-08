@@ -273,22 +273,30 @@ a:focus-visible .wm-wordmark-accent {
 
 /* ===== A tablature reads to the edge of the page =====
 
-   A tab is columns, so every pixel of padding is a column.  The page's 12px
-   gutter plus this paper's own 8px is what a phone loses now, against the 48px
-   that the page, the reading column and the paper each added before.  The
-   paper keeps its border and its radius, so the music still sits on something
-   rather than floating on the background, and it keeps enough room that a line
-   of characters does not touch the border it is drawn against. */
+   A tab is columns, so every pixel of padding is a column, and a phone has no
+   reading column to keep: the tab is the page.  On a narrow screen the paper
+   therefore reaches back over the shell's own gutter -- the 0.56rem every page
+   is inset by -- and keeps a hair of it, its border, and enough room that a
+   line of characters does not touch the border it is drawn against.  The paper
+   keeps its border and its radius, so the music still sits on something rather
+   than floating on the page.
+
+   The reach is a negative margin because the gutter belongs to the shell and
+   not to this block: a `pre' cannot unpad the page, and it should not -- the
+   paragraphs beside it want that gutter. */
 
 @media (max-width: 639px) {
   pre.wm-ascii {
-    padding: 0.35rem 0.5rem;
+    padding: 0.35rem 0.2rem;
+    margin-inline: -0.4rem;
   }
 }
 
 /* A PDF is a page inside a page: inset margins only make the document it shows
-   smaller, so on a narrow screen it opens to the width of the screen and keeps
-   on a desktop the width of the column it belongs to. */
+   smaller, so on a narrow screen it reaches the same edge the tab does, and
+   keeps on a desktop the width of the column it belongs to.  The reach stays
+   under the shell's gutter, because a frame wider than its column is a page
+   that scrolls sideways. */
 
 .wm-reading-frame {
   display: block;
@@ -300,8 +308,8 @@ a:focus-visible .wm-wordmark-accent {
 
 @media (max-width: 767px) {
   .wm-reading-frame {
-    width: calc(100% + 1.5rem);
-    margin-inline: -0.75rem;
+    width: calc(100% + 0.8rem);
+    margin-inline: -0.4rem;
     min-height: 90vh;
     border-radius: 0;
   }
