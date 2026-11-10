@@ -8,7 +8,7 @@ const highlightChords = (id) => {
   const preElement = document.getElementById(id)
 
   if (preElement) {
-    const originalContent = preElement.textContent
+    const originalContent = preElement.textContent || ''
 
     // Regular expression to match chords.
     // It looks for:
@@ -20,11 +20,29 @@ const highlightChords = (id) => {
     // - \b ensures word boundaries so "Amen" doesn't get "A" bolded
     const chordRegex = /\b[A-G](#|b)?(m|maj|min|dim|aug|sus|add)?\d*(\/[A-G](#|b)?)?\b/g
 
-    const boldedContent = originalContent.replace(chordRegex, (match) => {
-      return `<strong class="font-black text-persia-pink-900 dark:text-persia-pink-300 font-mono">${match}</strong>`
-    })
+    preElement.textContent = ''
 
-    preElement.innerHTML = boldedContent
+    let lastIndex = 0
+    let match
+    while ((match = chordRegex.exec(originalContent)) !== null) {
+      const matchText = match[0]
+      const matchIndex = match.index
+
+      if (matchIndex > lastIndex) {
+        preElement.appendChild(document.createTextNode(originalContent.slice(lastIndex, matchIndex)))
+      }
+
+      const strongElement = document.createElement('strong')
+      strongElement.className = 'font-black text-persia-pink-900 dark:text-persia-pink-300 font-mono'
+      strongElement.textContent = matchText
+      preElement.appendChild(strongElement)
+
+      lastIndex = matchIndex + matchText.length
+    }
+
+    if (lastIndex < originalContent.length) {
+      preElement.appendChild(document.createTextNode(originalContent.slice(lastIndex)))
+    }
   } else {
     console.error(`Element with ID ${id} not found.`)
   }
