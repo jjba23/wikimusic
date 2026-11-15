@@ -29,6 +29,7 @@
   #:use-module (srfi srfi-13)
   #:use-module ((artanis utils)
                 #:select (sxml->xml-string))
+  #:use-module (kracht prelude)
   #:use-module (wikimusic domain tuning)
   #:use-module (app views tuner)
   #:export (spec))
@@ -106,9 +107,12 @@
         #:got (preset-id-named #f)))))
 
 ;; The page as a reader meets it, rendered once and read by each assertion.
+;; The page is HTML, so a sentence holding a typographic mark is written as the
+;; entity that means it; what a test that looks for a sentence is reading is
+;; the document decoded.
 (define (page-html)
-  (html (tuner-page G_
-                    #:preset 'guitar-standard)))
+  (html-unescape (html (tuner-page G_
+                                  #:preset 'guitar-standard))))
 
 (define page-suite
   (suite "The page a reader tunes from"

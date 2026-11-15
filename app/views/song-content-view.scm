@@ -380,7 +380,7 @@ not of the music."
   "Return CONTENT, an Org legend, as the quiet block it is read in."
   `(div (@ (id "ascii-legend-container")
            (class "wm-ascii-legend"))
-        ,(org2html (html-unescape content))))
+        ,(raw (org2html content))))
 
 (define (format-chord-legend-ascii chord-alist)
   (if (or (not chord-alist)
@@ -757,7 +757,7 @@ more than one tab has no ambiguity about which it is addressing."
                                                     (assq-ref version
                                                               'ascii-contents)))
          (cleaned-pdf-data (let ((pdf-contents (assq-ref version
-                                                          'pdf-contents)))
+                                                         'pdf-contents)))
                              (if (data-url-with-payload? pdf-contents)
                                pdf-contents
                                "")))

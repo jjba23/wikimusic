@@ -287,23 +287,23 @@
                             ,(G_ "the song"))
                     ,(input #:label (G_ "display name")
                             #:name "display-name"
-                            #:value (html-unescape display-name)
+                            #:value display-name
                             #:required #t)
                     ,(input #:label (G_ "music key")
                             #:name "music-key"
-                            #:value (html-unescape music-key))
+                            #:value music-key)
                     ,(input #:label (G_ "music tuning")
                             #:name "music-tuning"
-                            #:value (html-unescape music-tuning))
+                            #:value music-tuning)
                     ,(input #:label (G_ "music creation date")
                             #:name "music-creation-date"
-                            #:value (html-unescape music-creation-date)))
+                            #:value music-creation-date))
           (fieldset (@ (class "wm-editor-group"))
                     (legend (@ (class "wm-editor-legend"))
                             ,(G_ "the album"))
                     ,(input #:label (G_ "album name")
                             #:name "album-name"
-                            #:value (html-unescape album-name))
+                            #:value album-name)
                     ,(input #:label (G_ "album info url")
                             #:name "album-info-link"
                             #:value (uri-decode album-info-link)))
@@ -317,7 +317,7 @@
                                ;; it is told so here rather than left to find
                                ;; out from the rendered page.
                                #:help-text (G_ "descriptions are written in Org mode syntax")
-                               #:value (html-unescape description)))
+                               #:value description))
           (div (@ (class "wm-editor-actions"))
                ,(submit-button (if identifier
                                  (G_ "edit")

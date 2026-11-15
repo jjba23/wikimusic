@@ -259,7 +259,7 @@ the session's own user."
          (parent (assoc-ref body "parent-identifier"))
          (parent (and (string? parent)
                    (not (string=? parent ""))
-                   (html-escape parent))))
+                   parent)))
     (when (and created-by
             (string? contents)
             (not (string=? contents "")))
@@ -275,7 +275,7 @@ the session's own user."
                         (created-by unquote created-by)
                         (visibility-status . 0)
                         (contents unquote
-                                  (html-escape contents))
+                                  contents)
                         (created-at unquote
                                     (current-time))
                         ,@(if parent
@@ -306,7 +306,7 @@ comment that is not there is a 404; one somebody else wrote is a 403."
                     (not (string=? contents "")))
               (update-comment-by-id repository entity comment-identifier
                                     `((contents unquote
-                                                (html-escape contents))
+                                                contents)
                                       (last-edited-at unquote
                                                       (current-time)))))
         (redirect-to rc

@@ -83,7 +83,9 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
                              [(equal? #f
                                       (get-from-qstr rc "search"))
                               #f]
-                             [else (html-escape (get-from-qstr rc "search"))]))
+                             ;; The link a search is carried on encodes its
+                             ;; words, and a row holds them as typed.
+                             [else (uri-decode (get-from-qstr rc "search"))]))
               (user-sort (cond
                            [(not (equal? #f
                                          (get-from-qstr rc "sort")))
@@ -144,13 +146,13 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
                                    #:limit query-limit
                                    #:offset query-offset)]
                        [else (search-songs song-repo
-                                           (html-escape user-search)
+                                           user-search
                                            #:order-by query-sort
                                            #:limit query-limit
                                            #:offset query-offset)]))
               (song-total (count-songs song-repo
                                        #:search (and user-search
-                                                  (html-escape user-search))))
+                                                  user-search)))
               (song-pages (max 1
                                (ceiling (/ song-total query-limit))))
               (song-ids (map (lambda (s)

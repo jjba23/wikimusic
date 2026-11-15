@@ -147,7 +147,8 @@
                                                                     search-query
                                                                     "")))
                                                           (format #f "&search=~a"
-                                                                  search-query)
+                                                                  (uri-encode
+                                                                   search-query))
                                                           ""))
                                      #:prev-label (G_ "previous")
                                      #:next-label (G_ "next"))

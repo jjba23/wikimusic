@@ -54,6 +54,7 @@
   #:use-module (ice-9 rdelim)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-13)
+  #:use-module (kracht prelude)
   #:use-module (support deployment)
   #:use-module ((artanis utils)
                 #:select (sxml->xml-string))
@@ -70,13 +71,20 @@
 (define (G_ key)
   key)
 
+;; A page is HTML, so an apostrophe or an ampersand the prose holds is written
+;; as an entity when the document is escaped.  What these tests compare is the
+;; text a reader reads, which is the document decoded.
+(define (page-html sxml)
+  "Return SXML as the characters a reader is served."
+  (html-unescape (sxml->xml-string sxml)))
+
 (define (about-html)
   "Return the about page as HTML, which every test below reads."
-  (sxml->xml-string (about-page G_)))
+  (page-html (about-page G_)))
 
 (define (footer-html)
   "Return the footer as HTML, which the link tests read."
-  (sxml->xml-string (page-footer G_)))
+  (page-html (page-footer G_)))
 
 ;; The promises the page is expected to make are taken from the module the
 ;; project writes its own prose in rather than copied here.  What this spec is
@@ -224,8 +232,8 @@ missing translation is a missing entry here and nothing else."
 ;; disagreed.
 (define (front-html)
   "Return the front page as HTML, with a stand-in for the songs it lists."
-  (sxml->xml-string (welcome-page G_
-                                  #:song-fragment '((p "songs")))))
+  (page-html (welcome-page G_
+                          #:song-fragment '((p "songs")))))
 
 (define (front-html-with-shelves)
   "Return the front page as HTML, with a stand-in for each shelf it lists.
@@ -233,9 +241,9 @@ missing translation is a missing entry here and nothing else."
 Both shelves are given one, which is what a page built by the controller has:
 what this reads is that neither is dropped and that they stand in the order a
 reader meets them, songs before artists."
-  (sxml->xml-string (welcome-page G_
-                                  #:song-fragment '((p "SONG-SHELF-MARKER"))
-                                  #:artist-fragment '((p "ARTIST-SHELF-MARKER")))))
+  (page-html (welcome-page G_
+                          #:song-fragment '((p "SONG-SHELF-MARKER"))
+                          #:artist-fragment '((p "ARTIST-SHELF-MARKER")))))
 
 (define shared-suite
   (suite "The words the two pages share"

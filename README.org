@@ -397,6 +397,8 @@ maak migrate
 
 Neither the server nor any other task applies migrations, and nothing reads the [[https://en.wikipedia.org/wiki/SQL][SQL]] files and hands them to ~sqlite3~ itself: ~maak init-db~ and ~maak migrate~ are the two ways in.  A copy of the SQLite file is the other way to arrive at the tables.
 
+One migration rewrites what a row held before wikimusic kept text as typed: those rows carry the HTML entities a page used to be built from, and the migration decodes them, so a database that has been migrated reads the same as one written today.  Running ~maak migrate~ once is the whole of the upgrade.
+
 Upon starting a blank new wikimusic deployment you will have no users in the database, and there is no sign-up route: the first account is made from the shell, and it should hold two permissions -- =wikimusic:modify-permissions=, the super grant, and =wikimusic:user-create=, which is what the routes that make an account ask for.  The second is not covered by the first: a route asks for the permissions it names, and what the super grant overrides is ownership, not that (see [[#accounts-permissions-and-ownership][Accounts, permissions and ownership]]).
 
 A password is stored as what ~hash-password~ derives -- Argon2id where this build's libgcrypt offers it, and PBKDF2-SHA256 otherwise -- with the algorithm, its cost and its salt written into the stored string itself.  Any characters may be in a password: the string reaches ~hash-password~ as a string and is never evaluated, and the salt is drawn fresh inside that call, which is why the ~users~ table's own ~salt~ column is left empty here.
@@ -623,10 +625,14 @@ The syntax that reads well in a description:
 - example and source blocks, =#+begin_example= / =#+begin_src=;
 - and links, written =[[https://example.org][the words shown]]=.
 
-A description is stored unescaped and rendered by orgwebalchemy, which escapes
-what it emits; the field is therefore for prose, not for hand-written HTML.
-The edit forms say so under the field itself, so a contributor need not read
-this page to find out.
+A description is stored as it was typed and rendered by orgwebalchemy when the
+page is read, and the field is therefore for prose, not for hand-written HTML:
+a tag typed there is shown to a reader rather than followed by the browser.
+Every other field a reader fills in is stored the same way -- the row keeps the
+characters, and the page's template escapes them once, while the document is
+written -- so nothing in the database is HTML and nothing written there is
+escaped twice.  The edit forms say so under the field itself, so a contributor
+need not read this page to find out.
 
 ------
 

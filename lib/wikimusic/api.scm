@@ -69,7 +69,7 @@
   #:use-module (wikimusic-api models)
   #:use-module ((wikimusic-api runtime) #:hide (uri-encode))
   #:export (serve-api emit-api-response protected-handler version-record
-            artwork-records external-source-record song-album-link api-timestamp))
+                      artwork-records external-source-record song-album-link api-timestamp))
 
 (define api-version "1.1.0")
 
@@ -112,7 +112,7 @@ numbers to every caller, so the conversion is made once, here."
 (define (encoded-scheme? url)
   "Return #t when URL starts with an encoded http or https scheme."
   (or (string-prefix-ci? "http%3A" url)
-      (string-prefix-ci? "https%3A" url)))
+    (string-prefix-ci? "https%3A" url)))
 
 (define (decoded-url value)
   "Return VALUE, a stored URL, as the URI a client sent.
@@ -120,11 +120,11 @@ numbers to every caller, so the conversion is made once, here."
 The forms store a URI-encoded URL, and a URL that passed through an encoded
 POST twice needs both layers removed.  Empty text is absence, not an empty URI."
   (and (string? value)
-       (not (string-null? (string-trim-both value)))
-       (let loop ((url (uri-decode value)) (remaining 3))
-         (if (and (positive? remaining) (encoded-scheme? url))
-           (loop (uri-decode url) (- remaining 1))
-           (and (not (encoded-scheme? url)) url)))))
+    (not (string-null? (string-trim-both value)))
+    (let loop ((url (uri-decode value)) (remaining 3))
+      (if (and (positive? remaining) (encoded-scheme? url))
+        (loop (uri-decode url) (- remaining 1))
+        (and (not (encoded-scheme? url)) url)))))
 
 (define (song-album-link row)
   "Return ROW's album link as the URI a client sent."
@@ -222,11 +222,11 @@ not two per song."
 (define (artwork-record row)
   (let ((url (decoded-url (column row 'content-url))))
     (and url
-         (make-artwork
-          #:identifier (column row 'identifier)
-          #:content-url url
-          #:content-caption (text (column row 'content-caption))
-          #:order-value (integer (column row 'order-value))))))
+      (make-artwork
+       #:identifier (column row 'identifier)
+       #:content-url url
+       #:content-caption (text (column row 'content-caption))
+       #:order-value (integer (column row 'order-value))))))
 
 (define (artwork-records rows)
   "Return ROWS, dropping artwork rows whose image URL is unusable."
@@ -400,7 +400,7 @@ HANDLER then receives the session and the arguments.  A one-argument closure
 here answered every write with a 500."
   (lambda (request args)
     (receive (session error) (session-thunk)
-      (if error error (handler session args)))))
+             (if error error (handler session args)))))
 
 (define (require-body args)
   "Return ARGS' decoded body and #f, or #f and a 400 response."
@@ -418,7 +418,7 @@ here answered every write with a 500."
 
 (define (text-attr key value)
   "Return an alist entry for KEY when VALUE is a string, and nothing otherwise."
-  (if (string? value) (list (cons key (html-escape value))) '()))
+  (if (string? value) (list (cons key value)) '()))
 
 (define (url-attr key value)
   "Return an encoded alist entry for KEY when VALUE is a string."
@@ -601,8 +601,8 @@ here answered every write with a 500."
                                           content-repo (list id)))
                                     #:artworks
                                     (artwork-records
-                                         (get-artworks-by-entity-ids
-                                          artwork-repo 'song (list id)))
+                                     (get-artworks-by-entity-ids
+                                      artwork-repo 'song (list id)))
                                     #:comments
                                     (map comment-record
                                          (get-comments-by-entity-ids
@@ -666,8 +666,8 @@ here answered every write with a 500."
                            #:dislike-count dislikes
                            #:artworks
                            (artwork-records
-                                (get-artworks-by-entity-ids
-                                 artwork-repo 'artist (list id)))
+                            (get-artworks-by-entity-ids
+                             artwork-repo 'artist (list id)))
                            #:comments
                            (map comment-record
                                 (get-comments-by-entity-ids
@@ -737,8 +737,8 @@ here answered every write with a 500."
                            #:dislike-count dislikes
                            #:artworks
                            (artwork-records
-                                (get-artworks-by-entity-ids
-                                 artwork-repo 'genre (list id)))
+                            (get-artworks-by-entity-ids
+                             artwork-repo 'genre (list id)))
                            #:comments
                            (map comment-record
                                 (get-comments-by-entity-ids
@@ -914,7 +914,7 @@ here answered every write with a 500."
                        (insert-song song-repo
                                     (append
                                      (list (cons 'identifier id)
-                                           (cons 'display-name (html-escape name))
+                                           (cons 'display-name name)
                                            (cons 'created-by owner)
                                            (cons 'visibility-status 0)
                                            (cons 'views 0)
@@ -1003,7 +1003,7 @@ here answered every write with a 500."
                        (insert-artist artist-repo
                                       (append
                                        (list (cons 'identifier id)
-                                             (cons 'display-name (html-escape name))
+                                             (cons 'display-name name)
                                              (cons 'created-by
                                                    (assoc-ref session 'owner-id))
                                              (cons 'visibility-status 0)
@@ -1058,7 +1058,7 @@ here answered every write with a 500."
                        (insert-genre genre-repo
                                      (append
                                       (list (cons 'identifier id)
-                                            (cons 'display-name (html-escape name))
+                                            (cons 'display-name name)
                                             (cons 'created-by
                                                   (assoc-ref session 'owner-id))
                                             (cons 'visibility-status 0)
@@ -1127,9 +1127,9 @@ here answered every write with a 500."
                                    (cons 'created-by
                                          (assoc-ref session 'owner-id))
                                    (cons 'visibility-status 0)
-                                   (cons 'version-name (html-escape version-name))
+                                   (cons 'version-name version-name)
                                    (cons 'instrument-type
-                                         (html-escape instrument-type))
+                                         instrument-type)
                                    (cons 'created-at (api-timestamp)))
                              (text-attr 'ascii-legend
                                         (song-version-input-ascii-legend body))
@@ -1221,10 +1221,10 @@ here answered every write with a 500."
                                (cons (entity-column entity) entity-id)
                                (cons 'created-by owner)
                                (cons 'visibility-status 0)
-                               (cons 'contents (html-escape contents))
+                               (cons 'contents contents)
                                (cons 'created-at (api-timestamp)))
                          (if (non-empty-string? parent)
-                           (list (cons 'parent-identifier (html-escape parent)))
+                           (list (cons 'parent-identifier parent))
                            '())))
                        (let ((row (get-comment-by-id comment-repo entity id)))
                          (if row
@@ -1250,7 +1250,7 @@ here answered every write with a 500."
                              (begin
                                (update-comment-by-id
                                 comment-repo entity comment-id
-                                (list (cons 'contents (html-escape contents))
+                                (list (cons 'contents contents)
                                       (cons 'last-edited-at (api-timestamp))))
                                (ok (comment->jso
                                     (comment-record
@@ -1627,12 +1627,12 @@ here answered every write with a 500."
                         article-repo
                         (append
                          (list (cons 'identifier id)
-                               (cons 'display-name (html-escape name))
+                               (cons 'display-name name)
                                (cons 'kind
                                      (symbol->string
                                       (article-kind-named (article-input-kind body))))
                                (cons 'contents
-                                     (html-escape (or (article-input-contents body) "")))
+                                     (or (article-input-contents body) ""))
                                (cons 'created-by (assoc-ref session 'owner-id))
                                (cons 'visibility-status 0)
                                (cons 'created-at (api-timestamp))
@@ -1765,8 +1765,8 @@ here answered every write with a 500."
                           user-repo
                           (append
                            (list (cons 'identifier id)
-                                 (cons 'username (html-escape username))
-                                 (cons 'email (html-escape email))
+                                 (cons 'username username)
+                                 (cons 'email email)
                                  (cons 'permissions
                                        (stored-permissions
                                         (user-input-permissions body))))

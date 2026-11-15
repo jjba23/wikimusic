@@ -458,8 +458,9 @@ the details block counts with."
           #:name "and the face the reader reads in")))
 
     (test "the legend is drawn as Org prose, not kept in a pre"
-      (let ((html (render (ascii-legend-block
-                           "- = means hold the note"))))
+      (let ((html (render (html-template G_
+                                         #:body (list (ascii-legend-block
+                                                       "- = means hold the note"))))))
         (assert-true (and (string-contains html "wm-ascii-legend")
                        #t)
           #:name "the quiet block")
@@ -469,6 +470,44 @@ the details block counts with."
                        #t)
           #:name "and the words survive the markup")))))
 
+;; A page is built from the strings a view hands it, and a string a reader
+;; typed is text until the document is written.  The template is therefore the
+;; one place a page's text is escaped, and a fragment that is already HTML --
+;; a description Org has been rendered into -- is the one thing it writes out
+;; as it is.
+(define escaping-suite
+  (suite "The escaping a page gets"
+    (test "text a view hands the template is escaped when it is written"
+      (let ((html (render (html-template G_
+                                         #:title "a & <b>"
+                                         #:body '((p "5 < 6 & 7"))))))
+        (assert-true (and (string-contains html "5 &lt; 6 &amp; 7") #t)
+          #:name "the body's text")
+        (assert-true (and (string-contains html
+                                           "<title>a &amp; &lt;b&gt;</title>")
+                       #t)
+          #:name "and the title")))
+
+    (test "a fragment that is already markup is written out as it is"
+      (let ((html (render (html-template G_
+                                         #:body (list `(div ,(raw
+                                                              "<em>x</em>")))))))
+        (assert-true (and (string-contains html "<em>x</em>") #t)
+          #:name "the fragment")))
+
+    (test "a script is code, not text"
+      (let ((html (render (html-template G_
+                                         #:body '((script "if (a && b) {}"))))))
+        (assert-true (and (string-contains html "a && b") #t)
+          #:name "the script's own characters")))
+
+    (test "a value in an attribute is escaped exactly once"
+      (let ((html (render (html-template G_
+                                         #:body '((input (@ (value "a & b"))
+                                                         ""))))))
+        (assert-true (and (string-contains html "value=\"a &amp; b\"") #t)
+          #:name "the attribute")))))
+
 (define (spec)
   (veritas-run locale-suite
     ascii-suite
@@ -476,4 +515,5 @@ the details block counts with."
     reading-suite
     footer-suite
     shell-suite
-    assets-suite))
+    assets-suite
+    escaping-suite))

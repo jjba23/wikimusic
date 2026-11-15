@@ -22,6 +22,7 @@
   #:use-module (srfi srfi-13)
   #:use-module ((artanis utils)
                 #:select (sxml->xml-string))
+  #:use-module (kracht prelude)
   #:use-module (wikimusic domain article)
   #:use-module (app views articles)
   #:export (spec))
@@ -38,6 +39,13 @@
 (define (contains? text needle)
   "Return #t when TEXT holds NEEDLE, as a boolean."
   (and (string-contains text needle) #t))
+
+(define (reads? html needle)
+  "Return #t when a reader of HTML reads NEEDLE in it.
+
+The page is HTML, so an apostrophe or an ampersand a row holds is written as
+an entity; what a reader sees is the HTML decoded."
+  (contains? (html-unescape html) needle))
 
 (define* (article-row #:key (identifier "article-1")
                       (display-name "Barre chords without pain")
@@ -138,10 +146,10 @@
 
     (test "an owner is offered edit and delete controls"
       (let ((page (html (article-page G_
-                                     #:article (article-row)
-                                     #:comments '()
-                                     #:is-logged-in #t
-                                     #:can-edit? #t))))
+                                      #:article (article-row)
+                                      #:comments '()
+                                      #:is-logged-in #t
+                                      #:can-edit? #t))))
         (assert-true (contains? page "/articles/uuid/article-1/edit")
           #:name "the edit link")
         (assert-true (contains? page "/articles/uuid/article-1/delete")
@@ -149,9 +157,9 @@
 
     (test "a reader is not offered controls they cannot use"
       (let ((page (html (article-page G_
-                                     #:article (article-row)
-                                     #:comments '()
-                                     #:is-logged-in #f))))
+                                      #:article (article-row)
+                                      #:comments '()
+                                      #:is-logged-in #f))))
         (assert-false (contains? page "/articles/uuid/article-1/edit")
           #:name "no edit link")
         (assert-false (contains? page "/articles/uuid/article-1/delete")
@@ -160,51 +168,65 @@
     (test "the edit form is filled in and posts to the article"
       (let ((page (html (article-edit-page G_
                                            #:article (article-row
-                                                      #:contents "Start&apos;s here")
+                                                      #:contents "Start's here")
                                            #:is-logged-in #t))))
         (assert-true (contains? page "/articles/uuid/article-1/edit")
           #:name "the form action")
         (assert-true (contains? page "Barre chords without pain")
           #:name "the current title")
-        (assert-true (contains? page "Start's here")
+        (assert-true (reads? page "Start's here")
           #:name "the current body")))
 
-    (test "stored entities are decoded before the article is rendered"
+    (test "a body stored as typed is escaped once when the page is written"
       (let ((page (html (article-page G_
-                                     #:article (article-row
-                                                #:contents "It&apos;s &ldquo;fine&rdquo; &mdash; caf&eacute;")
-                                     #:comments '()
-                                     #:is-logged-in #f))))
-        (assert-true (contains? page "It's “fine” — café")
-          #:name "apostrophes, quotation marks and accents are shown as characters")
-        (assert-true (not (contains? page "&amp;apos;"))
-          #:name "not as escaped text")))
+                                      #:article (article-row
+                                                 #:contents "It's “fine” — caf&eacute; & rock")
+                                      #:comments '()
+                                      #:is-logged-in #f))))
+        ;; A row holds what its author typed, so an entity they typed is shown
+        ;; to a reader as those characters rather than decoded a second time.
+        (assert-true (reads? page "It's “fine” — caf&eacute; & rock")
+          #:name "the characters reach the page")
+        (assert-true (not (contains? page "&amp;amp;"))
+          #:name "and nothing is escaped twice")))
 
-    (test "a title stored with entities is decoded before it is shown"
+    (test "a title stored as typed is escaped once too"
       (let ((page (html (article-page G_
-                                     #:article (article-row
-                                                #:display-name "Don&apos;t fear barre chords")
-                                     #:comments '()
-                                     #:is-logged-in #f))))
-        (assert-true (contains? page "Don't fear barre chords")
+                                      #:article (article-row
+                                                 #:display-name "Don't fear barre chords")
+                                      #:comments '()
+                                      #:is-logged-in #f))))
+        (assert-true (reads? page "Don't fear barre chords")
           #:name "the apostrophe is a character")
         (assert-true (not (contains? page "&amp;apos;"))
           #:name "not escaped text")))
 
-    (test "the list preview decodes the stored entities too"
+    (test "markup in a title is shown rather than run"
+      (let ((page (html (article-page G_
+                                      #:article (article-row
+                                                 #:display-name "<script>alert(1)</script>")
+                                      #:comments '()
+                                      #:is-logged-in #f))))
+        (assert-true (contains? page
+                                "&lt;script&gt;alert(1)&lt;/script&gt;")
+          #:name "the title's characters")
+        (assert-false (contains? page "<script>alert(1)</script>")
+          #:name "and nothing a browser would run")))
+
+    (test "the list preview shows the row's own characters"
       (let ((page (html (articles-list-page G_
-                                           #:articles (list
-                                                       (article-row
-                                                        #:display-name "Don&apos;t fear barre chords"
-                                                        #:contents "It&apos;s &ldquo;fine&rdquo; &mdash; caf&eacute;"))
-                                           #:pages 1
-                                           #:page 1
-                                           #:is-logged-in #f))))
-        (assert-true (contains? page "Don't fear barre chords")
+                                            #:articles (list
+                                                        (article-row
+                                                         #:display-name "Don't fear barre chords"
+                                                         #:contents "It's “fine” — café"))
+                                            #:pages 1
+                                            #:page 1
+                                            #:is-logged-in #f))))
+        (assert-true (reads? page "Don't fear barre chords")
           #:name "the title shows its apostrophe")
         (assert-true (contains? page "/articles/new")
           #:name "the write link")
-        (assert-true (contains? page "It's “fine” — café")
+        (assert-true (reads? page "It's “fine” — café")
           #:name "the preview shows characters")
         (assert-true (not (contains? page "&amp;apos;"))
           #:name "not escaped text")))

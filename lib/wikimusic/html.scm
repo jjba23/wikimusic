@@ -46,6 +46,7 @@
                           entity-details
                           artwork-form
                           org2html
+                          raw
                           external-sources-form
                           sort-select
                           grid-size-select
@@ -823,6 +824,51 @@ and six.
     (if (pair? addresses)
       (car addresses) fallback)))
 
+;;; ====== Text, and the markup it becomes ======
+;;;
+;;; A page is built from what a reader typed -- a song's name, a comment, a
+;;; description -- and a string is text: whatever looks like markup in it is
+;;; characters to read.  It is escaped here, once, while the document is
+;;; written, rather than by every view before it hands a value over, so a row
+;;; holds what was typed and no page can forget to escape it.
+;;;
+;;; The one thing that is not text is a fragment a renderer has already written
+;;; as HTML -- `org2html' -- and it is handed over as `(raw ...)' so the walk
+;;; below leaves it alone.  A `script' and a `style' hold raw text as well, and
+;;; are left as they are for the same reason.
+
+(define (raw html)
+  "Return HTML, a fragment that is already markup, as the node a page writes out
+unchanged.  Everything else a page is built from is text."
+  (cons 'wm-raw html))
+
+(define (escaped-node node)
+  "Return NODE with the text it holds escaped, and its markup left as markup."
+  (cond
+    [(string? node)
+     (html-escape node)]
+    [(and (pair? node)
+       (eq? (car node) 'wm-raw))
+     (cdr node)]
+    [(and (pair? node)
+       (symbol? (car node)))
+     (if (memq (car node) '(script style))
+       node
+       (let ((children (cdr node)))
+         (cons (car node)
+               (if (and (pair? children)
+                     (pair? (car children))
+                     (eq? (caar children) '@))
+                 (cons (car children) (map escaped-node (cdr children)))
+                 (map escaped-node children)))))]
+    [(pair? node)
+     (map escaped-node node)]
+    [else node]))
+
+(define (escaped-document document)
+  "Return DOCUMENT -- `(doctype html-element)' -- with the page's text escaped."
+  (cons (car document) (map escaped-node (cdr document))))
+
 ;;; The document every page is rendered into.  Its body is what a reader sees;
 ;;; the keywords after it are what a crawler and a link preview are told about
 ;;; the page instead, and are collected in `seo-head' (wikimusic seo).
@@ -847,7 +893,8 @@ and six.
                         (is-logged-in #f)
                         (reading? #f))
 
-  `(,doctype-html (html (@ (lang ,(language-of locale)))
+  (escaped-document
+   `(,doctype-html (html (@ (lang ,(language-of locale)))
                         (head (title ,title)
                               ,(hygguile-recommended-meta)
 
@@ -1054,7 +1101,7 @@ and six.
 
                                                                 ,body)))
 
-                                            #:footer (page-footer G_))))))
+                                            #:footer (page-footer G_)))))))
 
 (define* (item-tile G_
                     entity
@@ -1212,7 +1259,7 @@ and six.
                                     px-3))))
         ,(render-if-nempty (lambda (u)
                              `(p (@ (class ,(mk-class '(text-sm text-stone-500))))
-                                 ,(format #f "~a (~a) &lt;~a&gt;"
+                                 ,(format #f "~a (~a) <~a>"
                                           (assoc-ref u "display_name")
                                           (assoc-ref u "username")
                                           (assoc-ref u "email"))))
@@ -1430,8 +1477,7 @@ and six.
                                                                          "this description is written in Org markup"))
                                                                 #:dt-classes '(pt-3 sm:pt-4
                                                                                     pb-1))
-                                                            (dd (org2html (html-unescape
-                                                                           description))))))
+                                                            (dd (raw (org2html description))))))
                                                 (assq-ref x
                                                           'description)))
          (maybe-last-edited-at (render-if-nempty (lambda (last-edited-at)
@@ -1527,7 +1573,7 @@ and six.
                     ,(dt (G_ "contributor")
                          #:dt-classes '(pt-3 sm:pt-4 pb-1))
                     ,(dd (render-if-nempty (lambda (u)
-                                             (format #f "~a &lt;~a&gt;"
+                                             (format #f "~a <~a>"
                                                      (assq-ref u
                                                                'username)
                                                      (assq-ref u
@@ -1741,7 +1787,7 @@ when the reader is looking at search results, so that choosing a size does not
 throw the results away."
   (let ((tail (if (and search-query
                     (not (equal? search-query "")))
-                (format #f "&search=~a" search-query) "")))
+                (format #f "&search=~a" (uri-encode search-query)) "")))
     `((div (@ (role "group")
               (aria-label ,(G_ "tile size"))
               (class ,(mk-class '(wm-tile-size

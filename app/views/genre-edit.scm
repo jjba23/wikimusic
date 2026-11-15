@@ -146,7 +146,7 @@
              (content-type application/x-www-form-urlencoded))
           (div ,(input #:label (G_ "display name")
                        #:name "display-name"
-                       #:value (html-unescape display-name)
+                       #:value display-name
                        #:required #t)
                ,(textarea #:label (G_ "description")
                           #:name "description"
@@ -155,7 +155,7 @@
                           ;; so here rather than left to find out.
                           #:help-text (G_
                                        "descriptions are written in Org mode syntax")
-                          #:value (html-unescape description)))
+                          #:value description))
           (div ,(submit-button (if identifier
                                  (G_ "edit")
                                  (G_ "create")))))))

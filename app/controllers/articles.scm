@@ -100,11 +100,11 @@
                              (assoc-ref session
                                         'owner-id)))
                (body (body-alist rc))
-               (display-name (html-escape (or (assoc-ref body "display-name")
-                                            "")))
+               (display-name (or (assoc-ref body "display-name")
+                               ""))
                (kind (assoc-ref body "kind"))
                (video-url (assoc-ref body "video-url"))
-               (contents (html-escape (or (assoc-ref body "contents") ""))))
+               (contents (or (assoc-ref body "contents") "")))
           (cond
             [(not created-by) (forbidden rc)]
             [(string-null? (string-trim-both display-name)) (forbidden rc)]
@@ -192,10 +192,8 @@
                (body (body-alist rc)))
           (when (guard-owner #:rc rc
                              #:created-by (assq-ref article 'created-by))
-            (let ((display-name (html-escape
-                                 (or (assoc-ref body "display-name") "")))
-                  (contents (html-escape
-                             (or (assoc-ref body "contents") ""))))
+            (let ((display-name (or (assoc-ref body "display-name") ""))
+                  (contents (or (assoc-ref body "contents") "")))
               (if (string-null? (string-trim-both display-name))
                 (forbidden rc)
                 (begin
@@ -208,7 +206,7 @@
                                 (article-kind-named
                                  (assoc-ref body "kind"))))
                          (cons 'video-url (or (assoc-ref body "video-url")
-                                              ""))
+                                            ""))
                          (cons 'contents contents)
                          (cons 'last-edited-at (current-time))))
                   (redirect-to rc

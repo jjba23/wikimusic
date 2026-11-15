@@ -73,29 +73,29 @@
               (sql-execute! rc
                             (sql-update 'songs
                                         `((display-name unquote
-                                                        (html-escape (assoc-ref
-                                                                      body
-                                                                      "display-name")))
+                                                        (assoc-ref
+                                                         body
+                                                         "display-name"))
                                           (description unquote
-                                                       (html-escape (assoc-ref
-                                                                     body
-                                                                     "description")))
+                                                       (assoc-ref
+                                                        body
+                                                        "description"))
                                           (music-key unquote
-                                                     (html-escape (assoc-ref
-                                                                   body
-                                                                   "music-key")))
+                                                     (assoc-ref
+                                                      body
+                                                      "music-key"))
                                           (music-tuning unquote
-                                                        (html-escape (assoc-ref
-                                                                      body
-                                                                      "music-tuning")))
+                                                        (assoc-ref
+                                                         body
+                                                         "music-tuning"))
                                           (music-creation-date unquote
-                                                               (html-escape (assoc-ref
-                                                                             body
-                                                                             "music-creation-date")))
+                                                               (assoc-ref
+                                                                body
+                                                                "music-creation-date"))
                                           (album-name unquote
-                                                      (html-escape (assoc-ref
-                                                                    body
-                                                                    "album-name")))
+                                                      (assoc-ref
+                                                       body
+                                                       "album-name"))
                                           (album-info-link unquote
                                                            (uri-encode (assoc-ref
                                                                         body
@@ -139,17 +139,17 @@
                             (sql-update 'song_contents
                                         (append
                                          `((instrument-type unquote
-                                                            (html-escape (assoc-ref body
-                                                                                    "instrument-type")))
+                                                            (assoc-ref body
+                                                                       "instrument-type"))
                                            (version-name unquote
-                                                         (html-escape (assoc-ref body
-                                                                                 "version-name")))
+                                                         (assoc-ref body
+                                                                    "version-name"))
                                            (ascii-legend unquote
-                                                         (html-escape (assoc-ref body
-                                                                                 "ascii-legend")))
+                                                         (assoc-ref body
+                                                                    "ascii-legend"))
                                            (ascii-contents unquote
-                                                           (html-escape (assoc-ref body
-                                                                                   "ascii-contents")))
+                                                           (assoc-ref body
+                                                                      "ascii-contents"))
                                            (last-edited-at unquote
                                                            (current-time)))
                                          ;; An untouched file input posts
@@ -198,13 +198,13 @@
                                                                   body
                                                                   "content-url")))
                                         (content-caption unquote
-                                                         (html-escape (assoc-ref
-                                                                       body
-                                                                       "content-caption")))
+                                                         (assoc-ref
+                                                          body
+                                                          "content-caption"))
                                         (order-value unquote
-                                                     (html-escape (assoc-ref
-                                                                   body
-                                                                   "order-value")))
+                                                     (assoc-ref
+                                                      body
+                                                      "order-value"))
                                         (last-edited-at unquote
                                                         (current-time)))
                                       #:where `((identifier unquote
@@ -251,14 +251,14 @@
                             #:song_identifier (params rc "uuid")
                             #:created_by user-identifier
                             #:visibility_status 0
-                            #:instrument_type (html-escape (assoc-ref body
-                                                                      "instrument-type"))
-                            #:version_name (html-escape (assoc-ref body
-                                                                   "version-name"))
-                            #:ascii_legend (html-escape (assoc-ref body
-                                                                   "ascii-legend"))
-                            #:ascii_contents (html-escape (assoc-ref body
-                                                                     "ascii-contents"))
+                            #:instrument_type (assoc-ref body
+                                                         "instrument-type")
+                            #:version_name (assoc-ref body
+                                                      "version-name")
+                            #:ascii_legend (assoc-ref body
+                                                      "ascii-legend")
+                            #:ascii_contents (assoc-ref body
+                                                        "ascii-contents")
                             #:created_at (current-time))
                       (if (data-url-with-payload? pdf-contents)
                         (list #:pdf_contents pdf-contents)
@@ -299,10 +299,10 @@
                             #:visibility_status 0
                             #:content_url (uri-encode (assoc-ref body
                                                                  "content-url"))
-                            #:content_caption (html-escape (assoc-ref body
-                                                                      "content-caption"))
-                            #:order_value (html-escape (assoc-ref body
-                                                                  "order-value"))
+                            #:content_caption (assoc-ref body
+                                                         "content-caption")
+                            #:order_value (assoc-ref body
+                                                     "order-value")
                             #:created_at (current-time))
 
             (redirect-to rc
@@ -411,15 +411,15 @@
                                              'owner-id)))
             ($songs 'set
                     #:identifier new-uuid
-                    #:display_name (html-escape (assoc-ref body "display-name"))
-                    #:music_key (html-escape (assoc-ref body "music-key"))
-                    #:music_tuning (html-escape (assoc-ref body "music-tuning"))
-                    #:music_creation_date (html-escape (assoc-ref body
-                                                                  "music-creation-date"))
-                    #:album_name (html-escape (assoc-ref body "album-name"))
+                    #:display_name (assoc-ref body "display-name")
+                    #:music_key (assoc-ref body "music-key")
+                    #:music_tuning (assoc-ref body "music-tuning")
+                    #:music_creation_date (assoc-ref body
+                                                     "music-creation-date")
+                    #:album_name (assoc-ref body "album-name")
                     #:album_info_link (uri-encode (assoc-ref body
                                                              "album-info-link"))
-                    #:description (html-escape (assoc-ref body "description"))
+                    #:description (assoc-ref body "description")
                     #:created_by user-identifier
                     #:visibility_status 0
                     #:views 0

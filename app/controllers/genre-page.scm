@@ -53,7 +53,9 @@
                              [(equal? #f
                                       (get-from-qstr rc "search"))
                               #f]
-                             [else (html-escape (get-from-qstr rc "search"))]))
+                             ;; The link a search is carried on encodes its
+                             ;; words, and a row holds them as typed.
+                             [else (uri-decode (get-from-qstr rc "search"))]))
               (user-sort (cond
                            [(not (equal? #f
                                          (get-from-qstr rc "sort")))
@@ -114,14 +116,13 @@
                                      #:limit query-limit
                                      #:offset query-offset)]
                         [else (search-genres genre-repo
-                                             (html-escape user-search)
+                                             user-search
                                              #:order-by query-sort
                                              #:limit query-limit
                                              #:offset query-offset)]))
               (genre-total (count-genres genre-repo
                                          #:search (and user-search
-                                                    (html-escape
-                                                     user-search))))
+                                                    user-search)))
               (genre-pages (max 1
                                 (ceiling (/ genre-total query-limit))))
               (genre-ids (map (lambda (s)

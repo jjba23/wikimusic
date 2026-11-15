@@ -78,7 +78,7 @@ to translate and `G_' only translates a literal."
   (let* ((flat (string-join (string-split (string-map (lambda (ch)
                                                         (if (char-whitespace? ch)
                                                           #\space ch))
-                                                      (html-unescape (or contents "")))
+                                                      (or contents ""))
                                           #\space)
                             " "))
          (trimmed (string-trim-both flat)))
@@ -199,9 +199,8 @@ That is what its reader typed, the name of the account it was written from, or
                                                              font-semibold
                                                              text-onyx-900
                                                              dark:text-stone-100))))
-                                      ,(html-unescape
-                                        (or (assq-ref article 'display-name)
-                                            "")))
+                                      ,(or (assq-ref article 'display-name)
+                                         ""))
                                    (p (@ (class ,(mk-class '(text-md
                                                              text-onyx-500
                                                              dark:text-stone-300))))
@@ -227,10 +226,10 @@ That is what its reader typed, the name of the account it was written from, or
                                                  #:description description))
                    #:body `((div (@ (class ,(mk-class articles-column-classes)))
                                  (div (@ (class ,(mk-class '(flex flex-row
-                                                               flex-wrap
-                                                               items-center
-                                                               justify-between
-                                                               gap-2))))
+                                                                  flex-wrap
+                                                                  items-center
+                                                                  justify-between
+                                                                  gap-2))))
                                       ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (G_ "articles"))
                                       (a (@ (href "/articles/new")
                                             (class ,(mk-class '(no-underline))))
@@ -265,7 +264,7 @@ That is what its reader typed, the name of the account it was written from, or
   ;; video and a thread are both sometimes there, and a list of one fragment --
   ;; or of none -- splices into the page below without the markup asking.
   (let* ((identifier (assq-ref article 'identifier))
-         (display-name (html-unescape (or (assq-ref article 'display-name) "")))
+         (display-name (or (assq-ref article 'display-name) ""))
          (kind-word (article-kind-word G_ (assq-ref article 'kind)))
          (page-title (format #f "~a — ~a | WikiMusic" display-name kind-word))
          (page-description (article-excerpt (assq-ref article 'contents)))
@@ -336,10 +335,9 @@ That is what its reader typed, the name of the account it was written from, or
                                  ,@actions
                                  ,@video-fragment
                                  (div (@ (class ,(mk-class '(max-w-prose))))
-                                      ,(org2html (html-unescape
-                                                  (or (assq-ref article
-                                                                'contents)
-                                                      ""))))
+                                      ,(raw (org2html (or (assq-ref article
+                                                                    'contents)
+                                                        ""))))
                                  (div (@ (id "comments")
                                          (class ,(mk-class '(flex
                                                              flex-col
@@ -359,12 +357,10 @@ That is what its reader typed, the name of the account it was written from, or
 (define* (article-form G_ #:key (article #f))
   "Return the form an article is written or edited in."
   (let* ((identifier (and article (assq-ref article 'identifier)))
-         (display-name (html-unescape
-                        (or (and article (assq-ref article 'display-name)) "")))
+         (display-name (or (and article (assq-ref article 'display-name)) ""))
          (kind (and article (kind-string (assq-ref article 'kind))))
          (video-url (or (and article (assq-ref article 'video-url)) ""))
-         (contents (html-unescape
-                    (or (and article (assq-ref article 'contents)) ""))))
+         (contents (or (and article (assq-ref article 'contents)) "")))
     `(form (@ (method POST)
               (action ,(if identifier
                          (format #f "/articles/uuid/~a/edit" identifier)
@@ -394,8 +390,8 @@ That is what its reader typed, the name of the account it was written from, or
                                      (lambda (offered)
                                        `(option (@ (value ,(kind-string offered))
                                                    ,@(if (equal? (kind-string offered) kind)
-                                                     '((selected ""))
-                                                     '()))
+                                                       '((selected ""))
+                                                       '()))
                                                 ,(article-kind-word G_ offered)))
                                      article-kinds))))
            (fieldset (@ (class "wm-editor-group"))
@@ -411,8 +407,8 @@ That is what its reader typed, the name of the account it was written from, or
                                   (G_ "save article")
                                   (G_ "post article")))
                 (a (@ (href ,(if identifier
-                                 (format #f "/articles/uuid/~a" identifier)
-                                 "/articles"))
+                               (format #f "/articles/uuid/~a" identifier)
+                               "/articles"))
                       (class ,(mk-class '(no-underline))))
                    ,(button (G_ "cancel")))))))
 
@@ -432,19 +428,19 @@ That is what its reader typed, the name of the account it was written from, or
                                    (list (article-form G_))
                                    (list
                                     `(div (@ (class ,(mk-class '(max-w-prose
-                                                                flex flex-col
-                                                                gap-3))))
-                                         (p (@ (class ,(mk-class '(text-md
-                                                                   text-onyx-500
-                                                                   dark:text-stone-300))))
-                                            ,(G_ "an account is needed to write; anyone may comment"))
-                                         (a (@ (href "/login")
-                                               (class ,(mk-class '(no-underline))))
-                                            ,(button (G_ "log in to write"))))))))))
+                                                                 flex flex-col
+                                                                 gap-3))))
+                                          (p (@ (class ,(mk-class '(text-md
+                                                                    text-onyx-500
+                                                                    dark:text-stone-300))))
+                                             ,(G_ "an account is needed to write; anyone may comment"))
+                                          (a (@ (href "/login")
+                                                (class ,(mk-class '(no-underline))))
+                                             ,(button (G_ "log in to write"))))))))))
 
 (define* (article-edit-page G_ #:key article is-logged-in)
   (let* ((identifier (assq-ref article 'identifier))
-         (display-name (html-unescape (or (assq-ref article 'display-name) ""))))
+         (display-name (or (assq-ref article 'display-name) "")))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:title (format #f "Edit ~a | WikiMusic" display-name)

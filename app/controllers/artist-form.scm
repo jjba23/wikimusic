@@ -68,13 +68,13 @@
               (sql-execute! rc
                             (sql-update 'artists
                                         `((display-name unquote
-                                                        (html-escape (assoc-ref
-                                                                      body
-                                                                      "display-name")))
+                                                        (assoc-ref
+                                                         body
+                                                         "display-name"))
                                           (description unquote
-                                                       (html-escape (assoc-ref
-                                                                     body
-                                                                     "description")))
+                                                       (assoc-ref
+                                                        body
+                                                        "description"))
                                           (last-edited-at unquote
                                                           (current-time)))
                                         #:where `((identifier unquote
@@ -167,13 +167,13 @@
                                                                   body
                                                                   "content-url")))
                                         (content-caption unquote
-                                                         (html-escape (assoc-ref
-                                                                       body
-                                                                       "content-caption")))
+                                                         (assoc-ref
+                                                          body
+                                                          "content-caption"))
                                         (order-value unquote
-                                                     (html-escape (assoc-ref
-                                                                   body
-                                                                   "order-value")))
+                                                     (assoc-ref
+                                                      body
+                                                      "order-value"))
                                         (last-edited-at unquote
                                                         (current-time)))
                                       #:where `((identifier unquote
@@ -217,10 +217,10 @@
                               #:visibility_status 0
                               #:content_url (uri-encode (assoc-ref body
                                                                    "content-url"))
-                              #:content_caption (html-escape (assoc-ref body
-                                                                        "content-caption"))
-                              #:order_value (html-escape (assoc-ref body
-                                                                    "order-value"))
+                              #:content_caption (assoc-ref body
+                                                           "content-caption")
+                              #:order_value (assoc-ref body
+                                                       "order-value")
                               #:created_at (current-time))
 
             (redirect-to rc
@@ -250,9 +250,9 @@
                                              'owner-id)))
             ($artists 'set
                       #:identifier new-uuid
-                      #:display_name (html-escape (assoc-ref body
-                                                             "display-name"))
-                      #:description (html-escape (assoc-ref body "description"))
+                      #:display_name (assoc-ref body
+                                                "display-name")
+                      #:description (assoc-ref body "description")
                       #:created_by user-identifier
                       #:visibility_status 0
                       #:views 0

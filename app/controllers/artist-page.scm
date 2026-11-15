@@ -53,7 +53,9 @@
                              [(equal? #f
                                       (get-from-qstr rc "search"))
                               #f]
-                             [else (html-escape (get-from-qstr rc "search"))]))
+                             ;; The link a search is carried on encodes its
+                             ;; words, and a row holds them as typed.
+                             [else (uri-decode (get-from-qstr rc "search"))]))
               (user-sort (cond
                            [(not (equal? #f
                                          (get-from-qstr rc "sort")))
@@ -114,14 +116,13 @@
                                        #:limit query-limit
                                        #:offset query-offset)]
                          [else (search-artists artist-repo
-                                               (html-escape user-search)
+                                               user-search
                                                #:order-by query-sort
                                                #:limit query-limit
                                                #:offset query-offset)]))
               (artist-total (count-artists artist-repo
                                            #:search (and user-search
-                                                      (html-escape
-                                                       user-search))))
+                                                      user-search)))
               (artist-pages (max 1
                                  (ceiling (/ artist-total query-limit))))
               (artist-ids (map (lambda (s)
