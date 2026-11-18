@@ -426,10 +426,15 @@ a:focus-visible .wm-wordmark-accent {
 /* ===== The size of a tablature =====
 
    Three things in one pill: a step smaller, the share the tab is drawn at, and
-   a step larger.  The middle is a menu of the whole ladder, so a reader who
+   a step larger.  The middle opens onto the whole ladder, so a reader who
    wants the largest does not have to press six times -- and it is as wide as
    its widest value in tabular figures, because a control that changed width
-   with its own number would move under the pointer that is using it. */
+   with its own number would move under the pointer that is using it.
+
+   The ladder is a `details', which a browser opens and closes by itself, and
+   every step on it is an address: nothing here waits on a script, and the
+   panel is taken out of the row's layout so that opening it cannot move the
+   pill it hangs from. */
 
 .wm-size-control {
   display: inline-flex;
@@ -472,12 +477,22 @@ a.wm-size-step:hover {
   cursor: not-allowed;
 }
 
-.wm-size-select {
-  width: 4.25rem;
-  padding: 0.25rem 0.1rem;
-  border: 0;
+/* The share, and the ladder behind it.  `list-style: none' and the webkit
+   marker rule are what take the browser's own triangle off a summary; the
+   chevron is not needed because the figure is the control and the panel says
+   what it opens. */
+
+.wm-size-menu {
+  position: relative;
+}
+
+.wm-size-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.25rem;
+  padding: 0.25rem 0.4rem;
   border-radius: 9999px;
-  background: transparent;
   color: var(--wm-brand);
   font: inherit;
   font-size: 0.85rem;
@@ -485,24 +500,102 @@ a.wm-size-step:hover {
   font-variant-numeric: tabular-nums;
   text-align: center;
   cursor: pointer;
+  list-style: none;
+  user-select: none;
   transition: background-color 150ms ease;
 }
 
-.wm-size-select:hover {
-  background: color-mix(in oklch, var(--wm-brand) 12%, transparent);
+.wm-size-share::-webkit-details-marker {
+  display: none;
 }
 
-.wm-size-select:focus-visible {
+.wm-size-share:hover,
+.wm-size-menu[open] > .wm-size-share {
+  background: color-mix(in oklch, var(--wm-brand) 14%, transparent);
+}
+
+.wm-size-share:focus-visible {
   outline: 2px solid var(--wm-brand);
   outline-offset: 2px;
 }
 
-/* The paper and face menus answer in a word, not in a share, so they are as
-   wide as that word instead of as wide as the size's figure. */
+.wm-size-steps {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 50%;
+  z-index: 30;
+  display: grid;
+  gap: 0.1rem;
+  min-width: 6.5rem;
+  padding: 0.3rem;
+  border: 1px solid color-mix(in oklch, var(--wm-brand) 25%, transparent);
+  border-radius: 0.9rem;
+  background: var(--wm-paper);
+  box-shadow: 0 10px 24px color-mix(in oklch, var(--wm-ink) 18%, transparent);
+  transform: translateX(-50%);
+}
 
-.wm-size-select.wm-choice-select {
-  width: auto;
-  padding-inline: 0.6rem;
+[data-theme="dark"] .wm-size-steps {
+  border-color: color-mix(in oklch, white 14%, transparent);
+  background: color-mix(in oklch, var(--wm-ink) 92%, white);
+  box-shadow: 0 10px 24px black;
+}
+
+.wm-size-option {
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.6rem;
+  color: inherit;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.wm-size-option:hover {
+  background: color-mix(in oklch, var(--wm-brand) 14%, transparent);
+  color: var(--wm-brand);
+}
+
+.wm-size-option[aria-current="true"] {
+  background: color-mix(in oklch, var(--wm-brand) 10%, transparent);
+  color: var(--wm-brand);
+  font-weight: 700;
+}
+
+/* The paper and the face answer in a word, not in a share, so each answer is
+   as wide as that word and the one in use is painted rather than marked. */
+
+.wm-choice-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.7rem;
+  border-radius: 9999px;
+  color: color-mix(in oklch, var(--wm-ink) 62%, transparent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+[data-theme="dark"] .wm-choice-option {
+  color: color-mix(in oklch, white 74%, var(--wm-ink));
+}
+
+.wm-choice-option:hover {
+  background: color-mix(in oklch, var(--wm-brand) 14%, transparent);
+  color: var(--wm-brand);
+}
+
+.wm-choice-option:focus-visible {
+  outline: 2px solid var(--wm-brand);
+  outline-offset: 2px;
+}
+
+.wm-choice-option[aria-current="true"] {
+  background: var(--wm-brand);
+  color: white;
 }
 
 /* ===== The search =====

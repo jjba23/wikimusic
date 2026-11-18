@@ -51,16 +51,20 @@
                           sort-select
                           grid-size-select
                           ascii-size-steps
+                          ascii-size-step
                           ascii-size-default
                           ascii-size-known
                           ascii-size-control
                           ascii-paper-steps
+                          ascii-paper-step
                           ascii-paper-default
                           ascii-paper-known
                           ascii-paper-classes
                           ascii-face-steps
+                          ascii-face-step
                           ascii-face-default
                           ascii-face-known
+                          ascii-preference
                           ascii-face-class
                           ascii-preference-href
                           ascii-choice-control
@@ -1885,20 +1889,27 @@ throw the results away."
 (define ascii-size-default
   "text-4")
 
+(define (ascii-size-step size)
+  "Return the step of the ladder @var{size} names, or #f when it names none.
+
+SIZE is whatever the deployment was handed -- a class from the address or
+from the reader's cookie -- so it may be an old name (`text-sm'), a name this
+control no longer offers, or nothing at all.  The name an earlier control
+offered is answered with the step it means; anything else is #f, which is
+what lets a caller tell \"not a step\" from \"the default step\"."
+  (cond
+    [(assoc size ascii-size-steps) size]
+    [(and (string? size) (assoc-ref ascii-size-aliases size))
+     => (lambda (step)
+          (and (assoc step ascii-size-steps) step))]
+    [else #f]))
+
 (define (ascii-size-known size)
   "Return the step @var{size} names, or the default step when it names none.
 
-SIZE is whatever the deployment was handed -- a class from the query string
-or from the reader's cookie -- so it may be an old name (`text-sm'), a name
-this control no longer offers, or nothing at all.  Only a step of the ladder
-is returned, which is what keeps a size from being applied to the page that
-the stylesheet cannot draw."
-  (if (assoc size ascii-size-steps)
-    size
-    (let ((alias (assoc-ref ascii-size-aliases size)))
-      (if (and alias (assoc alias ascii-size-steps))
-        alias
-        ascii-size-default))))
+Only a step of the ladder is returned, which is what keeps a size from being
+applied to the page that the stylesheet cannot draw."
+  (or (ascii-size-step size) ascii-size-default))
 
 (define (ascii-size-neighbour size direction)
   "Return the step one place from @var{size} in DIRECTION, or #f at either end.
@@ -1927,11 +1938,13 @@ disabled stepper rather than as a link to nowhere."
 (define ascii-paper-steps '("auto" "light" "dark"))
 (define ascii-paper-default "auto")
 
+(define (ascii-paper-step paper)
+  "Return the paper @var{paper} names, or #f when it names none."
+  (and (member paper ascii-paper-steps) paper))
+
 (define (ascii-paper-known paper)
   "Return the paper @var{paper} names, or the default when it names none."
-  (if (member paper ascii-paper-steps)
-    paper
-    ascii-paper-default))
+  (or (ascii-paper-step paper) ascii-paper-default))
 
 (define (ascii-paper-classes paper)
   "Return the classes an ascii block is painted on @var{paper} with."
@@ -1948,11 +1961,13 @@ disabled stepper rather than as a link to nowhere."
 (define ascii-face-steps '("mono" "sans" "serif"))
 (define ascii-face-default "mono")
 
+(define (ascii-face-step face)
+  "Return the face @var{face} names, or #f when it names none."
+  (and (member face ascii-face-steps) face))
+
 (define (ascii-face-known face)
   "Return the face @var{face} names, or the default when it names none."
-  (if (member face ascii-face-steps)
-    face
-    ascii-face-default))
+  (or (ascii-face-step face) ascii-face-default))
 
 (define (ascii-face-class face)
   "Return the class an ascii block is set in @var{face} with."
@@ -1960,6 +1975,31 @@ disabled stepper rather than as a link to nowhere."
     [(sans) 'font-sans]
     [(serif) 'font-serif]
     [else 'font-mono]))
+
+;;; Reading one preference out of one request.
+;;;
+;;; A preference reaches the page from two places -- the address that names it
+;;; and the cookie that remembers it -- and both are the reader's to type, edit
+;;; and forge.  So both are read through the preference's own guard, a value the
+;;; page cannot draw is ignored rather than stored, and the answer says which
+;;; value, if any, is worth writing down.  A cookie the page cannot draw would
+;;; otherwise outlive the control that wrote it and pull its reader back to it
+;;; on every page that follows.
+(define* (ascii-preference #:key asked remembered step fallback)
+  "Return the answer a preference is read at, and the one to remember.
+
+ASKED is the value the address names, REMEMBERED the one the cookie holds,
+STEP the guard that answers the value the page can draw (or #f when it cannot
+draw it), and FALLBACK what an unset preference reads as.
+
+The address wins over the cookie, since it is the reader's latest word; the
+second value is what has to be written down for the next page -- the value the
+address named when the page can draw it, and #f when there is nothing new."
+  (let ((chosen (and asked (step asked))))
+    (values (or chosen
+                (and remembered (step remembered))
+                fallback)
+            chosen)))
 
 ;;; The address a preference is chosen at.
 ;;;
@@ -1988,12 +2028,12 @@ address this builds is always one the page can draw."
 ;;; The control a reader resizes the ascii contents of a song page with.
 ;;;
 ;;; It is three things in one group: a step down, the step the page is drawn at,
-;;; and a step up.  The two steppers are links, so the control works with no
-;;; script at all and the address a reader lands on says what size it is drawn
-;;; at -- and the middle is a menu, because a reader who knows they want the
-;;; largest step should not have to press six times to reach it.  The menu shows
-;;; the share rather than the class name (`text-4' says nothing to a reader),
-;;; and the step in use is the one already chosen in it, so the control always
+;;; and a step up.  All three are links and a `details', so the control works
+;;; with no script at all and the address a reader lands on says what size it
+;;; is drawn at.  The middle shows the share rather than the class name
+;;; (`text-4' says nothing to a reader) and opens onto the whole ladder, so a
+;;; reader who knows they want the largest step does not have to press six
+;;; times to reach it; the step in use is marked in the menu, so the control
 ;;; answers "how big is this" without being opened.
 ;;;
 ;;; A stepper at either end of the ladder is a span rather than a link: there is
@@ -2054,65 +2094,68 @@ builds carries them, so resizing the text does not reset them."
            ,(stepper (ascii-size-neighbour current -1)
                      'minus
                      "smaller text")
-           (select (@ (onchange "window.location.href=this.value;")
-                      (name ascii-size-select)
-                      (id ascii-size-select)
-                      (aria-label ,(G_ "ascii size"))
-                      (class "wm-size-select"))
-                   ,@(map (lambda (step)
-                            (let ((name (car step))
-                                  (share (cdr step)))
-                              `(option (@ (value ,(href name))
-                                          ,@(if (equal? name current)
-                                              '((selected ""))
-                                              '()))
-                                       ,(format #f "~a%" share))))
-                          ascii-size-steps))
+           (details (@ (class "wm-size-menu"))
+                    (summary (@ (class "wm-size-share")
+                                (title ,(G_ "ascii size")))
+                             ,(format #f "~a%" (cdr (assoc current
+                                                           ascii-size-steps))))
+                    (div (@ (class "wm-size-steps"))
+                         ,@(map (lambda (step)
+                                  (let ((name (car step))
+                                        (share (cdr step)))
+                                    `(a (@ (href ,(href name))
+                                           (class "wm-size-option")
+                                           ,@(if (equal? name current)
+                                               '((aria-current "true"))
+                                               '()))
+                                        ,(format #f "~a%" share))))
+                                ascii-size-steps)))
            ,(stepper (ascii-size-neighbour current 1)
                      'plus
                      "larger text")))))
 
 ;;; The control a reader changes the paper or the face with.
 ;;;
-;;; A menu of three, in the same pill the size control wears, because it is
-;;; the same kind of question: which of a few named answers the reader wants.
-;;; It is a menu rather than a stepper because these are not a ladder -- there
-;;; is no "larger" paper -- and the chosen answer is the row already selected
-;;; in it, so the pill says what the page is drawn in without being opened.
+;;; A row of three answers, in the same pill the size control wears, because it
+;;; is the same kind of question: which of a few named answers the reader wants.
+;;; It is a row of links rather than a stepper because these are not a ladder --
+;;; there is no "larger" paper -- and rather than a menu, because a menu a
+;;; script has to drive is a menu that does nothing when the script does not
+;;; run.  The answer in use is the link marked `aria-current', which the
+;;; stylesheet paints as chosen, so the pill says what the page is drawn in
+;;; without being opened by anybody.
 (define* (ascii-choice-control G_
                                #:key id label key options
                                (selected ascii-paper-default)
                                route (size ascii-size-default)
                                (paper ascii-paper-default)
                                (face ascii-face-default))
-  "Return a menu of one ascii preference, named for the reader.
+  "Return a row of addresses naming one ascii preference, named for the reader.
 
-ID is the menu's id and what its label points at, LABEL its accessible name,
-and KEY the preference its options set (`ascii-theme' or `ascii-face').
-OPTIONS are the values offered, SELECTED the one already chosen.  Every
-option's address carries the other two preferences (see
-`ascii-preference-href'), so this menu cannot reset what it does not ask."
+ID is the group's id, LABEL its accessible name, and KEY the preference its
+addresses set (`ascii-theme' or `ascii-face').  OPTIONS are the values
+offered, SELECTED the one already chosen.  Every address carries the other
+two preferences (see `ascii-preference-href'), so choosing one cannot reset
+what it does not ask."
   `((div (@ (role "group")
             (aria-label ,(G_ label))
+            (id ,id)
             (class "wm-size-control wm-choice-control"))
-         (select (@ (onchange "window.location.href=this.value;")
-                    (name ,id)
-                    (id ,id)
-                    (aria-label ,(G_ label))
-                    (class "wm-size-select wm-choice-select"))
-                 ,@(map (lambda (option)
-                          `(option (@ (value ,(ascii-preference-href
-                                               route
-                                               #:key key
-                                               #:value option
-                                               #:size size
-                                               #:paper paper
-                                               #:face face))
-                                      ,@(if (equal? option selected)
-                                          '((selected ""))
-                                          '()))
-                                   ,(G_ option)))
-                        options)))))
+         ,@(map (lambda (option)
+                  `(a (@ (href ,(ascii-preference-href
+                                 route
+                                 #:key key
+                                 #:value option
+                                 #:size size
+                                 #:paper paper
+                                 #:face face))
+                       (class "wm-choice-option")
+                       (title ,(G_ option))
+                       ,@(if (equal? option selected)
+                           '((aria-current "true"))
+                           '()))
+                    ,(G_ option)))
+                options))))
 
 ;;; The search control, and where it takes the words it is given.
 ;;;

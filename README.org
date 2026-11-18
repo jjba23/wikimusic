@@ -831,15 +831,23 @@ only to read.
   fetched, so a reader who never opens it pays nothing for it, and its tempo,
   its meter and its beat lamps are all the page's own Scheme.
 - The *size* the tab is drawn at is the page's own reading size until the reader
-  says otherwise: a control above the tab steps from 50% to 400%, shows the
-  share in use, and keeps the choice in a cookie, so the next song a reader
-  opens is drawn at the size they chose for the last one.
+  says otherwise: a control above the tab steps from 50% to 400% and opens onto
+  the whole ladder, and its figure is the share in use.  Every step is an
+  ordinary address, so the control works with no script at all and the page a
+  reader lands on says how it is drawn.
 - The *paper* under the tab and the *face* it is set in are the reader's too,
-  remembered beside the size in the same cookie jar and carried in the same
-  address, so changing one never resets the others.  The paper follows the
-  page's own theme (=auto=) unless the reader asks for a white or a dark sheet
-  always; the face is the mono one a tab is written in unless they read better
-  in sans or serif.
+  offered as the three answers each has rather than as a menu: the answer in
+  use is the one painted in the row.  All three preferences travel in the same
+  address, so changing one never resets the others, and each is kept in a
+  cookie of its own for every song the reader opens afterwards.  The paper
+  follows the page's own theme (=auto=) unless the reader asks for a white or a
+  dark sheet always; the face is the mono one a tab is written in unless they
+  read better in sans or serif.
+- A value the page cannot draw -- an old =text-11=, an invented =sepia=, a
+  cookie someone edited by hand -- is read as the default rather than applied,
+  and is never written down, so a preference cannot outlive the control that
+  offered it.  A cookie belongs to the answer that set it as well: one reader's
+  choice is never written into the next reader's jar.
 - The tab's *legend* is a key to the marks the tab uses rather than music, so it
   is written in Org mode and rendered as prose -- smaller, in the page's
   reading ink, and marked by a hairline down its edge instead of by a second

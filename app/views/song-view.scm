@@ -254,7 +254,7 @@
                            opinions
                            comments
                            user-alist
-                           (ascii-size 'text-md)
+                           (ascii-size ascii-size-default)
                            (ascii-theme ascii-paper-default)
                            (ascii-face ascii-face-default)
                            external-sources

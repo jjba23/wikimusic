@@ -408,8 +408,77 @@ the details block counts with."
 ;; an old or invented name is read as the default rather than applied.  And a
 ;; choice has to travel with the other two, or setting the paper would put the
 ;; reader's size back to 100%.
+(define (anchor-with html text)
+  "Return the opening <a> tag of HTML whose href names TEXT, or #f."
+  (let ((match (regexp-exec (make-regexp (format #f "<a [^>]*~a[^>]*>"
+                                                 (regexp-quote text)))
+                            html)))
+    (and match (match:substring match))))
+
 (define ascii-suite
   (suite "The preferences a tab is read with"
+    (test "a step is read as itself, and an old name as the step it means"
+      (assert-equal #:name "a step of the ladder"
+        #:expect "text-8"
+        #:got (ascii-size-step "text-8"))
+      (assert-equal #:name "the name an earlier control offered"
+        #:expect "text-5"
+        #:got (ascii-size-step "text-lg"))
+      (assert-false (ascii-size-step "text-11")
+        #:name "a name with no utility behind it"))
+
+    (test "a paper or a face the page does not offer is no answer at all"
+      (assert-false (ascii-paper-step "sepia")
+        #:name "an invented paper")
+      (assert-false (ascii-face-step "cursive")
+        #:name "an invented face")
+      (assert-equal #:name "and one it does offer is read as itself"
+        #:expect "dark"
+        #:got (ascii-paper-step "dark")))
+
+    (test "the address wins over the cookie, and is what is remembered"
+      (call-with-values
+        (lambda ()
+          (ascii-preference #:asked "text-6"
+                            #:remembered "text-8"
+                            #:step ascii-size-step
+                            #:fallback ascii-size-default))
+        (lambda (value remember)
+          (assert-equal #:name "the size the address asked for"
+            #:expect "text-6"
+            #:got value)
+          (assert-equal #:name "and the size written down for the next page"
+            #:expect "text-6"
+            #:got remember))))
+
+    (test "a value the page cannot draw is never remembered"
+      (call-with-values
+        (lambda ()
+          (ascii-preference #:asked "text-11"
+                            #:remembered "text-8"
+                            #:step ascii-size-step
+                            #:fallback ascii-size-default))
+        (lambda (value remember)
+          (assert-equal #:name "the address is ignored and the cookie kept"
+            #:expect "text-8"
+            #:got value)
+          (assert-false remember
+            #:name "and nothing is written over the reader's choice"))))
+
+    (test "a cookie left by an older control is read as the default"
+      (call-with-values
+        (lambda ()
+          (ascii-preference #:asked #f
+                            #:remembered "sepia"
+                            #:step ascii-paper-step
+                            #:fallback ascii-paper-default))
+        (lambda (value remember)
+          (assert-equal #:name "the sheet the page opens at"
+            #:expect "auto"
+            #:got value)
+          (assert-false remember
+            #:name "and no choice to remember"))))
+
     (test "a name the deployment does not know is read as the default"
       (assert-equal #:name "an invented paper"
         #:expect "auto"
@@ -456,6 +525,62 @@ the details block counts with."
           #:name "whatever theme the page has")
         (assert-true (and (member "font-serif" tokens) #t)
           #:name "and the face the reader reads in")))
+
+    (test "the size control offers the whole ladder as addresses"
+      (let ((html (render (ascii-size-control G_
+                                              #:route "/songs/uuid/one"
+                                              #:size "text-4"
+                                              #:paper "dark"
+                                              #:face "serif"))))
+        (assert-true (and (string-contains html ">100%<") #t)
+          #:name "the share it is drawn at")
+        (for-each (lambda (step)
+                    (assert-true (and (string-contains
+                                       html
+                                       (format #f "ascii-size=~a"
+                                               (car step))) #t)
+                      #:name (format #f "~a is an address" (car step))))
+                  ascii-size-steps)
+        (assert-false (string-contains html "<select")
+          #:name "and no menu a script has to drive")))
+
+    (test "the paper control is a row of addresses, one of them current"
+      (let* ((html (render (ascii-choice-control
+                            G_
+                            #:id "ascii-theme"
+                            #:label "ascii paper"
+                            #:key "ascii-theme"
+                            #:options ascii-paper-steps
+                            #:selected "dark"
+                            #:route "/songs/uuid/one"
+                            #:size "text-4"
+                            #:paper "dark"
+                            #:face "mono")))
+             (chosen (anchor-with html "ascii-theme=dark"))
+             (other (anchor-with html "ascii-theme=light")))
+        (assert-true (and chosen (string-contains chosen "aria-current") #t)
+          #:name "the sheet in use says so")
+        (assert-false (and other (string-contains other "aria-current"))
+          #:name "and a sheet not in use does not")
+        (for-each (lambda (paper)
+                    (assert-true (and (string-contains
+                                       html
+                                       (format #f "ascii-theme=~a" paper)) #t)
+                      #:name (format #f "~a is an address" paper)))
+                  ascii-paper-steps)
+        (assert-false (string-contains html "<select")
+          #:name "and no menu a script has to drive")))
+
+    (test "a song page is drawn with the preferences it was handed"
+      (let* ((html (song-page-html))
+             (default-size (anchor-with html "ascii-size=text-4")))
+        (assert-true (and (string-contains html ">100%<") #t)
+          #:name "the default size, not a name nothing draws")
+        (assert-true (and default-size
+                       (string-contains default-size "aria-current") #t)
+          #:name "marked as the step the page is drawn at")
+        (assert-true (and (anchor-with html "ascii-theme=auto") #t)
+          #:name "and the paper is a column of addresses")))
 
     (test "the legend is drawn as Org prose, not kept in a pre"
       (let ((html (render (html-template G_

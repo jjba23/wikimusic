@@ -5,6 +5,11 @@
 
 (define-artanis-controller song-page)
 
+;; `new-cookie' is not one of the names artanis re-exports, and the route needs
+;; it to build a cookie that belongs to its own answer (see
+;; `ascii-preference-of'); the controller's `import' takes module names only.
+(use-modules ((artanis cookie) #:select (new-cookie)))
+
 (import (app views song-content-edit)
   (app views song-content-view)
   (app views song-edit)
@@ -41,30 +46,41 @@
 ;;; One reader's ascii preferences, read and remembered.
 ;;;
 ;;; A song page carries three: how large its tab is drawn, the paper under it
-;;; and the face it is set in.  Each arrives the same way -- the control's own
-;;; query string first, then the cookie it was remembered in, then the default
-;;; -- and each is remembered the moment a control names it, so a reader sets
-;;; it once and every song they open afterwards is drawn the same.  The
-;;; attributes are the size preference's own: a year, the whole site, and not
-;;; readable by a script.
-(define* (ascii-preference rc #:key query cookie fallback)
-  "Return the ascii preference this request asks for, and remember it.
+;;; and the face it is set in.  Each arrives the same way -- the address that
+;;; names it first, then the cookie it was remembered in, then the default --
+;;; and each is remembered the moment an address names one the page can draw,
+;;; so a reader sets it once and every song they open afterwards is drawn the
+;;; same.  The address and the cookie are both the reader's to edit, so both are
+;;; read through the preference's own guard (see `(wikimusic html)'): a value
+;;; the page cannot draw is neither applied nor stored.
+(define (ascii-preference-of rc query cookie step fallback)
+  "Return the ascii preference this request reads at QUERY.
 
-QUERY is the query-string key the control links with and COOKIE the name the
-choice is remembered under; FALLBACK is what an unset preference reads as."
-  (let ((from-query (get-from-qstr rc query))
-        (from-cookie (:cookies-value rc cookie)))
-    (cond
-      [(not (equal? #f from-query))
-       (:cookies-set! rc (string->symbol cookie) cookie from-query)
-       (:cookies-setattr! rc (string->symbol cookie)
-                          #:expires 12000000
-                          #:path "/"
-                          #:secure #t
-                          #:http-only #t)
-       from-query]
-      [(not (equal? #f from-cookie)) from-cookie]
-      [else fallback])))
+COOKIE is the name a choice is remembered under, STEP the preference's own
+guard, and FALLBACK what an unset preference reads as.  A choice is kept for
+a year, for the whole site, and out of reach of a script."
+  (call-with-values
+   (lambda ()
+     (ascii-preference #:asked (get-from-qstr rc query)
+                       #:remembered (:cookies-value rc cookie)
+                       #:step step
+                       #:fallback fallback))
+   (lambda (value chosen)
+     (when chosen
+       ;; Not `:cookies-set!'.  Artanis builds one cookie record for the rule
+       ;; when the rule is registered and re-sends that record with every
+       ;; answer, so a value one request sets is written into the jar of
+       ;; whoever reads the next page -- a preference that moves by itself,
+       ;; from one visitor to the next.  A cookie built here belongs to the
+       ;; answer that carries it.
+       (rc-set-cookie! rc
+                       (cons (new-cookie #:npv `((,cookie . ,chosen))
+                                         #:expires (* 3600 24 365)
+                                         #:path "/"
+                                         #:secure #t
+                                         #:http-only #t)
+                             (rc-set-cookie rc))))
+     value)))
 
 (get "/songs"
      #:mime 'xml
@@ -246,8 +262,11 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
 (get "/songs/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-ascii-size wikimusic-ascii-theme
-                       wikimusic-ascii-face x-bewaking-wikimusic)
+     ;; The ascii preferences are read out of the request's own cookies and
+     ;; written back as an answer's own cookies (see `ascii-preference-of'), so
+     ;; this route registers no cookie of its own: a named one would be the
+     ;; rule's single record, re-sent to every reader.
+     #:cookies #t
      (lambda (rc)
        (let* ((song-repo (make-sqlite-song-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
@@ -261,18 +280,21 @@ choice is remembered under; FALLBACK is what an unset preference reads as."
               (song-id (params rc "uuid"))
               (song (entity-or-404 (get-song-by-id song-repo song-id) "song"
                                    song-id))
-              (ascii-size (ascii-preference rc
-                                            #:query "ascii-size"
-                                            #:cookie "wikimusic-ascii-size"
-                                            #:fallback ascii-size-default))
-              (ascii-theme (ascii-preference rc
-                                             #:query "ascii-theme"
-                                             #:cookie "wikimusic-ascii-theme"
-                                             #:fallback ascii-paper-default))
-              (ascii-face (ascii-preference rc
-                                            #:query "ascii-face"
-                                            #:cookie "wikimusic-ascii-face"
-                                            #:fallback ascii-face-default))
+              (ascii-size (ascii-preference-of rc
+                                               "ascii-size"
+                                               "wikimusic-ascii-size"
+                                               ascii-size-step
+                                               ascii-size-default))
+              (ascii-theme (ascii-preference-of rc
+                                                "ascii-theme"
+                                                "wikimusic-ascii-theme"
+                                                ascii-paper-step
+                                                ascii-paper-default))
+              (ascii-face (ascii-preference-of rc
+                                               "ascii-face"
+                                               "wikimusic-ascii-face"
+                                               ascii-face-step
+                                               ascii-face-default))
               (inc-v (+ 1
                         (assq-ref song
                                   'views)))

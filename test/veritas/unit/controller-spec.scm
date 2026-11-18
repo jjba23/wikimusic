@@ -29,6 +29,7 @@
 (define-module (veritas unit controller-spec)
   #:use-module (veritas veritas)
   #:use-module (ice-9 format)
+  #:use-module (ice-9 textual-ports)
   #:use-module (wikimusic controller)
   #:export (spec))
 
@@ -168,5 +169,34 @@ there is no answer."
                                 #:created-by #f)
         #:name "while the super grant may still change it"))))
 
+;;; ====== A choice is remembered for the answer that made it ======
+;;;
+;;; Artanis builds one cookie record for a rule when the rule is registered and
+;;; re-sends that record with every answer (`new-oht' runs once, in
+;;; `define-handler'), so `:cookies-set!' does not write "this reader's choice":
+;;; it writes a value into a record that every later reader is handed.  A tab
+;;; that grows from 100% to 200% under a reader who chose neither is that record
+;;; doing its work, one visitor's choice arriving in the next visitor's cookie
+;;; jar.  The song route therefore builds its own cookie per request (see
+;;; `ascii-preference-of'), and this pins it against the shortcut coming back --
+;;; the bug is invisible in a review of the handler, because the call that looks
+;;; per-request is not.
+
+(define (source-of path)
+  "Return the text of the file at PATH."
+  (call-with-input-file path
+    (lambda (port)
+      (get-string-all port))))
+
+(define cookie-suite
+  (suite "How a song page remembers a reader's choice"
+    (test "an ascii choice is a cookie of its own answer"
+      (let ((source (source-of "app/controllers/song-page.scm")))
+        (assert-false (string-contains source
+                                       ":cookies-set! rc (string->symbol cookie)")
+          #:name "no shared record is written")
+        (assert-true (and (string-contains source "(new-cookie #:npv") #t)
+          #:name "the route builds the cookie its answer carries")))))
+
 (define (spec)
-  (veritas-run guard-suite ownership-suite))
+  (veritas-run guard-suite ownership-suite cookie-suite))
