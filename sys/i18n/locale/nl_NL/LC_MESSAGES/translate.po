@@ -1366,6 +1366,10 @@ msgstr ""
 "Doe met ons mee aan een steeds groter wordende bibliotheek van muziekkennis "
 "— waar elke noot een verhaal vertelt."
 
+#: lib/wikimusic/html.scm:671
+msgid "theme"
+msgstr "thema"
+
 #~ msgid "larger text"
 #~ msgstr "grotere tekst"
 

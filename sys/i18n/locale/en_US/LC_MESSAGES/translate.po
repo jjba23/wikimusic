@@ -1363,6 +1363,10 @@ msgstr ""
 "Join us in building an ever-growing library of musical knowledge — where "
 "every note tells a story."
 
+#: lib/wikimusic/html.scm:671
+msgid "theme"
+msgstr ""
+
 #~ msgid "larger text"
 #~ msgstr "larger text"
 

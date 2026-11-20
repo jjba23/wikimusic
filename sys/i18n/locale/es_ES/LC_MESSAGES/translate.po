@@ -1366,6 +1366,10 @@ msgstr ""
 "Únete a nosotros para construir una biblioteca de conocimiento musical en "
 "constante crecimiento — donde cada nota cuenta una historia."
 
+#: lib/wikimusic/html.scm:671
+msgid "theme"
+msgstr "tema"
+
 #~ msgid "larger text"
 #~ msgstr "texto más grande"
 

@@ -428,6 +428,21 @@ a:focus-visible .wm-wordmark-accent {
    the labels, because a wrapped bar is still a bar and a shrunk one is not
    readable. */
 
+/* The theme switch's word is for the phone's bar, where the glyphs step aside;
+   on a wider bar the sun and the moon are the control, and the word is there
+   for whoever reads the page to a reader rather than showing itself. */
+.wm-theme-word {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 @media (max-width: 639px) {
   .wm-nav a {
     min-height: 2.5rem;
@@ -439,35 +454,56 @@ a:focus-visible .wm-wordmark-accent {
     font-size: 0.9375rem;
   }
 
-  /* Seven controls at a readable size make two rows on a phone, and a bar that
-     is pinned to the top of a 640px-tall screen cannot spend 140px of it.  The
-     words go instead, not the controls: every one of the seven keeps its 40px
-     square and its glyph, and the label it used to show stays in the markup for
-     a reader who is read to.  The row that scrolled sideways kept the words and
-     lost its last two controls -- articles and the theme switch -- off the edge
-     of the screen, where nothing could tell a thumb they were there. */
+  /* Seven controls, and the words are what a thumb reads: `articles' and
+     `tuner' are not pictures anybody recognises, and a row of bare glyphs
+     scrolls the last two off the edge.  The glyphs are the decoration here, so
+     on a phone the words take their place -- at 14px and a thin padding the six
+     sections and the theme switch sit on one row at 360px, and wrap onto two on
+     anything narrower rather than hiding behind a scroll. */
   .wm-nav > div:last-child {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     justify-content: center;
+    gap: 0.25rem;
+  }
+
+  .wm-nav a button > div > i {
+    display: none;
   }
 
   .wm-nav a button span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
+    font-size: 0.875rem;
+    line-height: 1.2;
   }
 
   .wm-nav a button,
-  .wm-nav > div:last-child > button {
-    min-width: 2.5rem;
+  .wm-nav > div:last-child > button,
+  .wm-nav > div:last-child > span > button {
+    min-width: 0;
+    min-height: 2.5rem;
     justify-content: center;
-    padding-inline: 0.35rem;
+    padding-inline: 0.1rem;
+  }
+
+  .wm-nav > div:last-child > span {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* The theme switch keeps its name in the bar too: the sun and the moon are
+     pictures of a control, and `theme' is a word for one. */
+  .wm-nav > div:last-child > span > button > div > span > div {
+    display: none;
+  }
+
+  .wm-nav > div:last-child > span > button > div > span > span {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    font-size: 0.875rem;
+    line-height: 1.2;
   }
 }
 

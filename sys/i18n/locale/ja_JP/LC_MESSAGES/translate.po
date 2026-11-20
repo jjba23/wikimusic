@@ -1360,6 +1360,10 @@ msgstr ""
 "成長し続ける音楽知識のライブラリづくりに参加してください — すべての音符が物語"
 "を語ります。"
 
+#: lib/wikimusic/html.scm:671
+msgid "theme"
+msgstr "テーマ"
+
 #~ msgid "larger text"
 #~ msgstr "文字を大きく"
 

@@ -663,14 +663,25 @@ classes it carries, so the element name is about what the bar *is*."
                                                                                                                                              cursor-pointer
                                                                                                                                              whitespace-nowrap))))
 
-                ;; Theme switch
-                ,(ui-mode-button #:icon ""
+                ;; Theme switch.  It is the one control in the bar with no word
+                ;; of its own, so it carries one as a hint: held down on a phone,
+                ;; or hovered, it says what it does -- and the same word is its
+                ;; name for a reader who is read to, since a sun and a moon
+                ;; name nothing out loud.
+                (span (@ (title ,(G_ "theme")))
+                      ,(ui-mode-button #:icon ""
                                  #:size '(text-sm sm:text-md)
                                  #:icon-css '(text-onyx-300
                                               dark:text-stone-300 text-sm
                                               sm:text-md)
                                  #:family '(font-sans)
-                                 #:content `((div ,(icon #:type 'sun
+                                 ;; On a phone the word takes the place of the
+                                 ;; sun and the moon (see `wm-theme-word' in the
+                                 ;; stylesheet): seven glyphs name nothing, seven
+                                 ;; words do.
+                                 #:content `((span (@ (class "wm-theme-word"))
+                                                   ,(G_ "theme"))
+                                               (div ,(icon #:type 'sun
                                                          #:icon-css '(text-sm
                                                                       sm:text-md
                                                                       lg:text-lg
@@ -690,7 +701,7 @@ classes it carries, so the element name is about what the bar *is*."
                                                             sm:px-2
                                                             md:py-2
                                                             md:px-3
-                                                            cursor-pointer)))))))
+                                                            cursor-pointer))))))))
 
 ;;; A click track, for a reader practising from a song page.
 ;;;

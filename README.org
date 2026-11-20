@@ -101,8 +101,9 @@ wikimusic is powered by: [[https://www.gnu.org/software/guile/][Guile Scheme]], 
   page, so a shelf keeps its rhythm and a page its shape whether or not
   somebody has uploaded a picture.  A reader's two opinions are a green thumb
   and a red one, each with its count beside it and no word either way.  On a
-  phone the bar keeps all seven of its controls and drops their words, rather
-  than scrolling the last two off the edge.  The site's own decisions --
+  phone the bar keeps all seven of its controls and their words on one row,
+  the glyphs stepping aside for them and coming back above 640px, rather than
+  scrolling the last two off the edge.  The site's own decisions --
   the palette in both themes, the type, the rhythm of a page and the surface a
   panel is -- are stated once in =pub/css/wikimusic.css=, the layer over the
   utility bundle the markup is built from.
