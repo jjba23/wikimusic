@@ -4,51 +4,89 @@
  * Copyright © Josep Bigorra <jjbigorra@gmail.com>
 */
 
+/// Marking the chords a tab names.
+///
+/// A chord name is a letter and a handful of symbols, so a pattern that asks
+/// only "is this a chord name?" answers yes to the `Am' in `Metallica - Am I
+/// Evil?' and the `A' in `[Riff A.1]'.  What tells those apart from a chord is
+/// not the name but the line: a tab writes its chords on a line of their own,
+/// above the notes or the words, and a line of nothing but chord names is a
+/// chord line.  A title or a heading is a sentence, and a sentence is mostly
+/// not chords.
+///
+/// So the mark is decided line by line: on a line where every word is a chord
+/// name, each one is marked; on any other line nothing is.  The line is written
+/// back as the same characters -- the mark wraps a name and adds no space --
+/// because a tab is read by its columns.
+
+// A chord name: a root, an accidental, a quality or a number of them, and a
+// bass note after a slash.  Matched against a whole token, never a fragment.
+const wikimusicChordName =
+  /^[A-G][#b]?(?:(?:maj|min|dim|aug|sus|add|alt|no|m)\d*|\d+|[#b]\d+|°|ø|\+)*(?:\/[A-G][#b]?)?$/
+
+// The brackets, bars and full stops around a chord are the line's punctuation,
+// not part of its name.
+const wikimusicChordCore = (token) =>
+  token.replace(/^[([{<]+/, '').replace(/[)\]}>.,;:*]+$/, '')
+
+// `x2' marks a repeat in a chord line; it is not a word of the line.  One or two
+// digits only, or a fingering (`x02210') would read as a repeat too.
+const wikimusicRepeatMark = (token) => /^x\d{1,2}$/i.test(wikimusicChordCore(token))
+
+const wikimusicChordToken = (token) =>
+  wikimusicChordName.test(wikimusicChordCore(token))
+
+const wikimusicChordLine = (tokens) => {
+  const words = tokens
+    .map(wikimusicChordCore)
+    .filter((word) => /[A-Za-z]/.test(word) && !wikimusicRepeatMark(word))
+  return words.length > 0 && words.every((word) => wikimusicChordName.test(word))
+}
+
 const highlightChords = (id) => {
   const preElement = document.getElementById(id)
 
-  if (preElement) {
-    const originalContent = preElement.textContent || ''
+  if (!preElement) {
+    console.error(`Element with ID ${id} not found.`)
+    return
+  }
 
-    // Regular expression to match chords.
-    // It looks for:
-    // - A-G (root note)
-    // - Optional # (sharp) or b (flat)
-    // - Optional 'm' (minor), 'maj' (major), 'min' (minor), 'dim' (diminished), 'aug' (augmented), 'sus' (suspended), 'add' (added)
-    // - Optional numbers (7, 9, 11, 13 etc.)
-    // - Optional / and another note for bass note (e.g., C/G)
-    // - \b ensures word boundaries so "Amen" doesn't get "A" bolded
-    const chordRegex = /\b[A-G](#|b)?(m|maj|min|dim|aug|sus|add)?\d*(\/[A-G](#|b)?)?\b/g
+  const originalContent = preElement.textContent || ''
+  // Whitespace runs are kept as pieces of their own, so the line is written
+  // back character for character and its columns do not move.
+  const lines = originalContent.split('\n')
 
-    preElement.textContent = ''
+  preElement.textContent = ''
 
-    let lastIndex = 0
-    let match
-    while ((match = chordRegex.exec(originalContent)) !== null) {
-      const matchText = match[0]
-      const matchIndex = match.index
+  lines.forEach((line, index) => {
+    const pieces = line.match(/\s+|\S+/g) || []
+    const onChordLine = wikimusicChordLine(pieces)
 
-      if (matchIndex > lastIndex) {
-        preElement.appendChild(document.createTextNode(originalContent.slice(lastIndex, matchIndex)))
+    pieces.forEach((piece) => {
+      if (!onChordLine || !wikimusicChordToken(piece)) {
+        preElement.appendChild(document.createTextNode(piece))
+        return
       }
 
-      // The mark is the sheet's own (`pub/css/wikimusic.css'): the tab's ink, a
-      // wash and a hairline, so the chords are found without the page shouting
-      // and the box holds the columns the tab is read in.
+      const name = wikimusicChordCore(piece)
+      const start = piece.indexOf(name)
+      if (start > 0) {
+        preElement.appendChild(document.createTextNode(piece.slice(0, start)))
+      }
+
       const strongElement = document.createElement('strong')
       strongElement.className = 'wm-chord'
-      strongElement.textContent = matchText
+      strongElement.textContent = name
       preElement.appendChild(strongElement)
 
-      lastIndex = matchIndex + matchText.length
+      const end = start + name.length
+      if (end < piece.length) {
+        preElement.appendChild(document.createTextNode(piece.slice(end)))
+      }
+    })
+
+    if (index < lines.length - 1) {
+      preElement.appendChild(document.createTextNode('\n'))
     }
-
-    if (lastIndex < originalContent.length) {
-      preElement.appendChild(document.createTextNode(originalContent.slice(lastIndex)))
-    }
-  } else {
-    console.error(`Element with ID ${id} not found.`)
-  }
-};
-
-
+  })
+}

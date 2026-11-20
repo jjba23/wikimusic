@@ -850,6 +850,10 @@ only to read.
   the tab itself.  A highlight is the tab's own ink -- a wash and a hairline
   under the letters, never a second colour -- so the chords are found without
   the page shouting over the music, on white paper and on dark paper alike.
+  What is a chord is decided by its line: a tab writes its chords on a line of
+  their own, so a line of nothing but chord names is highlighted and a sentence
+  is not -- the =Am= in a title stays a title, and the =A= in a section heading
+  stays a letter.
 - The *metronome* under the song is a click track whose sound is *made* in the
   browser -- twenty milliseconds of a shaped tone per beat -- rather than
   fetched, so a reader who never opens it pays nothing for it, and its tempo,
