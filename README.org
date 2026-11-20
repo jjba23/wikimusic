@@ -843,7 +843,8 @@ only to read.
   travels at that speed in every frame rather than jumping a block of lines on
   a timer, so changing either menu changes it under the reader's hand, and the
   scroll ends on the last line of the tab.  The reader's hand wins over it: a
-  wheel turn, a touch drag, a scroll key or the button stops it.
+  wheel turn, a touch drag, a scroll key, a dragged scrollbar or the button
+  stops it.
 - The *chords the tab names* are collected and shown under it as a small
   *guitar chord guide*, each chord with the fingering the transposition implies
   (=Am  x02210=, =F  133211=), and a control highlights those chord names in

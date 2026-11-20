@@ -16,13 +16,17 @@
 /// So the scroll happens in the frame loop: each frame moves the share of a line
 /// that the frame lasted, and the two menus are read as lines per second, so a
 /// reader can change either while it runs and feel it.  The reader's own hand
-/// wins -- a wheel turn, a touch drag or a scroll key stops it -- and it stops
-/// by itself at the last line of the tab rather than at the end of the page,
-/// because the tab is the music and what follows it is not.
+/// wins -- a wheel turn, a touch drag, a scroll key or a dragged scrollbar stops
+/// it -- and it stops by itself at the last line of the tab rather than at the
+/// end of the page, because the tab is the music and what follows it is not.
 ///
-/// shortcut: dragging the page's scrollbar is not a wheel turn and so does not
-/// stop the scroll; the button or a scroll key does.  Revisit if a reader
-/// reports the page fighting a dragged scrollbar.
+/// A scrollbar drag is the one the page is never told about: a scrollbar is the
+/// browser's, not the document's, so dragging it fires no event a page can
+/// hear.  It does leave a trace, though -- the page has moved to somewhere this
+/// loop did not put it.  So every frame records the position it scrolled to,
+/// and a frame that finds the page anywhere else stops the scroll instead of
+/// scrolling again.  Our own move is written down the moment it is made, so the
+/// loop can never mistake itself for the reader.
 
 const wikimusicSongScroll = (() => {
   let frame = null
@@ -32,6 +36,9 @@ const wikimusicSongScroll = (() => {
   let lineMenu = null
   let secondMenu = null
   let lineHeight = 18
+  // Where the last frame put the page.  A scroll that lands anywhere else is
+  // somebody else's.
+  let placed = 0
 
   const running = () => frame !== null
 
@@ -62,6 +69,13 @@ const wikimusicSongScroll = (() => {
     const elapsed = Math.min((now - last) / 1000, 0.25)
     last = now
 
+    // Two pixels of slack: a browser is free to round a scroll to the device
+    // pixel, and the frame that follows is where the next whole line begins.
+    if (Math.abs(window.scrollY - placed) > 2) {
+      stop()
+      return
+    }
+
     // A tab's foot is a measured position and so rarely a whole pixel: a
     // scroll cannot reach it exactly, and a test for equality would leave the
     // scroll running for ever at the last line.
@@ -82,6 +96,7 @@ const wikimusicSongScroll = (() => {
         top: Math.min(window.scrollY + pixels, end),
         behavior: 'instant'
       })
+      placed = window.scrollY
     }
     frame = requestAnimationFrame(step)
   }
@@ -98,6 +113,7 @@ const wikimusicSongScroll = (() => {
 
     const top = tab.getBoundingClientRect().top + window.scrollY
     if (window.scrollY < top) window.scrollTo({ top, behavior: 'instant' })
+    placed = window.scrollY
     if (window.scrollY + 1 >= endOfTab()) return
 
     lineHeight = parseFloat(getComputedStyle(tab).lineHeight) || 18
