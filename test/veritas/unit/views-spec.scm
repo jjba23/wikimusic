@@ -633,6 +633,66 @@ the details block counts with."
         (assert-true (and (string-contains html "value=\"a &amp; b\"") #t)
           #:name "the attribute")))))
 
+;;; ====== What stands in for a picture ======
+;;;
+;;; A song, an artist and a genre each draw their own placeholder when they have
+;;; no artwork -- in a tile and on a page -- so a grid keeps its rhythm and a
+;;; page keeps its shape.  The square is also the whole of the cover's link, so
+;;; it has to carry the name the picture would have carried.
+(define (tile-html entity)
+  "Return a tile for ENTITY, whose entity has no artwork."
+  (render (item-tile G_ entity
+                     '((identifier . "id") (display-name . "Name"))
+                     '() '())))
+
+(define (panel-html)
+  "Return the detail panel of an entity that has no artwork."
+  (render (entity-details G_
+                          #:entity 'song
+                          #:x '((identifier . "id")
+                                (display-name . "Name")
+                                (views . 0)
+                                (created-at . "1794044768")
+                                (visibility-status . 0)
+                                (created-by . "u"))
+                          #:artworks '()
+                          #:opinions '()
+                          #:comments '()
+                          #:user-alist '())))
+
+(define picture-suite
+  (suite "The picture an entity without one is drawn with"
+    (test "a tile keeps its square and its name"
+      (assert-true (and (string-contains (tile-html 'song)
+                                         "wm-placeholder") #t)
+        #:name "the placeholder is drawn")
+      (assert-true (and (string-contains (tile-html 'song)
+                                         "aria-label=\"Name\"") #t)
+        #:name "and the square still names the thing it leads to"))
+
+    (test "each entity class has a placeholder of its own"
+      (assert-true (and (string-contains (tile-html 'song)
+                                         "wm-placeholder-song") #t)
+        #:name "a song")
+      (assert-true (and (string-contains (tile-html 'artist)
+                                         "wm-placeholder-artist") #t)
+        #:name "an artist")
+      (assert-true (and (string-contains (tile-html 'genre)
+                                         "wm-placeholder-genre") #t)
+        #:name "a genre"))
+
+    (test "a page with no artwork still shows one"
+      (assert-true (and (string-contains (panel-html)
+                                         "wm-media-placeholder") #t)
+        #:name "the page's placeholder"))
+
+    (test "the opinions are thumbs and a count, not words"
+      (let ((html (panel-html)))
+        (assert-false (string-contains html ">like<")
+          #:name "no written-out like")
+        (assert-true (and (string-contains html "aria-label=\"like, 0\"") #t)
+          #:name "and a name for a reader who cannot see the glyph")))))
+
 (define (spec)
   (veritas-run locale-suite
     ascii-suite
@@ -641,4 +701,5 @@ the details block counts with."
     footer-suite
     shell-suite
     assets-suite
+    picture-suite
     escaping-suite))

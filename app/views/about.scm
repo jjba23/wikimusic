@@ -69,7 +69,7 @@
 ;; it.  They are named here rather than written into the markup so that the
 ;; page reads as an outline of itself.
 (define about-panel-classes
-  '(hg-frost bg-stone-100/75
+  '(wm-panel bg-stone-100/75
              dark:bg-onyx-900/75
              rounded-2xl
              sm:rounded-3xl

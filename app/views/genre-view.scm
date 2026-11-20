@@ -65,68 +65,34 @@
                                      #:prev-label (G_ "previous")
                                      #:next-label (G_ "next"))
                          '()))
-         (body `(div (@ (class ,(mk-class '(px-4 md:px-8
-                                                 py-2
-                                                 flex
-                                                 flex-col
-                                                 md:flex-row
-                                                 md:flex-wrap
-                                                 gap-3
-                                                 md:gap-5
-                                                 items-center
-                                                 items-center
-                                                 justify-center
-                                                 md:justify-between))))
-                     (,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-title text-2xl text-onyx-300" `(span (@ (class ,(mk-class '(flex flex-row
-                                                                                                                                                              items-center
-                                                                                                                                                              items-center
-                                                                                                                                                              gap-1))))
-                                                                                                                                  ,(G_ "viewing genres:"))) (div (@ (class ,(mk-class '(flex
-                                                                                                                                                                                        flex-wrap
-                                                                                                                                                                                        flex-row
-                                                                                                                                                                                        justify-center
-                                                                                                                                                                                        gap-2))))
-                                                                                                                                                                 (div (@ (class ,(mk-class '(flex
-                                                                                                                                                                                             flex-wrap
-                                                                                                                                                                                             flex-row
-                                                                                                                                                                                             justify-start
-                                                                                                                                                                                             items-center))))
-                                                                                                                                                                      ,(sort-select G_
-                                                                                                                                                                                    #:entity 'genre
-                                                                                                                                                                                    #:user-sort
-                                                                                                                                                                                    user-sort)
-                                                                                                                                                                      ,(grid-size-select
-                                                                                                                                                                        G_
-                                                                                                                                                                        #:entity 'genre
-                                                                                                                                                                        #:size grid-size
-                                                                                                                                                                        #:search-query
-                                                                                                                                                                        search-query))
-                                                                                                                                                                 (div (@ (class ,(mk-class '(flex
-                                                                                                                                                                                             flex-wrap
-                                                                                                                                                                                             flex-row
-                                                                                                                                                                                             gap-3
-                                                                                                                                                                                             justify-end
-                                                                                                                                                                                             items-center))))
-
-                                                                                                                                                                      ,(search-box G_
-                                                                                                                                                                                   #:search-query
-                                                                                                                                                                                   search-query)))
-                      (div (div (@ (class ,(item-tile-grid-face #:size
-                                                                grid-size)))
-                                ,(map (lambda (x)
-                                        `(div ,(item-tile G_
-                                                          'genre x
-                                                          (relevant-entities 'genre
-                                                                             artworks x)
-                                                          (relevant-entities 'genre
-                                                                             comments x))))
-                                      genres))
-                           ,page-buttons
-                           ,(hr)
-                           (div (@ (class ,(mk-class '(flex flex-row flex-wrap
-                                                            gap-2 justify-end))))
-                                (a (@ (href "/genres/new"))
-                                   ,(button (G_ "new genre")))))))))
+         (body `(div (@ (class "wm-list"))
+                     (div (@ (class "wm-list-head"))
+                          ,(wm-page-heading "wm-list-title"
+                                            (G_ "genres"))
+                          (div (@ (class "wm-list-tools"))
+                               ,(sort-select G_
+                                             #:entity 'genre
+                                             #:user-sort user-sort)
+                               ,(grid-size-select G_
+                                                  #:entity 'genre
+                                                  #:size grid-size
+                                                  #:search-query search-query)
+                               ,@(search-box G_
+                                             #:search-query search-query)))
+                     (div (@ (class ,(item-tile-grid-face #:size grid-size)))
+                          ,(map (lambda (x)
+                                  `(div ,(item-tile G_
+                                                    'genre x
+                                                    (relevant-entities 'genre
+                                                                       artworks x)
+                                                    (relevant-entities 'genre
+                                                                       comments x))))
+                                genres))
+                     ,page-buttons
+                     (div (@ (class "wm-list-actions"))
+                          (a (@ (href "/genres/new")
+                                (class "wm-button"))
+                             ,(G_ "new genre"))))))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:title list-title
@@ -205,21 +171,19 @@
                                                                             #:limit
                                                                             300)))
                                                                          '()))))
-                   #:body `((div (@ (class ,(mk-class '(px-3 py-2 md:px-6
-                                                             md:py-4))))
-                                 ((div (@ (class ,(mk-class '(py-4))))
-                                       ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display leading-10 md:text-10 text-3xl text-onyx-300" (assq-ref genre
-                                                                                                                                                                              'display-name)))
-                                  (div (div ,(entity-details G_
-                                                             #:entity 'genre
-                                                             #:x genre
-                                                             #:artworks
-                                                             artworks
-                                                             #:opinions
-                                                             opinions
-                                                             #:comments
-                                                             comments
-                                                             #:user-alist
-                                                             user-alist)))))
-                            ,(render-external-sources G_ external-sources)
-                            ,song-fragment))))
+                   #:body `((div (@ (class "wm-detail"))
+                                 (header (@ (class "wm-song-head"))
+                                         ,(wm-page-heading "wm-song-title"
+                                                           (assq-ref genre
+                                                                     'display-name)))
+                                 (div ,(entity-details G_
+                                                        #:entity 'genre
+                                                        #:x genre
+                                                        #:artworks artworks
+                                                        #:opinions opinions
+                                                        #:comments comments
+                                                        #:user-alist
+                                                        user-alist))
+                                 ,(render-external-sources G_
+                                                           external-sources)
+                                 (div ,song-fragment))))))

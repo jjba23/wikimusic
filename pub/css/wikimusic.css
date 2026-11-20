@@ -1555,7 +1555,7 @@ not run the width of a desk. */
 
 /* The two opinions and the way to the editor, as quiet controls: green and red
    buttons beside a song are louder than the song. */
-.wm-entity-actions button,
+.wm-entity-actions button:not(.wm-thumb),
 .wm-entity-actions > a > button {
   background: transparent;
   border: 1px solid var(--wm-line-strong);
@@ -1567,11 +1567,80 @@ not run the width of a desk. */
               background-color 150ms ease;
 }
 
-.wm-entity-actions button:hover,
+.wm-entity-actions button:not(.wm-thumb):hover,
 .wm-entity-actions > a > button:hover {
   border-color: var(--wm-brand);
   background-color: color-mix(in oklch, var(--wm-brand) 10%, transparent);
   color: var(--wm-brand);
+}
+
+/* --- The two opinions
+
+   Two thumbs and the count beside each: green for the one that says yes, red
+   for the one that says no, and no word either way.  The colour is the whole of
+   the label a sighted reader needs, and the count is what they came to read; a
+   reader who cannot see the colour gets the word from the button's own name. */
+
+.wm-opinions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wm-opinions form {
+  margin: 0;
+}
+
+.wm-thumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  padding: 0 0.85rem;
+  border: 1px solid color-mix(in oklch, var(--wm-thumb-ink) 45%, transparent);
+  border-radius: 9999px;
+  background-color: color-mix(in oklch, var(--wm-thumb-ink) 12%,
+                              var(--wm-surface));
+  color: var(--wm-thumb-ink);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease,
+              transform 150ms ease;
+}
+
+.wm-thumb i {
+  font-size: 1rem;
+}
+
+.wm-thumb:hover,
+.wm-thumb:focus-visible {
+  border-color: var(--wm-thumb-ink);
+  background-color: color-mix(in oklch, var(--wm-thumb-ink) 22%,
+                              var(--wm-surface));
+}
+
+.wm-thumb:active {
+  transform: scale(0.96);
+}
+
+.wm-thumb-up {
+  --wm-thumb-ink: oklch(0.52 0.13 150);
+}
+
+.wm-thumb-down {
+  --wm-thumb-ink: oklch(0.53 0.17 28);
+}
+
+[data-theme="dark"] .wm-thumb-up {
+  --wm-thumb-ink: oklch(0.80 0.14 150);
+}
+
+[data-theme="dark"] .wm-thumb-down {
+  --wm-thumb-ink: oklch(0.78 0.13 28);
 }
 
 /* --- The facts about a page rather than about the music
@@ -1648,7 +1717,8 @@ not run the width of a desk. */
    about the page rather than the music are folded into one row that can be
    opened. */
 
-.wm-song {
+.wm-song,
+.wm-detail {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -1914,6 +1984,127 @@ not run the width of a desk. */
 .wm-page footer a:focus-visible {
   color: var(--wm-brand);
   border-bottom-color: currentColor;
+}
+
+/* --- The picture an entity without artwork is drawn with
+
+   A song, an artist and a genre each stand in for themselves in their own
+   colour -- rose, violet, amber -- on the same square a cover would fill, so a
+   grid of tiles keeps its rhythm and a page keeps its shape whether or not
+   somebody has uploaded a picture. */
+
+.wm-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(135deg,
+                    color-mix(in oklch, var(--wm-placeholder-ink) 28%,
+                              transparent),
+                    color-mix(in oklch, var(--wm-placeholder-ink) 6%,
+                              var(--wm-surface)));
+  color: color-mix(in oklch, var(--wm-placeholder-ink) 82%, var(--wm-text));
+}
+
+.wm-placeholder-glyph {
+  font-size: 2rem;
+}
+
+.wm-placeholder-song {
+  --wm-placeholder-ink: oklch(0.62 0.17 5);
+}
+
+.wm-placeholder-artist {
+  --wm-placeholder-ink: oklch(0.58 0.15 285);
+}
+
+.wm-placeholder-genre {
+  --wm-placeholder-ink: oklch(0.68 0.14 70);
+}
+
+[data-theme="dark"] .wm-placeholder-song {
+  --wm-placeholder-ink: oklch(0.80 0.13 5);
+}
+
+[data-theme="dark"] .wm-placeholder-artist {
+  --wm-placeholder-ink: oklch(0.78 0.12 285);
+}
+
+[data-theme="dark"] .wm-placeholder-genre {
+  --wm-placeholder-ink: oklch(0.84 0.12 70);
+}
+
+/* The placeholder on a detail page is the room a photograph takes, so the
+   panel above the facts does not collapse when there is nothing to put in it. */
+.wm-media-placeholder {
+  width: 100%;
+  height: 12rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .wm-media-placeholder {
+    height: 18rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .wm-media-placeholder {
+    height: 21rem;
+  }
+}
+
+/* --- A list: a title, the controls that shape it, and the shelf under them */
+
+.wm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding: 0.5rem clamp(0.5rem, 2vw, 1.25rem) 2.5rem;
+}
+
+.wm-list-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--wm-line);
+}
+
+.wm-list-title {
+  margin: 0;
+  font-family: var(--wm-display);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.wm-list-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wm-list-tools .wm-search-row {
+  width: min(100%, 18rem);
+}
+
+.wm-search-row {
+  margin: 0;
+}
+
+.wm-list-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* --- Reduced motion covers the new transitions too */

@@ -153,78 +153,43 @@
                                      #:prev-label (G_ "previous")
                                      #:next-label (G_ "next"))
                          '()))
-         (body `(div (@ (class ,(mk-class '(px-4 md:px-8
-                                                 py-2
-                                                 flex
-                                                 flex-col
-                                                 md:flex-row
-                                                 md:flex-wrap
-                                                 gap-3
-                                                 md:gap-5
-                                                 items-center
-                                                 items-center
-                                                 justify-center
-                                                 md:justify-between))))
-                     (,(unless only-tiles
-                         (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-title text-2xl text-onyx-300" `(span (@ (class ,(mk-class '(flex flex-row
-                                                                                                                                                                items-center
-                                                                                                                                                                items-center
-                                                                                                                                                                gap-1))))
-                                                                                                                                    ,(G_ "viewing songs:")))) ,(unless only-tiles
-                                                                                                                                                                 `(div (@ (class ,(mk-class '(flex
-                                                                                                                                                                                              flex-wrap
-                                                                                                                                                                                              flex-row
-                                                                                                                                                                                              justify-center
-                                                                                                                                                                                              gap-2))))
-                                                                                                                                                                       (div (@ (class ,(mk-class '(flex
-                                                                                                                                                                                                   flex-wrap
-                                                                                                                                                                                                   flex-row
-                                                                                                                                                                                                   justify-start
-                                                                                                                                                                                                   items-center))))
-                                                                                                                                                                            ,(sort-select
-                                                                                                                                                                              G_
-                                                                                                                                                                              #:entity 'song
-                                                                                                                                                                              #:user-sort
-                                                                                                                                                                              user-sort)
-                                                                                                                                                                            ,(grid-size-select
-                                                                                                                                                                              G_
-                                                                                                                                                                              #:entity 'song
-                                                                                                                                                                              #:size
-                                                                                                                                                                              grid-size
-                                                                                                                                                                              #:search-query
-                                                                                                                                                                              search-query))
-                                                                                                                                                                       (div (@ (class ,(mk-class '(flex
-                                                                                                                                                                                                   flex-wrap
-                                                                                                                                                                                                   flex-row
-                                                                                                                                                                                                   gap-3
-                                                                                                                                                                                                   justify-end
-                                                                                                                                                                                                   items-center))))
-
-                                                                                                                                                                            ,(search-box
-                                                                                                                                                                              G_
-                                                                                                                                                                              #:search-query
-                                                                                                                                                                              search-query))))
-                      (div (div (@ (class ,(item-tile-grid-face #:size
-                                                                grid-size)))
-                                ,(map (lambda (x)
-                                        (render-song-tile G_
-                                                          #:artworks artworks
-                                                          #:song-version-count-alist
-                                                          song-version-count-alist
-                                                          #:comments comments
-                                                          #:artists artists
-                                                          #:song-artists song-artists
-                                                          #:x x)) songs))
-                           ,page-buttons
-
-                           ,(unless only-tiles
-                              `(,(hr) (div (@ (class ,(mk-class '(flex
-                                                                  flex-row
-                                                                  flex-wrap
-                                                                  gap-2
-                                                                  justify-end))))
-                                           (a (@ (href "/songs/new"))
-                                              ,(button (G_ "new song")))))))))))
+                  (body `(div (@ (class "wm-list"))
+                     ,@(if only-tiles
+                         '()
+                         `((div (@ (class "wm-list-head"))
+                                ,(wm-page-heading "wm-list-title"
+                                                  (G_ "songs"))
+                                (div (@ (class "wm-list-tools"))
+                                     ,(sort-select G_
+                                                   #:entity 'song
+                                                   #:user-sort user-sort)
+                                     ,(grid-size-select G_
+                                                        #:entity 'song
+                                                        #:size grid-size
+                                                        #:search-query
+                                                        search-query)
+                                     ,@(search-box G_
+                                                   #:search-query
+                                                   search-query)))))
+                     (div (@ (class ,(item-tile-grid-face #:size
+                                                          grid-size)))
+                          ,(map (lambda (x)
+                                  (render-song-tile G_
+                                                    #:artworks artworks
+                                                    #:song-version-count-alist
+                                                    song-version-count-alist
+                                                    #:comments comments
+                                                    #:artists artists
+                                                    #:song-artists song-artists
+                                                    #:x x))
+                                songs))
+                     ,page-buttons
+                     ,@(if only-tiles
+                         '()
+                         `((div (@ (class "wm-list-actions"))
+                                (a (@ (href "/songs/new")
+                                      (class "wm-button"))
+                                   ,(G_ "new song"))))))))
     (if only-tiles body
       (html-template G_
                      #:is-logged-in is-logged-in

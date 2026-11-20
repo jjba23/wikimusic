@@ -94,10 +94,16 @@ wikimusic is powered by: [[https://www.gnu.org/software/guile/][Guile Scheme]], 
 - *A responsive interface* -- the same shell on a phone and on a desktop -- set
   in a display serif for what a page is called and a sans for what it does, over
   a warm paper in the light theme and a deep ink in the dark one, with sorting,
-  search and a subtle, icon-first tile-size control on every list.  The site's
-  own decisions -- the palette in both themes, the type, the rhythm of a page
-  and the surface a panel is -- are stated once in =pub/css/wikimusic.css=, the
-  layer over the utility bundle the markup is built from.
+  search and a subtle, icon-first tile-size control on every list.  A song, an
+  artist or a genre with no artwork is drawn with a placeholder of its own
+  class -- a rose square with notes for a song, a violet one with a guitar for
+  an artist, an amber one with a disc for a genre -- in the grid and on the
+  page, so a shelf keeps its rhythm and a page its shape whether or not
+  somebody has uploaded a picture.  A reader's two opinions are a green thumb
+  and a red one, each with its count beside it and no word either way.  The
+  site's own decisions -- the palette in both themes, the type, the rhythm of a
+  page and the surface a panel is -- are stated once in =pub/css/wikimusic.css=,
+  the layer over the utility bundle the markup is built from.
 - *Light and dark*, with the reader's choice remembered, and four interface
   languages to read the whole site in.
 - *Pretty error pages* for the refusals a reader actually meets (404, 403, 500

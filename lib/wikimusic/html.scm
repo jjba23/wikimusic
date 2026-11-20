@@ -40,6 +40,7 @@
                           wm-page-heading
                           html-template
                           item-tile
+                          entity-placeholder
                           render-visibility-status
                           render-comment
                           render-comments
@@ -1114,6 +1115,32 @@ unchanged.  Everything else a page is built from is text."
 
                                             #:footer (page-footer G_)))))))
 
+;;; ====== The picture an entity without one is drawn with ======
+;;;
+;;; A song, an artist or a genre may have no artwork, and a tile that simply
+;;; leaves the cover out is a name floating in a hole: the grid loses its
+;;; rhythm and the tile stops looking like the ones beside it.  The placeholder
+;;; is therefore the same square as a cover, in the entity's own colour -- a
+;;; rose for a song, a violet for an artist, an amber for a genre -- with the
+;;; glyph of what it stands for in the middle.
+;;;
+;;; It is decorative and says so: on a tile the name under it is what names the
+;;; thing, and on a page the heading does.
+(define* (entity-placeholder entity)
+  "Return the square standing in for the artwork of ENTITY, as SXML."
+  (let ((glyph (case entity
+                 [(artist) 'guitar]
+                 [(genre) 'disc]
+                 [else 'music-notes-simple]))
+        (hue (case entity
+               [(artist) "wm-placeholder-artist"]
+               [(genre) "wm-placeholder-genre"]
+               [else "wm-placeholder-song"])))
+    `((div (@ (class ,(format #f "wm-placeholder ~a" hue))
+              (aria-hidden "true"))
+           ,(icon #:type glyph
+                  #:icon-css '(wm-placeholder-glyph))))))
+
 (define* (item-tile G_
                     entity
                     x
@@ -1127,25 +1154,26 @@ unchanged.  Everything else a page is built from is text."
                                      'identifier))))
     `((div (@ (class "wm-tile h-full flex flex-col overflow-hidden"))
 
-           ;; Cover
-           ,(render-if-nempty (lambda (art)
-                                `(a (@ (href ,item-link)
-                                       (class "wm-tile-cover block w-full aspect-square shrink-0 overflow-hidden"))
-                                    (img (@ (loading "lazy")
-                                            (class "w-full h-full object-cover transition-transform duration-300 hover:scale-105")
-                                            ;; The cover is the whole of the link
-                                            ;; around it, so its name is the only
-                                            ;; name that link has: an empty `alt'
-                                            ;; would leave a link a screen reader
-                                            ;; can only announce as "link".
-                                            (alt ,(assq-ref x
-                                                            'display-name))
-                                            (src ,(uri-decode (assq-ref art
-                                                                        'content-url)))) "")))
-                              (cond
-                                [(nil? artworks)
-                                 '()]
-                                [else (car artworks)]))
+           ;; Cover.  A tile whose entity has no artwork keeps the square and
+           ;; draws the placeholder in it: the grid stays a grid, and the name
+           ;; under it stays where it was.
+           ,@(if (or (nil? artworks)
+                   (null? artworks))
+               `((a (@ (href ,item-link)
+                       (class "wm-tile-cover block w-full aspect-square shrink-0 overflow-hidden")
+                       ;; The square is the whole of the link, so its name is
+                       ;; the only name that link has.
+                       (aria-label ,(assq-ref x
+                                              'display-name)))
+                    ,@(entity-placeholder entity)))
+               `((a (@ (href ,item-link)
+                       (class "wm-tile-cover block w-full aspect-square shrink-0 overflow-hidden"))
+                    (img (@ (loading "lazy")
+                            (class "w-full h-full object-cover transition-transform duration-300 hover:scale-105")
+                            (alt ,(assq-ref x
+                                            'display-name))
+                            (src ,(uri-decode (assq-ref (car artworks)
+                                                        'content-url)))) ""))))
 
            ;; Content
            (div (@ (class "wm-tile-body flex flex-col gap-1 grow min-w-0 text-center"))
@@ -1429,54 +1457,42 @@ unchanged.  Everything else a page is built from is text."
                                                     (assoc-ref o
                                                                'is-dislike))))
                                         opinions)))
-         (opinion-buttons `((div (@ (class ,(mk-class '(flex flex-row
-                                                             flex-wrap gap-3))))
+         ;; The two opinions, as two thumbs.  The colour says which is which,
+         ;; the figure says how many readers agree, and the word that used to
+         ;; sit beside them said the same thing twice.  They are buttons rather
+         ;; than links because they post, and each names itself -- with the
+         ;; count -- to a reader who cannot see the glyph.
+         (opinion-buttons `((div (@ (class "wm-opinions"))
                                  (form (@ (method POST)
                                           (action ,(format #f
-                                                           "/~as/uuid/~a/like" entity
+                                                           "/~as/uuid/~a/like"
+                                                           entity
                                                            (assq-ref x
                                                                      'identifier))))
-                                       ,(icon-button #:icon 'thumbs-up
-                                                     #:color '(text-stone-100)
-                                                     #:background '(bg-asparagus-500)
-                                                     #:hover-background '(hover:bg-asparagus-900
-                                                                          dark:hover:bg-asparagus-300)
-                                                     #:type 'submit
-                                                     #:icon-css '(text-lg
-                                                                  text-stone-300
-                                                                  dark:text-stone-300)
-                                                     #:content `(div ,(G_
-                                                                       "like")
-                                                                     (span (@ (class ,(mk-class '(font-light
-                                                                                                  text-md))))
-                                                                           ,(format
-                                                                             #f
-                                                                             " ( ~a ) "
-                                                                             like-count)))))
+                                       (button (@ (type "submit")
+                                                  (class "wm-thumb wm-thumb-up")
+                                                  (aria-label ,(format #f "~a, ~a"
+                                                                       (G_ "like")
+                                                                       like-count)))
+                                               ,(icon #:type 'thumbs-up)
+                                               (span (@ (class "wm-thumb-count"))
+                                                     ,(number->string
+                                                       like-count))))
                                  (form (@ (method POST)
                                           (action ,(format #f
                                                            "/~as/uuid/~a/dislike"
                                                            entity
                                                            (assq-ref x
                                                                      'identifier))))
-                                       ,(icon-button #:icon 'thumbs-down
-                                                     #:color '(text-stone-100)
-                                                     #:background '(bg-redwood-500)
-                                                     #:hover-background '(hover:bg-redwood-900
-                                                                          dark:hover:bg-redwood-300)
-                                                     #:type 'submit
-                                                     #:icon-css '(text-lg
-                                                                  text-stone-300
-                                                                  dark:text-stone-300)
-                                                     #:content `(div ,(G_
-                                                                       "dislike")
-
-                                                                     (span (@ (class ,(mk-class '(font-light
-                                                                                                  text-sm))))
-                                                                           ,(format
-                                                                             #f
-                                                                             " ( ~a ) "
-                                                                             dislike-count))))))))
+                                       (button (@ (type "submit")
+                                                  (class "wm-thumb wm-thumb-down")
+                                                  (aria-label ,(format #f "~a, ~a"
+                                                                       (G_ "dislike")
+                                                                       dislike-count)))
+                                               ,(icon #:type 'thumbs-down)
+                                               (span (@ (class "wm-thumb-count"))
+                                                     ,(number->string
+                                                       dislike-count)))))))
          ;; A description is Org markup, and a reader who has only ever seen
          ;; plain text there would not know that a list or a link is theirs to
          ;; write.  The note is a tooltip, so it costs the page no line.
@@ -1558,10 +1574,12 @@ unchanged.  Everything else a page is built from is text."
                                                             justify-center)
                          #:no-js-hint (G_
                                        "several pictures — scroll sideways to see them"))
-               ;; A page whose entity has no picture draws no box for one: a
-               ;; childless `div' serializes as a self-closed tag, which HTML
-               ;; reads as an opening tag and nests the rest of the page inside.
-               (if (null? rendered-artworks) '()
+               ;; An entity with no picture is drawn with the placeholder its
+               ;; entity class has, at the height a photograph would take, so
+               ;; the panel keeps the shape it has on every other page.
+               (if (null? rendered-artworks)
+                 `((div (@ (class "wm-media-placeholder"))
+                        ,@(entity-placeholder entity)))
                  (list `(div ,rendered-artworks))))
            (div (@ (class "wm-panel-body"))
                 (div (@ (class "wm-entity-actions"))
@@ -2225,7 +2243,7 @@ function addSearchQueryParam(form) {
   return true; // Allow default submission if the input is empty
 }
 ")
-    (div (@ (class ,(mk-class '(my-3))))
+    (div (@ (class "wm-search-row"))
          ;; The field and the control that sends it are one pill, at every
          ;; width: a reader who has typed a word is looking at the button beside
          ;; it, not below it.  The input takes whatever room the button leaves,
