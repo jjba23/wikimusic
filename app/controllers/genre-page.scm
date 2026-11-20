@@ -291,6 +291,11 @@
                                              #:limit 0
                                              #:offset 0
                                              #:search-query ""
+                                             ;; The shelf sits in a detail page's
+                                             ;; 48rem column: six to a row left
+                                             ;; each song 110px wide and cut its
+                                             ;; name.  Three to a row read.
+                                             #:grid-size "large"
                                              #:user-sort song-user-sort)))
          (update-genre-by-id genre-repo genre-id
                              `((views unquote inc-v)))

@@ -1796,6 +1796,15 @@ not run the width of a desk. */
   max-width: 48rem;
 }
 
+/* A genre's shelf on a phone: the largest tile size draws one to a row, which is
+   fifteen screens of artwork for fifteen songs.  Two to a row is the shape the
+   covers are drawn for. */
+@media (max-width: 639px) {
+  .wm-detail .wm-list .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* The horizontal gutter of a song page is the shell's on a phone and the
    markup's own from the medium breakpoint up (`px-0 md:px-6' on the element),
    so this padding is the vertical rhythm only. */
