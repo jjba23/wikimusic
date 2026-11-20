@@ -813,6 +813,30 @@ and `entity-placeholder' fill their own, and the suite renders them instead."
              (render (entity-placeholder 'artist))
              (render (entity-placeholder 'genre)))))))
 
+;;; ====== The chords a tab highlights ======
+;;;
+;;; A highlighted chord is drawn by a class the script writes, so the sheet and
+;;; the script have to agree on the name: a class one of them renames is a silent
+;;; no-op in the other, and the chord goes back to being only letters.  What the
+;;; mark looks like is the sheet's to say, which is why the script names one of
+;;; this site's classes rather than a set of utilities to keep in step.
+
+(define chord-script
+  (call-with-input-file "pub/js/song-chord-highlighter.js"
+    (lambda (port) (get-string-all port))))
+
+(define chord-sheet
+  (call-with-input-file "pub/css/wikimusic.css"
+    (lambda (port) (get-string-all port))))
+
+(define chord-suite
+  (suite "The chords a tab highlights"
+    (test "the class the script writes is one the sheet draws"
+      (assert-true (if (string-contains chord-script "wm-chord") #t #f)
+                   #:name "the script names wm-chord")
+      (assert-true (if (string-contains chord-sheet ".wm-chord") #t #f)
+                   #:name "the sheet styles wm-chord"))))
+
 (define (spec)
   (veritas-run locale-suite
     ascii-suite
@@ -823,4 +847,5 @@ and `entity-placeholder' fill their own, and the suite renders them instead."
     assets-suite
     picture-suite
     escaping-suite
-    glyph-suite))
+    glyph-suite
+    chord-suite))

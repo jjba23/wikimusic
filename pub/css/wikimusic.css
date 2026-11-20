@@ -903,6 +903,26 @@ a.wm-size-step:hover {
   text-rendering: optimizeSpeed;
 }
 
+/* ===== A chord in a tab is set apart, not repainted =====
+
+   A highlighted chord was drawn in the site's deepest pink at its heaviest
+   weight, which made the one thing a reader scans for the loudest thing on the
+   page -- and on the dark paper a tab can be read on, a smudge.  The mark is
+   the tab's own ink now: a wash and a hairline under the letters, both mixed
+   from `currentColor', so it reads the same on the white paper, the dark one
+   and the page's own surface.  The weight carries it for a reader who cannot
+   tell a wash of ink from ink, and JuliaMono's bold keeps its columns.
+
+   The box draws around the letters and adds nothing to them: no padding and no
+   space of its own, so a chord still sits in the columns the tab is read in. */
+
+.wm-chord {
+  font-weight: 600;
+  background: color-mix(in oklch, currentColor 10%, transparent);
+  box-shadow: inset 0 -1px 0 0 color-mix(in oklch, currentColor 38%, transparent);
+  border-radius: 0.2em;
+}
+
 /* ===== A legend, quieter than the tab it explains
 
    A legend is a key to the marks a tab uses, not the music, and it arrived as

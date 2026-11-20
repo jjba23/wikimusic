@@ -838,11 +838,18 @@ players have written and passed around -- is a page to practise from rather than
 only to read.
 
 - *Auto-scrolling* moves the tab down the screen at a speed the reader chooses,
-  a few lines at a time, so a hand is free to play.
+  so a hand is free to play.  The two menus are one speed: lines per step
+  against seconds per step, which is how many lines pass a second.  The scroll
+  travels at that speed in every frame rather than jumping a block of lines on
+  a timer, so changing either menu changes it under the reader's hand, and the
+  scroll ends on the last line of the tab.  The reader's hand wins over it: a
+  wheel turn, a touch drag, a scroll key or the button stops it.
 - The *chords the tab names* are collected and shown under it as a small
   *guitar chord guide*, each chord with the fingering the transposition implies
   (=Am  x02210=, =F  133211=), and a control highlights those chord names in
-  the tab itself.
+  the tab itself.  A highlight is the tab's own ink -- a wash and a hairline
+  under the letters, never a second colour -- so the chords are found without
+  the page shouting over the music, on white paper and on dark paper alike.
 - The *metronome* under the song is a click track whose sound is *made* in the
   browser -- twenty milliseconds of a shaped tone per beat -- rather than
   fetched, so a reader who never opens it pays nothing for it, and its tempo,

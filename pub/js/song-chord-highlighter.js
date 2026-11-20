@@ -32,8 +32,11 @@ const highlightChords = (id) => {
         preElement.appendChild(document.createTextNode(originalContent.slice(lastIndex, matchIndex)))
       }
 
+      // The mark is the sheet's own (`pub/css/wikimusic.css'): the tab's ink, a
+      // wash and a hairline, so the chords are found without the page shouting
+      // and the box holds the columns the tab is read in.
       const strongElement = document.createElement('strong')
-      strongElement.className = 'font-black text-persia-pink-900 dark:text-persia-pink-300 font-mono'
+      strongElement.className = 'wm-chord'
       strongElement.textContent = matchText
       preElement.appendChild(strongElement)
 
