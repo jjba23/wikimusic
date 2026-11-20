@@ -1,0 +1,63 @@
+#+title: Release notes
+#+subtitle: what each release of WikiMusic changed
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: toc:nil num:nil
+
+Each section is one release of WikiMusic: the version and the day it was cut in
+the heading, and what a reader of the site will notice under /Added/, /Changed/
+and /Fixed/.  A release is this section, an annotated =vX.Y.Z= tag on the commit
+it describes, and the same words published on the forge.
+
+The version follows SemVer.  A new thing is MINOR, a fix is PATCH, and a change
+that takes something away -- an export, a flag, the shape of a file -- is MAJOR.
+The first section is the next release: what has landed since the last tag waits
+there under the headings below, unnamed until the day it is cut.
+
+The file starts at =v1.19.0=; the releases before it are on the forge, at
+[[https://github.com/jjba23/wikimusic/releases][github.com/jjba23/wikimusic/releases]].
+
+* Unreleased
+:PROPERTIES:
+:CUSTOM_ID: unreleased
+:END:
+
+Since =v1.19.0=, and in the shape the sections below take.
+
+** Fixed
+- The tab's chord highlight decides by line: only a line whose every word is a
+  chord name is marked, so a title's =Am= and a heading's =A= stay what they are.
+  (=8bcc943=)
+- A drag of the page's scrollbar stops the tab's auto-scroll.  The loop records
+  each position it scrolls to, and a page found anywhere else is the reader's
+  and wins.  (=c6ac0ae=)
+
+* v1.19.0 -- 2026-11-20
+:PROPERTIES:
+:CUSTOM_ID: v1-19-0
+:END:
+
+** Added
+- Auto-scrolling travels at one steady speed instead of jumping a block of lines
+  on a timer.  The two menus are one speed -- lines per step against seconds per
+  step -- and are read while it runs, so changing either is felt under the hand.
+  It ends on the last line of the tab, and a wheel turn, a touch drag, a scroll
+  key or a second press stops it.
+- A highlighted chord is drawn in the tab's own ink: a wash and a hairline under
+  the letters, never a second colour, so it reads the same on white paper, on
+  dark paper and on the page's own surface.  The box adds nothing to the
+  characters, so the columns a tab is read in do not move.
+
+** Fixed
+- The bar keeps every one of its controls on a phone: one row of thumb-sized
+  targets that scroll sideways, and below 640px the glyphs give way to words so
+  each control still names itself.  The theme switch gained its word in all four
+  catalogs (=theme=, =thema=, =tema=, =テーマ=).
+- Images that had been drawn empty or oversized are drawn at their panel's size:
+  the tile-size control's glyph, the donation figure, the practice block, the
+  cover column and the detail column.
+- The songs under an artist or a genre are readable: three to a row at 230px
+  with the name whole inside the detail column, and two to a row on a phone,
+  where the six-to-a-row size a list page uses left each cover 110px wide and
+  every name cut short.
