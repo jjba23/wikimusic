@@ -26,6 +26,8 @@
 (define-module (veritas unit views-spec)
   #:use-module (veritas veritas)
   #:use-module (ice-9 format)
+  #:use-module (ice-9 ftw)
+  #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 regex)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-13)
@@ -693,6 +695,124 @@ the details block counts with."
         (assert-true (and (string-contains html "aria-label=\"like, 0\"") #t)
           #:name "and a name for a reader who cannot see the glyph")))))
 
+;;; ====== The glyphs the markup asks the sheet for ======
+;;;
+;;; An icon is two classes: the family the helper builds from the weight it was
+;;; given, and the name the call site passed.  The vendored sheet carries one
+;;; family -- `ph' -- and its own list of names, so a call asking for any other
+;;; weight draws nothing at all: an empty square where a control should be,
+;;; which is how a `bold' request went unseen until a page was looked at.
+;;;
+;;; These assertions read the sheet and the source, so a glyph that is not there
+;;; fails the suite instead of showing up blank on the site.
+
+(define glyph-sheet
+  (call-with-input-file "pub/vendor/phosphor/phosphor.css"
+    (lambda (port) (get-string-all port))))
+
+;; The names the vendored sheet draws, spelled the way a class spells them.
+(define sheet-glyph-names
+  (all-matches "\\.ph\\.ph-([a-z0-9-]+):before" glyph-sheet))
+
+(define (scheme-files directory)
+  "Return the Scheme files DIRECTORY holds."
+  (map (lambda (name) (string-append directory "/" name))
+       (scandir directory (lambda (name) (string-suffix? ".scm" name)))))
+
+(define (glyph-calls form)
+  "Return every `(icon ...)' call in FORM, however deeply nested it is.
+
+A source file is not made of proper lists only -- `(lambda (key . args) ...)'
+has a tail -- so this walks pair by pair instead of by list."
+  (if (not (pair? form))
+    '()
+    (append (if (eq? (car form) 'icon) (list form) '())
+            (glyph-calls (car form))
+            (glyph-calls (cdr form)))))
+
+(define (keyword-value form key)
+  "Return the value FORM gives KEY, or #f."
+  (let loop ((rest (cdr form)))
+    (cond [(null? rest) #f]
+          [(eq? (car rest) key) (and (pair? (cdr rest)) (cadr rest))]
+          [else (loop (cdr rest))])))
+
+(define (literal-symbol value)
+  "Return VALUE as a symbol when it is a quoted one, else #f."
+  (if (and (pair? value) (eq? (car value) 'quote) (symbol? (cadr value)))
+    (cadr value)
+    #f))
+
+(define (icon-requests)
+  "Return a (TYPE . WEIGHT) pair for every icon call whose arguments are literals.
+
+A call that names its glyph through a variable is not here: `grid-size-select'
+and `entity-placeholder' fill their own, and the suite renders them instead."
+  (let* ((files (append (scheme-files "lib/wikimusic")
+                        (scheme-files "app/views")))
+         (calls (append-map (lambda (file)
+                              (call-with-input-file file
+                                (lambda (port)
+                                  (let loop ((found '()))
+                                    (let ((form (read port)))
+                                      (if (eof-object? form)
+                                        found
+                                        (loop (append (glyph-calls form) found))))))))
+                            files)))
+    (delete-duplicates
+     (filter-map (lambda (call)
+                   (let ((type (literal-symbol (keyword-value call #:type))))
+                     (and type
+                          (cons type
+                                (or (literal-symbol (keyword-value call #:weight))
+                                    'regular)))))
+                 calls))))
+
+(define (glyph-tokens html)
+  "Return every glyph class token HTML carries."
+  (delete-duplicates
+   (filter (lambda (token) (string-prefix? "ph-" token))
+           (append-map string-tokenize (class-attributes html)))))
+
+(define glyph-suite
+  (suite "The glyphs the markup asks the sheet for"
+    (test "every glyph named in the source is one the sheet draws"
+      (for-each
+       (lambda (request)
+         (let ((name (symbol->string (car request))))
+           (assert-true (if (member name sheet-glyph-names) #t #f)
+                        #:name name)))
+       (icon-requests)))
+
+    (test "every weight asked for is a family the sheet carries"
+      (for-each
+       (lambda (weight)
+         (let ((family (if (eq? weight 'regular)
+                         "ph"
+                         (format #f "ph-~a" (symbol->string weight)))))
+           (assert-true (if (string-contains glyph-sheet
+                                             (format #f ".~a" family))
+                            #t
+                            #f)
+                        #:name family)))
+       (delete-duplicates (map cdr (icon-requests)))))
+
+    (test "the controls that choose their glyph draw one the sheet has"
+      (for-each
+       (lambda (html)
+         (for-each
+          (lambda (token)
+            (assert-true (if (or (equal? token "ph")
+                                 (member (substring token 3) sheet-glyph-names))
+                          #t
+                          #f)
+                         #:name token))
+          (glyph-tokens html)))
+       (list (render (grid-size-select G_ #:entity 'song #:size "medium"))
+             (render (entity-placeholder 'song))
+             (render (entity-placeholder 'artist))
+             (render (entity-placeholder 'genre)))))))
+
 (define (spec)
   (veritas-run locale-suite
     ascii-suite
@@ -702,4 +822,5 @@ the details block counts with."
     shell-suite
     assets-suite
     picture-suite
-    escaping-suite))
+    escaping-suite
+    glyph-suite))
