@@ -1879,10 +1879,11 @@ throw the results away."
                                                              dark:hover:bg-onyx-500/40
                                                              hover:text-persia-pink-500
                                                              dark:hover:text-persia-pink-300))))))
+                            ;; One weight, because the vendored Phosphor sheet
+                            ;; carries the regular face only: asking for bold
+                            ;; drew an empty box for whichever size was
+                            ;; current.  The colour says which one is.
                             ,(icon #:type glyph
-                                   #:weight (if current?
-                                              'bold
-                                              'regular)
                                    #:icon-css '(text-base))))))
                   (list (list "small"
                               'dots-nine
@@ -1890,8 +1891,11 @@ throw the results away."
                         (list "medium"
                               'squares-four
                               (G_ "Medium tiles"))
+                        ;; A bare square read as an unticked box next to the two
+                        ;; grids; a square with its corners marked is a frame,
+                        ;; which is what one tile of the largest size is.
                         (list "large"
-                              'square
+                              'bounding-box
                               (G_ "Large tiles"))))))))
 
 ;;; ====== The sizes a song page's ascii contents are read in ======

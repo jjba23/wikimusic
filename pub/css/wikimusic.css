@@ -441,19 +441,33 @@ a:focus-visible .wm-wordmark-accent {
 
   /* Seven controls at a readable size make two rows on a phone, and a bar that
      is pinned to the top of a 640px-tall screen cannot spend 140px of it.  The
-     row stays one row and scrolls sideways instead: the next control is always
-     half visible, which is what tells a thumb there is more of it.  The scroll
-     bar itself is hidden because it would be a second bar under the first. */
+     words go instead, not the controls: every one of the seven keeps its 40px
+     square and its glyph, and the label it used to show stays in the markup for
+     a reader who is read to.  The row that scrolled sideways kept the words and
+     lost its last two controls -- articles and the theme switch -- off the edge
+     of the screen, where nothing could tell a thumb they were there. */
   .wm-nav > div:last-child {
     flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    scrollbar-width: none;
-    overscroll-behavior-x: contain;
+    justify-content: center;
   }
 
-  .wm-nav > div:last-child::-webkit-scrollbar {
-    display: none;
+  .wm-nav a button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .wm-nav a button,
+  .wm-nav > div:last-child > button {
+    min-width: 2.5rem;
+    justify-content: center;
+    padding-inline: 0.35rem;
   }
 }
 
@@ -1543,12 +1557,22 @@ not run the width of a desk. */
   }
 
   .wm-page .wm-panel > div:first-child:not(.wm-panel-body) {
-    flex: 0 0 min(22rem, 42%);
+    flex: 0 0 min(16rem, 38%);
     min-width: 0;
   }
 
+  /* The facts column is short -- two opinions, the way to the editor and one
+     line of page information -- beside a cover that is tall.  Left at the top
+     it left the panel's whole right half empty from the first row down; the
+     facts now start at the top and the bookkeeping ends at the bottom, which
+     is what the panel's height is for. */
   .wm-page .wm-panel-body {
+    display: flex;
     flex: 1 1 0;
+    flex-direction: column;
+    align-self: stretch;
+    justify-content: space-between;
+    gap: 1rem;
     min-width: 0;
   }
 }
@@ -1728,6 +1752,14 @@ not run the width of a desk. */
   padding-block: 0.5rem 2.5rem;
 }
 
+/* An artist or a genre page is a name, a sleeve and the songs filed under them:
+   held to the full reading measure the sleeve was a wide card with its few
+   controls and a field of nothing beside them, and the one song under an artist
+   was a thumbnail in a shelf built for six.  The column is the page. */
+.wm-detail {
+  max-width: 48rem;
+}
+
 /* The horizontal gutter of a song page is the shell's on a phone and the
    markup's own from the medium breakpoint up (`px-0 md:px-6' on the element),
    so this padding is the vertical rhythm only. */
@@ -1856,10 +1888,13 @@ not run the width of a desk. */
    The click track and its heading share the reading column's left edge, so the
    page reads as a column rather than as a stack of blocks with their own
    margins. */
+/* A metronome is four small controls, not a panel: held to the reading measure
+   it was a wide empty card with a handful of pills in its top-left corner. */
 .wm-practice {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  max-width: 34rem;
   padding: 0.75rem 1rem;
   border: 1px solid var(--wm-line);
   border-radius: 0.9rem;
@@ -1925,7 +1960,7 @@ not run the width of a desk. */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.9rem;
 }
 
 .wm-figure {
@@ -1937,10 +1972,14 @@ not run the width of a desk. */
   box-shadow: var(--wm-shadow);
 }
 
+/* The picture is the deployment's social card, which is wide and was drawn to
+   be looked at in a chat window.  At the reading measure it took the lower half
+   of the front page and read as an advertisement; at 12rem it is the mark of
+   the place beside the one sentence that asks for anything. */
 .wm-figure img {
   display: block;
   width: 100%;
-  max-width: 34rem;
+  max-width: 12rem;
   height: auto;
   border-radius: 0.8rem;
 }

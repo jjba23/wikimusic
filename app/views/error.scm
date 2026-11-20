@@ -239,7 +239,6 @@ invited to sign in again."
                                                                   justify-center
                                                                   gap-3))))
                                            ,(icon #:type drawing
-                                                  #:weight 'bold
                                                   #:icon-css (append tone
                                                                      '(text-4xl
                                                                        sm:text-5xl)))
