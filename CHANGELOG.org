@@ -23,7 +23,13 @@ The file starts at =v1.19.0=; the releases before it are on the forge, at
 :CUSTOM_ID: unreleased
 :END:
 
-Since =v1.19.0=, and in the shape the sections below take.
+Nothing has landed since =v1.19.1=.  A change waits here under /Added/, /Changed/
+or /Fixed/, and the heading takes its version and its day when the release is cut.
+
+* v1.19.1 -- 2026-11-20
+:PROPERTIES:
+:CUSTOM_ID: v1-19-1
+:END:
 
 ** Fixed
 - The tab's chord highlight decides by line: only a line whose every word is a
