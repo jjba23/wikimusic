@@ -243,6 +243,42 @@
                                                    list-description))
                      #:body body))))
 
+;; The facts the song itself carries -- its key, its tuning, when it was written
+;; and the album it is from -- as the row of cards under its name.  These are
+;; the song's and not the row's: a reader came for the key and the tuning, so
+;; they are shown, while the row's own bookkeeping is a press away in
+;; `entity-details'.  A fact the song does not carry is left out rather than
+;; drawn empty, and the album's link is a link because that is what it is.
+(define (song-facts G_ song)
+  "Return the facts SONG carries, as the cards a reader skims under its name."
+  (let* ((text (lambda (key)
+                 (let ((value (assq-ref song key)))
+                   (and (string? value)
+                     (not (string-null? value))
+                     value))))
+         (album-link (text 'album-info-link))
+         (facts (filter (lambda (fact)
+                          (cdr fact))
+                        (list (cons (G_ "tuning")
+                                    (text 'music-tuning))
+                              (cons (G_ "music key")
+                                    (text 'music-key))
+                              (cons (G_ "music creation date")
+                                    (text 'music-creation-date))
+                              (cons (G_ "album")
+                                    (text 'album-name))
+                              (cons (G_ "album info")
+                                    (and album-link
+                                      `(a (@ (href ,(uri-decode album-link)))
+                                          ,(G_ "album info"))))))))
+    (if (null? facts) '()
+      `(dl (@ (class "wm-facts"))
+           ,@(map (lambda (fact)
+                    `(div (@ (class "wm-fact"))
+                          (dt ,(car fact))
+                          (dd ,(cdr fact))))
+                  facts)))))
+
 (define* (song-detail-page G_
                            #:key song
                            artworks
@@ -416,46 +452,9 @@
                                                                            "genre"
                                                                            genres-node))
                                                                     '())))))
-         (song-attributes `((div (@ (class ,(mk-class '(px-4 py-6 mx-auto))))
-                                 (dl ;The row's own keys are the hyphenated
-                                  ;; ones the repository asked SQL for; a
-                                  ;; column named with an underscore is
-                                  ;; not there, so each of these is `#f'
-                                  ;; and the whole list below rendered as
-                                  ;; nothing at all.
-                                  ,(render-if-nestring (lambda (tuning)
-                                                         (list (dt (G_
-                                                                    "tuning"))
-                                                               (dd tuning)))
-                                                       (assq-ref song
-                                                                 'music-tuning))
-                                  ,(render-if-nestring (lambda (keyy)
-                                                         (list (dt (G_
-                                                                    "music key"))
-                                                               (dd keyy)))
-                                                       (assq-ref song
-                                                                 'music-key))
-                                  ,(render-if-nestring (lambda (music-creation-date)
-                                                         (list (dt (G_
-                                                                    "music creation date"))
-                                                               (dd
-                                                                music-creation-date)))
-                                                       (assq-ref song
-                                                                 'music-creation-date))
-                                  ,(render-if-nestring (lambda (album-name)
-                                                         (list (dt (G_
-                                                                    "album name"))
-                                                               (dd
-                                                                album-name)))
-                                                       (assq-ref song
-                                                                 'album-name))
-                                  ,(render-if-nestring (lambda (album-link)
-                                                         (list (dt (G_
-                                                                    "album info link"))
-                                                               (dd (a (uri-decode
-                                                                       album-link)))))
-                                                       (assq-ref song
-                                                                 'album-info-link)))))))
+         ;; The song's own facts, as the row of cards under its name (see
+         ;; `song-facts').
+         (facts (song-facts G_ song)))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:title page-title
@@ -475,108 +474,120 @@
                    ;; of it is the width of a tab's first column, and a song
                    ;; page is read rather than skimmed.  From the medium
                    ;; breakpoint up there is room for both.
-                   #:body `((div (@ (class ,(mk-class '(px-0 py-2 md:px-6
-                                                             md:py-4))))
-                                 ((div (@ (class ,(mk-class '(flex flex-col
-                                                                   gap-4))))
-                                       (div (@ (class ,(mk-class '(py-4))))
-                                            ,(wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display leading-10 md:text-10 text-3xl text-onyx-300" (assq-ref song
-                                                                                                                                                                                   'display-name)))
-                                       ,(when (not (nil? artists))
-                                          `((div (@ (class ,(mk-class '(flex
-                                                                        flex-row
-                                                                        flex-wrap
-                                                                        gap-4
-                                                                        items-center
-                                                                        items-center
-                                                                        justify-start))))
-                                                 ,(em "by:")
-                                                 ,artist-name-titles)))
-                                       ,(when (not (nil? genres))
-                                          `((div (@ (class ,(mk-class '(flex
-                                                                        flex-row
-                                                                        flex-wrap
-                                                                        gap-4
-                                                                        items-center
-                                                                        items-center
-                                                                        justify-start))))
-                                                 ,(em "genres:")
-                                                 ,genre-name-titles))))
-
-                                  (div (div ,(entity-details G_
-                                                             #:entity 'song
-                                                             #:x song
-                                                             #:artworks
-                                                             artworks
-                                                             #:opinions
-                                                             opinions
-                                                             #:comments
-                                                             comments
-                                                             #:user-alist
-                                                             user-alist)))))
-                            ,(render-external-sources G_ external-sources)
-                            (div (@ (class ,(mk-class '(py-1 px-5))))
-                                 ,(sub-h3 (G_ "metronome"))
-                                 ,(metronome-widget G_
-                                                    #:id (format #f
-                                                                 "metronome-~a"
-                                                                 (assq-ref song
-                                                                           'identifier))
-                                                    #:tempo (or tab-tempo 120)))
-
-                            (div song-attributes
-                                 (div (@ (class "wm-song-setting"))
-                                      ;; The size the ascii contents are read
-                                      ;; at, said in the reader's own terms:
-                                      ;; the control steps up and down and
-                                      ;; shows the share it is drawn at, and
-                                      ;; the page remembers the choice for the
-                                      ;; next song they open (see
-                                      ;; `(wikimusic html)' and the route).
-                                      ,(sub-h3 (G_ "ascii size"))
-                                      ,(ascii-size-control G_
-                                                           #:route song-path
-                                                           #:size ascii-size
-                                                           #:paper (ascii-paper-known
-                                                                    ascii-theme)
-                                                           #:face (ascii-face-known
-                                                                   ascii-face)))
-                                 ;; The paper the tab is drawn on and the
-                                 ;; face it is set in.  Both are remembered
-                                 ;; beside the size and travel in the same
-                                 ;; address, so each control changes one
-                                 ;; without resetting the others (see
-                                 ;; `ascii-preference-href').
-                                 (div (@ (class "wm-song-setting"))
-                                      ,(sub-h3 (G_ "ascii paper"))
-                                      ,(ascii-choice-control
-                                        G_
-                                        #:id "ascii-theme"
-                                        #:label "ascii paper"
-                                        #:key "ascii-theme"
-                                        #:options ascii-paper-steps
-                                        #:selected (ascii-paper-known
-                                                    ascii-theme)
-                                        #:route song-path
-                                        #:size ascii-size
-                                        #:paper ascii-theme
-                                        #:face ascii-face))
-                                 (div (@ (class "wm-song-setting"))
-                                      ,(sub-h3 (G_ "ascii face"))
-                                      ,(ascii-choice-control
-                                        G_
-                                        #:id "ascii-face"
-                                        #:label "ascii face"
-                                        #:key "ascii-face"
-                                        #:options ascii-face-steps
-                                        #:selected (ascii-face-known
-                                                    ascii-face)
-                                        #:route song-path
-                                        #:size ascii-size
-                                        #:paper ascii-theme
-                                        #:face ascii-face)))
-
-                            (div ,(render-song-content G_ song song-contents
-                                                       ascii-size
-                                                       #:paper ascii-theme
-                                                       #:face ascii-face))))))
+                   ;; The page is one column: the song's name, who wrote it,
+                   ;; what the song carries, the panel holding its pictures and
+                   ;; its opinions, and then the music itself.  What belongs to
+                   ;; the page rather than to the song -- the metronome's
+                   ;; settings, the size its tab is drawn at -- is folded into
+                   ;; one row that a reader opens when they want it.
+                   ;; A phone's gutter is the shell's own: a second one on top of
+                   ;; it is the width of a tab's first column, and a song page
+                   ;; is read rather than skimmed.  From the medium breakpoint
+                   ;; up there is room for both.
+                   #:body `((div (@ (class "wm-song px-0 md:px-6"))
+                                 (header (@ (class "wm-song-head"))
+                                         ,(wm-page-heading "wm-song-title"
+                                                           song-name)
+                                         ,@(if (nil? artists)
+                                             '()
+                                             `((div (@ (class "wm-song-meta"))
+                                                    (em ,(G_ "by"))
+                                                    ,artist-name-titles)))
+                                         ,@(if (nil? genres)
+                                             '()
+                                             `((div (@ (class "wm-song-meta"))
+                                                    (em ,(G_ "genres"))
+                                                    ,genre-name-titles))))
+                                 ,facts
+                                 (div ,(entity-details G_
+                                                        #:entity 'song
+                                                        #:x song
+                                                        #:artworks artworks
+                                                        #:opinions opinions
+                                                        #:comments comments
+                                                        #:user-alist
+                                                        user-alist))
+                                 ,(render-external-sources G_
+                                                           external-sources)
+                                 (div (@ (class "wm-practice"))
+                                      ,(sub-h3 (G_ "metronome"))
+                                      ,(metronome-widget G_
+                                                         #:id (format #f
+                                                                      "metronome-~a"
+                                                                      (assq-ref
+                                                                       song
+                                                                       'identifier))
+                                                         #:tempo (or tab-tempo
+                                                                     120)))
+                                 (details (@ (class "wm-reading-options"))
+                                          (summary (@ (class
+                                                       "wm-reading-options-summary"))
+                                                   ,(icon #:type
+                                                          'sliders-horizontal
+                                                          #:icon-css '(text-base))
+                                                   ,(G_ "reading options"))
+                                          (div (@ (class "wm-song-setting"))
+                                               ;; The size the ascii contents
+                                               ;; are read at, said in the
+                                               ;; reader's own terms: the control
+                                               ;; steps up and down and shows the
+                                               ;; share it is drawn at, and the
+                                               ;; page remembers the choice for
+                                               ;; the next song they open (see
+                                               ;; `(wikimusic html)' and the
+                                               ;; route).
+                                               ,(sub-h3 (G_ "ascii size"))
+                                               ,(ascii-size-control G_
+                                                                    #:route
+                                                                    song-path
+                                                                    #:size
+                                                                    ascii-size
+                                                                    #:paper
+                                                                    (ascii-paper-known
+                                                                     ascii-theme)
+                                                                    #:face
+                                                                    (ascii-face-known
+                                                                     ascii-face)))
+                                          ;; The paper the tab is drawn on and
+                                          ;; the face it is set in.  Both are
+                                          ;; remembered beside the size and
+                                          ;; travel in the same address, so each
+                                          ;; control changes one without
+                                          ;; resetting the others (see
+                                          ;; `ascii-preference-href').
+                                          (div (@ (class "wm-song-setting"))
+                                               ,(sub-h3 (G_ "ascii paper"))
+                                               ,(ascii-choice-control
+                                                 G_
+                                                 #:id "ascii-theme"
+                                                 #:label "ascii paper"
+                                                 #:key "ascii-theme"
+                                                 #:options ascii-paper-steps
+                                                 #:selected (ascii-paper-known
+                                                             ascii-theme)
+                                                 #:route song-path
+                                                 #:size ascii-size
+                                                 #:paper ascii-theme
+                                                 #:face ascii-face))
+                                          (div (@ (class "wm-song-setting"))
+                                               ,(sub-h3 (G_ "ascii face"))
+                                               ,(ascii-choice-control
+                                                 G_
+                                                 #:id "ascii-face"
+                                                 #:label "ascii face"
+                                                 #:key "ascii-face"
+                                                 #:options ascii-face-steps
+                                                 #:selected (ascii-face-known
+                                                             ascii-face)
+                                                 #:route song-path
+                                                 #:size ascii-size
+                                                 #:paper ascii-theme
+                                                 #:face ascii-face)))
+                                 (div ,(render-song-content G_
+                                                            song
+                                                            song-contents
+                                                            ascii-size
+                                                            #:paper
+                                                            ascii-theme
+                                                            #:face
+                                                            ascii-face)))))))

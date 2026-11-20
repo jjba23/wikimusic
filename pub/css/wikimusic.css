@@ -34,15 +34,49 @@
    to the lighter pinks, because a deep pink on a dark page is a smudge. */
 
 :root {
-  --wm-brand: oklch(0.6904 0.1399 348.9);
-  --wm-brand-hover: oklch(0.6404 0.1399 348.9);
+  /* The brand, and the surfaces a page is read on.
+
+     `--wm-ink' and `--wm-paper' keep the meaning the rules above already give
+     them -- the darkest and the lightest thing in the palette -- so a rule that
+     names one of them still says what it said.  The tokens below are the ones
+     the interface layer at the end of this sheet is drawn with: a warm paper, a
+     rose that holds its contrast at reading size, and the amber that finishes a
+     gradient beside it rather than a second pink. */
+  --wm-brand: oklch(0.60 0.185 355);
+  --wm-brand-hover: oklch(0.52 0.185 355);
+  --wm-accent: oklch(0.68 0.14 62);
   --wm-ink: oklch(0.2588 0.0044 247.95);
   --wm-paper: oklch(0.987 0.0013 286.37);
+  --wm-page: oklch(0.982 0.007 75);
+  --wm-surface: oklch(0.998 0.003 75);
+  --wm-text: oklch(0.23 0.016 300);
+  --wm-muted: color-mix(in oklch, var(--wm-text) 62%, transparent);
+  --wm-line: color-mix(in oklch, var(--wm-text) 13%, transparent);
+  --wm-line-strong: color-mix(in oklch, var(--wm-text) 26%, transparent);
+  --wm-on-brand: white;
+  --wm-display: 'Source Serif 4', ui-serif, 'Source Serif Pro', Georgia, serif;
+  --wm-shadow: 0 1px 2px color-mix(in oklch, var(--wm-text) 7%, transparent),
+               0 20px 44px -32px color-mix(in oklch, var(--wm-text) 60%, transparent);
+  --wm-gradient: linear-gradient(100deg, var(--wm-brand) 8%, var(--wm-accent) 92%);
 }
 
 [data-theme="dark"] {
-  --wm-brand: oklch(0.7904 0.1399 348.9);
-  --wm-brand-hover: oklch(0.8404 0.1399 348.9);
+  --wm-brand: oklch(0.80 0.135 355);
+  --wm-brand-hover: oklch(0.87 0.11 355);
+  --wm-accent: oklch(0.83 0.11 70);
+  --wm-page: oklch(0.168 0.012 300);
+  --wm-surface: oklch(0.222 0.015 300);
+  --wm-text: oklch(0.962 0.006 75);
+  --wm-on-brand: oklch(0.19 0.02 340);
+  /* The three tokens derived from the ink are restated here rather than left
+     to be inherited from the light block: a custom property is substituted on
+     the element that declares it, so a dark page would otherwise take the
+     light theme's ink for its lines. */
+  --wm-muted: color-mix(in oklch, var(--wm-text) 66%, transparent);
+  --wm-line: color-mix(in oklch, var(--wm-text) 13%, transparent);
+  --wm-line-strong: color-mix(in oklch, var(--wm-text) 26%, transparent);
+  --wm-shadow: 0 1px 2px rgb(0 0 0 / 0.45),
+               0 24px 48px -32px rgb(0 0 0 / 0.9);
 }
 
 /* The wordmark: the name set tight and slightly heavier than the page's own
@@ -1056,6 +1090,847 @@ not run the width of a desk. */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+  }
+}
+
+/* ===== The interface =====
+
+   The rules below are the site as one design rather than as a set of pages: a
+   palette in both themes, a display face for what a page is called, a rhythm
+   for the blocks a page is built from, and the surface a panel stands on.  The
+   markup is still the bundle's utilities -- what is here is the handful of
+   decisions a utility cannot make, stated once in tokens so the pages agree
+   with each other instead of each naming its own grey.
+
+   The type is the load-bearing part.  The interface is set in Work Sans, which
+   is a good sign for a control and a poor one for a headline; the display face
+   is Source Serif 4, the same family the reading pages are set in, so a page's
+   name reads as a title and not as a bigger label.  Body copy, labels and
+   controls stay in the sans.
+
+   This sheet is read last, so a single class here wins over a single utility
+   there.  Where a rule overrides a surface the markup states (`bg-stone-100/75'
+   and the like) it is written with its parent class, so the order of the sheets
+   is not the only thing keeping it right. */
+
+/* --- The page */
+
+.wm-page {
+  background-color: var(--wm-page);
+  color: var(--wm-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wm-page h1,
+.wm-page h2,
+.wm-page h3 {
+  font-family: var(--wm-display);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--wm-text);
+}
+
+.wm-page ::selection {
+  background: color-mix(in oklch, var(--wm-brand) 28%, transparent);
+}
+
+/* A link that is a word in a sentence is underlined, because that is the only
+   thing that tells it apart from the sentence in a page with no colour of its
+   own; a link that is a control is not. */
+.wm-page a {
+  text-underline-offset: 0.18em;
+}
+
+/* --- The bar
+
+   Slim, translucent, and quiet: seven controls a reader passes on every page,
+   drawn as words with a glyph rather than as seven buttons on a shelf. */
+
+.wm-page .wm-nav {
+  background-color: color-mix(in oklch, var(--wm-page) 82%, transparent);
+  border: 1px solid var(--wm-line);
+  border-radius: 1rem;
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--wm-text) 4%, transparent),
+              0 24px 36px -34px color-mix(in oklch, var(--wm-text) 70%, transparent);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+}
+
+/* Every control in the bar is a button drawn on a grey slab by the component
+   library; here it is a word with a glyph that answers the pointer and is
+   otherwise part of the bar. */
+.wm-page .wm-nav button {
+  background: transparent;
+  border: 0;
+  border-radius: 0.7rem;
+  box-shadow: none;
+  color: inherit;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.wm-page .wm-nav a:hover > button,
+.wm-page .wm-nav a:focus-visible > button,
+.wm-page .wm-nav button:hover,
+.wm-page .wm-nav button:focus-visible {
+  background-color: color-mix(in oklch, var(--wm-brand) 13%, transparent);
+  color: var(--wm-brand);
+}
+
+/* The mark is drawn at the size of the name beside it rather than as a small
+   stamp: it is the first thing in the corner a reader looks for. */
+.wm-page .wm-nav img {
+  height: 1.6rem;
+  width: auto;
+}
+
+.wm-page .wm-wordmark {
+  font-family: var(--wm-display);
+  letter-spacing: -0.02em;
+}
+
+/* --- The front page's first screen
+
+   A record sleeve: the name of the place set as a title over a warm wash, one
+   sentence under it, the search, two doors, and the size of the collection
+   along the bottom edge.  Everything the page needs to be understood is in it,
+   and nothing else is -- the panels that used to surround it were the empty
+   space between the words. */
+
+.wm-front {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(2rem, 4vw, 3rem);
+  width: 100%;
+  padding-block: 0.75rem 3rem;
+}
+
+.wm-hero {
+  position: relative;
+  width: 100%;
+  max-width: 62rem;
+  margin-inline: auto;
+  padding: clamp(1.75rem, 4.5vw, 3.25rem) clamp(1rem, 4vw, 3rem) 0;
+  border: 1px solid var(--wm-line);
+  border-radius: clamp(1.1rem, 2.5vw, 1.75rem);
+  background-image:
+    radial-gradient(70% 60% at 8% 0%,
+                    color-mix(in oklch, var(--wm-brand) 24%, transparent),
+                    transparent 70%),
+    radial-gradient(60% 55% at 92% 4%,
+                    color-mix(in oklch, var(--wm-accent) 20%, transparent),
+                    transparent 72%);
+  background-color: var(--wm-surface);
+  box-shadow: var(--wm-shadow);
+  overflow: hidden;
+}
+
+.wm-hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  text-align: center;
+}
+
+.wm-hero-title {
+  margin: 0;
+  font-family: var(--wm-display);
+  font-size: clamp(2.05rem, 5.6vw, 3.9rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+  background-image: var(--wm-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.wm-hero-lede {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--wm-muted);
+  font-size: clamp(1rem, 0.9rem + 0.45vw, 1.2rem);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.wm-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.25rem;
+}
+
+/* One shape for a page's two doors: the solid one is the thing most visitors
+   came to do, the quiet one is the door beside it. */
+.wm-button,
+.wm-button-quiet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.85rem;
+  padding: 0.6rem 1.4rem;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 160ms ease, background-color 160ms ease,
+              border-color 160ms ease, color 160ms ease;
+}
+
+.wm-button {
+  background-color: var(--wm-brand);
+  color: var(--wm-on-brand);
+}
+
+.wm-button:hover,
+.wm-button:focus-visible {
+  background-color: var(--wm-brand-hover);
+  transform: translateY(-1px);
+}
+
+.wm-button-quiet {
+  border-color: var(--wm-line-strong);
+  color: var(--wm-text);
+}
+
+.wm-button-quiet:hover,
+.wm-button-quiet:focus-visible {
+  border-color: var(--wm-brand);
+  color: var(--wm-brand);
+}
+
+/* The size of the collection, along the bottom edge of the sleeve: three
+   figures a reader can take in at a glance, and each one a way into the list it
+   counts. */
+.wm-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: clamp(1.5rem, 3vw, 2.25rem) calc(-1 * clamp(1rem, 4vw, 3rem)) 0;
+  border-top: 1px solid var(--wm-line);
+}
+
+.wm-stat {
+  padding: 1rem 0.5rem 1.2rem;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 160ms ease;
+}
+
+.wm-stat + .wm-stat {
+  border-left: 1px solid var(--wm-line);
+}
+
+.wm-stat:hover {
+  background-color: color-mix(in oklch, var(--wm-brand) 8%, transparent);
+}
+
+.wm-stat-value {
+  font-family: var(--wm-display);
+  font-size: clamp(1.5rem, 3.4vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.wm-stat-label {
+  margin-top: 0.4rem;
+  color: var(--wm-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* --- What a reader can do here
+
+   Four promises, set as text under a hairline rather than as four panels: a
+   panel around one sentence is a box drawn for its own sake. */
+
+.wm-promises {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem 1.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .wm-promises {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .wm-promises {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.wm-promise {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--wm-line);
+}
+
+.wm-promise i {
+  color: var(--wm-brand);
+  font-size: 1.45rem;
+}
+
+.wm-promise span {
+  color: var(--wm-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* --- The blocks a page is built from */
+
+.wm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 64rem;
+  margin-inline: auto;
+  padding-inline: clamp(0.5rem, 2vw, 1rem);
+}
+
+.wm-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--wm-line);
+}
+
+.wm-section-title {
+  margin: 0;
+  font-family: var(--wm-display);
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+}
+
+.wm-section-link {
+  color: var(--wm-brand);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 150ms ease;
+}
+
+.wm-section-link:hover,
+.wm-section-link:focus-visible {
+  border-bottom-color: currentColor;
+}
+
+.wm-section-lede {
+  max-width: 58ch;
+  margin: 0;
+  color: var(--wm-muted);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.wm-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wm-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.3rem 0.9rem;
+  border: 1px solid var(--wm-line);
+  border-radius: 9999px;
+  background-color: var(--wm-surface);
+  color: var(--wm-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 150ms ease, color 150ms ease,
+              background-color 150ms ease;
+}
+
+.wm-chip:hover,
+.wm-chip:focus-visible {
+  border-color: var(--wm-brand);
+  background-color: color-mix(in oklch, var(--wm-brand) 9%, transparent);
+  color: var(--wm-brand);
+}
+
+/* --- The cover a list is a shelf of */
+
+.wm-page .wm-tile {
+  --wm-tile-surface: var(--wm-surface);
+  --wm-tile-line: var(--wm-line);
+  --wm-tile-ink: var(--wm-text);
+  --wm-tile-quiet: var(--wm-muted);
+  background: var(--wm-surface);
+  border-color: var(--wm-line);
+  box-shadow: none;
+}
+
+@media (hover: hover) {
+  .wm-page .wm-tile:hover {
+    box-shadow: var(--wm-shadow);
+  }
+}
+
+/* The name and the credit sit under the cover at the height of the text, not
+   spread down a card the height of the tallest one in the row: the empty space
+   belongs under the tile, where nothing is looked for, rather than inside it. */
+.wm-page .wm-tile-body {
+  flex-grow: 0;
+  gap: 0.2rem;
+}
+
+.wm-page .wm-tile-name {
+  font-family: var(--wm-display);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--wm-tile-ink);
+}
+
+.wm-page .wm-tile-by {
+  color: var(--wm-tile-quiet);
+}
+
+/* --- A panel
+
+   The surface a detail page is read on: one edge, one shadow, no frost.  Frost
+   over a page with nothing behind it is a grey box, which is how the panels
+   arrived. */
+
+.wm-page .wm-panel {
+  background-color: var(--wm-surface);
+  border: 1px solid var(--wm-line);
+  border-radius: clamp(1rem, 2vw, 1.35rem);
+  box-shadow: var(--wm-shadow);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* A detail page is a sleeve: the cover on one side of the panel, the facts and
+   the controls on the other.  One square cover stretched to the width of the
+   panel left a field of nothing on either side of it, which is most of what
+   the page looked like.  A panel with no picture keeps its one column. */
+@media (min-width: 900px) {
+  .wm-page .wm-panel {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+  }
+
+  .wm-page .wm-panel > div:first-child:not(.wm-panel-body) {
+    flex: 0 0 min(22rem, 42%);
+    min-width: 0;
+  }
+
+  .wm-page .wm-panel-body {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+/* The two opinions and the way to the editor, as quiet controls: green and red
+   buttons beside a song are louder than the song. */
+.wm-entity-actions button,
+.wm-entity-actions > a > button {
+  background: transparent;
+  border: 1px solid var(--wm-line-strong);
+  border-radius: 9999px;
+  box-shadow: none;
+  color: var(--wm-text);
+  font-weight: 500;
+  transition: border-color 150ms ease, color 150ms ease,
+              background-color 150ms ease;
+}
+
+.wm-entity-actions button:hover,
+.wm-entity-actions > a > button:hover {
+  border-color: var(--wm-brand);
+  background-color: color-mix(in oklch, var(--wm-brand) 10%, transparent);
+  color: var(--wm-brand);
+}
+
+/* --- The facts about a page rather than about the music
+
+   Views, creation time, the contributor, the identifier: a reader wants the
+   song, not the row.  They are kept, one press away, under a summary that says
+   what they are. */
+
+/* The headings a long page folds with are titles, so they are set in the
+   display face like the titles they stand in for; the two summaries this sheet
+   styles itself (`.wm-info-summary', `.wm-reading-options > summary') are
+   stated after this rule and keep the voice of a control. */
+.wm-page .wm-disclosure > summary {
+  font-family: var(--wm-display);
+  letter-spacing: -0.01em;
+}
+
+.wm-info,
+.wm-comments {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--wm-line);
+}
+
+.wm-comments {
+  margin-top: 0.4rem;
+}
+
+.wm-info-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--wm-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  list-style: none;
+  cursor: pointer;
+}
+
+.wm-info-summary::-webkit-details-marker {
+  display: none;
+}
+
+.wm-info-summary:hover,
+.wm-info[open] > .wm-info-summary {
+  color: var(--wm-brand);
+}
+
+.wm-info dl {
+  display: grid;
+  grid-template-columns: minmax(6rem, max-content) 1fr;
+  gap: 0.4rem 1.25rem;
+  align-items: baseline;
+  margin-block: 0.9rem 0;
+  font-size: 0.9rem;
+}
+
+.wm-info dt {
+  padding: 0;
+  color: var(--wm-muted);
+  font-weight: 500;
+}
+
+.wm-info dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* --- A song page
+
+   The title, who wrote it, the tab: in that order, and the controls that are
+   about the page rather than the music are folded into one row that can be
+   opened. */
+
+.wm-song {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-block: 0.5rem 2.5rem;
+}
+
+/* The horizontal gutter of a song page is the shell's on a phone and the
+   markup's own from the medium breakpoint up (`px-0 md:px-6' on the element),
+   so this padding is the vertical rhythm only. */
+
+.wm-song-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-block: 0.5rem;
+}
+
+.wm-song-title {
+  margin: 0;
+  font-family: var(--wm-display);
+  font-size: clamp(1.85rem, 4vw, 2.9rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+
+.wm-song-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.6rem;
+  color: var(--wm-muted);
+  font-size: 1rem;
+}
+
+.wm-song-meta a {
+  color: var(--wm-text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--wm-line-strong);
+}
+
+.wm-song-meta a:hover {
+  color: var(--wm-brand);
+  border-bottom-color: currentColor;
+}
+
+.wm-song-meta em {
+  color: var(--wm-muted);
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* The facts the song itself carries -- key, tuning, album -- as a row of small
+   cards rather than as a list of lines: they are read at a glance or not at
+   all. */
+.wm-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.wm-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 6.5rem;
+  padding: 0.45rem 0.8rem 0.55rem;
+  border: 1px solid var(--wm-line);
+  border-radius: 0.8rem;
+  background-color: var(--wm-surface);
+}
+
+.wm-fact dt {
+  color: var(--wm-muted);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wm-fact dd {
+  margin: 0;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+/* The reading controls -- the size the tab is drawn at, its paper and its face
+   -- folded into one row: they are a reader's preferences, not the music, and
+   they stood in three lines above the tab every time. */
+.wm-reading-options {
+  border: 1px solid var(--wm-line);
+  border-radius: 0.9rem;
+  background-color: var(--wm-surface);
+  padding: 0 0.9rem;
+}
+
+.wm-reading-options > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding-block: 0.6rem;
+  color: var(--wm-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  list-style: none;
+  cursor: pointer;
+}
+
+.wm-reading-options > summary::-webkit-details-marker {
+  display: none;
+}
+
+.wm-reading-options > summary:hover,
+.wm-reading-options[open] > summary {
+  color: var(--wm-brand);
+}
+
+.wm-reading-options .wm-song-setting {
+  padding-inline: 0;
+}
+
+/* --- The practice row
+
+   The click track and its heading share the reading column's left edge, so the
+   page reads as a column rather than as a stack of blocks with their own
+   margins. */
+.wm-practice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--wm-line);
+  border-radius: 0.9rem;
+  background-color: var(--wm-surface);
+}
+
+.wm-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding-block: 0.25rem;
+}
+
+.wm-sources a {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--wm-line);
+  border-radius: 9999px;
+  background-color: var(--wm-surface);
+  font-size: 0.9rem;
+}
+
+.wm-sources a:hover {
+  border-color: var(--wm-brand);
+}
+
+/* --- The end of a page */
+
+.wm-closing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 62rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  text-align: center;
+}
+
+.wm-closing-invitation {
+  max-width: 46ch;
+  margin: 0;
+  color: var(--wm-muted);
+  font-family: var(--wm-display);
+  font-size: 1.15rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* The language control, at the end of the page: a preference is not a panel, so
+   it keeps the border of the page's own furniture and loses the frosted card
+   it used to sit on. */
+.wm-closing form {
+  border-color: var(--wm-line);
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* --- The project's own picture and its ask */
+
+.wm-project {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.wm-figure {
+  margin: 0;
+  padding: 0.4rem;
+  border: 1px solid var(--wm-line);
+  border-radius: 1.1rem;
+  background-color: var(--wm-surface);
+  box-shadow: var(--wm-shadow);
+}
+
+.wm-figure img {
+  display: block;
+  width: 100%;
+  max-width: 34rem;
+  height: auto;
+  border-radius: 0.8rem;
+}
+
+.wm-support {
+  margin: 0;
+}
+
+.wm-support a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.15rem;
+  border: 1px solid var(--wm-line);
+  border-radius: 9999px;
+  background-color: var(--wm-surface);
+  color: var(--wm-brand);
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 150ms ease;
+}
+
+.wm-support a:hover,
+.wm-support a:focus-visible {
+  border-color: var(--wm-brand);
+}
+
+.wm-page footer {
+  border-top: 1px solid var(--wm-line);
+  margin-top: 1.5rem;
+  color: var(--wm-muted);
+}
+
+.wm-page footer a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.wm-page footer a:hover,
+.wm-page footer a:focus-visible {
+  color: var(--wm-brand);
+  border-bottom-color: currentColor;
+}
+
+/* --- Reduced motion covers the new transitions too */
+
+@media (prefers-reduced-motion: reduce) {
+  .wm-button,
+  .wm-button-quiet,
+  .wm-chip,
+  .wm-stat,
+  .wm-section-link,
+  .wm-page .wm-nav a > button,
+  .wm-page .wm-tile {
+    transition: none;
+  }
+
+  .wm-button:hover {
+    transform: none;
   }
 }
 

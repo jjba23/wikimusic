@@ -1042,7 +1042,14 @@ unchanged.  Everything else a page is built from is text."
                               (script ,(assoc-ref asset-library
                                                   "pub/js/carousel.js")))
 
-                        (body (@ (class ,(mk-class '(bg-stone-100
+                        ;; `wm-page' is the interface's own name for the page:
+                        ;; the palette, the display face and the surfaces are
+                        ;; read off it (see `pub/css/wikimusic.css'), so a page
+                        ;; is painted in one place instead of by the first
+                        ;; utility in each element that happens to name a
+                        ;; colour.
+                        (body (@ (class ,(mk-class '(wm-page
+                                                     bg-stone-100
                                                      dark:bg-onyx-900
                                                      font-sans min-h-screen))))
 
@@ -1502,13 +1509,10 @@ unchanged.  Everything else a page is built from is text."
                                               (assq-ref x
                                                         'approved-by))))
 
-    `((div (@ (class ,(mk-class '(hg-frost bg-stone-100/75
+    `((div (@ (class ,(mk-class '(wm-panel
+                                           bg-stone-100/75
                                            dark:bg-onyx-900/75
                                            rounded-3xl
-                                           border-2
-                                           border-stone-500/25
-                                           dark:border-onyx-100/25
-                                           shadow-lg
                                            p-4
                                            sm:p-6
                                            flex
@@ -1554,8 +1558,13 @@ unchanged.  Everything else a page is built from is text."
                                                             justify-center)
                          #:no-js-hint (G_
                                        "several pictures — scroll sideways to see them"))
-               (list `(div ,rendered-artworks)))
-           (div (div (@ (class ,(mk-class '(flex flex-col gap-3 my-4))))
+               ;; A page whose entity has no picture draws no box for one: a
+               ;; childless `div' serializes as a self-closed tag, which HTML
+               ;; reads as an opening tag and nests the rest of the page inside.
+               (if (null? rendered-artworks) '()
+                 (list `(div ,rendered-artworks))))
+           (div (@ (class "wm-panel-body"))
+                (div (@ (class "wm-entity-actions"))
                      ,opinion-buttons
                      (a (@ (href ,(format #f "/~as/uuid/~a/edit" entity
                                           (assq-ref x
@@ -1563,6 +1572,16 @@ unchanged.  Everything else a page is built from is text."
                         ,(icon-button #:icon 'pencil
                                       #:content (G_ "edit"))))
                 ,maybe-description
+                ;; The row's own bookkeeping -- how often the page was read,
+                ;; when it was written, by whom, under which identifier -- is
+                ;; a press away rather than the first thing under the music.
+                ;; A reader came for the song; a page that opens on a UUID has
+                ;; told them it was built for its database.
+                (details (@ (class "wm-info"))
+                         (summary (@ (class "wm-info-summary"))
+                                  ,(icon #:type 'info
+                                         #:icon-css '(text-base))
+                                  ,(G_ "page information"))
                 (dl ,(dt (G_ "views")
                          #:dt-classes '(pt-3 sm:pt-4 pb-1))
                     ,(dd (format #f "~a"
@@ -1606,13 +1625,18 @@ unchanged.  Everything else a page is built from is text."
                                               #:on-click (format #f
                                                                  "navigator.clipboard.writeText('~a')"
                                                                  (assoc-ref x
-                                                                            'identifier)))))))))
-      (details (summary (@ (class ,(mk-class '(text-onyx-300
-                                               dark:text-stone-300
-                                               cursor-pointer))))
-                        ,(em (format #f "~a ~a"
-                                     (length comments)
-                                     (G_ "comments"))))
+                                                                            'identifier))))))))))
+      ;; The comments are a section of the page with its own heading, like the
+      ;; bookkeeping above them: a reader who has read the song and wants to
+      ;; say something finds them where the rest of the page's furniture is,
+      ;; and everyone else reads the music.
+      (details (@ (class "wm-comments"))
+               (summary (@ (class "wm-info-summary"))
+                        ,(icon #:type 'chat-circle
+                               #:icon-css '(text-base))
+                        ,(format #f "~a ~a"
+                                 (length comments)
+                                 (G_ "comments")))
                ;; Anyone signed in may add a comment; nobody else is let in by
                ;; the route this posts to.
                (form (@ (method POST)
@@ -2258,17 +2282,7 @@ function addSearchQueryParam(form) {
                                              dark:hover:text-persia-pink-300))))) link))
 
 (define* (render-external-sources G_ external-sources)
-  `((div (@ (class ,(mk-class '(flex flex-row
-                                     flex-wrap
-                                     gap-6
-                                     py-2
-                                     px-6
-                                     md:py-4
-                                     md:px-12
-                                     w-full
-                                     justify-center
-                                     items-start
-                                     items-end))))
+  `((div (@ (class "wm-sources"))
          ,(render-external-link #:link (uri-decode (assoc-ref-or-empty-str
                                                     external-sources
                                                     'wikipedia-url))

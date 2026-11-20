@@ -91,20 +91,28 @@ wikimusic is powered by: [[https://www.gnu.org/software/guile/][Guile Scheme]], 
   five-string bass, or a ukulele -- with every string named, its frequency
   given, and a reference tone to hear -- and a microphone that names the note it
   hears and shows how far off it is, in this browser, with nothing recorded.
-- *A responsive interface* -- the same shell on a phone and on a desktop -- with
-  sorting, search and a subtle, icon-first tile-size control on every list.
+- *A responsive interface* -- the same shell on a phone and on a desktop -- set
+  in a display serif for what a page is called and a sans for what it does, over
+  a warm paper in the light theme and a deep ink in the dark one, with sorting,
+  search and a subtle, icon-first tile-size control on every list.  The site's
+  own decisions -- the palette in both themes, the type, the rhythm of a page
+  and the surface a panel is -- are stated once in =pub/css/wikimusic.css=, the
+  layer over the utility bundle the markup is built from.
 - *Light and dark*, with the reader's choice remembered, and four interface
   languages to read the whole site in.
 - *Pretty error pages* for the refusals a reader actually meets (404, 403, 500
   and the rest), rendered by the application itself in the site's own shell.
 - *Accounts and permissions*: sign-in, per-row ownership, and a super grant that
   overrides ownership for an instance's maintainers.
-- *A front page that is a way in*: what the place is called and what it holds,
-  a line under it, a field that searches the collection, the two things a
-  visitor came to do, the promises the community makes, the instance's own
-  numbers, the genres to browse, and the newest songs and the newest artists --
-  each shelf drawn with the tiles the list pages draw, so a tile on the front
-  page and a tile on a list page are the same tile.
+- *A front page that is a way in*: the name of the place over the collection's
+  own figures -- each one a link into the list it counts -- a line under it, a
+  field that searches the collection, and the two things a visitor came to do;
+  then the promises the community makes, the genres to browse, and the newest
+  songs and the newest artists, each shelf drawn with the tiles the list pages
+  draw, so a tile on the front page and a tile on a list page are the same
+  tile.  The language control is a reader's preference for the whole site, so
+  it stands at the end of the page rather than between the title and the
+  sentence that explains it.
 - *A page about the project*, at =/about=: what the community is, what a
   reader can do here, what it is built on, and the one control that asks for
   support -- which an instance that raises no money turns off.  The front page
