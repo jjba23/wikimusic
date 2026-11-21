@@ -9,3 +9,7 @@ README.html
 
 # msgmerge keeps the previous catalog beside the new one
 sys/i18n/locale/*/LC_MESSAGES/*.po~
+
+# The API reference `dokgen' writes, and the page it is rendered to.
+doc/api/
+doc/api-dist/

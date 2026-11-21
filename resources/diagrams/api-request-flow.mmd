@@ -1,0 +1,8 @@
+flowchart LR
+  route["Artanis route: /api/v1"] --> serve["serve-api"]
+  serve --> repos["handlers-for: repositories for this request"]
+  serve --> dispatcher["generated dispatcher"]
+  serve --> request["artanis->http-request"]
+  dispatcher --> response["JSON response"]
+  serve -.-> error["json-error: bad request, no route, validation, not implemented"]
+  error --> response

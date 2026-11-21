@@ -23,8 +23,36 @@ The file starts at =v1.19.0=; the releases before it are on the forge, at
 :CUSTOM_ID: unreleased
 :END:
 
-Nothing has landed since =v1.20.0=.  A change waits here under /Added/, /Changed/
+Nothing has landed since =v1.20.1=.  A change waits here under /Added/, /Changed/
 or /Fixed/, and the heading takes its version and its day when the release is cut.
+
+* v1.20.1 -- 2026-11-21
+:PROPERTIES:
+:CUSTOM_ID: v1-20-1
+:END:
+
+** Added
+- The Scheme layer has an API reference: =maak docs= runs dokgen over the
+  modules rather than over their text, writes a card per exported procedure
+  with its signature and its docstring, and renders it to
+  =doc/api-dist/index.html=.  The generated =lib/wikimusic-api= tree stays out
+  of it on purpose -- its documentation is the specification =maak api-check=
+  guards.
+- A new section of the manual says how a request is answered -- the Artanis
+  route, =serve-api=, the generated dispatcher and the JSON answer -- with a
+  diagram of that path, and =(wikimusic api)= carries the same figure in its
+  commentary, so the reference and the manual tell one story.
+
+** Changed
+- =channels.scm= pins Guix master =5cea8de= and the jointhefreeworld collection
+  at =139880f=, which is where =guile-dokgen= comes from.  =maak diagrams=
+  re-renders every =resources/diagrams/*.mmd= to the SVG beside it.
+
+** Fixed
+- The docstrings the reference renders are Texinfo: the =@@type= the seo builder
+  documents is escaped, the =@itemx= lists =guitarpro= describes sit one item to
+  a line, and =format-fretboard= is no longer exported, since the procedure is
+  no longer there to export.
 
 * v1.20.0 -- 2026-11-21
 :PROPERTIES:

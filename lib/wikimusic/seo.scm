@@ -318,7 +318,7 @@ the JSON-LD array a node that is more than one kind of thing is written as."
 
 It is the shape almost every node here has -- what it is, what it is called,
 and the couple of facts that make it worth describing -- without the caller
-having to remember to put `@type' first."
+having to remember to put `@@type' first."
   (append (list (schema-name type))
           (if (and name
                 (not (string-null? name)))

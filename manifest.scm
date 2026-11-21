@@ -5,6 +5,7 @@
 
 (use-modules (guix packages)
              (gnu)
+             (gnu packages)
              (guix utils)
              (guix git-download)
              (guix download)
@@ -311,6 +312,10 @@ checksums to track schema evolution in a @code{migrations_history} table.")
                           guile-kracht
                           guile-orgwebalchemy
                           guile-bewaking
+                          ;; The API reference under `doc/api' is extracted by
+                          ;; dokgen from the modules themselves; maak's `docs'
+                          ;; task renders it.
+                          (specification->package "guile-dokgen")
                           ;; The REST API under lib/wikimusic-api is generated
                           ;; from openapi/wikimusic.yaml; maak's `api' task runs
                           ;; this generator.

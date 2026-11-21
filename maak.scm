@@ -6,6 +6,8 @@
 (define-module (maak)
   #:use-module (maak maak)
   #:use-module ((ice-9 rdelim) #:select (read-line))
+  ;; `scandir' is what the `diagrams' task walks resources/diagrams with.
+  #:use-module (ice-9 ftw)
   ;; The i18n helpers are imported under a prefix because two of the tasks
   ;; below are named `i18n-compile' and `i18n-merge', and a task may not shadow
   ;; the helper it calls.
@@ -20,6 +22,10 @@
 
 (define deploy-dir
   "/srv/http/jointhefreeworld.org")
+
+;;; The URL for the CSS style-sheet used to style API documentation.
+(define api-docs-css-url
+  "https://jointhefreeworld.org/static/css/jointhefreeworld.css")
 
 ;;; The file where the Wikimusic DB is located.
 (define wikimusic-db
@@ -184,6 +190,77 @@ Args: update? represents whether we should update a template or create a new one
          "-c"
          "'((@ (openapi-generator cli) main!) (list \"generate\" \"--config\" \"openapi/openapi-generator.yaml\" \"--check\"))'")
    #:verbose? #t))
+
+(define (docs)
+  "Generate the Scheme API reference and render it as HTML.
+
+Dokgen reads the modules rather than their text, so every exported procedure
+that has a docstring is in the reference.  `lib/wikimusic/' is what it
+documents, and `lib/' is the load root that lets dokgen name the modules the
+way they name themselves.
+
+Two trees are deliberately not in this chapter.  `lib/wikimusic-api/' is
+generated from `openapi/wikimusic.yaml' and checked in, so its documentation is
+the specification (the README's REST API section), and editing it to suit a
+documentation tool would make `maak api-check' report drift.  The Artanis
+application under `app/' names its modules from the project root instead --
+`(app views about)' -- so it is a second tree with a second root.
+
+Beside the Texinfo dokgen writes the stylesheet and the script the page is read
+with, and a directory of diagrams for the docstrings that carry one; Texinfo
+copies neither, so both are put beside the page that points at them."
+  (delete-file-recursively "doc/api")
+  ;; The modules import `(wikimusic env)', which is the deployment's own file at
+  ;; the root rather than a module under `lib/', so it is loaded first -- the
+  ;; same order the server's ENTRY and the test task use.  The expression is the
+  ;; one `dokgen' itself runs; `guile' is called here only to get the load of
+  ;; `env.scm' in front of it.
+  (time-machine-manifest-shell
+   (list "guile" "-L" "./lib" "-L" "."
+         "-l" "env.scm"
+         "-c" "'(begin (use-modules (dokgen cli)) (call (command-line) spec))'"
+         "api" "--destination" "doc/api"
+         "./lib/wikimusic")
+   #:verbose? #t)
+  (mkdir-p "doc/api-dist")
+  (time-machine-manifest-shell
+   (list "texi2any" "-v" "--html" "--no-split"
+         (~ "--css-ref=~a" api-docs-css-url)
+         "-I" "doc/api"
+         "-c" (shell-quote
+               (string-append
+                "EXTRA_HEAD="
+                "<link rel=\"stylesheet\" href=\"dokgen.css\">"
+                "<script src=\"dokgen.js\" defer></script>"))
+         "-o" "doc/api-dist/index.html"
+         "./doc/api/index.texi")
+   #:verbose? #t)
+  (for-each (lambda (asset)
+              (when (file-exists? (~ "doc/api/~a" asset))
+                (cp (~ "doc/api/~a" asset) "doc/api-dist"
+                    #:force? #t #:verbose? #t)))
+            '("dokgen.css" "dokgen.js"))
+  (when (file-exists? "doc/api/diagrams")
+    (cp "doc/api/diagrams" "doc/api-dist" #:force? #t #:verbose? #t)))
+
+(define (diagrams)
+  "Render every mermaid source under resources/diagrams to the SVG beside it.
+
+A diagram is committed twice -- the source and the rendering -- so reading the
+README needs no renderer.  `mmdc' is a JavaScript tool the pinned shell does not
+carry, so it is looked up on $PATH, where `npm install --global
+@mermaid-js/mermaid-cli' puts it."
+  (for-each
+   (lambda (name)
+     (let* ((source (in-vicinity "resources/diagrams" name))
+            (image (string-append (string-drop-right source 4) ".svg")))
+       (run (list "mmdc" "-i" source "-o" image
+                  "--backgroundColor" "transparent")
+            #:verbose? #t)))
+   (scandir "resources/diagrams"
+            (lambda (name)
+              (and (not (member name '("." "..")))
+                   (string-suffix? ".mmd" name))))))
 
 (define (deploy)
   "Deploy the project's documentation.

@@ -18,6 +18,19 @@
 ;;; and the permission the specification names.  A row may be changed by its
 ;;; creator or by a holder of `wikimusic:modify-permissions', which is the same
 ;;; ownership rule the pages follow, so the API cannot become a way around it.
+;;;
+;;; ```mermaid
+;;; flowchart LR
+;;;   route["Artanis route: /api/v1"] --> serve["serve-api"]
+;;;   serve --> repos["handlers-for: repositories for this request"]
+;;;   serve --> dispatcher["generated dispatcher"]
+;;;   serve --> request["artanis->http-request"]
+;;;   dispatcher --> response["JSON response"]
+;;;   serve -.-> error["json-error: bad request, no route, validation, not implemented"]
+;;;   error --> response
+;;; ```
+;;;
+;;; Code:
 
 (define-module (wikimusic api)
   #:declarative? #t

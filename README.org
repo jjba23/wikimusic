@@ -235,6 +235,8 @@ will reach for most:
 | =maak api=                      | Generate the REST API code from ~openapi/wikimusic.yaml=                 |
 | =maak api-check=                | Fail when the generated API no longer matches its specification          |
 | =maak build-manual=             | Render this document to ~README.html=                                   |
+| =maak docs=                     | Generate the Scheme API reference and render it to ~doc/api-dist/~      |
+| =maak diagrams=                 | Re-render every ~resources/diagrams/*.mmd~ to the SVG beside it         |
 | =maak deploy=                   | Render this document and copy the rendering to the instance that serves it |
 | =maak fmt=                      | Format every Scheme file the way the Guix style guide does               |
 | =maak repl=                     | A Guile REPL in the project's environment, with its load paths           |
@@ -295,6 +297,31 @@ The routes are mounted by ~app/controllers/api.scm=, and
 ~lib/wikimusic/api.scm= answers each operation from the same SQLite
 repositories the pages read, so a running instance serves =/api/v1= beside its
 HTML pages.
+
+** How a request is answered
+:PROPERTIES:
+:CUSTOM_ID: how-a-request-is-answered
+:END:
+
+Every request that reaches =/api/v1= goes through one procedure.  It builds the
+repositories the request may read, installs the generated handlers for them,
+and hands the generated dispatcher an ordinary HTTP request; whatever the
+dispatcher throws has already been turned into a JSON error by the time a
+client sees it.
+
+#+attr_html: :width 720 :alt The path of an API request: Artanis route, serve-api, the generated dispatcher and the JSON answer
+[[file:resources/diagrams/api-request-flow.svg]]
+
+The OpenAPI pages above describe the HTTP interface, and the Scheme reference
+that ~maak docs~ generates describes the code behind it: every exported
+procedure of ~lib/wikimusic~ with its documentation string, rendered to
+~doc/api-dist/index.html~.  The generated ~lib/wikimusic-api~ tree is not in
+that chapter on purpose -- its documentation is the specification it is
+generated from, above, and editing it to suit a documentation tool would make
+~maak api-check~ report drift.  The two are kept apart because they answer
+different questions -- what a client may call, and what an implementor may
+reuse.  The diagram's source is ~resources/diagrams/api-request-flow.mmd~;
+~maak diagrams~ re-renders the SVG beside it.
 
 * Running WikiMusic
 :PROPERTIES:

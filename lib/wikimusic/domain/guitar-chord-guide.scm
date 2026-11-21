@@ -7,7 +7,6 @@
   #:use-module (ice-9 regex)
   #:use-module (srfi srfi-1)
   #:export (extract-guitar-chords guitar-chord->fingering
-                                  format-fretboard
                                   generate-guitar-chord-guide
                                   guitar-tab-line-pattern
                                   guitar-chord-database

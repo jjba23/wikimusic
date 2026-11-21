@@ -524,8 +524,15 @@ page needs.  The keys of the answer are
 The release of the format, as a list of numbers and as the string the file
 spells.  A file of any other generation than the fifth is refused here, since
 the fields that follow are laid out differently in it.
-@item title @itemx subtitle @itemx artist @itemx album @itemx words @itemx
-music @itemx copyright @itemx tabber @itemx instructions
+@item title
+@itemx subtitle
+@itemx artist
+@itemx album
+@itemx words
+@itemx music
+@itemx copyright
+@itemx tabber
+@itemx instructions
 The nine text fields of the score, empty strings included.
 @item notices
 The numbered notes of a published edition, usually none.
@@ -533,12 +540,14 @@ The numbered notes of a published edition, usually none.
 The lyric lines the author wrote, empty ones left out.
 @item tempo
 The tempo in quarter notes per minute.
-@item key @itemx key-name
+@item key
+@itemx key-name
 The key signature as the number of accidentals and as the name of the key
 they name, which is #f for a number no signature has.
 @item octave
 The octave offset of the score.
-@item measures @itemx tracks
+@item measures
+@itemx tracks
 How many measures and how many tracks the score holds.
 @item header-bytes
 How many bytes of the file the header occupies, which is where the music
