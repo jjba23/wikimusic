@@ -23,8 +23,40 @@ The file starts at =v1.19.0=; the releases before it are on the forge, at
 :CUSTOM_ID: unreleased
 :END:
 
-Nothing has landed since =v1.19.1=.  A change waits here under /Added/, /Changed/
+Nothing has landed since =v1.20.0=.  A change waits here under /Added/, /Changed/
 or /Fixed/, and the heading takes its version and its day when the release is cut.
+
+* v1.20.0 -- 2026-11-21
+:PROPERTIES:
+:CUSTOM_ID: v1-20-0
+:END:
+
+** Added
+- Editing a song is a page of foldable sections -- the song, its artists, its
+  genres, its artwork and its links -- with the song itself open first.  An
+  artist or a genre is linked by choosing its name from a menu, and the ones
+  already linked are links to what they name, each with the button that removes
+  the link.
+- A version of a tab says which song it belongs to and links back to it, and the
+  field it is written in keeps the columns it was typed in.
+- Saving a version says so on the song it returns to, as saving a song already
+  did.
+
+** Changed
+- The controls that drive a tab are part of the tab: the heading, the button and
+  the two menus above a tablature are one strip on the sheet's own top edge, in
+  the paper's ink, held at the top of the screen while the tab travels under it.
+  The speed is one menu of lines a second instead of a step and an interval.
+- The chords a tab names are marked as the page is drawn instead of when a
+  control is pressed.  The button that marked them is gone, and the wash under
+  a chord is lighter.
+
+** Fixed
+- A name holding an apostrophe -- an album called =Guns N' Roses= -- no longer
+  ends the statement that saves it.  Every row a route creates is written
+  through kracht's bound values, which double a quote, rather than through the
+  model API Artanis generates, which spliced the value between two single
+  quotes; a test keeps a controller from going back to it.
 
 * v1.19.1 -- 2026-11-20
 :PROPERTIES:
