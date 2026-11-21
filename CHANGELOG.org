@@ -23,8 +23,23 @@ The file starts at =v1.19.0=; the releases before it are on the forge, at
 :CUSTOM_ID: unreleased
 :END:
 
-Nothing has landed since =v1.20.1=.  A change waits here under /Added/, /Changed/
+Nothing has landed since =v1.20.2=.  A change waits here under /Added/, /Changed/
 or /Fixed/, and the heading takes its version and its day when the release is cut.
+
+* v1.20.2 -- 2026-11-21
+:PROPERTIES:
+:CUSTOM_ID: v1-20-2
+:END:
+
+** Changed
+- =channels.scm= pins the jointhefreeworld collection at =dc9f38c=, where
+  =guile-dokgen= 0.9.1 is defined, so =maak docs= renders the reference with
+  the generator this release was cut with.
+
+** Fixed
+- The API links point at =index.html=.  The reference has been one page named
+  =index.html= since the dokgen migration; the links still named =API.html=,
+  which is a page that is no longer written.
 
 * v1.20.1 -- 2026-11-21
 :PROPERTIES:
