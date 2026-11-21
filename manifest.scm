@@ -316,6 +316,7 @@ checksums to track schema evolution in a @code{migrations_history} table.")
                           ;; dokgen from the modules themselves; maak's `docs'
                           ;; task renders it.
                           (specification->package "guile-dokgen")
+                          (specification->package "texinfo")
                           ;; The REST API under lib/wikimusic-api is generated
                           ;; from openapi/wikimusic.yaml; maak's `api' task runs
                           ;; this generator.
