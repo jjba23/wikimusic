@@ -14,6 +14,8 @@
   (wikimusic auth)
   (wikimusic controller)
   (wikimusic sqlite util)
+  (wikimusic sqlite user)
+  (wikimusic domain user)
   (kracht prelude)
   (app views me)
   (curl)
@@ -162,11 +164,13 @@
                                              wikimusic:user-delete
                                              wikimusic:modify-permissions))))
                  (new-id (generate-string-uuid))
-                 (_ ($users 'set
-                            #:identifier new-id
-                            #:username username
-                            #:email email
-                            #:permissions (format #f "`~s" permissions)))
+                 (_ (insert-user
+                        (make-sqlite-user-repository rc)
+                        `((identifier unquote new-id)
+                          (username unquote username)
+                          (email unquote email)
+                          (permissions unquote
+                                       (format #f "`~s" permissions)))))
                  (u ($users 'get
                             #:ret 'top
                             #:condition (where #:identifier new-id))))
@@ -208,9 +212,7 @@
           (let* ((G_ (:i18n rc))
                  (body (body-alist rc))
                  (identifier (assoc-ref body "identifier"))
-                 (_ ($users 'mod
-                            'row-delete
-                            (where #:identifier identifier))))
+                 (_ (delete-user-by-id (make-sqlite-user-repository rc) identifier)))
             (redirect-to rc
                          (string->uri (format #f
                                               "~a/users/manage/?deleted=true"

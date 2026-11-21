@@ -18,6 +18,10 @@
 
 (define-module (veritas unit sql-spec)
   #:use-module (veritas veritas)
+  #:use-module (ice-9 format)
+  #:use-module (ice-9 ftw)
+  #:use-module (ice-9 regex)
+  #:use-module (ice-9 textual-ports)
   #:use-module (srfi srfi-13)
   #:use-module (kracht sql)
   #:use-module (wikimusic sqlite util)
@@ -262,10 +266,39 @@
                        #t)
           #:name "and the paging is written as numbers")))))
 
+;;; ====== How a route writes a row ======
+;;;
+;;; Artanis' generated model API renders an inserted value as `'~a'': the value
+;;; between two single quotes and nothing else.  A song whose album was `Guns
+;;; N' Roses' therefore ended the statement, and the page answered 500 instead
+;;; of creating the song.  Every route writes through kracht now, whose bound
+;;; values are quoted and their quotes doubled, and this keeps a new route from
+;;; reaching for the builder that does not.
+
+(define controller-files
+  (map (lambda (name)
+         (format #f "app/controllers/~a" name))
+       (filter (lambda (name)
+                 (string-suffix? ".scm" name))
+               (scandir "app/controllers"))))
+
+(define write-suite
+  (suite "How a route writes a row"
+    (test "no controller hands a value to the model API"
+      (for-each (lambda (path)
+                  (let ((source (call-with-input-file path
+                                  (lambda (port) (get-string-all port)))))
+                    (assert-false (regexp-exec
+                                   (make-regexp "\\$[a-z_]+ '(set|mod)\\b")
+                                   source)
+                                  #:name path)))
+                controller-files))))
+
 (define (spec)
   (veritas-run rendering-suite
     accounting-suite
     order-by-suite
     row-suite
     in-suite
-    like-suite))
+    like-suite
+    write-suite))

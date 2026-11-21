@@ -35,6 +35,8 @@
   (app models users)
   (wikimusic sqlite song)
   (wikimusic domain song)
+  (wikimusic domain song-content)
+  (wikimusic sqlite song-content)
   (wikimusic sqlite artwork)
   (wikimusic domain artwork)
   (wikimusic domain comment)
@@ -292,18 +294,17 @@
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
-            ($song_artworks 'set
-                            #:identifier new-uuid
-                            #:song_identifier (params rc "uuid")
-                            #:created_by user-identifier
-                            #:visibility_status 0
-                            #:content_url (uri-encode (assoc-ref body
-                                                                 "content-url"))
-                            #:content_caption (assoc-ref body
-                                                         "content-caption")
-                            #:order_value (assoc-ref body
-                                                     "order-value")
-                            #:created_at (current-time))
+            (insert-artwork
+             (make-sqlite-artwork-repository rc)
+             'song
+             `((identifier unquote new-uuid)
+               (song-identifier unquote (params rc "uuid"))
+               (created-by unquote user-identifier)
+               (visibility-status . 0)
+               (content-url unquote (uri-encode (assoc-ref body "content-url")))
+               (content-caption unquote (assoc-ref body "content-caption"))
+               (order-value unquote (assoc-ref body "order-value"))
+               (created-at unquote (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a/edit"
@@ -336,13 +337,19 @@
                                                                     body
                                                                     "artist-identifier")))))
             (when (not (nil? artist))
-              ($song_artists 'set
-                             #:identifier new-uuid
-                             #:song_identifier (params rc "uuid")
-                             #:artist_identifier (assoc-ref body
-                                                            "artist-identifier")
-                             #:created_by user-identifier
-                             #:created_at (current-time)))
+              (sql-execute! rc
+                            (sql-insert 'song_artists
+                                        `((identifier unquote new-uuid)
+                                          (song-identifier unquote
+                                                           (params rc "uuid"))
+                                          (artist-identifier unquote
+                                                             (assoc-ref
+                                                              body
+                                                              "artist-identifier"))
+                                          (created-by unquote user-identifier)
+                                          (created-at unquote
+                                                      (current-time))))
+                            #:name "insert-song-artist"))
 
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a/edit"
@@ -375,13 +382,19 @@
                                                                   body
                                                                   "genre-identifier")))))
             (when (not (nil? genre))
-              ($song_genres 'set
-                            #:identifier new-uuid
-                            #:song_identifier (params rc "uuid")
-                            #:genre_identifier (assoc-ref body
-                                                          "genre-identifier")
-                            #:created_by user-identifier
-                            #:created_at (current-time)))
+              (sql-execute! rc
+                            (sql-insert 'song_genres
+                                        `((identifier unquote new-uuid)
+                                          (song-identifier unquote
+                                                           (params rc "uuid"))
+                                          (genre-identifier unquote
+                                                            (assoc-ref
+                                                             body
+                                                             "genre-identifier"))
+                                          (created-by unquote user-identifier)
+                                          (created-at unquote
+                                                      (current-time))))
+                            #:name "insert-song-genre"))
 
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a/edit"
@@ -409,21 +422,23 @@
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
-            ($songs 'set
-                    #:identifier new-uuid
-                    #:display_name (assoc-ref body "display-name")
-                    #:music_key (assoc-ref body "music-key")
-                    #:music_tuning (assoc-ref body "music-tuning")
-                    #:music_creation_date (assoc-ref body
-                                                     "music-creation-date")
-                    #:album_name (assoc-ref body "album-name")
-                    #:album_info_link (uri-encode (assoc-ref body
-                                                             "album-info-link"))
-                    #:description (assoc-ref body "description")
-                    #:created_by user-identifier
-                    #:visibility_status 0
-                    #:views 0
-                    #:created_at (current-time))
+            (insert-song
+             (make-sqlite-song-repository rc)
+             `((identifier unquote new-uuid)
+               (display-name unquote (assoc-ref body "display-name"))
+               (music-key unquote (assoc-ref body "music-key"))
+               (music-tuning unquote (assoc-ref body "music-tuning"))
+               (music-creation-date unquote
+                                    (assoc-ref body "music-creation-date"))
+               (album-name unquote (assoc-ref body "album-name"))
+               (album-info-link unquote
+                                (uri-encode (assoc-ref body
+                                                       "album-info-link")))
+               (description unquote (assoc-ref body "description"))
+               (created-by unquote user-identifier)
+               (visibility-status . 0)
+               (views . 0)
+               (created-at unquote (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/songs/uuid/~a"
@@ -450,17 +465,18 @@
                                         #:condition (where #:song_identifier
                                                            uuid)))))
     (if (not (nil? ex-op))
-      ($song_opinions 'mod
-                      'row-delete
-                      (where #:identifier (assoc-ref (car ex-op)
-                                                     "identifier"))))
-    ($song_opinions 'set
-                    #:identifier new-uuid
-                    #:song_identifier uuid
-                    #:created_by user-identifier
-                    #:is_like is-like
-                    #:is_dislike is-dislike
-                    #:created_at (current-time))
+      (delete-opinion-by-id (make-sqlite-opinion-repository rc)
+                            'song
+                            (assoc-ref (car ex-op) "identifier")))
+    (insert-opinion
+                    (make-sqlite-opinion-repository rc)
+                    'song
+                    `((identifier unquote new-uuid)
+                      (song-identifier unquote uuid)
+                      (created-by unquote user-identifier)
+                      (is-like . ,is-like)
+                      (is-dislike . ,is-dislike)
+                      (created-at unquote (current-time))))
     (redirect-to rc
                  (string->uri (format #f "~a/songs/uuid/~a?notify-title=~a"
                                       (current-myhost) uuid
@@ -748,21 +764,21 @@
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
-            ($song_external_sources 'set
-                                    #:identifier new-uuid
-                                    #:song_identifier (params rc "uuid")
-                                    #:wikipedia_url (uri-encode (assoc-ref
-                                                                 body
-                                                                 "wikipedia-url"))
-                                    #:soundcloud_url (uri-encode (assoc-ref
-                                                                  body
-                                                                  "soundcloud-url"))
-                                    #:youtube_url (uri-encode (assoc-ref body
-                                                                         "youtube-url"))
-                                    #:spotify_url (uri-encode (assoc-ref body
-                                                                         "spotify-url"))
-                                    #:created_by user-identifier
-                                    #:created_at (current-time))
+            (insert-external-source
+             (make-sqlite-external-source-repository rc)
+             'song
+             `((identifier unquote new-uuid)
+               (song-identifier unquote (params rc "uuid"))
+               (wikipedia-url unquote (uri-encode (assoc-ref body
+                                                             "wikipedia-url")))
+               (soundcloud-url unquote (uri-encode (assoc-ref body
+                                                              "soundcloud-url")))
+               (youtube-url unquote (uri-encode (assoc-ref body
+                                                           "youtube-url")))
+               (spotify-url unquote (uri-encode (assoc-ref body
+                                                           "spotify-url")))
+               (created-by unquote user-identifier)
+               (created-at unquote (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f

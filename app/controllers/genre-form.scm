@@ -157,18 +157,17 @@
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
-            ($genre_artworks 'set
-                             #:identifier new-uuid
-                             #:genre_identifier (params rc "uuid")
-                             #:created_by user-identifier
-                             #:visibility_status 0
-                             #:content_url (uri-encode (assoc-ref body
-                                                                  "content-url"))
-                             #:content_caption (assoc-ref body
-                                                          "content-caption")
-                             #:order_value (assoc-ref body
-                                                      "order-value")
-                             #:created_at (current-time))
+            (insert-artwork
+             (make-sqlite-artwork-repository rc)
+             'genre
+             `((identifier unquote new-uuid)
+               (genre-identifier unquote (params rc "uuid"))
+               (created-by unquote user-identifier)
+               (visibility-status . 0)
+               (content-url unquote (uri-encode (assoc-ref body "content-url")))
+               (content-caption unquote (assoc-ref body "content-caption"))
+               (order-value unquote (assoc-ref body "order-value"))
+               (created-at unquote (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/genres/uuid/~a/edit"
@@ -195,15 +194,15 @@
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
-            ($genres 'set
-                     #:identifier new-uuid
-                     #:display_name (assoc-ref body
-                                               "display-name")
-                     #:description (assoc-ref body "description")
-                     #:created_by user-identifier
-                     #:visibility_status 0
-                     #:views 0
-                     #:created_at (current-time))
+            (insert-genre
+             (make-sqlite-genre-repository rc)
+             `((identifier unquote new-uuid)
+               (display-name unquote (assoc-ref body "display-name"))
+               (description unquote (assoc-ref body "description"))
+               (created-by unquote user-identifier)
+               (visibility-status . 0)
+               (views . 0)
+               (created-at unquote (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/genres/uuid/~a"
@@ -231,17 +230,18 @@
                                          #:condition (where #:genre_identifier
                                                             uuid)))))
     (if (not (nil? ex-op))
-      ($genre_opinions 'mod
-                       'row-delete
-                       (where #:identifier (assoc-ref (car ex-op)
-                                                      "identifier"))))
-    ($genre_opinions 'set
-                     #:identifier new-uuid
-                     #:genre_identifier uuid
-                     #:created_by user-identifier
-                     #:is_like is-like
-                     #:is_dislike is-dislike
-                     #:created_at (current-time))
+      (delete-opinion-by-id (make-sqlite-opinion-repository rc)
+                             'genre
+                             (assoc-ref (car ex-op) "identifier")))
+    (insert-opinion
+                     (make-sqlite-opinion-repository rc)
+                     'genre
+                     `((identifier unquote new-uuid)
+                       (genre-identifier unquote uuid)
+                       (created-by unquote user-identifier)
+                       (is-like . ,is-like)
+                       (is-dislike . ,is-dislike)
+                       (created-at unquote (current-time))))
     (redirect-to rc
                  (string->uri (format #f "~a/genres/uuid/~a?notify-title=~a"
                                       (current-myhost) uuid
@@ -430,21 +430,21 @@
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
-            ($genre_external_sources 'set
-                                     #:identifier new-uuid
-                                     #:genre_identifier (params rc "uuid")
-                                     #:wikipedia_url (uri-encode (assoc-ref
-                                                                  body
-                                                                  "wikipedia-url"))
-                                     #:soundcloud_url (uri-encode (assoc-ref
-                                                                   body
-                                                                   "soundcloud-url"))
-                                     #:youtube_url (uri-encode (assoc-ref body
-                                                                          "youtube-url"))
-                                     #:spotify_url (uri-encode (assoc-ref body
-                                                                          "spotify-url"))
-                                     #:created_by user-identifier
-                                     #:created_at (current-time))
+            (insert-external-source
+             (make-sqlite-external-source-repository rc)
+             'genre
+             `((identifier unquote new-uuid)
+               (genre-identifier unquote (params rc "uuid"))
+               (wikipedia-url unquote (uri-encode (assoc-ref body
+                                                             "wikipedia-url")))
+               (soundcloud-url unquote (uri-encode (assoc-ref body
+                                                              "soundcloud-url")))
+               (youtube-url unquote (uri-encode (assoc-ref body
+                                                           "youtube-url")))
+               (spotify-url unquote (uri-encode (assoc-ref body
+                                                           "spotify-url")))
+               (created-by unquote user-identifier)
+               (created-at unquote (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f

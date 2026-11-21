@@ -210,18 +210,17 @@
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
-            ($artist_artworks 'set
-                              #:identifier new-uuid
-                              #:artist_identifier (params rc "uuid")
-                              #:created_by user-identifier
-                              #:visibility_status 0
-                              #:content_url (uri-encode (assoc-ref body
-                                                                   "content-url"))
-                              #:content_caption (assoc-ref body
-                                                           "content-caption")
-                              #:order_value (assoc-ref body
-                                                       "order-value")
-                              #:created_at (current-time))
+            (insert-artwork
+             (make-sqlite-artwork-repository rc)
+             'artist
+             `((identifier unquote new-uuid)
+               (artist-identifier unquote (params rc "uuid"))
+               (created-by unquote user-identifier)
+               (visibility-status . 0)
+               (content-url unquote (uri-encode (assoc-ref body "content-url")))
+               (content-caption unquote (assoc-ref body "content-caption"))
+               (order-value unquote (assoc-ref body "order-value"))
+               (created-at unquote (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/artists/uuid/~a/edit"
@@ -248,15 +247,15 @@
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
-            ($artists 'set
-                      #:identifier new-uuid
-                      #:display_name (assoc-ref body
-                                                "display-name")
-                      #:description (assoc-ref body "description")
-                      #:created_by user-identifier
-                      #:visibility_status 0
-                      #:views 0
-                      #:created_at (current-time))
+            (insert-artist
+             (make-sqlite-artist-repository rc)
+             `((identifier unquote new-uuid)
+               (display-name unquote (assoc-ref body "display-name"))
+               (description unquote (assoc-ref body "description"))
+               (created-by unquote user-identifier)
+               (visibility-status . 0)
+               (views . 0)
+               (created-at unquote (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/artists/uuid/~a"
@@ -284,17 +283,18 @@
                                                        #:artist_identifier
                                                        uuid)))))
     (if (not (nil? ex-op))
-      ($artist_opinions 'mod
-                        'row-delete
-                        (where #:identifier (assoc-ref (car ex-op)
-                                                       "identifier"))))
-    ($artist_opinions 'set
-                      #:identifier new-uuid
-                      #:artist_identifier uuid
-                      #:created_by user-identifier
-                      #:is_like is-like
-                      #:is_dislike is-dislike
-                      #:created_at (current-time))
+      (delete-opinion-by-id (make-sqlite-opinion-repository rc)
+                              'artist
+                              (assoc-ref (car ex-op) "identifier")))
+    (insert-opinion
+                      (make-sqlite-opinion-repository rc)
+                      'artist
+                      `((identifier unquote new-uuid)
+                        (artist-identifier unquote uuid)
+                        (created-by unquote user-identifier)
+                        (is-like . ,is-like)
+                        (is-dislike . ,is-dislike)
+                        (created-at unquote (current-time))))
     (redirect-to rc
                  (string->uri (format #f "~a/artists/uuid/~a?notify-title=~a"
                                       (current-myhost) uuid
@@ -432,23 +432,25 @@
                  (new-uuid (generate-string-uuid))
                  (user-identifier (assoc-ref t
                                              'owner-id)))
-            ($artist_external_sources 'set
-                                      #:identifier new-uuid
-                                      #:artist_identifier (params rc "uuid")
-                                      #:wikipedia_url (uri-encode (assoc-ref-or-empty-str
-                                                                   body
-                                                                   "wikipedia-url"))
-                                      #:soundcloud_url (uri-encode (assoc-ref-or-empty-str
-                                                                    body
-                                                                    "soundcloud-url"))
-                                      #:youtube_url (uri-encode (assoc-ref-or-empty-str
-                                                                 body
-                                                                 "youtube-url"))
-                                      #:spotify_url (uri-encode (assoc-ref-or-empty-str
-                                                                 body
-                                                                 "spotify-url"))
-                                      #:created_by user-identifier
-                                      #:created_at (current-time))
+            (insert-external-source
+             (make-sqlite-external-source-repository rc)
+             'artist
+             `((identifier unquote new-uuid)
+               (artist-identifier unquote (params rc "uuid"))
+               (wikipedia-url unquote
+                              (uri-encode (assoc-ref-or-empty-str
+                                           body "wikipedia-url")))
+               (soundcloud-url unquote
+                               (uri-encode (assoc-ref-or-empty-str
+                                            body "soundcloud-url")))
+               (youtube-url unquote
+                            (uri-encode (assoc-ref-or-empty-str
+                                         body "youtube-url")))
+               (spotify-url unquote
+                            (uri-encode (assoc-ref-or-empty-str
+                                         body "spotify-url")))
+               (created-by unquote user-identifier)
+               (created-at unquote (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f
