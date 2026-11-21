@@ -14,11 +14,12 @@
 /// A prompter travels at a speed; it does not take steps.
 ///
 /// So the scroll happens in the frame loop: each frame moves the share of a line
-/// that the frame lasted, and the two menus are read as lines per second, so a
-/// reader can change either while it runs and feel it.  The reader's own hand
-/// wins -- a wheel turn, a touch drag, a scroll key or a dragged scrollbar stops
-/// it -- and it stops by itself at the last line of the tab rather than at the
-/// end of the page, because the tab is the music and what follows it is not.
+/// that the frame lasted, and the menu on the tab's own sheet is read as lines a
+/// second, so a reader can change it while it runs and feel it.  The reader's
+/// own hand wins -- a wheel turn, a touch drag, a scroll key or a dragged
+/// scrollbar stops it -- and it stops by itself at the last line of the tab
+/// rather than at the end of the page, because the tab is the music and what
+/// follows it is not.
 ///
 /// A scrollbar drag is the one the page is never told about: a scrollbar is the
 /// browser's, not the document's, so dragging it fires no event a page can
@@ -33,8 +34,7 @@ const wikimusicSongScroll = (() => {
   let last = 0
   let carry = 0
   let tab = null
-  let lineMenu = null
-  let secondMenu = null
+  let speedMenu = null
   let lineHeight = 18
   // Where the last frame put the page.  A scroll that lands anywhere else is
   // somebody else's.
@@ -42,11 +42,7 @@ const wikimusicSongScroll = (() => {
 
   const running = () => frame !== null
 
-  const linesPerSecond = () => {
-    const lines = Number(lineMenu.value) || 4
-    const seconds = Number(secondMenu.value) || 1
-    return lines / seconds
-  }
+  const linesPerSecond = () => Number(speedMenu.value) || 4
 
   // The furthest position worth reaching: the last line of the tab at the foot
   // of the viewport, so the scroll ends on the music and not on the footer.
@@ -107,9 +103,8 @@ const wikimusicSongScroll = (() => {
       return
     }
     tab = document.getElementById('ascii-content-container')
-    lineMenu = document.getElementById('line-scroll')
-    secondMenu = document.getElementById('second-scroll')
-    if (!tab || !lineMenu || !secondMenu) return
+    speedMenu = document.getElementById('scroll-speed')
+    if (!tab || !speedMenu) return
 
     const top = tab.getBoundingClientRect().top + window.scrollY
     if (window.scrollY < top) window.scrollTo({ top, behavior: 'instant' })

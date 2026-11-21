@@ -18,6 +18,10 @@
 /// name, each one is marked; on any other line nothing is.  The line is written
 /// back as the same characters -- the mark wraps a name and adds no space --
 /// because a tab is read by its columns.
+///
+/// The marks are drawn as the page is drawn, not on a press: a chord is part of
+/// how the tab is read, like the columns it sits in, and a mode a reader has to
+/// turn on is a tab they read once without the chords and then again with them.
 
 // A chord name: a root, an accidental, a quality or a number of them, and a
 // bass note after a slash.  Matched against a whole token, never a fragment.
@@ -89,4 +93,19 @@ const highlightChords = (id) => {
       preElement.appendChild(document.createTextNode('\n'))
     }
   })
+}
+
+const wikimusicMarkTabChords = () => {
+  if (document.getElementById('ascii-content-container')) {
+    highlightChords('ascii-content-container')
+  }
+}
+
+// The script is inlined in the page's head, so on a fresh page the tab has not
+// been parsed yet; on a page that is already parsed -- a prerendered one, or one
+// the browser restores -- the tab is there to be marked at once.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', wikimusicMarkTabChords)
+} else {
+  wikimusicMarkTabChords()
 }

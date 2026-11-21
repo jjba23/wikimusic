@@ -323,14 +323,11 @@ async function main() {
   await shot('09-metronome');
 
   log('chords');
-  const highlight = page.locator('button:has-text("highlight chords")').first();
-  if (!(await highlight.count())) {
-    throw new Error('song page has no chord guide');
-  }
-  await scrollToLocator(highlight, 300, 700);
+  // The chords are marked as the page is drawn, so the shot is the tab itself.
+  const chords = page.locator('#ascii-content-container');
+  if (!(await chords.count())) throw new Error('song page has no tablature');
+  await scrollToLocator(chords, 300, 700);
   await sleep(300);
-  await clickOn(highlight);
-  await sleep(950);
   await shot('10-chords');
 
   log('auto-scroll');

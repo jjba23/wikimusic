@@ -320,9 +320,14 @@ a:focus-visible .wm-wordmark-accent {
    paragraphs beside it want that gutter. */
 
 @media (max-width: 639px) {
+  /* The reach belongs to the sheet, which is what carries the paper now; the
+     tab inside it keeps the hair of room that keeps a line off the border. */
+  .wm-tab {
+    margin-inline: -0.4rem;
+  }
+
   pre.wm-ascii {
     padding: 0.35rem 0.2rem;
-    margin-inline: -0.4rem;
   }
 }
 
@@ -903,6 +908,127 @@ a.wm-size-step:hover {
   text-rendering: optimizeSpeed;
 }
 
+/* ===== The field a tab is written in
+
+   A tab is columns, and a textarea wraps at its own edge by default: the line
+   a contributor typed would arrive on the page folded, so a chord line would
+   stop being a line.  `white-space: pre' is the attribute `wrap="off"' in a
+   stylesheet -- the browser keeps the line whole and scrolls the field -- and
+   the tab stop is the one the tab itself is read with. */
+
+.wm-tab-input {
+  white-space: pre;
+  overflow-x: auto;
+  tab-size: 4;
+}
+
+/* ===== The controls belong to the sheet
+
+   A tab used to be preceded by a row of its own: a heading, a button and two
+   menus, drawn like the page's other controls and set above the music they
+   drive.  What drives the tab is now the sheet's own top edge -- right-aligned,
+   in the paper's ink, on the paper's own colour -- so the music and the way to
+   walk through it read as one block rather than as a control with a tab under
+   it.
+
+   The strip is sticky, so the reader who started the scroll with the controls
+   stops it with the same controls: they stay at the top of the screen while
+   the tab travels under them.  Its colour is `inherit' for the same reason --
+   the paper is the reader's choice, and the strip has to be that paper rather
+   than a second surface laid over it.
+
+   It is visible rather than revealed on hover: a control a phone or a keyboard
+   cannot reveal is a control that does not exist.  What keeps it quiet is its
+   size, its ink and the hairline under it, not its absence. */
+
+.wm-tab {
+  margin-block: 0.5rem 1rem;
+}
+
+.wm-tab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  padding: 0.25rem 0.5rem;
+  border-bottom: 1px solid color-mix(in oklch, currentColor 12%, transparent);
+  background-color: inherit;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.wm-tab-bar label,
+.wm-tab-action,
+.wm-tab-speed {
+  font: inherit;
+  color: inherit;
+  opacity: 0.65;
+  transition: opacity 150ms ease;
+}
+
+.wm-tab-bar label {
+  cursor: pointer;
+}
+
+.wm-tab-bar label:hover,
+.wm-tab-action:hover,
+.wm-tab-action:focus-visible,
+.wm-tab-action[aria-pressed="true"],
+.wm-tab-speed:hover,
+.wm-tab-speed:focus-visible {
+  opacity: 1;
+}
+
+.wm-tab-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.wm-tab-action[aria-pressed="true"] {
+  background-color: color-mix(in oklch, currentColor 12%, transparent);
+}
+
+.wm-tab-action-idle,
+.wm-tab-action-busy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.wm-tab-action-busy {
+  display: none;
+}
+
+.wm-tab-action[aria-pressed="true"] .wm-tab-action-idle {
+  display: none;
+}
+
+.wm-tab-action[aria-pressed="true"] .wm-tab-action-busy {
+  display: inline-flex;
+}
+
+.wm-tab-action:focus-visible,
+.wm-tab-speed:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.wm-tab-speed {
+  padding: 0 0.15rem;
+  border: 0;
+  border-bottom: 1px dashed color-mix(in oklch, currentColor 40%, transparent);
+  border-radius: 0.2rem 0.2rem 0 0;
+  background: transparent;
+  cursor: pointer;
+}
+
 /* ===== A chord in a tab is set apart, not repainted =====
 
    A highlighted chord was drawn in the site's deepest pink at its heaviest
@@ -913,14 +1039,19 @@ a.wm-size-step:hover {
    and the page's own surface.  The weight carries it for a reader who cannot
    tell a wash of ink from ink, and JuliaMono's bold keeps its columns.
 
+   The marks are drawn as the page is drawn: there is no control to press and
+   no unmarked state to leave, because a chord is part of how a tab is read and
+   not a mode laid over it.  The wash is light enough to read the note through,
+   and the hairline is the only line the sheet adds.
+
    The box draws around the letters and adds nothing to them: no padding and no
    space of its own, so a chord still sits in the columns the tab is read in. */
 
 .wm-chord {
   font-weight: 600;
-  background: color-mix(in oklch, currentColor 10%, transparent);
-  box-shadow: inset 0 -1px 0 0 color-mix(in oklch, currentColor 38%, transparent);
-  border-radius: 0.2em;
+  background: color-mix(in oklch, currentColor 7%, transparent);
+  box-shadow: inset 0 -1px 0 0 color-mix(in oklch, currentColor 26%, transparent);
+  border-radius: 0.15em;
 }
 
 /* ===== A legend, quieter than the tab it explains
