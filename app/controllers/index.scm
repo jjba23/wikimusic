@@ -180,7 +180,7 @@
 (get "/"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic lang)
+     #:cookies #t
      (lambda (rc)
        (response-emit (:mime rc
                              (welcome-page (:i18n rc)

@@ -5,11 +5,6 @@
 
 (define-artanis-controller song-page)
 
-;; `new-cookie' is not one of the names artanis re-exports, and the route needs
-;; it to build a cookie that belongs to its own answer (see
-;; `ascii-preference-of'); the controller's `import' takes module names only.
-(use-modules ((artanis cookie) #:select (new-cookie)))
-
 (import (app views song-content-edit)
   (app views song-content-view)
   (app views song-edit)
@@ -67,26 +62,13 @@ a year, for the whole site, and out of reach of a script."
                        #:fallback fallback))
    (lambda (value chosen)
      (when chosen
-       ;; Not `:cookies-set!'.  Artanis builds one cookie record for the rule
-       ;; when the rule is registered and re-sends that record with every
-       ;; answer, so a value one request sets is written into the jar of
-       ;; whoever reads the next page -- a preference that moves by itself,
-       ;; from one visitor to the next.  A cookie built here belongs to the
-       ;; answer that carries it.
-       (rc-set-cookie! rc
-                       (cons (new-cookie #:npv `((,cookie . ,chosen))
-                                         #:expires (* 3600 24 365)
-                                         #:path "/"
-                                         #:secure #t
-                                         #:http-only #t)
-                             (rc-set-cookie rc))))
+       (remember-cookie! rc cookie chosen))
      value)))
 
 (get "/songs"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-song-sort wikimusic-grid-size
-                       x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (song-repo (make-sqlite-song-repository rc))
@@ -105,16 +87,9 @@ a year, for the whole site, and out of reach of a script."
               (user-sort (cond
                            [(not (equal? #f
                                          (get-from-qstr rc "sort")))
-                            (:cookies-set! rc
-                                           'wikimusic-song-sort
-                                           "wikimusic-song-sort"
-                                           (get-from-qstr rc "sort"))
-                            (:cookies-setattr! rc
-                                               'wikimusic-song-sort
-                                               #:expires 12000000
-                                               #:path "/"
-                                               #:secure #t
-                                               #:http-only #t)
+                            (remember-cookie! rc "wikimusic-song-sort"
+                                              (get-from-qstr rc "sort")
+                                              #:expires 12000000)
                             (get-from-qstr rc "sort")]
                            [(not (equal? #f
                                          (:cookies-value rc
@@ -128,16 +103,9 @@ a year, for the whole site, and out of reach of a script."
               (grid-size (cond
                            [(not (equal? #f
                                          (get-from-qstr rc "grid-size")))
-                            (:cookies-set! rc
-                                           'wikimusic-grid-size
-                                           "wikimusic-grid-size"
-                                           (get-from-qstr rc "grid-size"))
-                            (:cookies-setattr! rc
-                                               'wikimusic-grid-size
-                                               #:expires 12000000
-                                               #:path "/"
-                                               #:secure #t
-                                               #:http-only #t)
+                            (remember-cookie! rc "wikimusic-grid-size"
+                                              (get-from-qstr rc "grid-size")
+                                              #:expires 12000000)
                             (get-from-qstr rc "grid-size")]
                            [(not (equal? #f
                                          (:cookies-value rc
@@ -238,7 +206,7 @@ a year, for the whole site, and out of reach of a script."
 (get "/songs/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (response-emit (:mime rc
                              (song-new-page (:i18n rc)
@@ -248,7 +216,7 @@ a year, for the whole site, and out of reach of a script."
 (get "/songs/uuid/:uuid/contents/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (response-emit (:mime rc
                              (song-content-new-page (:i18n rc)

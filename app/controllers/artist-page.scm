@@ -41,8 +41,7 @@
 (get "/artists"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-artist-sort wikimusic-grid-size
-                       x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (artist-repo (make-sqlite-artist-repository rc))
@@ -59,16 +58,9 @@
               (user-sort (cond
                            [(not (equal? #f
                                          (get-from-qstr rc "sort")))
-                            (:cookies-set! rc
-                                           'wikimusic-artist-sort
-                                           "wikimusic-artist-sort"
-                                           (get-from-qstr rc "sort"))
-                            (:cookies-setattr! rc
-                                               'wikimusic-artist-sort
-                                               #:expires 12000000
-                                               #:path "/"
-                                               #:secure #t
-                                               #:http-only #t)
+                            (remember-cookie! rc "wikimusic-artist-sort"
+                                              (get-from-qstr rc "sort")
+                                              #:expires 12000000)
                             (get-from-qstr rc "sort")]
                            [(not (equal? #f
                                          (:cookies-value rc
@@ -82,16 +74,9 @@
               (grid-size (cond
                            [(not (equal? #f
                                          (get-from-qstr rc "grid-size")))
-                            (:cookies-set! rc
-                                           'wikimusic-grid-size
-                                           "wikimusic-grid-size"
-                                           (get-from-qstr rc "grid-size"))
-                            (:cookies-setattr! rc
-                                               'wikimusic-grid-size
-                                               #:expires 12000000
-                                               #:path "/"
-                                               #:secure #t
-                                               #:http-only #t)
+                            (remember-cookie! rc "wikimusic-grid-size"
+                                              (get-from-qstr rc "grid-size")
+                                              #:expires 12000000)
                             (get-from-qstr rc "grid-size")]
                            [(not (equal? #f
                                          (:cookies-value rc
@@ -156,7 +141,7 @@
 (get "/artists/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((artist-id (params rc "uuid"))
               (artist-repo (make-sqlite-artist-repository rc))
@@ -198,16 +183,9 @@
               (song-user-sort (cond
                                 [(not (equal? #f
                                               (get-from-qstr rc "sort")))
-                                 (:cookies-set! rc
-                                                'wikimusic-song-sort
-                                                "wikimusic-song-sort"
-                                                (get-from-qstr rc "sort"))
-                                 (:cookies-setattr! rc
-                                                    'wikimusic-song-sort
-                                                    #:expires 12000000
-                                                    #:path "/"
-                                                    #:secure #t
-                                                    #:http-only #t)
+                                 (remember-cookie! rc "wikimusic-song-sort"
+                                                   (get-from-qstr rc "sort")
+                                                   #:expires 12000000)
                                  (get-from-qstr rc "sort")]
                                 [(not (equal? #f
                                               (:cookies-value rc
@@ -295,7 +273,7 @@
 (get "/artists/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (response-emit (:mime rc
                              (artist-new-page (:i18n rc)
@@ -306,7 +284,7 @@
 (get "/artists/uuid/:uuid/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((artist-id (params rc "uuid"))
               (artwork-repo (make-sqlite-artwork-repository rc))

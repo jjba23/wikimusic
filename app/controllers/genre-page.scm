@@ -41,8 +41,7 @@
 (get "/genres"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names wikimusic-genre-sort wikimusic-grid-size
-                       x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((artwork-repo (make-sqlite-artwork-repository rc))
               (genre-repo (make-sqlite-genre-repository rc))
@@ -59,16 +58,9 @@
               (user-sort (cond
                            [(not (equal? #f
                                          (get-from-qstr rc "sort")))
-                            (:cookies-set! rc
-                                           'wikimusic-genre-sort
-                                           "wikimusic-genre-sort"
-                                           (get-from-qstr rc "sort"))
-                            (:cookies-setattr! rc
-                                               'wikimusic-genre-sort
-                                               #:expires 12000000
-                                               #:path "/"
-                                               #:secure #t
-                                               #:http-only #t)
+                            (remember-cookie! rc "wikimusic-genre-sort"
+                                              (get-from-qstr rc "sort")
+                                              #:expires 12000000)
                             (get-from-qstr rc "sort")]
                            [(not (equal? #f
                                          (:cookies-value rc
@@ -82,16 +74,9 @@
               (grid-size (cond
                            [(not (equal? #f
                                          (get-from-qstr rc "grid-size")))
-                            (:cookies-set! rc
-                                           'wikimusic-grid-size
-                                           "wikimusic-grid-size"
-                                           (get-from-qstr rc "grid-size"))
-                            (:cookies-setattr! rc
-                                               'wikimusic-grid-size
-                                               #:expires 12000000
-                                               #:path "/"
-                                               #:secure #t
-                                               #:http-only #t)
+                            (remember-cookie! rc "wikimusic-grid-size"
+                                              (get-from-qstr rc "grid-size")
+                                              #:expires 12000000)
                             (get-from-qstr rc "grid-size")]
                            [(not (equal? #f
                                          (:cookies-value rc
@@ -156,7 +141,7 @@
 (get "/genres/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (response-emit (:mime rc
                              (genre-new-page (:i18n rc)
@@ -166,7 +151,7 @@
 (get "/genres/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((genre-id (params rc "uuid"))
               (genre-repo (make-sqlite-genre-repository rc))
@@ -208,16 +193,9 @@
               (song-user-sort (cond
                                 [(not (equal? #f
                                               (get-from-qstr rc "sort")))
-                                 (:cookies-set! rc
-                                                'wikimusic-song-sort
-                                                "wikimusic-song-sort"
-                                                (get-from-qstr rc "sort"))
-                                 (:cookies-setattr! rc
-                                                    'wikimusic-song-sort
-                                                    #:expires 12000000
-                                                    #:path "/"
-                                                    #:secure #t
-                                                    #:http-only #t)
+                                 (remember-cookie! rc "wikimusic-song-sort"
+                                                   (get-from-qstr rc "sort")
+                                                   #:expires 12000000)
                                  (get-from-qstr rc "sort")]
                                 [(not (equal? #f
                                               (:cookies-value rc
@@ -317,7 +295,7 @@
 (get "/genres/uuid/:uuid/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((genre-id (params rc "uuid"))
               (genre-repo (make-sqlite-genre-repository rc))

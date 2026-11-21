@@ -52,7 +52,7 @@
 (get "/articles"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((repo (make-sqlite-article-repository rc))
               (page (max 1
@@ -77,7 +77,7 @@
 (get "/articles/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (response-emit (:mime rc
                              (article-new-page (:i18n rc)
@@ -93,7 +93,7 @@
 (post "/articles/new"
       #:mime 'xml
       #:i18n '(cookie "lang")
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       (lambda (rc)
         (let* ((session (session-payload rc))
                (created-by (and session
@@ -128,7 +128,7 @@
 (get "/articles/uuid/:uuid"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((article-id (params rc "uuid"))
               (article-repo (make-sqlite-article-repository rc))
@@ -160,7 +160,7 @@
 (get "/articles/uuid/:uuid/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((article-id (params rc "uuid"))
               (article (entity-or-404
@@ -181,7 +181,7 @@
 (post "/articles/uuid/:uuid/edit"
       #:mime 'xml
       #:i18n '(cookie "lang")
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       (lambda (rc)
         (let* ((article-id (params rc "uuid"))
                (article (entity-or-404
@@ -216,7 +216,7 @@
 (post "/articles/uuid/:uuid/delete"
       #:mime 'xml
       #:i18n '(cookie "lang")
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       (lambda (rc)
         (let* ((article-id (params rc "uuid"))
                (article (entity-or-404
@@ -243,7 +243,7 @@
 (post "/articles/uuid/:uuid/comments/new"
       #:mime 'xml
       #:i18n '(cookie "lang")
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       (lambda (rc)
         (let* ((article-id (params rc "uuid"))
                (article (entity-or-404 (get-article-by-id

@@ -27,7 +27,7 @@
 (get "/me"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (let* ((t (decrypt-token #:token (:cookies-value rc
                                                         "x-bewaking-wikimusic")
@@ -59,7 +59,7 @@
 (get "/users/manage"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (define (go-to-users-management)
          (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -86,7 +86,7 @@
 (get "/users/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (define (go-to-new-user)
          (let* ((t (decrypt-token #:token (:cookies-value rc
@@ -112,7 +112,7 @@
 (get "/users/edit/:identifier"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (define (go-to-edit-user)
          (let* ((user (car ($users 'get
@@ -133,7 +133,7 @@
                  (symbol->string n)) n #f))
 
 (post "/users/new"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-user)
@@ -201,7 +201,7 @@
                            #:unhappy-flow back-to-login)))
 
 (post "/users/delete"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete-user)
@@ -223,7 +223,7 @@
                            #:unhappy-flow back-to-login)))
 
 (post "/users/edit/:identifier"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-user)
@@ -602,7 +602,7 @@ exists and that a mail was expected -- can say that it was not."
     (send-to-pingwing #:body mail-payload)))
 
 (post "/password/reset"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (let* ((G_ (:i18n rc))
@@ -649,7 +649,7 @@ exists and that a mail was expected -- can say that it was not."
                        #:status 302))))
 
 (post "/password/do-reset"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (let* ((G_ (:i18n rc))
@@ -707,15 +707,7 @@ exists and that a mail was expected -- can say that it was not."
                                                                    sealed-payload
                                                                    'user))))
                                 #:name "reset-user-password")
-              (:cookies-set! rc
-                             'x-bewaking-wikimusic "x-bewaking-wikimusic"
-                             "")
-              (:cookies-setattr! rc
-                                 'x-bewaking-wikimusic
-                                 #:expires 1
-                                 #:path "/"
-                                 #:secure #t
-                                 #:http-only #t)
+              (forget-cookie! rc session-cookie-name)
               (redirect-to rc
                            (string->uri (format #f
                                                 "~a/login?has-reset-password=true~a"

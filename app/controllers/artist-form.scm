@@ -45,7 +45,7 @@
 ;; ====== Data edit POST routes ======
 
 (post "/artists/uuid/:uuid/edit"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit)
@@ -96,7 +96,7 @@
                            #:unhappy-flow back-to-login)))
 
 (post "/artists/uuid/:uuid/external-sources/:sourcesuuid/edit"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-external-sources)
@@ -148,7 +148,7 @@
                            #:unhappy-flow back-to-login)))
 
 (post "/artists/uuid/:uuid/artworks/edit/:artwork-uuid"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit-artwork)
@@ -197,7 +197,7 @@
 ;; 
 
 (post "/artists/uuid/:uuid/artworks/new"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-artwork)
@@ -235,7 +235,7 @@
                            #:unhappy-flow back-to-login)))
 
 (post "/artists/new"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new)
@@ -304,7 +304,7 @@
                  #:status 302)))
 
 (post "/artists/uuid/:uuid/like"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
@@ -322,7 +322,7 @@
                            #:unhappy-flow back-to-login)))
 
 (post "/artists/uuid/:uuid/dislike"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
@@ -347,7 +347,7 @@
 ;; `comment-*' helpers rather than being repeated at each route.
 
 (post "/artists/uuid/:uuid/comments/new"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-comment)
@@ -364,7 +364,7 @@
                            #:unhappy-flow back-to-login)))
 
 (post "/artists/uuid/:uuid/comments/:comment-uuid/edit"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-edit)
@@ -381,7 +381,7 @@
                            #:unhappy-flow back-to-login)))
 
 (post "/artists/uuid/:uuid/comments/:comment-uuid/delete"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete)
@@ -400,7 +400,7 @@
 ;; ====== Delete data routes ======
 
 (post "/artists/uuid/:uuid/artworks/:artwork-uuid/delete"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-delete)
@@ -419,7 +419,7 @@
                            #:unhappy-flow back-to-login)))
 
 (post "/artists/uuid/:uuid/external-sources/new"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (define (do-new-external-sources)

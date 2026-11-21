@@ -109,9 +109,8 @@ sign-in page."
   "Run HAPPY-FLOW when the request in RC carries a session that holds every
 permission in NEEDED-PERMISSIONS, and call UNHAPPY-FLOW with RC otherwise.
 
-TOKEN-NAME is the cookie's *symbol*: Artanis' `#:cookies' declaration and
-`:cookies-set!' are written in symbols while `:cookies-value' looks the cookie
-up by string."
+TOKEN-NAME is the cookie's *symbol*, while `:cookies-value' looks a cookie up
+by its string name."
   (let ((who (authorized-payload #:token (:cookies-value rc
                                                          (symbol->string
                                                           token-name))

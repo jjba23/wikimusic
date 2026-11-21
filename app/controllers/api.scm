@@ -104,10 +104,10 @@
  (lambda (route)
    (let ((path (cadr route)))
      (case [car route]
-       [(get) (get path #:cookies '(names x-bewaking-wikimusic) serve)]
-       [(post) (post path #:cookies '(names x-bewaking-wikimusic) serve)]
-       [(patch) (patch path #:cookies '(names x-bewaking-wikimusic) serve)]
-       [(put) (put path #:cookies '(names x-bewaking-wikimusic) serve)]
+       [(get) (get path #:cookies #t serve)]
+       [(post) (post path #:cookies #t serve)]
+       [(patch) (patch path #:cookies #t serve)]
+       [(put) (put path #:cookies #t serve)]
        [(delete)
-        (page-delete path #:cookies '(names x-bewaking-wikimusic) serve)])))
+        (page-delete path #:cookies #t serve)])))
  routes)

@@ -26,6 +26,7 @@
   #:use-module (srfi srfi-19)
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route)
+  #:use-module (artanis cookie)
   #:use-module (artanis db)
   #:use-module (artanis artanis)
   #:use-module (wikimusic sqlite util)
@@ -38,6 +39,7 @@
   #:use-module (app views error)
   #:use-module (kracht prelude)
   #:export (body-alist notice-query
+                       remember-cookie! forget-cookie!
                        delete-artwork
                        entity-or-404
                        session-payload
@@ -94,6 +96,38 @@ string comes back, so a caller may append the answer unconditionally."
                    (if duration-millis
                      (format #f "&notify-duration-millis=~a"
                              duration-millis) ""))))
+
+;;; ====== A cookie belongs to the answer that sets it ======
+;;;
+;;; `:cookies-set!' is the shortcut that looks right and is not: artanis builds
+;;; one cookie record for a rule when the rule is registered (`new-oht' runs
+;;; once, inside `define-handler') and appends that record to every answer the
+;;; rule gives, so a value one request writes is handed to whoever reads the
+;;; next page.  A session token is the worst of it -- the last sign-in's token
+;;; arriving in another visitor's jar -- but a preference moves the same way,
+;;; from one reader to the next.  A record built here, in the request that made
+;;; the choice, belongs to that answer alone, which is what a cookie is.
+
+(define* (remember-cookie! rc name value #:key (expires (* 3600 24 365)))
+  "Add NAME, holding VALUE, to the answer the request in RC is about to send.
+
+The cookie is good for the whole site and out of reach of a script, and lapses
+after EXPIRES seconds -- a year unless the caller says otherwise.
+@code{forget-cookie!} takes one away."
+  (rc-set-cookie! rc
+                  (cons (new-cookie #:npv `((,name . ,value))
+                                    #:expires expires
+                                    #:path "/"
+                                    #:secure #t
+                                    #:http-only #t)
+                        (rc-set-cookie rc))))
+
+(define* (forget-cookie! rc name)
+  "Expire NAME in the answer the request in RC is about to send.
+
+A reader's browser drops a cookie whose expiry is in the past; emptying the
+value alone would leave an empty cookie in the jar until its own expiry."
+  (remember-cookie! rc name #f #:expires #t))
 
 (define* (entity-or-404 entity entity-name identifier)
   "Return ENTITY, or answer the request with a 404 page when there is none.

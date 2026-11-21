@@ -38,7 +38,8 @@
                                              permissions-from-column
                                              session-token-validity-seconds
                                              session-cookie-name))
-  #:use-module ((wikimusic controller) #:select (may-mutate?))
+  #:use-module ((wikimusic controller)
+                #:select (may-mutate? remember-cookie! forget-cookie!))
   #:use-module (wikimusic env)
   #:use-module (wikimusic guitarpro)
   #:use-module (wikimusic sqlite util)
@@ -438,20 +439,11 @@ here answered every write with a 500."
                (or permissions '()))))
 
 (define (set-session-cookie! rc token)
-  (:cookies-set! rc 'x-bewaking-wikimusic "x-bewaking-wikimusic" token)
-  (:cookies-setattr! rc 'x-bewaking-wikimusic
-                     #:expires session-token-validity-seconds
-                     #:path "/"
-                     #:secure #t
-                     #:http-only #t))
+  (remember-cookie! rc session-cookie-name token
+                    #:expires session-token-validity-seconds))
 
 (define (clear-session-cookie! rc)
-  (:cookies-set! rc 'x-bewaking-wikimusic "x-bewaking-wikimusic" "")
-  (:cookies-setattr! rc 'x-bewaking-wikimusic
-                     #:expires 1
-                     #:path "/"
-                     #:secure #t
-                     #:http-only #t))
+  (forget-cookie! rc session-cookie-name))
 
 ;;; ====== The operations ======
 

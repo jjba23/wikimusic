@@ -24,7 +24,7 @@
 (get "/login"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (response-emit (:mime rc
                              (login-page (:i18n rc)
@@ -32,7 +32,7 @@
                                                                         "x-bewaking-wikimusic"))))))
 
 (post "/login"
-      #:cookies '(names x-bewaking-wikimusic)
+      #:cookies #t
       #:i18n '(cookie "lang")
       (lambda (rc)
         (let* ((G_ (:i18n rc))
@@ -112,16 +112,9 @@
                                           session-token-validity-seconds
                                           #:get-owner-details
                                           get-owner-details)))
-                  (:cookies-set! rc
-                                 'x-bewaking-wikimusic
-                                 "x-bewaking-wikimusic" t)
-                  (:cookies-setattr! rc
-                                     'x-bewaking-wikimusic
-                                     #:expires
-                                     session-token-validity-seconds
-                                     #:path "/"
-                                     #:secure #t
-                                     #:http-only #t)
+                  (remember-cookie! rc session-cookie-name t
+                                    #:expires
+                                    session-token-validity-seconds)
                   (redirect-to rc
                                (string->uri (format #f
                                                     "~a/songs?login_succeeded=true~a"
@@ -135,17 +128,10 @@
 (get "/logout"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-wikimusic)
+     #:cookies #t
      (lambda (rc)
        (begin
-         (:cookies-set! rc
-                        'x-bewaking-wikimusic "x-bewaking-wikimusic" "")
-         (:cookies-setattr! rc
-                            'x-bewaking-wikimusic
-                            #:expires 1
-                            #:path "/"
-                            #:secure #t
-                            #:http-only #t)
+         (forget-cookie! rc session-cookie-name)
 
          (redirect-to rc
                       (string->uri (format #f "~a/"

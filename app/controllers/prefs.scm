@@ -8,6 +8,7 @@
 (import (ice-9 string-fun)
   (kracht prelude)
   (web uri)
+  (wikimusic controller)
   (wikimusic html))
 
 ;; A reader's preferences are not session state -- they are what the reader
@@ -20,7 +21,7 @@
 ;; a request to render the whole application in a language that does not
 ;; exist.
 (post "/preferences/locale"
-      #:cookies '(names lang)
+      #:cookies #t
       (lambda (rc)
         (let* ((body (alist-from-url-encoded-body (rc-body rc)))
                (user-lang (assoc-ref body "user-lang"))
@@ -35,14 +36,7 @@
                              (not (string-prefix? "//" return-to)))
                          return-to "/")))
           (when (assoc user-lang wikimusic-locales)
-            (:cookies-set! rc
-                           'lang "lang" user-lang)
-            (:cookies-setattr! rc
-                               'lang
-                               #:expires (* 3600 24 365)
-                               #:path "/"
-                               #:secure #t
-                               #:http-only #t))
+            (remember-cookie! rc "lang" user-lang))
           ;; The reader is sent back to the page the choice was made on,
           ;; which is where a language change is easiest to read.
           (redirect-to rc target

@@ -29,7 +29,13 @@
 (define-module (veritas unit controller-spec)
   #:use-module (veritas veritas)
   #:use-module (ice-9 format)
+  #:use-module (ice-9 ftw)
   #:use-module (ice-9 textual-ports)
+  #:use-module (srfi srfi-1)
+  #:use-module (artanis cookie)
+  #:use-module (artanis route)
+  #:use-module (web request)
+  #:use-module (web uri)
   #:use-module (wikimusic controller)
   #:export (spec))
 
@@ -169,17 +175,21 @@ there is no answer."
                                 #:created-by #f)
         #:name "while the super grant may still change it"))))
 
-;;; ====== A choice is remembered for the answer that made it ======
+;;; ====== A remembered choice belongs to the answer that made it ======
 ;;;
 ;;; Artanis builds one cookie record for a rule when the rule is registered and
-;;; re-sends that record with every answer (`new-oht' runs once, in
+;;; appends that record to every answer the rule gives (`new-oht' runs once, in
 ;;; `define-handler'), so `:cookies-set!' does not write "this reader's choice":
-;;; it writes a value into a record that every later reader is handed.  A tab
+;;; it writes a value into a record that every later request shares.  A session
+;;; token the last sign-in put there is handed to the next visitor, and a tab
 ;;; that grows from 100% to 200% under a reader who chose neither is that record
-;;; doing its work, one visitor's choice arriving in the next visitor's cookie
-;;; jar.  The song route therefore builds its own cookie per request (see
-;;; `ascii-preference-of'), and this pins it against the shortcut coming back --
-;;; the bug is invisible in a review of the handler, because the call that looks
+;;; doing its work, one visitor's choice arriving in the next visitor's jar.
+;;;
+;;; A cookie built in the request that made the choice belongs to that answer
+;;; alone, which is what `remember-cookie!' builds.  Three things are pinned
+;;; here: the cookie it builds, that one request's answer carries no cookie of
+;;; another's, and that no route writes through a rule's record any more -- the
+;;; bug is invisible in a review of a handler, because the call that looks
 ;;; per-request is not.
 
 (define (source-of path)
@@ -188,15 +198,111 @@ there is no answer."
     (lambda (port)
       (get-string-all port))))
 
+(define (scheme-files-under directory)
+  "Return every Scheme file at or below DIRECTORY."
+  (append-map (lambda (name)
+                (let ((path (string-append directory "/" name)))
+                  (cond
+                    ((string-suffix? ".scm" name)
+                     (list path))
+                    ((and (not (member name '("." "..")))
+                       (eq? 'directory
+                            (stat:type (stat path))))
+                     (scheme-files-under path))
+                    (else '()))))
+              (scandir directory)))
+
+(define (a-request-context)
+  "Return a route context as artanis builds one, with no answer written in it."
+  (let ((make-route-context (@@ (artanis route) make-route-context)))
+    (make-route-context #f #f #f
+                        (build-request (string->uri
+                                        "http://wikimusic.test/login")
+                                       #:method 'GET)
+                        "/login" #f 'GET #f #f #vu8() #f '() '() #f #f #f)))
+
+(define (answer-cookies rc)
+  "Return the Set-Cookie lines the answer to RC carries."
+  (map cookie->header-string (rc-set-cookie rc)))
+
+(define remembering-suite
+  (suite "A choice is remembered by the answer that made it"
+    (test "the answer that makes a choice carries it"
+      (let ((rc (a-request-context)))
+        (remember-cookie! rc "wikimusic-ascii-size" "text-md")
+        (let ((cookies (answer-cookies rc)))
+          (assert-equal #:name "exactly one cookie is added"
+            #:expect 1
+            #:got (length cookies))
+          (assert-true (and (string-contains (car cookies)
+                                             "wikimusic-ascii-size=text-md")
+                            #t)
+            #:name "holding what the reader chose")
+          (assert-true (and (string-contains (car cookies) "Path=/") #t)
+            #:name "good for the whole site")
+          (assert-true (and (string-contains (car cookies) "Expires=") #t)
+            #:name "with a day to lapse on")
+          (assert-true (and (string-contains (car cookies) "; Secure") #t)
+            #:name "sent only over an encrypted connection")
+          (assert-true (and (string-contains (car cookies) "; HttpOnly") #t)
+            #:name "and out of reach of a script"))))
+
+    (test "a session cookie lapses with the session it was given for"
+      (let ((rc (a-request-context)))
+        (remember-cookie! rc "x-bewaking-wikimusic" "a-token" #:expires 60)
+        (let ((cookie (car (answer-cookies rc))))
+          (assert-true (and (string-contains cookie
+                                             "x-bewaking-wikimusic=a-token")
+                            #t)
+            #:name "it carries the token")
+          (assert-true (and (string-contains cookie "Expires=") #t)
+            #:name "and an expiry"))))
+
+    (test "forgetting a cookie expires it before the reader arrived"
+      (let ((rc (a-request-context)))
+        (forget-cookie! rc "x-bewaking-wikimusic")
+        (let ((cookie (car (answer-cookies rc))))
+          (assert-true (and (string-contains cookie
+                                             "x-bewaking-wikimusic=\"\"")
+                            #t)
+            #:name "the cookie is emptied")
+          (assert-true (and (string-contains cookie "Thu, 01 Jan 1970") #t)
+            #:name "and dated in the past, which is what removes it"))))
+
+    (test "a sign-in on one request sets no cookie on another"
+      (let ((signed-in (a-request-context))
+            (later (a-request-context)))
+        (remember-cookie! signed-in "x-bewaking-wikimusic" "the-token")
+        (assert-equal #:name "the answer to the sign-in carries one cookie"
+          #:expect 1
+          #:got (length (rc-set-cookie signed-in)))
+        (assert-equal #:name "the next request's answer carries none"
+          #:expect '()
+          #:got (rc-set-cookie later))))
+
+    (test "no route writes through a rule's shared cookie record"
+      (for-each (lambda (path)
+                  (let ((source (source-of path)))
+                    (assert-false (string-contains source "(:cookies-set")
+                      #:name (format #f "~a sets no shared cookie" path))
+                    (assert-false (string-contains source "(:cookies-setattr")
+                      #:name (format #f "~a adjusts no shared cookie" path))
+                    (assert-false (string-contains source "#:cookies '(names")
+                      #:name
+                      (format #f "~a names no cookie of its rule" path))))
+                (append (scheme-files-under "app")
+                        (scheme-files-under "lib"))))))
+
 (define cookie-suite
   (suite "How a song page remembers a reader's choice"
     (test "an ascii choice is a cookie of its own answer"
       (let ((source (source-of "app/controllers/song-page.scm")))
-        (assert-false (string-contains source
-                                       ":cookies-set! rc (string->symbol cookie)")
-          #:name "no shared record is written")
-        (assert-true (and (string-contains source "(new-cookie #:npv") #t)
-          #:name "the route builds the cookie its answer carries")))))
+        (assert-true (and (string-contains source
+                                           "(remember-cookie! rc cookie chosen)")
+                          #t)
+          #:name "the route hands the choice to the answer it is building")
+        (assert-false (string-contains source "(new-cookie")
+          #:name "and builds no cookie of its own")))))
 
 (define (spec)
-  (veritas-run guard-suite ownership-suite cookie-suite))
+  (veritas-run guard-suite ownership-suite remembering-suite cookie-suite))
