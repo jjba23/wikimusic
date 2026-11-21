@@ -13,3 +13,6 @@ sys/i18n/locale/*/LC_MESSAGES/*.po~
 # The API reference `dokgen' writes, and the page it is rendered to.
 doc/api/
 doc/api-dist/
+
+# Editor tool cache.
+.freebuff/
