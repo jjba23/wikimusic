@@ -169,9 +169,11 @@
                                                               (params rc "version-uuid"))))
                             #:name "edit-song-contents")
               (redirect-to rc
-                           (string->uri (format #f "~a/songs/uuid/~a"
+                           (string->uri (format #f
+                                                "~a/songs/uuid/~a?notify-title=~a"
                                                 (current-myhost)
-                                                (params rc "uuid")))
+                                                (params rc "uuid")
+                                                (uri-encode (G_ "version saved"))))
                            #:status 302))))
 
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
@@ -247,32 +249,34 @@
               ;; An absent or empty file is no column at all: storing the #f
               ;; the form parser answers would make the API report a PDF that
               ;; does not exist.
-              (apply $song_contents 'set
-                     (append
-                      (list #:identifier new-uuid
-                            #:song_identifier (params rc "uuid")
-                            #:created_by user-identifier
-                            #:visibility_status 0
-                            #:instrument_type (assoc-ref body
-                                                         "instrument-type")
-                            #:version_name (assoc-ref body
-                                                      "version-name")
-                            #:ascii_legend (assoc-ref body
-                                                      "ascii-legend")
-                            #:ascii_contents (assoc-ref body
-                                                        "ascii-contents")
-                            #:created_at (current-time))
-                      (if (data-url-with-payload? pdf-contents)
-                        (list #:pdf_contents pdf-contents)
-                        '())
-                      (if (data-url-with-payload? guitarpro-contents)
-                        (list #:guitarpro_contents guitarpro-contents)
-                        '()))))
+              ;; kracht binds the values and doubles their quotes; the model API
+              ;; Artanis generates splices each one as `'~a'', so a version name
+              ;; or a tab holding an apostrophe would end the statement.
+              (insert-song-content
+               (make-sqlite-song-content-repository rc)
+               (append
+                `((identifier unquote new-uuid)
+                  (song-identifier unquote (params rc "uuid"))
+                  (created-by unquote user-identifier)
+                  (visibility-status . 0)
+                  (instrument-type unquote (assoc-ref body "instrument-type"))
+                  (version-name unquote (assoc-ref body "version-name"))
+                  (ascii-legend unquote (assoc-ref body "ascii-legend"))
+                  (ascii-contents unquote (assoc-ref body "ascii-contents"))
+                  (created-at unquote (current-time)))
+                (if (data-url-with-payload? pdf-contents)
+                  `((pdf-contents unquote pdf-contents))
+                  '())
+                (if (data-url-with-payload? guitarpro-contents)
+                  `((guitarpro-contents unquote guitarpro-contents))
+                  '()))))
 
             (redirect-to rc
-                         (string->uri (format #f "~a/songs/uuid/~a"
+                         (string->uri (format #f
+                                              "~a/songs/uuid/~a?notify-title=~a"
                                               (current-myhost)
-                                              (params rc "uuid")))
+                                              (params rc "uuid")
+                                              (uri-encode (G_ "version saved"))))
                          #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-wikimusic
                            #:needed-permissions '(wikimusic:song-create)

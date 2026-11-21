@@ -21,7 +21,9 @@
   #:use-module (ice-9 string-fun)
   #:export (render-song-content render-version render-guitarpro-section
                                 guitarpro-facts guitarpro-filename
-                                ascii-block ascii-legend-block))
+                                ascii-block ascii-legend-block
+                                disclosure-summary
+                                ascii-tools))
 
 ;;; A chord guide a player can hear.
 ;;;
@@ -214,88 +216,54 @@ the fingering, and what they are offered is the chord, played."
                 ,(icon-button #:icon 'plus
                               #:content (G_ "new version"))))))
 
-(define* (scroll-step-select G_ #:key id label selected steps)
-  "Return a menu of auto-scroll steps, named for what it chooses.
-
-The library's `select' builder carries no aria attribute, and a menu beside a
-heading with no name of its own is announced as an unnamed combobox.  The
-classes are the ones that builder gave it, so the menu looks the same as the
-others on the page; what is new is the name and the options written out, which
-is the only way to attach one."
-  `(select (@ (id ,id)
-              (name ,id)
-              (aria-label ,(G_ label))
-              (class ,(mk-class '(bg-stone-300/75
-                                  border-2
-                                  border-stone-700
-                                  cursor-pointer
-                                  dark:bg-onyx-700
-                                  dark:border-onyx-100
-                                  dark:text-stone-300
-                                  duration-150
-                                  focus-visible:outline-2
-                                  focus-visible:outline-offset-2
-                                  font-sans
-                                  max-w-full
-                                  outline-onyx-500
-                                  px-3
-                                  py-2
-                                  rounded-xl
-                                  shadow-md
-                                  text-md
-                                  text-onyx-500
-                                  transition-colors
-                                  w-full))))
-           ,@(map (lambda (step)
-                    `(option (@ (value ,(car step))
-                                (class "font-sans")
-                                ,@(if (equal? (car step) selected)
+;;; The controls a tab is driven with.
+;;;
+;;; A tab used to be preceded by a row of its own: a heading, a button and two
+;;; menus, drawn like the page's other controls and set above the music they
+;;; drive.  What drives the tab is now a strip on the tab's own sheet, in the
+;;; paper's ink, and it is the sheet's first row rather than a row before it:
+;;; the music and the way to walk through it are one block.
+;;;
+;;; The speed is one number -- lines a second -- rather than a step and an
+;;; interval a reader has to divide in their head, and the menu is a plain
+;;; `select', so the keyboard and the screen reader get the control the browser
+;;; has always known how to describe.
+(define (scroll-speed-select G_)
+  "Return the menu of automatic scroll speeds, counted in lines a second."
+  `(select (@ (id "scroll-speed")
+              (name "scroll-speed")
+              (aria-label ,(G_ "speed, lines per second"))
+              (class "wm-tab-speed"))
+           ,@(map (lambda (speed)
+                    `(option (@ (value ,speed)
+                                ,@(if (string=? speed "4")
                                     '((selected ""))
                                     '()))
-                             ,(cdr step)))
-                  steps)))
+                             ,speed))
+                  '("0.25" "0.5" "1" "2" "3" "4" "6" "8" "12"))))
 
-(define (line-scroll-select G_)
-  (scroll-step-select G_
-                      #:id "line-scroll"
-                      #:label "lines per scroll step"
-                      #:selected "4"
-                      #:steps (list (cons "1" (G_ "1 line"))
-                                    (cons "2" (G_ "2 line"))
-                                    (cons "4" (G_ "4 line"))
-                                    (cons "8" (G_ "8 line"))
-                                    (cons "16" (G_ "16 line"))
-                                    (cons "32" (G_ "32 line")))))
+(define (ascii-tools G_)
+  "Return the strip a tab is driven with, as its sheet's first row.
 
-(define (second-scroll-select G_)
-  (scroll-step-select G_
-                      #:id "second-scroll"
-                      #:label "seconds per scroll step"
-                      #:selected "1"
-                      #:steps (list (cons "1" (G_ "1 second"))
-                                    (cons "2" (G_ "2 second"))
-                                    (cons "4" (G_ "4 second"))
-                                    (cons "8" (G_ "8 second"))
-                                    (cons "16" (G_ "16 second"))
-                                    (cons "32" (G_ "32 second")))))
-
-(define (ascii-button-section G_)
-  `((div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4 items-center
-                                     justify-center))))
-         ,(sub-h3 (G_ "auto-scrolling:"))
-         ,(icon-button #:id 'start-autoscroll
-                       #:icon 'mouse-scroll
-                       #:content (G_ "scroll")
-                       #:on-click "startSongAutoScroll()")
-         ,(line-scroll-select G_)
-         ,(second-scroll-select G_)
-         ;; Only the tab is highlighted.  The legend is Org markup drawn as
-         ;; elements, and the highlighter works by rewriting an element's
-         ;; text, so pointing it at the legend would replace that markup with
-         ;; the words it held.
-         ,(icon-button #:icon 'music-notes-simple
-                       #:content (G_ "highlight chords")
-                       #:on-click "highlightChords('ascii-content-container');"))))
+The button says what the next press does rather than what is happening: it is
+pressed while the tab travels, and the sheet's stylesheet swaps its glyph and
+its word on that one attribute, so the script never writes a label.  `scroll'
+and `stop' are words the catalogs already carry, and the speed's name is drawn
+beside its menu because a number on its own is not a name."
+  `((button (@ (type "button")
+               (id "start-autoscroll")
+               (class "wm-tab-action")
+               (aria-pressed "false")
+               (onclick "startSongAutoScroll()"))
+            (span (@ (class "wm-tab-action-idle"))
+                  ,(icon #:type 'mouse-scroll)
+                  ,(G_ "scroll"))
+            (span (@ (class "wm-tab-action-busy"))
+                  ,(icon #:type 'stop)
+                  ,(G_ "stop")))
+    (label (@ (for "scroll-speed"))
+           ,(G_ "speed"))
+    ,(scroll-speed-select G_)))
 
 ;; The heading of a disclosure, and the mark that says whether it is open.
 ;;
@@ -343,7 +311,8 @@ section holds that a reader should not have to open it to find out."
 ;; step it stands in for rather than at no size at all.
 (define* (ascii-block content #:key id size
                       (paper ascii-paper-default)
-                      (face ascii-face-default))
+                      (face ascii-face-default)
+                      toolbar)
   "Return CONTENT as the ascii block a song page draws it in.
 
 SIZE is the step it is drawn at, PAPER the surface under it and FACE the type
@@ -351,22 +320,29 @@ it is set in; all three are the reader's, and all three are read through their
 guards, so a name this deployment does not know lands on the default rather
 than at no size and on no paper at all.
 
-The paper is the block's own rather than the page's, because a tablature is
-the music itself: it is opaque, so no colour wash and no content scrolling
-behind it tints a note, and it casts no shadow -- a shadow is an edge of paper,
-not of the music."
-  `(pre (@ (id ,id)
-           (class ,(mk-class (append (list (string->symbol
-                                            (ascii-size-known size))
-                                           (ascii-face-class face))
+TOOLBAR, when given, is drawn in the strip on the sheet's own top edge: what
+a reader drives the tab with belongs to the tab, not to a row of page controls
+above the music.
+
+The paper is the sheet's rather than the page's, because a tablature is the
+music itself: it is opaque, so no colour wash and no content scrolling behind
+it tints a note, and it casts no shadow -- a shadow is an edge of paper, not of
+the music."
+  `(div (@ (class ,(mk-class (append (list 'wm-tab)
                                      (ascii-paper-classes paper)
-                                     '(wm-ascii
-                                       p-4 md:p-6
-                                       rounded-xl
-                                       border-2
-                                       whitespace-pre
-                                       overflow-x-auto)))))
-        ,content))
+                                     '(rounded-xl border-2)))))
+        ,@(if toolbar
+            (list `(div (@ (class "wm-tab-bar")) ,toolbar))
+            '())
+        (pre (@ (id ,id)
+                (class ,(mk-class (append (list (string->symbol
+                                                 (ascii-size-known size))
+                                                (ascii-face-class face))
+                                          '(wm-ascii
+                                            p-4 md:p-6
+                                            whitespace-pre
+                                            overflow-x-auto)))))
+             ,content)))
 
 ;; The legend, as the prose it is.
 ;;
@@ -395,10 +371,9 @@ not of the music."
 (define* (render-ascii-content G_ ascii-size ascii-contents
                                #:key (paper ascii-paper-default)
                                (face ascii-face-default))
-  (let* ((guitar-chord-guide-contents (generate-guitar-chord-guide
-                                       ascii-contents)))
-    `(,(ascii-button-section G_) ,(render-chord-guide G_
-                                                      guitar-chord-guide-contents)
+  (let ((guitar-chord-guide-contents (generate-guitar-chord-guide
+                                      ascii-contents)))
+    `(,(render-chord-guide G_ guitar-chord-guide-contents)
       (details (@ (open true)
                   (class ,(mk-class '(wm-disclosure my-6))))
                ,(disclosure-summary G_ "ascii contents")
@@ -407,7 +382,8 @@ not of the music."
                              #:id "ascii-content-container"
                              #:size ascii-size
                              #:paper paper
-                             #:face face)))))
+                             #:face face
+                             #:toolbar (ascii-tools G_))))))
 
 ;; The Guitar Pro 5 tab of a version: the file itself, which a browser cannot
 ;; open, offered back for download beside what its own header says about the

@@ -534,64 +534,16 @@ msgstr ""
 msgid "hear this chord"
 msgstr ""
 
-#: app/views/song-content-view.scm:216 app/views/song-content-view.scm:258
-msgid "1 line"
-msgstr ""
-
-#: app/views/song-content-view.scm:218 app/views/song-content-view.scm:259
-msgid "2 line"
-msgstr ""
-
-#: app/views/song-content-view.scm:220 app/views/song-content-view.scm:260
-msgid "4 line"
-msgstr ""
-
-#: app/views/song-content-view.scm:223 app/views/song-content-view.scm:261
-msgid "8 line"
-msgstr ""
-
-#: app/views/song-content-view.scm:225 app/views/song-content-view.scm:262
-msgid "16 line"
-msgstr ""
-
-#: app/views/song-content-view.scm:227 app/views/song-content-view.scm:263
-msgid "32 line"
-msgstr ""
-
-#: app/views/song-content-view.scm:232 app/views/song-content-view.scm:270
-msgid "1 second"
-msgstr ""
-
-#: app/views/song-content-view.scm:234 app/views/song-content-view.scm:271
-msgid "2 second"
-msgstr ""
-
-#: app/views/song-content-view.scm:236 app/views/song-content-view.scm:272
-msgid "4 second"
-msgstr ""
-
-#: app/views/song-content-view.scm:238 app/views/song-content-view.scm:273
-msgid "8 second"
-msgstr ""
-
-#: app/views/song-content-view.scm:240 app/views/song-content-view.scm:274
-msgid "16 second"
-msgstr ""
-
-#: app/views/song-content-view.scm:242 app/views/song-content-view.scm:275
-msgid "32 second"
-msgstr ""
-
-#: app/views/song-content-view.scm:247 app/views/song-content-view.scm:280
-msgid "auto-scrolling:"
-msgstr ""
-
 #: app/views/song-content-view.scm:250 app/views/song-content-view.scm:283
 msgid "scroll"
 msgstr ""
 
-#: app/views/song-content-view.scm:255 app/views/song-content-view.scm:288
-msgid "highlight chords"
+#: app/views/song-content-view.scm:246
+msgid "speed"
+msgstr ""
+
+#: app/views/song-content-view.scm:256
+msgid "speed, lines per second"
 msgstr ""
 
 #: app/views/song-content-view.scm:375 app/views/song-content-view.scm:408
@@ -1318,4 +1270,20 @@ msgstr ""
 msgid ""
 "Join us in building an ever-growing library of musical knowledge — where "
 "every note tells a story."
+msgstr ""
+
+#: app/views/song-edit.scm:120
+msgid "add"
+msgstr ""
+
+#: app/views/song-edit.scm:120
+msgid "back to the song"
+msgstr ""
+
+#: app/views/song-edit.scm:120
+msgid "genre"
+msgstr ""
+
+#: app/views/song-edit.scm:120
+msgid "version saved"
 msgstr ""

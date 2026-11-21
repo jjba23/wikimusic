@@ -548,65 +548,17 @@ msgstr ""
 msgid "hear this chord"
 msgstr ""
 
-#: app/views/song-content-view.scm:216 app/views/song-content-view.scm:258
-msgid "1 line"
-msgstr "1行"
-
-#: app/views/song-content-view.scm:218 app/views/song-content-view.scm:259
-msgid "2 line"
-msgstr "2行"
-
-#: app/views/song-content-view.scm:220 app/views/song-content-view.scm:260
-msgid "4 line"
-msgstr "4行"
-
-#: app/views/song-content-view.scm:223 app/views/song-content-view.scm:261
-msgid "8 line"
-msgstr "8行"
-
-#: app/views/song-content-view.scm:225 app/views/song-content-view.scm:262
-msgid "16 line"
-msgstr "16行"
-
-#: app/views/song-content-view.scm:227 app/views/song-content-view.scm:263
-msgid "32 line"
-msgstr "32行"
-
-#: app/views/song-content-view.scm:232 app/views/song-content-view.scm:270
-msgid "1 second"
-msgstr "1秒"
-
-#: app/views/song-content-view.scm:234 app/views/song-content-view.scm:271
-msgid "2 second"
-msgstr "2秒"
-
-#: app/views/song-content-view.scm:236 app/views/song-content-view.scm:272
-msgid "4 second"
-msgstr "4秒"
-
-#: app/views/song-content-view.scm:238 app/views/song-content-view.scm:273
-msgid "8 second"
-msgstr "8秒"
-
-#: app/views/song-content-view.scm:240 app/views/song-content-view.scm:274
-msgid "16 second"
-msgstr "16秒"
-
-#: app/views/song-content-view.scm:242 app/views/song-content-view.scm:275
-msgid "32 second"
-msgstr "32秒"
-
-#: app/views/song-content-view.scm:247 app/views/song-content-view.scm:280
-msgid "auto-scrolling:"
-msgstr "自動スクロール:"
-
 #: app/views/song-content-view.scm:250 app/views/song-content-view.scm:283
 msgid "scroll"
 msgstr "スクロール"
 
-#: app/views/song-content-view.scm:255 app/views/song-content-view.scm:288
-msgid "highlight chords"
-msgstr "コードを強調表示"
+#: app/views/song-content-view.scm:246
+msgid "speed"
+msgstr "速度"
+
+#: app/views/song-content-view.scm:256
+msgid "speed, lines per second"
+msgstr "速度（1秒あたりの行数）"
 
 #: app/views/song-content-view.scm:375 app/views/song-content-view.scm:408
 #, fuzzy
@@ -1384,3 +1336,19 @@ msgstr "テーマ"
 
 #~ msgid "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"
 #~ msgstr "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"
+
+#: app/views/song-edit.scm:120
+msgid "add"
+msgstr "追加"
+
+#: app/views/song-edit.scm:120
+msgid "back to the song"
+msgstr "曲に戻る"
+
+#: app/views/song-edit.scm:120
+msgid "genre"
+msgstr "ジャンル"
+
+#: app/views/song-edit.scm:120
+msgid "version saved"
+msgstr "バージョンを保存しました"

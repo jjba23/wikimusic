@@ -377,7 +377,16 @@ a year, for the whole site, and out of reach of a script."
                                                      (list song-id)))
               (external-sources (if (not (nil? e))
                                   (car e)
-                                  '())))
+                                  '()))
+              ;; What the relation menus offer: an artist and a genre are
+              ;; chosen by name, and the identifier the route needs never has
+              ;; to be found by the contributor.
+              (all-artists (get-artists artist-repo
+                                       #:order-by '((display-name asc))
+                                       #:limit 500))
+              (all-genres (get-genres genre-repo
+                                      #:order-by '((display-name asc))
+                                      #:limit 500)))
 
          (response-emit (:mime rc
                                (song-edit-page (:i18n rc)
@@ -386,6 +395,8 @@ a year, for the whole site, and out of reach of a script."
                                                #:artworks artworks
                                                #:artists artists
                                                #:genres genres
+                                               #:all-artists all-artists
+                                               #:all-genres all-genres
                                                #:external-sources
                                                external-sources
                                                #:is-logged-in (:cookies-value

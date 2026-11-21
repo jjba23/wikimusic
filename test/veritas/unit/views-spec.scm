@@ -38,6 +38,7 @@
   #:use-module (wikimusic html)
   #:use-module (app views song-content-view)
   #:use-module (app views song-view)
+  #:use-module (app views song-edit)
   #:export (spec))
 
 (define (G_ key)
@@ -514,18 +515,19 @@ the details block counts with."
                                            "ascii-face=serif") #t)
           #:name "and the face")))
 
-    (test "the reader's paper is painted on the block"
-      (let ((tokens (class-tokens (render (ascii-block "x"
-                                                       #:id "one"
-                                                       #:size "text-4"
-                                                       #:paper "light"
-                                                       #:face "serif"))
-                                  "wm-ascii")))
-        (assert-true (and (member "bg-white" tokens) #t)
+    (test "the reader's paper is painted on the sheet, its face on the type"
+      (let* ((html (render (ascii-block "x"
+                                        #:id "one"
+                                        #:size "text-4"
+                                        #:paper "light"
+                                        #:face "serif")))
+             (sheet (class-tokens html "wm-tab"))
+             (type (class-tokens html "wm-ascii")))
+        (assert-true (and (member "bg-white" sheet) #t)
           #:name "a white sheet")
-        (assert-false (member "dark:bg-onyx-900" tokens)
+        (assert-false (member "dark:bg-onyx-900" sheet)
           #:name "whatever theme the page has")
-        (assert-true (and (member "font-serif" tokens) #t)
+        (assert-true (and (member "font-serif" type) #t)
           #:name "and the face the reader reads in")))
 
     (test "the size control offers the whole ladder as addresses"
@@ -595,7 +597,26 @@ the details block counts with."
           #:name "not a tablature block")
         (assert-true (and (string-contains html "hold the note")
                        #t)
-          #:name "and the words survive the markup")))))
+          #:name "and the words survive the markup")))
+
+    (test "the controls that drive a tab are drawn on its sheet"
+      (let* ((html (render (ascii-block "x"
+                                        #:id "one"
+                                        #:size "text-4"
+                                        #:toolbar (ascii-tools G_))))
+             (strip (string-contains html "wm-tab-bar")))
+        (assert-true (and strip (> strip 0) #t)
+          #:name "a strip on the sheet")
+        (assert-true (and (< (string-contains html "wm-tab") strip) #t)
+          #:name "drawn by the sheet itself")
+        (assert-true (and (< strip (string-contains html "<pre")) #t)
+          #:name "and in front of the tab")
+        (assert-true (and (string-contains html "id=\"start-autoscroll\"") #t)
+          #:name "the control that travels")
+        (assert-true (and (string-contains html "id=\"scroll-speed\"") #t)
+          #:name "with one menu of speeds")
+        (assert-false (string-contains html "highlight")
+          #:name "and nothing to press to mark the chords")))))
 
 ;; A page is built from the strings a view hands it, and a string a reader
 ;; typed is text until the document is written.  The template is therefore the
@@ -835,7 +856,107 @@ and `entity-placeholder' fill their own, and the suite renders them instead."
       (assert-true (if (string-contains chord-script "wm-chord") #t #f)
                    #:name "the script names wm-chord")
       (assert-true (if (string-contains chord-sheet ".wm-chord") #t #f)
-                   #:name "the sheet styles wm-chord"))))
+                   #:name "the sheet styles wm-chord"))
+
+    (test "the tab is marked as it is drawn, not on a press"
+      (assert-true (if (string-contains chord-script "DOMContentLoaded") #t #f)
+                   #:name "the script runs itself")
+      (assert-false (if (string-contains chord-script "onclick") #t #f)
+                    #:name "and nothing has to be pressed"))))
+
+;;; ====== Editing a song ======
+;;;
+;;; The relations a song has used to be edited by pasting a UUID into a text
+;;; field: the identifier is what the route wants, and it was the
+;;; contributor's job to go and find one.  The page asks for a name now; the
+;;; identifier is still the value a submit sends, it is just never something a
+;;; reader has to know.
+
+(define editing-suite
+  (suite "Editing a song"
+    (test "an artist relation is chosen by name"
+      (let ((html (render (relation-editor G_
+                                           #:path "/songs/uuid/one/artists"
+                                           #:link-base "/artists/uuid"
+                                           #:field 'artist-identifier
+                                           #:label "artist"
+                                           #:candidates '(((identifier . "artist-1")
+                                                           (display-name . "The Band")))
+                                           #:linked '()))))
+        (assert-true (and (string-contains html
+                                           "name=\"artist-identifier\"") #t)
+          #:name "the field the route reads")
+        (assert-true (and (string-contains html "value=\"artist-1\"") #t)
+          #:name "the identifier a menu row carries")
+        (assert-true (and (string-contains html "The Band") #t)
+          #:name "behind the name it is chosen by")
+        (assert-false (string-contains html "UUID")
+          #:name "and nothing an identifier has to be typed into")))
+
+    (test "a linked row is a link to what it names, with the way to unlink it"
+      (let ((html (render (relation-editor G_
+                                           #:path "/songs/uuid/one/artists"
+                                           #:link-base "/artists/uuid"
+                                           #:field 'artist-identifier
+                                           #:label "artist"
+                                           #:candidates '()
+                                           #:linked '(((identifier . "artist-1")
+                                                       (display-name . "The Band")))))))
+        (assert-true (and (string-contains html
+                                           "href=\"/artists/uuid/artist-1\"") #t)
+          #:name "the way to the artist")
+        (assert-true (and (string-contains
+                           html
+                           "action=\"/songs/uuid/one/artists/artist-1/delete\"") #t)
+          #:name "and the way to take the link away")))
+
+    (test "a name holding an apostrophe reaches the page whole"
+      (let ((html (render (relation-editor G_
+                                           #:path "/songs/uuid/one/artists"
+                                           #:link-base "/artists/uuid"
+                                           #:field 'artist-identifier
+                                           #:label "artist"
+                                           #:candidates '(((identifier . "a-1")
+                                                           (display-name . "Guns N' Roses")))
+                                           #:linked '()))))
+        (assert-true (and (string-contains html "Guns N' Roses") #t)
+          #:name "the apostrophe is a character")))
+
+
+    (test "the page opens on the song and asks for its relations by name"
+      (let* ((page (render (song-edit-page
+                            G_
+                            #:song '((identifier . "song-1")
+                                     (display-name . "Don't fear the reaper")
+                                     (music-key . "Am")
+                                     (music-tuning . "Standard")
+                                     (music-creation-date . "1976")
+                                     (album-name . "Guns N' Roses")
+                                     (album-info-link . "https://example.org")
+                                     (description . ""))
+                            #:artworks '()
+                            #:artists '()
+                            #:genres '()
+                            #:all-artists '(((identifier . "artist-1")
+                                             (display-name . "Guns N' Roses")))
+                            #:all-genres '(((identifier . "genre-1")
+                                            (display-name . "Hard rock")))
+                            #:external-sources '()
+                            #:is-logged-in #t)))
+             (song (string-contains page "editing song"))
+             (artists (string-contains page "song&apos;s artists")))
+        (assert-true (and song #t)
+          #:name "the song's own section")
+        (assert-true (and artists #t)
+          #:name "and its artists'")
+        (assert-true (and (< song artists) #t)
+          #:name "the song comes first")
+        (assert-true (and (string-contains page "value=\"artist-1\"") #t)
+          #:name "the artist it can be linked to")
+        (assert-true (and (string-contains page "Hard rock") #t)
+          #:name "and the genre")
+        (assert-true (and (string-contains page "Guns N&apos; Roses") #t)
+          #:name "a name with an apostrophe reaches the menu")))))
 
 (define (spec)
   (veritas-run locale-suite
@@ -848,4 +969,5 @@ and `entity-placeholder' fill their own, and the suite renders them instead."
     picture-suite
     escaping-suite
     glyph-suite
-    chord-suite))
+    chord-suite
+    editing-suite))

@@ -78,6 +78,18 @@
                             (guitarpro-contents "")
                             (pdf-contents ""))
   `((div (@ (class ,(mk-class '(py-3))))
+         ,(if song-identifier
+            `(a (@ (href ,(format #f "/songs/uuid/~a" song-identifier))
+                   (class ,(mk-class '(text-sm
+                                       font-sans
+                                       text-onyx-300
+                                       dark:text-stone-300
+                                       underline
+                                       underline-offset-2
+                                       hover:text-persia-pink-500
+                                       dark:hover:text-persia-pink-300))))
+                ,(G_ "back to the song"))
+            '())
          ,(if (and song-identifier song-content-identifier)
             (wm-page-heading "dark:text-stone-300 font-light font-sans hg-leading-display text-3xl text-onyx-300" (format #f "~a: ~a ~a"
                                                                                                                           (G_ "editing version") version-name instrument-type))
@@ -96,7 +108,8 @@
                ,(input #:label (G_ "version name")
                        #:name 'version-name
                        #:value version-name
-                       #:required #t)
+                       #:required #t
+                       #:autofocus (if song-content-identifier #f #t))
                (label (@ (class ,(mk-class '(dark:text-stone-300
                                              text-stone-500 font-bold text-sm
                                              mt-3))))
@@ -136,10 +149,16 @@
                                                font-mono
                                                text-sm
                                                min-w-prose))
+               ;; The tab is written in columns, so the field it is written
+               ;; in does not wrap them, keeps the browser's spell checker out
+               ;; of the notes, and is tall enough to hold a verse without
+               ;; being scrolled first.
                ,(textarea #:label (G_ "ascii contents")
                           #:name 'ascii-contents
                           #:value ascii-contents
                           #:required #f
+                          #:rows 24
+                          #:spellcheck "false"
                           #:textarea-css '(p-3 rounded-xl
                                                border-stone-300
                                                dark:border-stone-700
@@ -148,11 +167,12 @@
                                                bg-stone-100/75
                                                dark:bg-onyx-900/75
                                                border-2
-                                               min-h-256
+                                               min-h-72
                                                text-sm
                                                shadow-md
                                                font-mono
-                                               min-w-prose))
+                                               w-full
+                                               wm-tab-input))
 
                ;; A Guitar Pro tab is uploaded the way the PDF is: the browser
                ;; turns the file into a data URL and the form carries that, so

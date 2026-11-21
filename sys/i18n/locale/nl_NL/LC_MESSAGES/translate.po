@@ -548,65 +548,17 @@ msgstr ""
 msgid "hear this chord"
 msgstr ""
 
-#: app/views/song-content-view.scm:216 app/views/song-content-view.scm:258
-msgid "1 line"
-msgstr "1 regel"
-
-#: app/views/song-content-view.scm:218 app/views/song-content-view.scm:259
-msgid "2 line"
-msgstr "2 regels"
-
-#: app/views/song-content-view.scm:220 app/views/song-content-view.scm:260
-msgid "4 line"
-msgstr "4 regels"
-
-#: app/views/song-content-view.scm:223 app/views/song-content-view.scm:261
-msgid "8 line"
-msgstr "8 regels"
-
-#: app/views/song-content-view.scm:225 app/views/song-content-view.scm:262
-msgid "16 line"
-msgstr "16 regels"
-
-#: app/views/song-content-view.scm:227 app/views/song-content-view.scm:263
-msgid "32 line"
-msgstr "32 regels"
-
-#: app/views/song-content-view.scm:232 app/views/song-content-view.scm:270
-msgid "1 second"
-msgstr "1 seconde"
-
-#: app/views/song-content-view.scm:234 app/views/song-content-view.scm:271
-msgid "2 second"
-msgstr "2 seconden"
-
-#: app/views/song-content-view.scm:236 app/views/song-content-view.scm:272
-msgid "4 second"
-msgstr "4 seconden"
-
-#: app/views/song-content-view.scm:238 app/views/song-content-view.scm:273
-msgid "8 second"
-msgstr "8 seconden"
-
-#: app/views/song-content-view.scm:240 app/views/song-content-view.scm:274
-msgid "16 second"
-msgstr "16 seconden"
-
-#: app/views/song-content-view.scm:242 app/views/song-content-view.scm:275
-msgid "32 second"
-msgstr "32 seconden"
-
-#: app/views/song-content-view.scm:247 app/views/song-content-view.scm:280
-msgid "auto-scrolling:"
-msgstr "automatisch scrollen:"
-
 #: app/views/song-content-view.scm:250 app/views/song-content-view.scm:283
 msgid "scroll"
 msgstr "scrollen"
 
-#: app/views/song-content-view.scm:255 app/views/song-content-view.scm:288
-msgid "highlight chords"
-msgstr "akkoorden markeren"
+#: app/views/song-content-view.scm:246
+msgid "speed"
+msgstr "snelheid"
+
+#: app/views/song-content-view.scm:256
+msgid "speed, lines per second"
+msgstr "snelheid, regels per seconde"
 
 #: app/views/song-content-view.scm:375 app/views/song-content-view.scm:408
 #, fuzzy
@@ -1390,3 +1342,19 @@ msgstr "thema"
 
 #~ msgid "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"
 #~ msgstr "Copyright © Josep Bigorra &lt;jjbigorra@gmail.com&gt;"
+
+#: app/views/song-edit.scm:120
+msgid "add"
+msgstr "toevoegen"
+
+#: app/views/song-edit.scm:120
+msgid "back to the song"
+msgstr "terug naar het nummer"
+
+#: app/views/song-edit.scm:120
+msgid "genre"
+msgstr "genre"
+
+#: app/views/song-edit.scm:120
+msgid "version saved"
+msgstr "versie opgeslagen"

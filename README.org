@@ -698,6 +698,22 @@ finishes the job must not be the thing that scrolled away.  The description
 field says that it is written in Org mode rather than plain text, so the syntax
 is known before the page renders it and not after.
 
+** One page, one section at a time
+
+Editing a song is six questions, not one: the song, the artists it is by, the
+genres it belongs to, the artwork it has, more artwork, and the links it cites.
+Each is a =details= that folds under the same heading the song page uses for its
+own sections, and the song itself is the one open when the page arrives -- it is
+what most visits come to change.  An artist and a genre are chosen by name from
+a menu rather than by pasting an identifier, and the ones already linked are
+shown as their names, each a link to the artist or genre with the button that
+removes the link beside it.
+
+A version of a tab is edited the same way: its page says which song it belongs
+to and links back to it, the name field has the focus when the version is new,
+and the field the tab is written in does not wrap, so the columns a contributor
+typed are the columns the tab keeps.
+
 ------
 
 * Browsing the lists: sorting, tile size and search
@@ -839,19 +855,21 @@ players have written and passed around -- is a page to practise from rather than
 only to read.
 
 - *Auto-scrolling* moves the tab down the screen at a speed the reader chooses,
-  so a hand is free to play.  The two menus are one speed: lines per step
-  against seconds per step, which is how many lines pass a second.  The scroll
-  travels at that speed in every frame rather than jumping a block of lines on
-  a timer, so changing either menu changes it under the reader's hand, and the
-  scroll ends on the last line of the tab.  The reader's hand wins over it: a
-  wheel turn, a touch drag, a scroll key, a dragged scrollbar or the button
-  stops it.
+  so a hand is free to play.  Its controls are the top edge of the tab's own
+  sheet -- a button that travels and one menu of speeds, counted in lines a
+  second -- rather than a row above the music, and they stay at the top of the
+  screen while the tab moves under them.  The speed is read every frame rather
+  than fixed when the button was pressed, so changing it is felt under the
+  reader's hand, and the scroll ends on the last line of the tab.  The reader's
+  hand wins over it: a wheel turn, a touch drag, a scroll key, a dragged
+  scrollbar or a second press stops it.
 - The *chords the tab names* are collected and shown under it as a small
   *guitar chord guide*, each chord with the fingering the transposition implies
-  (=Am  x02210=, =F  133211=), and a control highlights those chord names in
-  the tab itself.  A highlight is the tab's own ink -- a wash and a hairline
-  under the letters, never a second colour -- so the chords are found without
-  the page shouting over the music, on white paper and on dark paper alike.
+  (=Am  x02210=, =F  133211=), and are marked in the tab itself as the page is
+  drawn -- there is nothing to press and no unmarked state to leave.  A mark is
+  the tab's own ink -- a wash and a hairline under the letters, never a second
+  colour -- so the chords are found without the page shouting over the music,
+  on white paper and on dark paper alike.
   What is a chord is decided by its line: a tab writes its chords on a line of
   their own, so a line of nothing but chord names is highlighted and a sentence
   is not -- the =Am= in a title stays a title, and the =A= in a section heading
@@ -1072,7 +1090,7 @@ Wikimusic chooses lots of its UI to appeal to the widest public possible by defa
 
 What that means here, concretely.  Every cover on a list carries its name as its
 `alt` text, so the link around it is announced as the song rather than as
-"link".  The two auto-scroll menus say what they choose, because a bare
+"link".  The auto-scroll menu says what it counts, because a bare
 `<select>` beside a heading has no name of its own.  The bar's controls are
 thumb-sized on a phone and scroll sideways in one row there, so a bar pinned to
 the top of the screen does not spend a fifth of it.  Every page has exactly one
