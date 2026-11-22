@@ -13,6 +13,8 @@
 #+attr_html: :width 160 :alt WikiMusic logo
 [[file:logo.svg]]
 
+- 📖 *API reference:* [[https://jointhefreeworld.org/api-docs/wikimusic/index.html][WikiMusic API reference]]
+
 *the free music knowledge encyclopaedia*: a community-run catalogue of songs,
 artists and genres with guitar and bass tabs, chords, lyrics, keys, tunings and
 sheet music, written by musicians for anyone learning to play.
