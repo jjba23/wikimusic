@@ -23,8 +23,20 @@ The file starts at =v1.19.0=; the releases before it are on the forge, at
 :CUSTOM_ID: unreleased
 :END:
 
-Nothing has landed since =v1.20.3=.  A change waits here under /Added/, /Changed/
+Nothing has landed since =v1.20.7=.  A change waits here under /Added/, /Changed/
 or /Fixed/, and the heading takes its version and its day when the release is cut.
+
+* v1.20.7 -- 2026-11-26
+:PROPERTIES:
+:CUSTOM_ID: v1-20-7
+:END:
+
+** Changed
+- The pinned Guix channel carries =guile-dokgen= 0.12.0: the published API
+  reference folds the source behind each definition into a panel a reader opens,
+  and reads on a quieter page with translucent surfaces.  =channels.scm= pins the
+  jointhefreeworld collection at =59d58ac=, so =maak docs= renders the reference
+  with the generator this release was cut with.
 
 * v1.20.3 -- 2026-11-21
 :PROPERTIES:
